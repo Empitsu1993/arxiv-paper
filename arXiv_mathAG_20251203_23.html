@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Wed, 03 Dec 2025 05:02:18 +0000<br>
+        <strong>論文数:</strong> 23件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">MMP on the generic fiber of log Calabi--Yau type fibration</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Minimal algebraic space filling curves on the product of projective lines</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Characterizing Varieties Using Birational Transformations</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">Log syntomic cohomology of truncated polynomials and coordinate axes</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">Holomorphic linking numbers, ABC Massey products, and Calabi-Yau 3-folds</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">Moderate rank jumps on rational elliptic surfaces via construction of conics</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Slices for reductive group actions in algebraic and holomorphic symplectic geometry</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">The Nash-Tognoli theorem over the rationals and its version for isolated singularities</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">Simplicial presheaves of Green complexes and twisting cochains</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">Prismatic crystals for smooth schemes in characteristic $p$ with Frobenius lifting mod $p^2$</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">Geometry of genus sixteen K3 surfaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">Combinatorial K3 surfaces and the Mori fan of the Dolgachev--Nikulin--Voisin family in degree 2</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">On lattice-polarized K3 surfaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Degree-one foliations on complete intersections</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">The Deligne-Riemann-Roch isomorphism</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">Some classical formul{\ae} for curves and surfaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">Liquid Tannaka Duality I: Classical Case</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">Homogeneous Khovanskii bases and MUVAK bases</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Complexity theory of orbit closure intersection for tensors: reductions, completeness, and graph isomorphism hardness</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">Some coefficients of rank 2 cluster scattering diagrams</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-21" onchange="updateSelectedCount()">
+            <span class="title-number">21.</span>
+            <a href="#paper-21">Arithmetic Duality</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-22" onchange="updateSelectedCount()">
+            <span class="title-number">22.</span>
+            <a href="#paper-22">On almost strong approximation for linear algebraic groups</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-23" onchange="updateSelectedCount()">
+            <span class="title-number">23.</span>
+            <a href="#paper-23">Numerical cohomology for arithmetic surfaces and applications</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "MMP on the generic fiber of log Calabi--Yau type fibration", "author": "Donghyeon Kim, Dae-Won Lee", "published": "Wed, 03 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.02429", "summary": "arXiv:2512.02429v1 Announce Type: new \nAbstract: We study the minimal model program on the geometric generic fiber of a fibration whose closed fibers are of $\\varepsilon$-lc log Calabi--Yau type. We prove that for a fibration $f:X\\to S$ of varieties, if the fibers are of $\\varepsilon$-lc log Calabi--Yau type, then the geometric generic fiber $X_{\\overline{\\eta}}$ is pklt. In particular, for any big divisor $D$ on $X_{\\overline{\\eta}}$, we can run the anticanonical MMP and $D$-MMP with scaling of an ample divisor on $X_{\\overline{\\eta}}$.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2512.02429" target="_blank">MMP on the generic fiber of log Calabi--Yau type fibration</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Donghyeon Kim, Dae-Won Lee</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 03 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.02429" target="_blank">https://arxiv.org/abs/2512.02429</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the minimal model program on the geometric generic fiber of a fibration whose closed fibers are of $\varepsilon$-lc log Calabi--Yau type. We prove that for a fibration $f:X\to S$ of varieties, if the fibers are of $\varepsilon$-lc log Calabi--Yau type, then the geometric generic fiber $X_{\overline{\eta}}$ is pklt. In particular, for any big divisor $D$ on $X_{\overline{\eta}}$, we can run the anticanonical MMP and $D$-MMP with scaling of an ample divisor on $X_{\overline{\eta}}$.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Minimal algebraic space filling curves on the product of projective lines", "author": "Menhaz Ahammed, Matthew Campbell, Han-Bom Moon", "published": "Wed, 03 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.02796", "summary": "arXiv:2512.02796v1 Announce Type: new \nAbstract: We investigate minimal degree smooth algebraic space filling curves on the product of projective lines. We prove that there are plenty of examples in an explicit sense, extending the existence result of Homma and Kim.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2512.02796" target="_blank">Minimal algebraic space filling curves on the product of projective lines</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Menhaz Ahammed, Matthew Campbell, Han-Bom Moon</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 03 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.02796" target="_blank">https://arxiv.org/abs/2512.02796</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We investigate minimal degree smooth algebraic space filling curves on the product of projective lines. We prove that there are plenty of examples in an explicit sense, extending the existence result of Homma and Kim.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Characterizing Varieties Using Birational Transformations", "author": "Nathan Chen, Louis Esser, Andriy Regeta, Christian Urech, Immanuel van Santen", "published": "Wed, 03 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.02837", "summary": "arXiv:2512.02837v1 Announce Type: new \nAbstract: Suppose $X$ is an irreducible complex variety. We show that when $X$ is ruled, the group of birational transformations $Bir(X)$, as a group, determines $X$ up to birational transformations and automorphisms of the base field. In contrast, we demonstrate that this same property never holds for non-uniruled varieties.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2512.02837" target="_blank">Characterizing Varieties Using Birational Transformations</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Nathan Chen, Louis Esser, Andriy Regeta, Christian Urech, Immanuel van Santen</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 03 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.02837" target="_blank">https://arxiv.org/abs/2512.02837</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Suppose $X$ is an irreducible complex variety. We show that when $X$ is ruled, the group of birational transformations $Bir(X)$, as a group, determines $X$ up to birational transformations and automorphisms of the base field. In contrast, we demonstrate that this same property never holds for non-uniruled varieties.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "Log syntomic cohomology of truncated polynomials and coordinate axes", "author": "Doosung Park, Paul Arne {\\O}stv{\\ae}r", "published": "Wed, 03 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.02886", "summary": "arXiv:2512.02886v1 Announce Type: new \nAbstract: We study the logarithmic syntomic cohomology of fine and saturated log schemes and its realization in the logarithmic motivic stable homotopy category $\\mathrm{logSH}(\\mathrm{pt}_\\mathbb{N})$ of a log point. We prove that logarithmic prismatic and syntomic cohomology satisfy saturated descent under the sole assumption that the log structure is free, and that the presheaves $\\mathrm{logTHH}$, $\\mathrm{logTC}$, $\\widehat{\\mathbf{\\Delta}}$, and $\\mathbb{Z}_p^\\mathrm{syn}(i)$ are representable and $\\square$-invariant in $\\mathrm{logSH}_{\\mathrm{k\\acute{e}t}}^{\\mathrm{eff}}(\\mathrm{pt}_\\mathrm{N})$. As an application, we compute $\\mathbb{Z}_p^\\mathrm{syn}(i)$ for the projective log coordinate axes $D$ in $\\mathbb{P}^2$, obtaining \\[ \\mathbb{Z}_p^\\mathrm{syn}(i)(D) \\simeq \\mathbb{Z}_p^\\mathrm{syn}(i)(k,\\mathbb{N})\\oplus \\mathbb{Z}_p^\\mathrm{syn}(i-1)(k,\\mathbb{N})[-2] \\] Moreover, we determine logarithmic topological cyclic homology for truncated polynomial and semistable examples, directly from the syntomic calculations.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2512.02886" target="_blank">Log syntomic cohomology of truncated polynomials and coordinate axes</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Doosung Park, Paul Arne {\O}stv{\ae}r</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 03 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.02886" target="_blank">https://arxiv.org/abs/2512.02886</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the logarithmic syntomic cohomology of fine and saturated log schemes and its realization in the logarithmic motivic stable homotopy category $\mathrm{logSH}(\mathrm{pt}_\mathbb{N})$ of a log point. We prove that logarithmic prismatic and syntomic cohomology satisfy saturated descent under the sole assumption that the log structure is free, and that the presheaves $\mathrm{logTHH}$, $\mathrm{logTC}$, $\widehat{\mathbf{\Delta}}$, and $\mathbb{Z}_p^\mathrm{syn}(i)$ are representable and $\square$-invariant in $\mathrm{logSH}_{\mathrm{k\acute{e}t}}^{\mathrm{eff}}(\mathrm{pt}_\mathrm{N})$. As an application, we compute $\mathbb{Z}_p^\mathrm{syn}(i)$ for the projective log coordinate axes $D$ in $\mathbb{P}^2$, obtaining \[ \mathbb{Z}_p^\mathrm{syn}(i)(D) \simeq \mathbb{Z}_p^\mathrm{syn}(i)(k,\mathbb{N})\oplus \mathbb{Z}_p^\mathrm{syn}(i-1)(k,\mathbb{N})[-2] \] Moreover, we determine logarithmic topological cyclic homology for truncated polynomial and semistable examples, directly from the syntomic calculations.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "Holomorphic linking numbers, ABC Massey products, and Calabi-Yau 3-folds", "author": "Luc\\'ia Mart\\'in-Merch\\'an, Jonas Stelzig", "published": "Wed, 03 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.02187", "summary": "arXiv:2512.02187v1 Announce Type: cross \nAbstract: On compact K\\\"ahler manifolds, we relate ABC Massey products arising from complex analytic cycles to holomorphic linking numbers. This enables us to construct a family of simply connected projective 3-folds with trivial canonical bundle, equipped with a non-vanishing ABC Massey product.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2512.02187" target="_blank">Holomorphic linking numbers, ABC Massey products, and Calabi-Yau 3-folds</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Luc\'ia Mart\'in-Merch\'an, Jonas Stelzig</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 03 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.02187" target="_blank">https://arxiv.org/abs/2512.02187</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                On compact K\"ahler manifolds, we relate ABC Massey products arising from complex analytic cycles to holomorphic linking numbers. This enables us to construct a family of simply connected projective 3-folds with trivial canonical bundle, equipped with a non-vanishing ABC Massey product.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "Moderate rank jumps on rational elliptic surfaces via construction of conics", "author": "Julie Desjardins", "published": "Wed, 03 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.02548", "summary": "arXiv:2512.02548v1 Announce Type: cross \nAbstract: This note is devoted to studying certain families of elliptic surfaces with infinitely many fibers with rank at least 3 or 4 revisiting and combining ideas from of Gary Walsh, Salgado and Loughran, and the author.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2512.02548" target="_blank">Moderate rank jumps on rational elliptic surfaces via construction of conics</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Julie Desjardins</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 03 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.02548" target="_blank">https://arxiv.org/abs/2512.02548</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This note is devoted to studying certain families of elliptic surfaces with infinitely many fibers with rank at least 3 or 4 revisiting and combining ideas from of Gary Walsh, Salgado and Loughran, and the author.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Slices for reductive group actions in algebraic and holomorphic symplectic geometry", "author": "Peter Crooks, Rebecca Goldin, Yiannis Loizides", "published": "Wed, 03 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.02956", "summary": "arXiv:2512.02956v1 Announce Type: cross \nAbstract: Symplectic slice theorems elucidate the local structure of symplectic manifolds carrying Hamiltonian actions of compact Lie groups. We generalize these theorems in two natural settings. The first is based on the idea that complex reductive algebraic groups are the natural complex-geometric counterparts of compact Lie groups. Using new definitions of Poisson and symplectic slices, we prove analogues of the classical symplectic slice theorems for Hamiltonian actions of complex reductive algebraic groups. These analogues have versions in the complex-algebraic and holomorphic categories, and make extensive use of Slodowy slices and decomposition classes in complex reductive Lie algebras. The starting point for our second setting is the fact that Hamiltonian Lie group actions are special cases of Hamiltonian symplectic groupoid actions. We generalize the classical symplectic slice theorems to the latter case.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2512.02956" target="_blank">Slices for reductive group actions in algebraic and holomorphic symplectic geometry</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Peter Crooks, Rebecca Goldin, Yiannis Loizides</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 03 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.02956" target="_blank">https://arxiv.org/abs/2512.02956</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Symplectic slice theorems elucidate the local structure of symplectic manifolds carrying Hamiltonian actions of compact Lie groups. We generalize these theorems in two natural settings. The first is based on the idea that complex reductive algebraic groups are the natural complex-geometric counterparts of compact Lie groups. Using new definitions of Poisson and symplectic slices, we prove analogues of the classical symplectic slice theorems for Hamiltonian actions of complex reductive algebraic groups. These analogues have versions in the complex-algebraic and holomorphic categories, and make extensive use of Slodowy slices and decomposition classes in complex reductive Lie algebras. The starting point for our second setting is the fact that Hamiltonian Lie group actions are special cases of Hamiltonian symplectic groupoid actions. We generalize the classical symplectic slice theorems to the latter case.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "The Nash-Tognoli theorem over the rationals and its version for isolated singularities", "author": "Riccardo Ghiloni, Enrico Savi", "published": "Wed, 03 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2302.04142", "summary": "arXiv:2302.04142v2 Announce Type: replace \nAbstract: Let $\\mathbb{Q}$ be the field of rational numbers and let $X$ be a subset of $\\mathbb{R}^n$. We say that $X$ is $\\mathbb{Q}$-algebraic if it is the common zero set in $\\mathbb{R}^n$ of a family of polynomials in $\\mathbb{Q}[\\mathtt{x}_1,\\ldots,\\mathtt{x}_n]$. If $X$ is $\\mathbb{Q}$-algebraic and of dimension $d$, then we say that $X$ is $\\mathbb{Q}$-nonsingular if, for all $a\\in X$, there exist a neighborhood $U$ of $a$ in $\\mathbb{R}^n$ and $f_1,\\ldots,f_{n-d}\\in\\mathbb{Q}[\\mathtt{x}_1,\\ldots,\\mathtt{x}_n]$ such that $\\nabla f_1(a),\\ldots,\\nabla f_{n-d}(a)$ are linearly independent and $X\\cap U=\\{x\\in U:f_1(x)=0,\\cdots,f_{n-d}(x)=0\\}$.\n  The celebrated Nash-Tognoli theorem asserts the following: if $M$ is a compact smooth manifold of dimension $d$ and $\\psi:M\\to\\mathbb{R}^{2d+1}$ is a smooth embedding, then $\\psi$ can be approximated by an arbitrarily close smooth embedding $\\phi:M\\to\\mathbb{R}^{2d+1}$ whose image $\\phi(M)$ is a nonsingular algebraic subset of $\\mathbb{R}^{2d+1}$. In this article, we prove that $\\phi$ can be chosen in such a way that $\\phi(M)$ is a $\\mathbb{Q}$-nonsingular $\\mathbb{Q}$-algebraic subset of $\\mathbb{R}^{2d+1}$. This guarantees for the first time that, up to smooth diffeomorphisms, every compact smooth manifold $M$ can be described both globally and locally by means of finitely many exact data, such as a finite system of generators of the ideal of polynomials in $\\mathbb{Q}[\\mathtt{x}_1,\\ldots,\\mathtt{x}_{2d+1}]$ vanishing on $\\phi(M)$. We extend our result to the singular setting by proving that every real algebraic set with finitely many singularities is semialgebraically homeomorphic to a $\\mathbb{Q}$-algebraic set with the same number of singularities.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2302.04142" target="_blank">The Nash-Tognoli theorem over the rationals and its version for isolated singularities</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Riccardo Ghiloni, Enrico Savi</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 03 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2302.04142" target="_blank">https://arxiv.org/abs/2302.04142</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $\mathbb{Q}$ be the field of rational numbers and let $X$ be a subset of $\mathbb{R}^n$. We say that $X$ is $\mathbb{Q}$-algebraic if it is the common zero set in $\mathbb{R}^n$ of a family of polynomials in $\mathbb{Q}[\mathtt{x}_1,\ldots,\mathtt{x}_n]$. If $X$ is $\mathbb{Q}$-algebraic and of dimension $d$, then we say that $X$ is $\mathbb{Q}$-nonsingular if, for all $a\in X$, there exist a neighborhood $U$ of $a$ in $\mathbb{R}^n$ and $f_1,\ldots,f_{n-d}\in\mathbb{Q}[\mathtt{x}_1,\ldots,\mathtt{x}_n]$ such that $\nabla f_1(a),\ldots,\nabla f_{n-d}(a)$ are linearly independent and $X\cap U=\{x\in U:f_1(x)=0,\cdots,f_{n-d}(x)=0\}$.
+  The celebrated Nash-Tognoli theorem asserts the following: if $M$ is a compact smooth manifold of dimension $d$ and $\psi:M\to\mathbb{R}^{2d+1}$ is a smooth embedding, then $\psi$ can be approximated by an arbitrarily close smooth embedding $\phi:M\to\mathbb{R}^{2d+1}$ whose image $\phi(M)$ is a nonsingular algebraic subset of $\mathbb{R}^{2d+1}$. In this article, we prove that $\phi$ can be chosen in such a way that $\phi(M)$ is a $\mathbb{Q}$-nonsingular $\mathbb{Q}$-algebraic subset of $\mathbb{R}^{2d+1}$. This guarantees for the first time that, up to smooth diffeomorphisms, every compact smooth manifold $M$ can be described both globally and locally by means of finitely many exact data, such as a finite system of generators of the ideal of polynomials in $\mathbb{Q}[\mathtt{x}_1,\ldots,\mathtt{x}_{2d+1}]$ vanishing on $\phi(M)$. We extend our result to the singular setting by proving that every real algebraic set with finitely many singularities is semialgebraically homeomorphic to a $\mathbb{Q}$-algebraic set with the same number of singularities.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "Simplicial presheaves of Green complexes and twisting cochains", "author": "Timothy Hosgood, Mahmoud Zeinalian", "published": "Wed, 03 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2308.09627", "summary": "arXiv:2308.09627v2 Announce Type: replace \nAbstract: We construct three simplicial presheaves on the site of ringed spaces, and in particular on that of complex manifolds. The descent objects for these simplicial presheaves yield Toledo--Tong's twisting cochains, simplicial twisting cochains, and complexes that appear in Green's thesis on Chern classes for coherent analytic sheaves, respectively. We thus extend the aforementioned constructions to the equivariant setting, and more generally to stacks. This is the first step in achieving push-forwards in K-theory and Riemann--Roch theorems for appropriate stacks, as was achieved by Toledo and Tong for arbitrary complex manifolds, and further pursued by O'Brian and Green.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2308.09627" target="_blank">Simplicial presheaves of Green complexes and twisting cochains</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Timothy Hosgood, Mahmoud Zeinalian</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 03 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2308.09627" target="_blank">https://arxiv.org/abs/2308.09627</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We construct three simplicial presheaves on the site of ringed spaces, and in particular on that of complex manifolds. The descent objects for these simplicial presheaves yield Toledo--Tong's twisting cochains, simplicial twisting cochains, and complexes that appear in Green's thesis on Chern classes for coherent analytic sheaves, respectively. We thus extend the aforementioned constructions to the equivariant setting, and more generally to stacks. This is the first step in achieving push-forwards in K-theory and Riemann--Roch theorems for appropriate stacks, as was achieved by Toledo and Tong for arbitrary complex manifolds, and further pursued by O'Brian and Green.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "Prismatic crystals for smooth schemes in characteristic $p$ with Frobenius lifting mod $p^2$", "author": "Yupeng Wang", "published": "Wed, 03 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2402.02109", "summary": "arXiv:2402.02109v2 Announce Type: replace \nAbstract: Let $(A,(p))$ be a crystalline prism with $A_n = A/p^{n+1}A$ for all $n\\geq 0$. Let $\\frakX_0$ be a smooth scheme over $A_0$. Suppose that $\\frakX_0$ admits a lifting $\\frakX_n$ over $A_n$ and the absolute Frobenius $\\rF_{\\frakX_0}:\\frakX_0\\to \\frakX_0$ admits a lifting over $A_1$. Then we show that there is an equivalence between the category of the prismatic crystals of truncation $n$ on $(\\frakX_0/A)_{\\Prism}$ and the category of $p$-connections over $\\frakX_n$, which is compatible with cohomologies. This generalises a previous work of Ogus. We also give some remarks on trivializing the Hodge--Tate gerbe $\\pi_{\\frakX_0}^{\\rm HT}:\\frakX_0^{\\rm HT}\\to\\frakX_0$ introduced by Bhatt--Lurie.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2402.02109" target="_blank">Prismatic crystals for smooth schemes in characteristic $p$ with Frobenius lifting mod $p^2$</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yupeng Wang</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 03 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2402.02109" target="_blank">https://arxiv.org/abs/2402.02109</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $(A,(p))$ be a crystalline prism with $A_n = A/p^{n+1}A$ for all $n\geq 0$. Let $\frakX_0$ be a smooth scheme over $A_0$. Suppose that $\frakX_0$ admits a lifting $\frakX_n$ over $A_n$ and the absolute Frobenius $\rF_{\frakX_0}:\frakX_0\to \frakX_0$ admits a lifting over $A_1$. Then we show that there is an equivalence between the category of the prismatic crystals of truncation $n$ on $(\frakX_0/A)_{\Prism}$ and the category of $p$-connections over $\frakX_n$, which is compatible with cohomologies. This generalises a previous work of Ogus. We also give some remarks on trivializing the Hodge--Tate gerbe $\pi_{\frakX_0}^{\rm HT}:\frakX_0^{\rm HT}\to\frakX_0$ introduced by Bhatt--Lurie.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "Geometry of genus sixteen K3 surfaces", "author": "Frederic Han", "published": "Wed, 03 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2501.16013", "summary": "arXiv:2501.16013v2 Announce Type: replace \nAbstract: Polarized K3 surfaces of genus sixteen have a Mukai vector bundle of rank two. We study the geometry of the projectivization of this bundle. We prove that it has an embedding in $\\mathbb{P}_9$ with an ideal generated by quadrics. We give an effective method to compute these quadrics from a general choice in Mukai's unirationalization of the moduli space. This linear system gives a double cover of $\\mathbb{P}_9$ ramified on a degree $10$ hypersurface. It gives relative Weddle/Kummer surfaces over a Peskine variety associated to an explicit trivector. This work is also motivated by hyperk\\\"ahler geometry and Debarre-Voisin varieties. Oberdieck showed that the Hilbert square of a general K3-surface of genus $16$ is a Debarre-Voisin variety for some trivector. We start to investigate the relationship between these two trivectors.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2501.16013" target="_blank">Geometry of genus sixteen K3 surfaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Frederic Han</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 03 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2501.16013" target="_blank">https://arxiv.org/abs/2501.16013</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Polarized K3 surfaces of genus sixteen have a Mukai vector bundle of rank two. We study the geometry of the projectivization of this bundle. We prove that it has an embedding in $\mathbb{P}_9$ with an ideal generated by quadrics. We give an effective method to compute these quadrics from a general choice in Mukai's unirationalization of the moduli space. This linear system gives a double cover of $\mathbb{P}_9$ ramified on a degree $10$ hypersurface. It gives relative Weddle/Kummer surfaces over a Peskine variety associated to an explicit trivector. This work is also motivated by hyperk\"ahler geometry and Debarre-Voisin varieties. Oberdieck showed that the Hilbert square of a general K3-surface of genus $16$ is a Debarre-Voisin variety for some trivector. We start to investigate the relationship between these two trivectors.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "Combinatorial K3 surfaces and the Mori fan of the Dolgachev--Nikulin--Voisin family in degree 2", "author": "Klaus Hulek, Christian Lehn", "published": "Wed, 03 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2505.03963", "summary": "arXiv:2505.03963v2 Announce Type: replace \nAbstract: We introduce the notion of a combinatorial K3 surface. Those form a certain class of type III semistable K3 surfaces and are completely determined by combinatorial data called curve structures. Emphasis is put on degree $2$ combinatorial K3 surfaces, but the approach can be used to study higher degree as well. We describe elementary modifications both in terms of the curve structures as well as on the Picard groups. Together with a description of the nef cone in terms of curve structures, this provides an approach to explicitly computing the Mori fan of the Dolgachev--Nikulin--Voisin family in degree $2$.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2505.03963" target="_blank">Combinatorial K3 surfaces and the Mori fan of the Dolgachev--Nikulin--Voisin family in degree 2</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Klaus Hulek, Christian Lehn</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 03 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2505.03963" target="_blank">https://arxiv.org/abs/2505.03963</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We introduce the notion of a combinatorial K3 surface. Those form a certain class of type III semistable K3 surfaces and are completely determined by combinatorial data called curve structures. Emphasis is put on degree $2$ combinatorial K3 surfaces, but the approach can be used to study higher degree as well. We describe elementary modifications both in terms of the curve structures as well as on the Picard groups. Together with a description of the nef cone in terms of curve structures, this provides an approach to explicitly computing the Mori fan of the Dolgachev--Nikulin--Voisin family in degree $2$.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "On lattice-polarized K3 surfaces", "author": "Valery Alexeev, Philip Engel", "published": "Wed, 03 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2505.22557", "summary": "arXiv:2505.22557v4 Announce Type: replace \nAbstract: We propose modifications to the commonly used definitions of lattice-polarized and lattice-quasipolarized smooth K3 surfaces, collecting various versions of the definition, and determining the effects of these choices on the resulting moduli space. We fill a gap in the theory, by replacing Weyl chambers with the new notion of a ``small cone'': the true datum in the definition of lattice quasipolarized K3 surfaces. In addition, we describe the separated moduli stack and moduli space for lattice-polarized K3 surfaces with $ADE$ singularities, an important notion for applications.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2505.22557" target="_blank">On lattice-polarized K3 surfaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Valery Alexeev, Philip Engel</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 03 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2505.22557" target="_blank">https://arxiv.org/abs/2505.22557</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We propose modifications to the commonly used definitions of lattice-polarized and lattice-quasipolarized smooth K3 surfaces, collecting various versions of the definition, and determining the effects of these choices on the resulting moduli space. We fill a gap in the theory, by replacing Weyl chambers with the new notion of a ``small cone'': the true datum in the definition of lattice quasipolarized K3 surfaces. In addition, we describe the separated moduli stack and moduli space for lattice-polarized K3 surfaces with $ADE$ singularities, an important notion for applications.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Degree-one foliations on complete intersections", "author": "Mateus Figueira, Crislaine Kuster, Ruben Lizarbe, Alan Muniz", "published": "Wed, 03 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2507.08090", "summary": "arXiv:2507.08090v2 Announce Type: replace \nAbstract: We prove that, under mild restrictions, the space of codimension-one foliations of degree one on a smooth projective complete intersection has two irreducible components of logarithmic type. We also prove that the same conclusion holds for any smooth hypersurface of dimension at least three that is not a quadric threefold. The proof of these results follows essentially from a more general structure theorem for foliations on manifolds covered by lines.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2507.08090" target="_blank">Degree-one foliations on complete intersections</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Mateus Figueira, Crislaine Kuster, Ruben Lizarbe, Alan Muniz</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 03 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2507.08090" target="_blank">https://arxiv.org/abs/2507.08090</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove that, under mild restrictions, the space of codimension-one foliations of degree one on a smooth projective complete intersection has two irreducible components of logarithmic type. We also prove that the same conclusion holds for any smooth hypersurface of dimension at least three that is not a quadric threefold. The proof of these results follows essentially from a more general structure theorem for foliations on manifolds covered by lines.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "The Deligne-Riemann-Roch isomorphism", "author": "Dennis Eriksson, Gerard Freixas i Montplet", "published": "Wed, 03 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2509.05077", "summary": "arXiv:2509.05077v2 Announce Type: replace \nAbstract: This work establishes the geometric component of Deligne's longstanding program on refined Grothendieck-Riemann-Roch formulas expressed through determinants of cohomology. The approach relies on a newly developed universal category of Chern classes together with an associated relative intersection theory. As an example of the applications, we provide a structural description of the coefficients in the Knudsen-Mumford expansion and establish a fundamental Mumford-type isomorphism for the alternating product of Griffiths bundles.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2509.05077" target="_blank">The Deligne-Riemann-Roch isomorphism</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Dennis Eriksson, Gerard Freixas i Montplet</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 03 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2509.05077" target="_blank">https://arxiv.org/abs/2509.05077</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This work establishes the geometric component of Deligne's longstanding program on refined Grothendieck-Riemann-Roch formulas expressed through determinants of cohomology. The approach relies on a newly developed universal category of Chern classes together with an associated relative intersection theory. As an example of the applications, we provide a structural description of the coefficients in the Knudsen-Mumford expansion and establish a fundamental Mumford-type isomorphism for the alternating product of Griffiths bundles.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "Some classical formul{\\ae} for curves and surfaces", "author": "Thomas Dedieu", "published": "Wed, 03 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2510.18686", "summary": "arXiv:2510.18686v2 Announce Type: replace \nAbstract: The goal of this text is to present the computation by Salmon, in the second half of the XIXth century, of various numbers enumerating planes with a prescribed tangency pattern with a sufficiently general surface $S$ in $\\mathbf{P}^3$ (or, equivalently, of hyperplane sections of $S$ with prescribed singularities). Emblematic among these are the number of tritangent planes, and the number of planes cutting out a curve with a tacnode.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2510.18686" target="_blank">Some classical formul{\ae} for curves and surfaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Thomas Dedieu</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 03 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.18686" target="_blank">https://arxiv.org/abs/2510.18686</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The goal of this text is to present the computation by Salmon, in the second half of the XIXth century, of various numbers enumerating planes with a prescribed tangency pattern with a sufficiently general surface $S$ in $\mathbf{P}^3$ (or, equivalently, of hyperplane sections of $S$ with prescribed singularities). Emblematic among these are the number of tritangent planes, and the number of planes cutting out a curve with a tacnode.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "Liquid Tannaka Duality I: Classical Case", "author": "Waleed Qaisar, Gregory Taroyan", "published": "Wed, 03 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.23180", "summary": "arXiv:2511.23180v2 Announce Type: replace \nAbstract: We prove a Tannaka duality statement for geometric stacks in the setting of analytic stacks modelled on globally finitely presented Stein spaces. The key ingredient is the theory of liquid vector spaces and liquid quasicoherent sheaves of Clausen-Scholze. As an application, we reconstruct the topological fundamental group of any complex algebraic variety from its category of liquid local systems. We also reconstruct a series of \"twisted fundamental groupoids\" whose representations correspond to meromorphic flat connections on the complex affine line with logarithmic or irregular singularities at the origin.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2511.23180" target="_blank">Liquid Tannaka Duality I: Classical Case</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Waleed Qaisar, Gregory Taroyan</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 03 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.23180" target="_blank">https://arxiv.org/abs/2511.23180</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove a Tannaka duality statement for geometric stacks in the setting of analytic stacks modelled on globally finitely presented Stein spaces. The key ingredient is the theory of liquid vector spaces and liquid quasicoherent sheaves of Clausen-Scholze. As an application, we reconstruct the topological fundamental group of any complex algebraic variety from its category of liquid local systems. We also reconstruct a series of "twisted fundamental groupoids" whose representations correspond to meromorphic flat connections on the complex affine line with logarithmic or irregular singularities at the origin.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "Homogeneous Khovanskii bases and MUVAK bases", "author": "Johannes Schmitt", "published": "Wed, 03 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2409.01146", "summary": "arXiv:2409.01146v2 Announce Type: replace-cross \nAbstract: In 2019, Kaveh and Manon introduced Khovanskii bases as a special 'Gr\\\"obner-like' generating system of an algebra. We extend their work by considering an arbitrary grading on the algebra and propose a definition for a 'homogeneous Khovanskii basis' that respects this grading. We generalize Khovanskii bases further by taking multiple valuations into account (MUVAK bases). We give algorithms in both cases.\n  MUVAK bases appear in the computation of the Cox ring of a minimal model of a quotient singularity. Our algorithm is an improvement of an algorithm by Yamagishi in this situation.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2409.01146" target="_blank">Homogeneous Khovanskii bases and MUVAK bases</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Johannes Schmitt</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 03 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2409.01146" target="_blank">https://arxiv.org/abs/2409.01146</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In 2019, Kaveh and Manon introduced Khovanskii bases as a special 'Gr\"obner-like' generating system of an algebra. We extend their work by considering an arbitrary grading on the algebra and propose a definition for a 'homogeneous Khovanskii basis' that respects this grading. We generalize Khovanskii bases further by taking multiple valuations into account (MUVAK bases). We give algorithms in both cases.
+  MUVAK bases appear in the computation of the Cox ring of a minimal model of a quotient singularity. Our algorithm is an improvement of an algorithm by Yamagishi in this situation.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Complexity theory of orbit closure intersection for tensors: reductions, completeness, and graph isomorphism hardness", "author": "Vladimir Lysikov, Michael Walter", "published": "Wed, 03 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2411.04639", "summary": "arXiv:2411.04639v2 Announce Type: replace-cross \nAbstract: Many natural computational problems in computer science, mathematics, physics, and other sciences amount to deciding if two objects are equivalent. Often this equivalence is defined in terms of group actions. A natural question is to ask when two objects can be distinguished by polynomial functions that are invariant under the group action. For finite groups, this is the usual notion of equivalence, but for continuous groups like the general linear groups it gives rise to a new notion, called orbit closure intersection. It captures, among others, the graph isomorphism problem, noncommutative PIT, null cone problems in invariant theory, equivalence problems for tensor networks, and the classification of multiparty quantum states. Despite recent algorithmic progress in celebrated special cases, the computational complexity of general orbit closure intersection problems is currently quite unclear. In particular, tensors seem to give rise to the most difficult problems.\n  In this work we start a systematic study of orbit closure intersection from the complexity-theoretic viewpoint. To this end, we define a complexity class TOCI that captures the power of orbit closure intersection problems for general tensor actions, give an appropriate notion of algebraic reductions that imply polynomial-time reductions in the usual sense, but are amenable to invariant-theoretic techniques, identify natural tensor problems that are complete for TOCI, including the equivalence of 2D tensor networks with constant physical dimension, and show that the graph isomorphism problem can be reduced to these complete problems, hence GI$\\subseteq$TOCI. As such, our work establishes the first lower bound on the computational complexity of orbit closure intersection problems, and it explains the difficulty of finding unconditional polynomial-time algorithms beyond special cases, as has been observed in the literature.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2411.04639" target="_blank">Complexity theory of orbit closure intersection for tensors: reductions, completeness, and graph isomorphism hardness</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Vladimir Lysikov, Michael Walter</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 03 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2411.04639" target="_blank">https://arxiv.org/abs/2411.04639</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Many natural computational problems in computer science, mathematics, physics, and other sciences amount to deciding if two objects are equivalent. Often this equivalence is defined in terms of group actions. A natural question is to ask when two objects can be distinguished by polynomial functions that are invariant under the group action. For finite groups, this is the usual notion of equivalence, but for continuous groups like the general linear groups it gives rise to a new notion, called orbit closure intersection. It captures, among others, the graph isomorphism problem, noncommutative PIT, null cone problems in invariant theory, equivalence problems for tensor networks, and the classification of multiparty quantum states. Despite recent algorithmic progress in celebrated special cases, the computational complexity of general orbit closure intersection problems is currently quite unclear. In particular, tensors seem to give rise to the most difficult problems.
+  In this work we start a systematic study of orbit closure intersection from the complexity-theoretic viewpoint. To this end, we define a complexity class TOCI that captures the power of orbit closure intersection problems for general tensor actions, give an appropriate notion of algebraic reductions that imply polynomial-time reductions in the usual sense, but are amenable to invariant-theoretic techniques, identify natural tensor problems that are complete for TOCI, including the equivalence of 2D tensor networks with constant physical dimension, and show that the graph isomorphism problem can be reduced to these complete problems, hence GI$\subseteq$TOCI. As such, our work establishes the first lower bound on the computational complexity of orbit closure intersection problems, and it explains the difficulty of finding unconditional polynomial-time algorithms beyond special cases, as has been observed in the literature.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "Some coefficients of rank 2 cluster scattering diagrams", "author": "Ryota Akagi", "published": "Wed, 03 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2507.21916", "summary": "arXiv:2507.21916v3 Announce Type: replace-cross \nAbstract: The purpose of this paper is to translate the expression of rank 2 cluster scattering diagrams via dilogarithm elements into via formal power series. As a corollary, we prove some conjectures introduced by Thomas Elgin, Nathan Reading, and Salvatore Stella.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2507.21916" target="_blank">Some coefficients of rank 2 cluster scattering diagrams</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ryota Akagi</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 03 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2507.21916" target="_blank">https://arxiv.org/abs/2507.21916</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The purpose of this paper is to translate the expression of rank 2 cluster scattering diagrams via dilogarithm elements into via formal power series. As a corollary, we prove some conjectures introduced by Thomas Elgin, Nathan Reading, and Salvatore Stella.
+            </div>
+        </div>
+        <div class="paper" id="paper-21">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-21" data-paper-data='{"title": "Arithmetic Duality", "author": "James S. Milne", "published": "Wed, 03 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2509.13016", "summary": "arXiv:2509.13016v2 Announce Type: replace-cross \nAbstract: In the 1950s and 1960s Tate proved some duality theorems in the Galois cohomology of finite modules and abelian varieties. As for most of Tate's work this has had a profound influence on mathematics with many applications and further developments. In this article, I discuss Tate's theorems and some of these developments.", "number": 21, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#21</span>
+                <a href="https://arxiv.org/abs/2509.13016" target="_blank">Arithmetic Duality</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> James S. Milne</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 03 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2509.13016" target="_blank">https://arxiv.org/abs/2509.13016</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In the 1950s and 1960s Tate proved some duality theorems in the Galois cohomology of finite modules and abelian varieties. As for most of Tate's work this has had a profound influence on mathematics with many applications and further developments. In this article, I discuss Tate's theorems and some of these developments.
+            </div>
+        </div>
+        <div class="paper" id="paper-22">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-22" data-paper-data='{"title": "On almost strong approximation for linear algebraic groups", "author": "Yang Cao, Yijin Wang", "published": "Wed, 03 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.00824", "summary": "arXiv:2511.00824v2 Announce Type: replace-cross \nAbstract: Let $G$ be a connected linear algebraic group over a number field $K$. In this article, we study the almost strong approximation property (ASA) of $G$ raised by Rapinchuk and Tralle. Building on Demarche's results on strong approximation with Brauer-Manin obstruction, we introduce a necessary and sufficient condition for (ASA) to hold in terms of the Brauer group of $G$. Using the criteria, we conclude that (ASA) can be completely controlled by the Dirichlet density of the places and the splitting field of $G$, which generalizes a result of Rapinchuk and Tralle.", "number": 22, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#22</span>
+                <a href="https://arxiv.org/abs/2511.00824" target="_blank">On almost strong approximation for linear algebraic groups</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yang Cao, Yijin Wang</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 03 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.00824" target="_blank">https://arxiv.org/abs/2511.00824</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $G$ be a connected linear algebraic group over a number field $K$. In this article, we study the almost strong approximation property (ASA) of $G$ raised by Rapinchuk and Tralle. Building on Demarche's results on strong approximation with Brauer-Manin obstruction, we introduce a necessary and sufficient condition for (ASA) to hold in terms of the Brauer group of $G$. Using the criteria, we conclude that (ASA) can be completely controlled by the Dirichlet density of the places and the splitting field of $G$, which generalizes a result of Rapinchuk and Tralle.
+            </div>
+        </div>
+        <div class="paper" id="paper-23">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-23" data-paper-data='{"title": "Numerical cohomology for arithmetic surfaces and applications", "author": "Wei He", "published": "Wed, 03 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.01811", "summary": "arXiv:2512.01811v2 Announce Type: replace-cross \nAbstract: In this paper, we introduce numerical cohomology for arithmetic surfaces, which leads to an absolute version of arithmetic Riemann-Roch formula. As an application, we derive an upper bound for the self-intersection number of relative dualizing sheaf in terms of successive minima with respect to $L^2$-norm. The result has the geometric analogue that the slopes of the Harder-Narasimhan filtration of relative dualizing sheaf provide an upper bound for self-intersection number. Suppose that the arithmetic surface admits a section and has generic fiber of genus at least two, we obtain a refined upper bound for the self-intersection number, which is governed by the topological and arithmetic information of the section.", "number": 23, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#23</span>
+                <a href="https://arxiv.org/abs/2512.01811" target="_blank">Numerical cohomology for arithmetic surfaces and applications</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Wei He</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 03 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.01811" target="_blank">https://arxiv.org/abs/2512.01811</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we introduce numerical cohomology for arithmetic surfaces, which leads to an absolute version of arithmetic Riemann-Roch formula. As an application, we derive an upper bound for the self-intersection number of relative dualizing sheaf in terms of successive minima with respect to $L^2$-norm. The result has the geometric analogue that the slopes of the Harder-Narasimhan filtration of relative dualizing sheaf provide an upper bound for self-intersection number. Suppose that the arithmetic surface admits a section and has generic fiber of genus at least two, we obtain a refined upper bound for the self-intersection number, which is governed by the topological and arithmetic information of the section.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2025-12-03 18:00:02
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>

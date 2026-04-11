@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Fri, 16 Jan 2026 05:00:17 +0000<br>
+        <strong>論文数:</strong> 18件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">On some Exotic Cylindrical Algebraic Decompositions and Cells</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">The Galois Structure of the Spaces of polydifferentials on the Drinfeld Curve</a>
+            <span class="title-label-badge" style="background-color: #ff69b4;">privacy</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">On directional second-order tangent sets of analytic sets and applications in optimization</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">Kov\'acs' conjecture on characterisation of projective space and hyperquadrics</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">Fano threefolds of genus 12 with large automorphism group in positive and mixed characteristic</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">Deformations of Chow groups via cyclic homology</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Polymultiplicative maps associated with the algebra of Iterated Laurent series and the higher-dimensional Contou-Carrere Symbol</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Positivity of Schur forms for Griffiths positive vector bundles of rank three over complex threefolds</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">On the projective dimension of some deformations of Weyl arrangements</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">Witt affine Springer theory</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">Moduli of rank two semistable sheaves on rational Fano threefolds of the main series</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">The five-color hypercube Adinkra and the Jacobian of a generalized Fermat curve</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">Topological triviality and link-constancy in deformations of inner Khovanskii non-degenerate maps</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">On the geometry of punctual Hilbert schemes on singular curves and their motivic zeta functions</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Poincar\'e duality for singular tropical hypersurfaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">Extension of Lipschitz maps definable in Hensel minimal structures</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">Reformulation of the stable Adams conjecture</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">A vector bundle approach to Nash equilibria</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "On some Exotic Cylindrical Algebraic Decompositions and Cells", "author": "Lucas Michel", "published": "Fri, 16 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.09795", "summary": "arXiv:2601.09795v1 Announce Type: new \nAbstract: Cylindrical Algebraic Decompositions (CADs) endowed with additional topological properties have found applications beyond their original logical setting, including algorithmic optimizations in CAD construction, robot motion planning, and the algorithmic study of the topology of semi-algebraic sets. In this paper, we construct explicit examples of CADs and CAD cells that refute several conjectures and open questions of J. H. Davenport, A. Locatelli, and G. K. Sankaran concerning these topological assumptions.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2601.09795" target="_blank">On some Exotic Cylindrical Algebraic Decompositions and Cells</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Lucas Michel</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 16 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.09795" target="_blank">https://arxiv.org/abs/2601.09795</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Cylindrical Algebraic Decompositions (CADs) endowed with additional topological properties have found applications beyond their original logical setting, including algorithmic optimizations in CAD construction, robot motion planning, and the algorithmic study of the topology of semi-algebraic sets. In this paper, we construct explicit examples of CADs and CAD cells that refute several conjectures and open questions of J. H. Davenport, A. Locatelli, and G. K. Sankaran concerning these topological assumptions.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "The Galois Structure of the Spaces of polydifferentials on the Drinfeld Curve", "author": "Denver-James Logan Marchment, Bernhard K\\\"ock", "published": "Fri, 16 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.09956", "summary": "arXiv:2601.09956v1 Announce Type: new \nAbstract: Let $C$ be a smooth projective curve over an algebraically closed field ${\\mathbb{F}}$ equipped with the action of a finite group $G$. When $p =\\textrm{char}(\\mathbb{F})$ divides the order of $G$, the long-standing problem of computing the induced representation of $G$ on the space $H^0(C,\\Omega^{\\otimes m}_C)$ of globally holomorphic polydifferentials remains unsolved in general. In this paper, we study the case of the group $G = \\mathrm{SL}_2(\\mathbb{F}_q)$ (where $q$ is a power of~$p$) acting on the Drinfeld curve $C$ which is the projective plane curve given by the equation $XY^q-X^qY-Z^{q+1} = 0$. When $q = p$, we fully decompose $H^0(C,\\Omega^{\\otimes m}_C)$ as a direct sum of indecomposable $\\mathbb{F}[G]$-modules. For arbitrary $q$, we give a partial decomposition in terms of an explicit $\\mathbb{F}$-basis of $H^0(C,\\Omega^{\\otimes m}_C)$.", "number": 2, "labels": [{"name": "privacy", "color": "#ff69b4"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2601.09956" target="_blank">The Galois Structure of the Spaces of polydifferentials on the Drinfeld Curve</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #ff69b4;">privacy</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Denver-James Logan Marchment, Bernhard K\"ock</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 16 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.09956" target="_blank">https://arxiv.org/abs/2601.09956</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $C$ be a smooth projective curve over an algebraically closed field ${\mathbb{F}}$ equipped with the action of a finite group $G$. When $p =\textrm{char}(\mathbb{F})$ divides the order of $G$, the long-standing problem of computing the induced representation of $G$ on the space $H^0(C,\Omega^{\otimes m}_C)$ of globally holomorphic polydifferentials remains unsolved in general. In this paper, we study the case of the group $G = \mathrm{SL}_2(\mathbb{F}_q)$ (where $q$ is a power of~$p$) acting on the Drinfeld curve $C$ which is the projective plane curve given by the equation $XY^q-X^qY-Z^{q+1} = 0$. When $q = p$, we fully decompose $H^0(C,\Omega^{\otimes m}_C)$ as a direct sum of indecomposable $\mathbb{F}[G]$-modules. For arbitrary $q$, we give a partial decomposition in terms of an explicit $\mathbb{F}$-basis of $H^0(C,\Omega^{\otimes m}_C)$.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "On directional second-order tangent sets of analytic sets and applications in optimization", "author": "Le Cong Trinh", "published": "Fri, 16 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.09991", "summary": "arXiv:2601.09991v1 Announce Type: new \nAbstract: In this paper we study directional second-order tangent sets of real and complex analytic sets. For an analytic set $X\\subseteq\\mathbb{K}^n$ and a nonzero tangent direction $u\\in T_0X$, we compare the geometric second-order tangent set $T^2_{0,u}X$, defined via second-order expansions of analytic arcs, with the algebraic second-order tangent set $T^{2,a}_{0,u}X$, defined by initial forms of the defining equations. We prove the general inclusion $T^2_{0,u}X\\subseteq T^{2,a}_{0,u}X$ and construct explicit real and complex analytic examples showing that the inclusion is strict.\n  We introduce a second-jet formulation along fixed tangent directions and show that $T^2_{0,u}X=T^{2,a}_{0,u}X$ if and only if the natural second-jet map from analytic arcs in $X$ to jets on the tangent cone $C_0X$ is surjective. This surjectivity is established for smooth analytic germs, homogeneous analytic cones, hypersurfaces with nondegenerate tangent directions, and nondegenerate analytic complete intersections. As an application, we derive second-order necessary and sufficient optimality conditions for $C^2$ optimization problems on analytic sets.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2601.09991" target="_blank">On directional second-order tangent sets of analytic sets and applications in optimization</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Le Cong Trinh</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 16 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.09991" target="_blank">https://arxiv.org/abs/2601.09991</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper we study directional second-order tangent sets of real and complex analytic sets. For an analytic set $X\subseteq\mathbb{K}^n$ and a nonzero tangent direction $u\in T_0X$, we compare the geometric second-order tangent set $T^2_{0,u}X$, defined via second-order expansions of analytic arcs, with the algebraic second-order tangent set $T^{2,a}_{0,u}X$, defined by initial forms of the defining equations. We prove the general inclusion $T^2_{0,u}X\subseteq T^{2,a}_{0,u}X$ and construct explicit real and complex analytic examples showing that the inclusion is strict.
+  We introduce a second-jet formulation along fixed tangent directions and show that $T^2_{0,u}X=T^{2,a}_{0,u}X$ if and only if the natural second-jet map from analytic arcs in $X$ to jets on the tangent cone $C_0X$ is surjective. This surjectivity is established for smooth analytic germs, homogeneous analytic cones, hypersurfaces with nondegenerate tangent directions, and nondegenerate analytic complete intersections. As an application, we derive second-order necessary and sufficient optimality conditions for $C^2$ optimization problems on analytic sets.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "Kov\\'acs' conjecture on characterisation of projective space and hyperquadrics", "author": "Soham Ghosh", "published": "Fri, 16 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.10055", "summary": "arXiv:2601.10055v1 Announce Type: new \nAbstract: We prove Kov\\'acs' conjecture that claims that if the $p^{th}$ exterior power of the tangent bundle of a smooth complex projective variety contains the $p^{th}$ exterior power of an ample vector bundle then the variety is either projective space or the $p$-dimensional quadric hypersurface. This provides a common generalization of Mori, Wahl, Cho-Sato, Andreatta-Wi\\'sniewski, Kobayashi-Ochiai, and Araujo-Druel-Kov\\'acs type characterizations of such varieties.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2601.10055" target="_blank">Kov\'acs' conjecture on characterisation of projective space and hyperquadrics</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Soham Ghosh</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 16 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.10055" target="_blank">https://arxiv.org/abs/2601.10055</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove Kov\'acs' conjecture that claims that if the $p^{th}$ exterior power of the tangent bundle of a smooth complex projective variety contains the $p^{th}$ exterior power of an ample vector bundle then the variety is either projective space or the $p$-dimensional quadric hypersurface. This provides a common generalization of Mori, Wahl, Cho-Sato, Andreatta-Wi\'sniewski, Kobayashi-Ochiai, and Araujo-Druel-Kov\'acs type characterizations of such varieties.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "Fano threefolds of genus 12 with large automorphism group in positive and mixed characteristic", "author": "Tetsushi Ito, Akihiro Kanemitsu, Teppei Takamatsu, Yuuji Tanaka", "published": "Fri, 16 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.10106", "summary": "arXiv:2601.10106v1 Announce Type: new \nAbstract: We study prime Fano threefolds of genus 12 ($V_{22}$-varieties) with positive-dimensional automorphism groups in positive and mixed characteristic. We classify such varieties over any perfect field. In particular, we prove that $V_{22}$-varieties of Mukai-Umemura type over $k$ exist if and only if $\\mathrm{char}\\ k \\neq 2$, $5$. We also prove the same result for $\\mathbb{G}_a$-type. As arithmetic applications, we show that the Shafarevich conjecture holds for $V_{22}$-varieties of Mukai-Umemura type and of $\\mathbb{G}_m$-type, while it fails for $V_{22}$-varieties of $\\mathbb{G}_a$-type. Moreover, we prove that there exists $V_{22}$-varieties over $\\mathbb{Z}$, whereas there do not exist $V_{22}$-varieties over $\\mathbb{Z}$ whose generic fiber has a positive-dimensional automorphism group.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2601.10106" target="_blank">Fano threefolds of genus 12 with large automorphism group in positive and mixed characteristic</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Tetsushi Ito, Akihiro Kanemitsu, Teppei Takamatsu, Yuuji Tanaka</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 16 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.10106" target="_blank">https://arxiv.org/abs/2601.10106</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study prime Fano threefolds of genus 12 ($V_{22}$-varieties) with positive-dimensional automorphism groups in positive and mixed characteristic. We classify such varieties over any perfect field. In particular, we prove that $V_{22}$-varieties of Mukai-Umemura type over $k$ exist if and only if $\mathrm{char}\ k \neq 2$, $5$. We also prove the same result for $\mathbb{G}_a$-type. As arithmetic applications, we show that the Shafarevich conjecture holds for $V_{22}$-varieties of Mukai-Umemura type and of $\mathbb{G}_m$-type, while it fails for $V_{22}$-varieties of $\mathbb{G}_a$-type. Moreover, we prove that there exists $V_{22}$-varieties over $\mathbb{Z}$, whereas there do not exist $V_{22}$-varieties over $\mathbb{Z}$ whose generic fiber has a positive-dimensional automorphism group.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "Deformations of Chow groups via cyclic homology", "author": "Sen Yang", "published": "Fri, 16 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.10309", "summary": "arXiv:2601.10309v1 Announce Type: new \nAbstract: Let $X$ be a smooth projective variety over an arbitrary field $k$ of characteristic zero. We explore infinitesimal deformations of the Chow group $CH^{p}(X)$ via its formal completion $\\widehat{CH}^{p}$, a functor defined on the category of local augmented Artinian $k$-algebras. Under a natural vanishing condition on Hodge cohomology groups, for certain augmented graded Artinian $k$-algebras $A$ with the maximal ideal $m_{A}$, we prove that \\[ \\widehat{CH}^{p}(A) \\cong H^{p}(X, \\Omega^{p-1}_{X/ k})\\otimes_{k}m_{A}. \\]This extends earlier results of Bloch and others from the case where $k$ is algebraic over $\\mathbb{Q}$ to arbitrary fields of characteristic zero,and gives a partial affirmative answer to a general question linking the pro-representability of Chow groups to a specific set of Hodge-theoretic vanishing conditions.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2601.10309" target="_blank">Deformations of Chow groups via cyclic homology</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sen Yang</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 16 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.10309" target="_blank">https://arxiv.org/abs/2601.10309</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $X$ be a smooth projective variety over an arbitrary field $k$ of characteristic zero. We explore infinitesimal deformations of the Chow group $CH^{p}(X)$ via its formal completion $\widehat{CH}^{p}$, a functor defined on the category of local augmented Artinian $k$-algebras. Under a natural vanishing condition on Hodge cohomology groups, for certain augmented graded Artinian $k$-algebras $A$ with the maximal ideal $m_{A}$, we prove that \[ \widehat{CH}^{p}(A) \cong H^{p}(X, \Omega^{p-1}_{X/ k})\otimes_{k}m_{A}. \]This extends earlier results of Bloch and others from the case where $k$ is algebraic over $\mathbb{Q}$ to arbitrary fields of characteristic zero,and gives a partial affirmative answer to a general question linking the pro-representability of Chow groups to a specific set of Hodge-theoretic vanishing conditions.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Polymultiplicative maps associated with the algebra of Iterated Laurent series and the higher-dimensional Contou-Carrere Symbol", "author": "Levashev Vladislav", "published": "Fri, 16 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.10335", "summary": "arXiv:2601.10335v1 Announce Type: new \nAbstract: We study functorial polymultiplicative maps from the multiplicative group of the algebra of $n$-times iterated Laurent series over a commutative ring in $n+1$ variables into the multiplicative group of the ring. It is proven that if such a map is invariant under continuous automorphisms of this algebra, then it coincides, up to a sign, with an integer power of the $n$-dimensional Contou-Carr\\`ere symbol.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2601.10335" target="_blank">Polymultiplicative maps associated with the algebra of Iterated Laurent series and the higher-dimensional Contou-Carrere Symbol</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Levashev Vladislav</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 16 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.10335" target="_blank">https://arxiv.org/abs/2601.10335</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study functorial polymultiplicative maps from the multiplicative group of the algebra of $n$-times iterated Laurent series over a commutative ring in $n+1$ variables into the multiplicative group of the ring. It is proven that if such a map is invariant under continuous automorphisms of this algebra, then it coincides, up to a sign, with an integer power of the $n$-dimensional Contou-Carr\`ere symbol.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Positivity of Schur forms for Griffiths positive vector bundles of rank three over complex threefolds", "author": "Xueyuan Wan", "published": "Fri, 16 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.10424", "summary": "arXiv:2601.10424v1 Announce Type: new \nAbstract: In this paper, we prove the positivity of the double mixed discriminant associated with a positive linear map between spaces of \\(3\\times 3\\) complex matrices, thereby settling the three-dimensional case of Finski's open problem. As an application, we show that all Schur forms are weakly positive for Griffiths positive Hermitian holomorphic vector bundles of rank three over complex threefolds. This yields a complete affirmative answer, in the case where both the rank and the dimension are three, to the question posed by Griffiths in 1969.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2601.10424" target="_blank">Positivity of Schur forms for Griffiths positive vector bundles of rank three over complex threefolds</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Xueyuan Wan</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 16 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.10424" target="_blank">https://arxiv.org/abs/2601.10424</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we prove the positivity of the double mixed discriminant associated with a positive linear map between spaces of \(3\times 3\) complex matrices, thereby settling the three-dimensional case of Finski's open problem. As an application, we show that all Schur forms are weakly positive for Griffiths positive Hermitian holomorphic vector bundles of rank three over complex threefolds. This yields a complete affirmative answer, in the case where both the rank and the dimension are three, to the question posed by Griffiths in 1969.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "On the projective dimension of some deformations of Weyl arrangements", "author": "Takuro Abe (UBE, IMB), Daniele Faenzi (UBE, IMB)", "published": "Fri, 16 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.10466", "summary": "arXiv:2601.10466v1 Announce Type: new \nAbstract: We show that the logarithmic derivation module of (the cone of) the deformation A of a Weyl arrangement associated with a root system of simply laced type has projective dimension one if the deforming parameter ranges from -j to j+2. In addition, we give an explicit minimal free resolution when the root system is of type A3 and B2. Moreover, in the second case, we determine the jumping lines of maximal jumping order of the associated vector bundle. When the deforming parameter of A (respectively A') ranges from -k to k+j (respectively, from -k' to k'+j), with k different from k' and j at least 3, this allows to distinguish D0(A) from D0(A') shifted by 4(k'-k), even though these modules have the same graded Betti numbers.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2601.10466" target="_blank">On the projective dimension of some deformations of Weyl arrangements</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Takuro Abe (UBE, IMB), Daniele Faenzi (UBE, IMB)</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 16 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.10466" target="_blank">https://arxiv.org/abs/2601.10466</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We show that the logarithmic derivation module of (the cone of) the deformation A of a Weyl arrangement associated with a root system of simply laced type has projective dimension one if the deforming parameter ranges from -j to j+2. In addition, we give an explicit minimal free resolution when the root system is of type A3 and B2. Moreover, in the second case, we determine the jumping lines of maximal jumping order of the associated vector bundle. When the deforming parameter of A (respectively A') ranges from -k to k+j (respectively, from -k' to k'+j), with k different from k' and j at least 3, this allows to distinguish D0(A) from D0(A') shifted by 4(k'-k), even though these modules have the same graded Betti numbers.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "Witt affine Springer theory", "author": "Noam Nissan, Yakov Varshavsky", "published": "Fri, 16 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.09798", "summary": "arXiv:2601.09798v1 Announce Type: cross \nAbstract: This paper extends the affine Springer theory developed by Bouthier, Kazhdan, and the second author (see [BKV]) to the mixed characteristic case. In particular, we introduce a theory of perfectly placid perfect infinity stacks and establish their dimension theory. Furthermore, we prove that, in the Witt vector setting, the Chevalley morphism between arc spaces is flat.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2601.09798" target="_blank">Witt affine Springer theory</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Noam Nissan, Yakov Varshavsky</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 16 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.09798" target="_blank">https://arxiv.org/abs/2601.09798</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This paper extends the affine Springer theory developed by Bouthier, Kazhdan, and the second author (see [BKV]) to the mixed characteristic case. In particular, we introduce a theory of perfectly placid perfect infinity stacks and establish their dimension theory. Furthermore, we prove that, in the Witt vector setting, the Chevalley morphism between arc spaces is flat.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "Moduli of rank two semistable sheaves on rational Fano threefolds of the main series", "author": "Alexander S. Tikhomirov, Danil A. Vassiliev", "published": "Fri, 16 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2405.20460", "summary": "arXiv:2405.20460v2 Announce Type: replace \nAbstract: In this paper we investigate the moduli spaces of semistable coherent sheaves of rank two on the projective space $\\mathbb{P}^3$ and the following rational Fano manifolds of the main series - the three-dimensional quadric $X_2$, the intersection of two 4-dimensional quadrics $X_4$ and the Fano manifold $X_5$ of degree 5. For the quadric $X_2$, the boundedness of the third Chern class $c_3$ of rank two semistable objects in $\\mathrm{D}^b(X_2)$, including sheaves, is proved. An explicit description is given of all the moduli spaces of semistable sheaves of rank two on $X_2$, including reflexive ones, with a maximal third class $c_3\\ge0$. These spaces turn out to be irreducible smooth rational manifolds in all cases, except for the following two: $(c_1,c_2,c_3)=(0,2,2)$ or (0,4,8). Several new infinite series of rational components of the moduli spaces of semistable sheaves of rank two on $\\mathbb{P}^3$, $X_2$, $X_4$ and $X_5$ are constructed, as well as a new infinite series of irrational components on $X_4$. The boundedness of the class $c_3$ is proved for $c_1=0$ and any $c_2&gt;0$ for stable reflexive sheaves of general type on manifolds $X_4$ and $X_5$.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2405.20460" target="_blank">Moduli of rank two semistable sheaves on rational Fano threefolds of the main series</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Alexander S. Tikhomirov, Danil A. Vassiliev</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 16 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2405.20460" target="_blank">https://arxiv.org/abs/2405.20460</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper we investigate the moduli spaces of semistable coherent sheaves of rank two on the projective space $\mathbb{P}^3$ and the following rational Fano manifolds of the main series - the three-dimensional quadric $X_2$, the intersection of two 4-dimensional quadrics $X_4$ and the Fano manifold $X_5$ of degree 5. For the quadric $X_2$, the boundedness of the third Chern class $c_3$ of rank two semistable objects in $\mathrm{D}^b(X_2)$, including sheaves, is proved. An explicit description is given of all the moduli spaces of semistable sheaves of rank two on $X_2$, including reflexive ones, with a maximal third class $c_3\ge0$. These spaces turn out to be irreducible smooth rational manifolds in all cases, except for the following two: $(c_1,c_2,c_3)=(0,2,2)$ or (0,4,8). Several new infinite series of rational components of the moduli spaces of semistable sheaves of rank two on $\mathbb{P}^3$, $X_2$, $X_4$ and $X_5$ are constructed, as well as a new infinite series of irrational components on $X_4$. The boundedness of the class $c_3$ is proved for $c_1=0$ and any $c_2&gt;0$ for stable reflexive sheaves of general type on manifolds $X_4$ and $X_5$.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "The five-color hypercube Adinkra and the Jacobian of a generalized Fermat curve", "author": "Amanda E. Francis, Ursula A. Whitcher", "published": "Fri, 16 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2410.11137", "summary": "arXiv:2410.11137v2 Announce Type: replace \nAbstract: Adinkras are highly structured graphs developed to study 1-dimensional supersymmetry algebras. A cyclic ordering of the edge colors of an Adinkra, or rainbow, determines a Riemann surface and a height function on the vertices of the Adinkra determines a divisor on this surface. We study the induced map from height functions to divisors on the Jacobian of the Riemann surface. In the first nontrivial case, a 5-dimensional hypercube corresponding to a Jacobian given by a product of 5 elliptic curves each with $j$-invariant 2048, we develop and characterize a purely combinatorial algorithm to compute height function images. We show that when restricted to a single elliptic curve, every height function is a multiple of a specified generating divisor, and raising and lowering vertices corresponds to adding or subtracting this generator. We also give strict bounds on the coefficients of this generator that appear in the collection of all divisors of height functions.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2410.11137" target="_blank">The five-color hypercube Adinkra and the Jacobian of a generalized Fermat curve</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Amanda E. Francis, Ursula A. Whitcher</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 16 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2410.11137" target="_blank">https://arxiv.org/abs/2410.11137</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Adinkras are highly structured graphs developed to study 1-dimensional supersymmetry algebras. A cyclic ordering of the edge colors of an Adinkra, or rainbow, determines a Riemann surface and a height function on the vertices of the Adinkra determines a divisor on this surface. We study the induced map from height functions to divisors on the Jacobian of the Riemann surface. In the first nontrivial case, a 5-dimensional hypercube corresponding to a Jacobian given by a product of 5 elliptic curves each with $j$-invariant 2048, we develop and characterize a purely combinatorial algorithm to compute height function images. We show that when restricted to a single elliptic curve, every height function is a multiple of a specified generating divisor, and raising and lowering vertices corresponds to adding or subtracting this generator. We also give strict bounds on the coefficients of this generator that appear in the collection of all divisors of height functions.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "Topological triviality and link-constancy in deformations of inner Khovanskii non-degenerate maps", "author": "Julian D. Espinel Leal, Eder L. Sanchez Quiceno", "published": "Fri, 16 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2504.18816", "summary": "arXiv:2504.18816v5 Announce Type: replace \nAbstract: For real and mixed polynomial maps $f=(f^1,\\dots,f^p)$ satisfying $f(0)=0$, we introduce the notion of Inner Khovanskii Non-Degeneracy (IKND), that generalizes a previous non-degeneracy condition introduced by Wall for complex polynomial functions (J. Reine Angew. Math. 509 (1999), 1-19). We prove that IKND is a sufficient condition ensuring that the link of the singularity of $f$ at the origin is smooth and well-defined. We study one-parameter deformations of an IKND map $f$, given by $F(\\boldsymbol{x},\\varepsilon)=f(\\boldsymbol{x})+\\theta(\\boldsymbol{x},\\varepsilon)$, with $ F(0,\\varepsilon)=0$. We prove that the deformation is \\textit{link-constant} under suitable conditions on $f$ and $\\theta$, meaning that the ambient isotopy type of the link remains unchanged along the deformation. Furthermore, by employing a strong version of this non-degeneracy, Strong Inner Khovanskii Non-Degeneracy (SIKND), we obtain results on topological triviality. In the final section, we present link-constant deformations for IKND mixed polynomial functions of two variables. We also explore several applications motivated by the recent findings of Ara\\'ujo dos Santos, Bode, and Sanchez Quiceno (Bull. Braz. Math. Soc. (N.S.) 55 (2024), no. 3, Paper No. 34).", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2504.18816" target="_blank">Topological triviality and link-constancy in deformations of inner Khovanskii non-degenerate maps</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Julian D. Espinel Leal, Eder L. Sanchez Quiceno</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 16 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2504.18816" target="_blank">https://arxiv.org/abs/2504.18816</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                For real and mixed polynomial maps $f=(f^1,\dots,f^p)$ satisfying $f(0)=0$, we introduce the notion of Inner Khovanskii Non-Degeneracy (IKND), that generalizes a previous non-degeneracy condition introduced by Wall for complex polynomial functions (J. Reine Angew. Math. 509 (1999), 1-19). We prove that IKND is a sufficient condition ensuring that the link of the singularity of $f$ at the origin is smooth and well-defined. We study one-parameter deformations of an IKND map $f$, given by $F(\boldsymbol{x},\varepsilon)=f(\boldsymbol{x})+\theta(\boldsymbol{x},\varepsilon)$, with $ F(0,\varepsilon)=0$. We prove that the deformation is \textit{link-constant} under suitable conditions on $f$ and $\theta$, meaning that the ambient isotopy type of the link remains unchanged along the deformation. Furthermore, by employing a strong version of this non-degeneracy, Strong Inner Khovanskii Non-Degeneracy (SIKND), we obtain results on topological triviality. In the final section, we present link-constant deformations for IKND mixed polynomial functions of two variables. We also explore several applications motivated by the recent findings of Ara\'ujo dos Santos, Bode, and Sanchez Quiceno (Bull. Braz. Math. Soc. (N.S.) 55 (2024), no. 3, Paper No. 34).
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "On the geometry of punctual Hilbert schemes on singular curves and their motivic zeta functions", "author": "Mounir Hajli, Hussein Mourtada, Wenhao Zhu", "published": "Fri, 16 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2509.06761", "summary": "arXiv:2509.06761v4 Announce Type: replace \nAbstract: Inspired by the work of Soma and Watari, we define a tree structure on certain subsemimodules of the semigroup $\\Gamma$ associated with an irreducible plane curve singularity $(C,O)$. Building on results of Oblomkov, Rasmussen, and Shende, we show that for specific classes of singularities, this tree encodes key aspects of the geometry of the punctual Hilbert schemes of $(C,O)$. As an application, we compute the motivic Hilbert zeta function for a family of singular curves. \\vskip 0.1cm A point in the Hilbert scheme corresponds to an ideal in the local ring $\\mathcal{O}_{C,O}$ of the singularity. We study the stratification of these Hilbert schemes induced by constraints on the minimal number of generators of the defining ideals, and we describe geometric properties of these strata, including their dimension and closure relations.\\vskip 0.1cm More importantly, we study their motivic zeta functions, particularly the motivic Hilbert zeta function, which encodes the classes of all punctual Hilbert schemes in the Grothendieck ring of varieties.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2509.06761" target="_blank">On the geometry of punctual Hilbert schemes on singular curves and their motivic zeta functions</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Mounir Hajli, Hussein Mourtada, Wenhao Zhu</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 16 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2509.06761" target="_blank">https://arxiv.org/abs/2509.06761</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Inspired by the work of Soma and Watari, we define a tree structure on certain subsemimodules of the semigroup $\Gamma$ associated with an irreducible plane curve singularity $(C,O)$. Building on results of Oblomkov, Rasmussen, and Shende, we show that for specific classes of singularities, this tree encodes key aspects of the geometry of the punctual Hilbert schemes of $(C,O)$. As an application, we compute the motivic Hilbert zeta function for a family of singular curves. \vskip 0.1cm A point in the Hilbert scheme corresponds to an ideal in the local ring $\mathcal{O}_{C,O}$ of the singularity. We study the stratification of these Hilbert schemes induced by constraints on the minimal number of generators of the defining ideals, and we describe geometric properties of these strata, including their dimension and closure relations.\vskip 0.1cm More importantly, we study their motivic zeta functions, particularly the motivic Hilbert zeta function, which encodes the classes of all punctual Hilbert schemes in the Grothendieck ring of varieties.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Poincar\\'e duality for singular tropical hypersurfaces", "author": "Samuel Dentan", "published": "Fri, 16 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.24548", "summary": "arXiv:2512.24548v2 Announce Type: replace \nAbstract: We establish a partial extension of the Poincar\\'e duality theorem of Jell-Rau-Shaw to tropical hypersurfaces arising from non-primitive triangulations. We introduce a notion of level of primitivity for triangulations of lattice polytopes and show that tropical hypersurfaces satisfy a partial form of Poincar\\'e duality determined by this level. This notion of primitivity is defined modulo a fixed integral domain and is weaker than the classical notion of primitivity. Moreover, we obtain a generalization of complete Poincar\\'e duality over this integral domain for tropical hypersurfaces whose underlying triangulations are primitive modulo the integral domain. As a corollary, we show that any tropical hypersurface obtained by patchworking from a triangualtion of a simple lattice polytope satisfies complete Poincar\\'e duality over the field of rational numbers, providing a converse to a theorem of Aksnes. Throughout, we allow triangulations that are not necessarily convex.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2512.24548" target="_blank">Poincar\'e duality for singular tropical hypersurfaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Samuel Dentan</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 16 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.24548" target="_blank">https://arxiv.org/abs/2512.24548</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We establish a partial extension of the Poincar\'e duality theorem of Jell-Rau-Shaw to tropical hypersurfaces arising from non-primitive triangulations. We introduce a notion of level of primitivity for triangulations of lattice polytopes and show that tropical hypersurfaces satisfy a partial form of Poincar\'e duality determined by this level. This notion of primitivity is defined modulo a fixed integral domain and is weaker than the classical notion of primitivity. Moreover, we obtain a generalization of complete Poincar\'e duality over this integral domain for tropical hypersurfaces whose underlying triangulations are primitive modulo the integral domain. As a corollary, we show that any tropical hypersurface obtained by patchworking from a triangualtion of a simple lattice polytope satisfies complete Poincar\'e duality over the field of rational numbers, providing a converse to a theorem of Aksnes. Throughout, we allow triangulations that are not necessarily convex.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "Extension of Lipschitz maps definable in Hensel minimal structures", "author": "Krzysztof Jan Nowak", "published": "Fri, 16 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2204.05900", "summary": "arXiv:2204.05900v4 Announce Type: replace-cross \nAbstract: In this paper, we establish a theorem on extension of Lipschitz maps $f$ definable in Hensel minimal, non-trivially valued fields $K$ of equicharacteristic zero. This may be regarded as a definable, non-Archimedean, non-locally compact version of Kirszbraun's extension theorem. We proceed with double induction with respect to the dimensions of the ambient space and of the domain of $f$. To this end we introduce the concept of a definable open cell package with a skeleton, which along with the concept of a risometry plays a key role in our induction procedure.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2204.05900" target="_blank">Extension of Lipschitz maps definable in Hensel minimal structures</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Krzysztof Jan Nowak</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 16 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2204.05900" target="_blank">https://arxiv.org/abs/2204.05900</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we establish a theorem on extension of Lipschitz maps $f$ definable in Hensel minimal, non-trivially valued fields $K$ of equicharacteristic zero. This may be regarded as a definable, non-Archimedean, non-locally compact version of Kirszbraun's extension theorem. We proceed with double induction with respect to the dimensions of the ambient space and of the domain of $f$. To this end we introduce the concept of a definable open cell package with a skeleton, which along with the concept of a risometry plays a key role in our induction procedure.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "Reformulation of the stable Adams conjecture", "author": "Eric M. Friedlander", "published": "Fri, 16 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2310.14425", "summary": "arXiv:2310.14425v3 Announce Type: replace-cross \nAbstract: We revisit methods of proof of the Adams Conjecture in order to correct and supplement earlier efforts to prove analogous conjectures in the stable homotopy category. We utilize simplicial schemes over an algebraically closed field of positive characteristic and a rigid version of Artin-Mazur \\'etale homotopy theory. Consideration of special $\\mathcal F$-spaces and together with Bousfield-Kan $\\mathbb Z/\\ell$-completion enables us to employ an \"\\'etale functor\" which commutes up to homotopy with products of simplicial schemes. In order to prove the Stable Adams Conjecture, we construct the universal $\\mathbb Z/\\ell$-completed $X$-fibrations for various pointed simplicial sets $X$. Thus, two maps from a given $\\mathcal F$-space $\\underline{\\mathcal B}$ to the base $\\mathcal F$-space of the universal $\\mathbb Z/\\ell$-completed $X$-fibration $\\pi_{X,\\ell}: \\underline {\\mathcal B} (G_\\ell(X),X_\\ell) \\to \\underline {\\mathcal B} G_\\ell(X)$ determine homotopy equivalent maps of spectra if and only they correspond via pull-back of $\\pi_{X,\\ell}$ to fiber homotopy equivalent $\\mathbb Z/\\ell$-completed $X$-fibrations over $\\underline {\\mathcal B}$. For the proof of the Stable Adams Conjecture, we consider maps of $\\mathcal F$-spaces $\\underline {\\mathcal B }\\to \\underline {\\mathcal B} G_\\ell(S^2)$ where $\\underline {\\mathcal B}$ is an $\\mathcal F$-space model of connective $\\ell$-completed connective $K$-theory.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2310.14425" target="_blank">Reformulation of the stable Adams conjecture</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Eric M. Friedlander</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 16 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2310.14425" target="_blank">https://arxiv.org/abs/2310.14425</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We revisit methods of proof of the Adams Conjecture in order to correct and supplement earlier efforts to prove analogous conjectures in the stable homotopy category. We utilize simplicial schemes over an algebraically closed field of positive characteristic and a rigid version of Artin-Mazur \'etale homotopy theory. Consideration of special $\mathcal F$-spaces and together with Bousfield-Kan $\mathbb Z/\ell$-completion enables us to employ an "\'etale functor" which commutes up to homotopy with products of simplicial schemes. In order to prove the Stable Adams Conjecture, we construct the universal $\mathbb Z/\ell$-completed $X$-fibrations for various pointed simplicial sets $X$. Thus, two maps from a given $\mathcal F$-space $\underline{\mathcal B}$ to the base $\mathcal F$-space of the universal $\mathbb Z/\ell$-completed $X$-fibration $\pi_{X,\ell}: \underline {\mathcal B} (G_\ell(X),X_\ell) \to \underline {\mathcal B} G_\ell(X)$ determine homotopy equivalent maps of spectra if and only they correspond via pull-back of $\pi_{X,\ell}$ to fiber homotopy equivalent $\mathbb Z/\ell$-completed $X$-fibrations over $\underline {\mathcal B}$. For the proof of the Stable Adams Conjecture, we consider maps of $\mathcal F$-spaces $\underline {\mathcal B }\to \underline {\mathcal B} G_\ell(S^2)$ where $\underline {\mathcal B}$ is an $\mathcal F$-space model of connective $\ell$-completed connective $K$-theory.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "A vector bundle approach to Nash equilibria", "author": "Hirotachi Abo, Irem Portakal, Luca Sodomaco", "published": "Fri, 16 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2504.03456", "summary": "arXiv:2504.03456v2 Announce Type: replace-cross \nAbstract: We use vector bundles to study the locus of totally mixed Nash equilibria of an $n$-player game in normal form, which we call the Nash equilibrium scheme. When the payoff tensor format is balanced, we study the Nash discriminant variety, i.e., the algebraic variety of games whose Nash equilibrium scheme is nonreduced or has a positive dimensional component. We prove that this variety has codimension one. We classify all possible components of the Nash equilibrium scheme for a binary three-player game. We prove that if the payoff tensor is of boundary format, then the Nash discriminant variety has two components: an irreducible hypersurface and a larger-codimensional component. A generic game with an unbalanced payoff tensor format does not admit totally mixed Nash equilibria. We define the Nash resultant variety of games admitting a positive number of totally mixed Nash equilibria. We prove that it is irreducible and determine its codimension and degree.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2504.03456" target="_blank">A vector bundle approach to Nash equilibria</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Hirotachi Abo, Irem Portakal, Luca Sodomaco</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 16 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2504.03456" target="_blank">https://arxiv.org/abs/2504.03456</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We use vector bundles to study the locus of totally mixed Nash equilibria of an $n$-player game in normal form, which we call the Nash equilibrium scheme. When the payoff tensor format is balanced, we study the Nash discriminant variety, i.e., the algebraic variety of games whose Nash equilibrium scheme is nonreduced or has a positive dimensional component. We prove that this variety has codimension one. We classify all possible components of the Nash equilibrium scheme for a binary three-player game. We prove that if the payoff tensor is of boundary format, then the Nash discriminant variety has two components: an irreducible hypersurface and a larger-codimensional component. A generic game with an unbalanced payoff tensor format does not admit totally mixed Nash equilibria. We define the Nash resultant variety of games admitting a positive number of totally mixed Nash equilibria. We prove that it is irreducible and determine its codimension and degree.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-01-16 18:00:11
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>

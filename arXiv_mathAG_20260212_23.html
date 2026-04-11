@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Thu, 12 Feb 2026 05:00:12 +0000<br>
+        <strong>論文数:</strong> 23件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Singularity of cubic hypersurfaces and hyperplane sections of projectivized tangent bundle of projective space</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">The fibrewise trivial locus of a line bundle</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Hermitian Distance Degree of Unitary-Invariant Matrix Varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">From complex to non-Archimedean geometry: an approach to the YTD conjecture</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">Combinatorial structure of low degree rational curves on a smooth Hermitian surface</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">The Base Change Of Fundamental Group Schemes</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Divided powers on abelian varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Totally decomposable algebras with involution and R-triviality</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">Uniform bound on common periodic points for families of regular plane polynomial automorphisms</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">Linear Operators on Polynomials and $K$-Positivity Preserver -- A journey from analysis to algebra and back</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">Correlators in the theory of Integral Discriminants</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">A motivic Fundamental Lemma</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">Conics on smooth quartic surfaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Delta invariants of weighted hypersurfaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">On the Hodge and V-filtrations of mixed Hodge modules</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">Morphisms on the modular curve $X_0(p)$ and degree $6$ points</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">All genus open mirror symmetry for the projective line</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">Weak Fano threefolds arising as the blowup of a hyperquadric in $\mathbb{P}^4$ along a curve</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Deformations of the connected sum of Gorenstein algebras</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">Hensel's lemma for the norm principle for spinor groups</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-21" onchange="updateSelectedCount()">
+            <span class="title-number">21.</span>
+            <a href="#paper-21">Index from a point</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-22" onchange="updateSelectedCount()">
+            <span class="title-number">22.</span>
+            <a href="#paper-22">Sandwiched singularities and nearly Lefschetz fibrations</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-23" onchange="updateSelectedCount()">
+            <span class="title-number">23.</span>
+            <a href="#paper-23">Curves of genus two with maps of every degree to a fixed elliptic curve</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Singularity of cubic hypersurfaces and hyperplane sections of projectivized tangent bundle of projective space", "author": "Ashima Bansal, Supravat Sarkar, Shivam Vats", "published": "Thu, 12 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.10517", "summary": "arXiv:2602.10517v1 Announce Type: new \nAbstract: We show that the normal points of a cubic hypersurface in projective space have canonical singularities unless the hypersurface is an iterated cone over an elliptic curve. As an application, we give a simple linear algebraic description of all the hyperplane sections of projectivized tangent bundle of projective space, hence describing hyperplane sections of a rational homogeneous manifold of Picard rank $2$. This also simplifies and extends recent results of Mazouni-Nagaraj in higher dimensions. We also compute the Chow ring of these hyperplane sections.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2602.10517" target="_blank">Singularity of cubic hypersurfaces and hyperplane sections of projectivized tangent bundle of projective space</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ashima Bansal, Supravat Sarkar, Shivam Vats</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 12 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.10517" target="_blank">https://arxiv.org/abs/2602.10517</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We show that the normal points of a cubic hypersurface in projective space have canonical singularities unless the hypersurface is an iterated cone over an elliptic curve. As an application, we give a simple linear algebraic description of all the hyperplane sections of projectivized tangent bundle of projective space, hence describing hyperplane sections of a rational homogeneous manifold of Picard rank $2$. This also simplifies and extends recent results of Mazouni-Nagaraj in higher dimensions. We also compute the Chow ring of these hyperplane sections.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "The fibrewise trivial locus of a line bundle", "author": "Amira Tlemsani", "published": "Thu, 12 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.10582", "summary": "arXiv:2602.10582v1 Announce Type: new \nAbstract: Let $\\mathcal{L}$ be a line bundle on a smooth and proper scheme $X$ over $S$. We compute, in the case where $S$ is smooth over a field of characteristic $0$, the virtual fundamental class of the closed subset of $S$ consisting of those $s\\in S$ such that the restriction of $\\mathcal{L}$ to the fibre $X_s$ over $s$ is trivial.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2602.10582" target="_blank">The fibrewise trivial locus of a line bundle</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Amira Tlemsani</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 12 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.10582" target="_blank">https://arxiv.org/abs/2602.10582</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $\mathcal{L}$ be a line bundle on a smooth and proper scheme $X$ over $S$. We compute, in the case where $S$ is smooth over a field of characteristic $0$, the virtual fundamental class of the closed subset of $S$ consisting of those $s\in S$ such that the restriction of $\mathcal{L}$ to the fibre $X_s$ over $s$ is trivial.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Hermitian Distance Degree of Unitary-Invariant Matrix Varieties", "author": "Nikhil Ken", "published": "Thu, 12 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.10737", "summary": "arXiv:2602.10737v1 Announce Type: new \nAbstract: We study the Hermitian distance degree, a real enumerative invariant counting critical points of the squared Hermitian distance function, for matrix varieties invariant under left and right unitary actions. For such a variety \\(M \\subset \\mathbb{C}^{n\\times t}\\), we prove that its Hermitian distance degree equals the real Euclidean distance degree of the associated absolutely symmetric variety of singular values. Equivalently, for a generic data matrix, Hermitian distance critical points on \\(M\\) are obtained by lifting Euclidean distance critical points from the singular-value slice. We also establish a Hermitian slicing theorem, paralleling the Bik--Draisma principle, which reduces the critical point count to a diagonal slice. As a motivating example, we recover a geometric Hermitian analogue of the Eckart-Young theorem.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2602.10737" target="_blank">Hermitian Distance Degree of Unitary-Invariant Matrix Varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Nikhil Ken</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 12 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.10737" target="_blank">https://arxiv.org/abs/2602.10737</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the Hermitian distance degree, a real enumerative invariant counting critical points of the squared Hermitian distance function, for matrix varieties invariant under left and right unitary actions. For such a variety \(M \subset \mathbb{C}^{n\times t}\), we prove that its Hermitian distance degree equals the real Euclidean distance degree of the associated absolutely symmetric variety of singular values. Equivalently, for a generic data matrix, Hermitian distance critical points on \(M\) are obtained by lifting Euclidean distance critical points from the singular-value slice. We also establish a Hermitian slicing theorem, paralleling the Bik--Draisma principle, which reduces the critical point count to a diagonal slice. As a motivating example, we recover a geometric Hermitian analogue of the Eckart-Young theorem.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "From complex to non-Archimedean geometry: an approach to the YTD conjecture", "author": "S\\'ebastien Boucksom, Mattias Jonsson", "published": "Thu, 12 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.10800", "summary": "arXiv:2602.10800v1 Announce Type: new \nAbstract: These notes expand on talks given by the authors at the 2025 Summer Research Institute in Algebraic Geometry in Fort Collins, Colorado. We discuss the relation between algebraic, analytic, and non-Archimedean geometry over the complex numbers, and sketch a proof of a version of the Yau--Tian--Donaldson conjecture for constant scalar curvature K\\\"ahler metrics.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2602.10800" target="_blank">From complex to non-Archimedean geometry: an approach to the YTD conjecture</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> S\'ebastien Boucksom, Mattias Jonsson</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 12 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.10800" target="_blank">https://arxiv.org/abs/2602.10800</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                These notes expand on talks given by the authors at the 2025 Summer Research Institute in Algebraic Geometry in Fort Collins, Colorado. We discuss the relation between algebraic, analytic, and non-Archimedean geometry over the complex numbers, and sketch a proof of a version of the Yau--Tian--Donaldson conjecture for constant scalar curvature K\"ahler metrics.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "Combinatorial structure of low degree rational curves on a smooth Hermitian surface", "author": "Norifumi Ojiro", "published": "Thu, 12 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.10842", "summary": "arXiv:2602.10842v1 Announce Type: new \nAbstract: A smooth Hermitian surface $X$ is a projective surface isomorphic to the Fermat surface of degree $q+1$ in positive characteristic. We study incidence relations of the rational curves of degree $q+1$ contained in $X$, and show that such curves produce a family of certain strongly regular graphs and association schemes.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2602.10842" target="_blank">Combinatorial structure of low degree rational curves on a smooth Hermitian surface</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Norifumi Ojiro</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 12 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.10842" target="_blank">https://arxiv.org/abs/2602.10842</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                A smooth Hermitian surface $X$ is a projective surface isomorphic to the Fermat surface of degree $q+1$ in positive characteristic. We study incidence relations of the rational curves of degree $q+1$ contained in $X$, and show that such curves produce a family of certain strongly regular graphs and association schemes.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "The Base Change Of Fundamental Group Schemes", "author": "Lingguang Li, Niantao Tian", "published": "Thu, 12 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.11110", "summary": "arXiv:2602.11110v1 Announce Type: new \nAbstract: Let $k$ be a field, $K/k$ a field extension, $X$ a connected scheme proper over $k$, $x_K\\in X_K(K)$ lying over $x\\in X(k)$, $\\mathcal{C}_X$ and $\\mathcal{C}_{X_K}$ the Tannakian categories over $X$ and $X_K$ respectively, $\\pi(\\mathcal{C}_X,x)$ and $\\pi(\\mathcal{C}_{X_K},x_K)$ the corresponding Tannaka group schemes respectively. We give equivalent conditions to the isomorphisms of fundamental group schemes $$\\pi(\\mathcal{C}_{X_K},x_K)\\xrightarrow{\\cong} \\pi(\\mathcal{C}_X,x)_K.$$ As application, we generalize the base change of certain fundamental group schemes under separable extension and extension of algebraically closed fields, such as S, Nori, EN, F, \\'Etale, Loc, ELoc and Unipotent fundamental group schemes.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2602.11110" target="_blank">The Base Change Of Fundamental Group Schemes</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Lingguang Li, Niantao Tian</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 12 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.11110" target="_blank">https://arxiv.org/abs/2602.11110</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $k$ be a field, $K/k$ a field extension, $X$ a connected scheme proper over $k$, $x_K\in X_K(K)$ lying over $x\in X(k)$, $\mathcal{C}_X$ and $\mathcal{C}_{X_K}$ the Tannakian categories over $X$ and $X_K$ respectively, $\pi(\mathcal{C}_X,x)$ and $\pi(\mathcal{C}_{X_K},x_K)$ the corresponding Tannaka group schemes respectively. We give equivalent conditions to the isomorphisms of fundamental group schemes $$\pi(\mathcal{C}_{X_K},x_K)\xrightarrow{\cong} \pi(\mathcal{C}_X,x)_K.$$ As application, we generalize the base change of certain fundamental group schemes under separable extension and extension of algebraically closed fields, such as S, Nori, EN, F, \'Etale, Loc, ELoc and Unipotent fundamental group schemes.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Divided powers on abelian varieties", "author": "Bruno Kahn", "published": "Thu, 12 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.11135", "summary": "arXiv:2602.11135v1 Announce Type: new \nAbstract: We prove the existence of divided powers in \\'etale Chow groups of abelian varieties over a separably closed field, and hence of an integral lift of the Fourier transform, away from the characteristic and up to $2$-torsion. The method is to lift the Deninger-Murre Chow-K\\\"unneth projectors to integral ones, and draw consequences. Several techniques used here are new.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2602.11135" target="_blank">Divided powers on abelian varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Bruno Kahn</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 12 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.11135" target="_blank">https://arxiv.org/abs/2602.11135</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove the existence of divided powers in \'etale Chow groups of abelian varieties over a separably closed field, and hence of an integral lift of the Fourier transform, away from the characteristic and up to $2$-torsion. The method is to lift the Deninger-Murre Chow-K\"unneth projectors to integral ones, and draw consequences. Several techniques used here are new.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Totally decomposable algebras with involution and R-triviality", "author": "M. Archita, Karim Johannes Becher", "published": "Thu, 12 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.10302", "summary": "arXiv:2602.10302v1 Announce Type: cross \nAbstract: We show that the group of proper projective similitudes of a totally decomposable algebra with involution of the first kind over a field of characteristic different from 2 is R-trivial.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2602.10302" target="_blank">Totally decomposable algebras with involution and R-triviality</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> M. Archita, Karim Johannes Becher</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 12 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.10302" target="_blank">https://arxiv.org/abs/2602.10302</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We show that the group of proper projective similitudes of a totally decomposable algebra with involution of the first kind over a field of characteristic different from 2 is R-trivial.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "Uniform bound on common periodic points for families of regular plane polynomial automorphisms", "author": "Marc Abboud, Yugang Zhang", "published": "Thu, 12 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.10310", "summary": "arXiv:2602.10310v1 Announce Type: cross \nAbstract: Given two one-dimensional families $f$ and $g$ of regular plane polynomial automorphisms parameterised by an algebraic curve $B$, all defined over some number field $K$, such that one of them is dissipative, we prove that at any parameter $b\\in B(\\mathbb{C})$, either $f_b$ and $g_b$ share a common iterate, or the number of their common periodic points $\\mathrm{Per}(f_b) \\cap \\mathrm{Per}(g_b)$ is bounded by a uniform constant $D$ (independent of the parameter $b$). We thus extend a result of Mavraki and Schmidt for rational maps to our setting.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2602.10310" target="_blank">Uniform bound on common periodic points for families of regular plane polynomial automorphisms</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Marc Abboud, Yugang Zhang</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 12 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.10310" target="_blank">https://arxiv.org/abs/2602.10310</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Given two one-dimensional families $f$ and $g$ of regular plane polynomial automorphisms parameterised by an algebraic curve $B$, all defined over some number field $K$, such that one of them is dissipative, we prove that at any parameter $b\in B(\mathbb{C})$, either $f_b$ and $g_b$ share a common iterate, or the number of their common periodic points $\mathrm{Per}(f_b) \cap \mathrm{Per}(g_b)$ is bounded by a uniform constant $D$ (independent of the parameter $b$). We thus extend a result of Mavraki and Schmidt for rational maps to our setting.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "Linear Operators on Polynomials and $K$-Positivity Preserver -- A journey from analysis to algebra and back", "author": "Philipp J. di Dio", "published": "Thu, 12 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.10926", "summary": "arXiv:2602.10926v1 Announce Type: cross \nAbstract: These are the extended lecture notes of my lecture about ``Linear Operators on Polynomials, $K$-Positivity Preserver, and their Generators''. The lecture was given at the University of Konstanz in the winter semester 2025/26.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2602.10926" target="_blank">Linear Operators on Polynomials and $K$-Positivity Preserver -- A journey from analysis to algebra and back</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Philipp J. di Dio</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 12 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.10926" target="_blank">https://arxiv.org/abs/2602.10926</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                These are the extended lecture notes of my lecture about ``Linear Operators on Polynomials, $K$-Positivity Preserver, and their Generators''. The lecture was given at the University of Konstanz in the winter semester 2025/26.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "Correlators in the theory of Integral Discriminants", "author": "A. Morozov, Sh. Shakirov", "published": "Thu, 12 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.10981", "summary": "arXiv:2602.10981v1 Announce Type: cross \nAbstract: Integral discriminants provide a simple and fundamental model for non-Gaussian integrals, associated with homogeneous polynomials of degree r in n variables. We argue that, in this context, the study of correlators is equally if not more important. In this paper, we study a natural class of correlators in this model -- the invariant correlators. We suggest a general method to compute invariant correlators using differential operators that act on the partition function. This method allows to compute general invariant correlators in terms of the fundamental invariants. Moreover, in some cases the correlators appear to be simply polynomials in the invariants. This could be an interesting manifestation of superintegrability phenomenon in the theory of integral discriminants.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2602.10981" target="_blank">Correlators in the theory of Integral Discriminants</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> A. Morozov, Sh. Shakirov</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 12 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.10981" target="_blank">https://arxiv.org/abs/2602.10981</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Integral discriminants provide a simple and fundamental model for non-Gaussian integrals, associated with homogeneous polynomials of degree r in n variables. We argue that, in this context, the study of correlators is equally if not more important. In this paper, we study a natural class of correlators in this model -- the invariant correlators. We suggest a general method to compute invariant correlators using differential operators that act on the partition function. This method allows to compute general invariant correlators in terms of the fundamental invariants. Moreover, in some cases the correlators appear to be simply polynomials in the invariants. This could be an interesting manifestation of superintegrability phenomenon in the theory of integral discriminants.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "A motivic Fundamental Lemma", "author": "Arthur Forey, Fran\\c{c}ois Loeser, Dimitri Wyss", "published": "Thu, 12 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2308.12195", "summary": "arXiv:2308.12195v4 Announce Type: replace \nAbstract: In this paper we prove motivic versions of the Langlands-Shelstad Fundamental Lemma and Ng\\^o's Geometric Stabilization. To achieve this, we follow the strategy from the recent proof by Groechenig, Wyss and Ziegler which avoided the use of perverse sheaves using instead $p$-adic integration and Tate duality. We make a key use of a construction of Denef and Loeser which assigns a virtual motive to any definable set in the theory of pseudo-finite fields.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2308.12195" target="_blank">A motivic Fundamental Lemma</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Arthur Forey, Fran\c{c}ois Loeser, Dimitri Wyss</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 12 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2308.12195" target="_blank">https://arxiv.org/abs/2308.12195</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper we prove motivic versions of the Langlands-Shelstad Fundamental Lemma and Ng\^o's Geometric Stabilization. To achieve this, we follow the strategy from the recent proof by Groechenig, Wyss and Ziegler which avoided the use of perverse sheaves using instead $p$-adic integration and Tate duality. We make a key use of a construction of Denef and Loeser which assigns a virtual motive to any definable set in the theory of pseudo-finite fields.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "Conics on smooth quartic surfaces", "author": "Alex Degtyarev", "published": "Thu, 12 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2407.00493", "summary": "arXiv:2407.00493v2 Announce Type: replace \nAbstract: We prove that the maximal number of conics, a priori irreducible of reducible, on a smooth spatial quartic surface is 800, realized by a unique quartic. We also classify quartics with many (at least 720) conics. The maximal number of real conics on a real quartics is between 656 and 718.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2407.00493" target="_blank">Conics on smooth quartic surfaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Alex Degtyarev</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 12 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2407.00493" target="_blank">https://arxiv.org/abs/2407.00493</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove that the maximal number of conics, a priori irreducible of reducible, on a smooth spatial quartic surface is 800, realized by a unique quartic. We also classify quartics with many (at least 720) conics. The maximal number of real conics on a real quartics is between 656 and 718.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Delta invariants of weighted hypersurfaces", "author": "Taro Sano, Luca Tasin", "published": "Thu, 12 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2408.03057", "summary": "arXiv:2408.03057v3 Announce Type: replace \nAbstract: We give a lower bound for the delta invariant of the fundamental divisor of a quasi-smooth weighted hypersurface. As a consequence, we prove K-stability of a large class of quasi-smooth Fano hypersurfaces of index 1 and of all smooth Fano weighted hypersurfaces of index 1 and 2. The proofs are based on the Abban--Zhuang method and on the study of linear systems on flags of weighted hypersurfaces.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2408.03057" target="_blank">Delta invariants of weighted hypersurfaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Taro Sano, Luca Tasin</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 12 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2408.03057" target="_blank">https://arxiv.org/abs/2408.03057</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We give a lower bound for the delta invariant of the fundamental divisor of a quasi-smooth weighted hypersurface. As a consequence, we prove K-stability of a large class of quasi-smooth Fano hypersurfaces of index 1 and of all smooth Fano weighted hypersurfaces of index 1 and 2. The proofs are based on the Abban--Zhuang method and on the study of linear systems on flags of weighted hypersurfaces.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "On the Hodge and V-filtrations of mixed Hodge modules", "author": "Dougal Davis, Ruijie Yang", "published": "Thu, 12 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2503.16619", "summary": "arXiv:2503.16619v4 Announce Type: replace \nAbstract: In this paper, we prove a Beilinson-type formula for the V-filtration of Kashiwara and Malgrange on a complex mixed Hodge module, using Hodge filtrations on the localization. Our formula expresses the V-filtration as the filtered D-module underlying a pro-mixed Hodge module.\n  We apply this to the theory of higher multiplier and Hodge ideals. Our first result shows that higher multiplier ideals can be obtained directly from Hodge ideals by taking a suitable limit. As a corollary, we deduce that Hodge ideals are left semi-continuous if and only if they coincide with higher multiplier ideals, thereby improving results of Saito and Musta\\c{t}\\u{a}--Popa and resolving a folklore question. We further prove a birational transformation formula for higher multiplier ideals, generalising the classical formula for multiplier ideals and answering a question of Schnell and the second author. Finally, we provide very quick proofs of the main vanishing theorems for Hodge ideals, and strengthen a result of B. Chen.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2503.16619" target="_blank">On the Hodge and V-filtrations of mixed Hodge modules</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Dougal Davis, Ruijie Yang</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 12 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2503.16619" target="_blank">https://arxiv.org/abs/2503.16619</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we prove a Beilinson-type formula for the V-filtration of Kashiwara and Malgrange on a complex mixed Hodge module, using Hodge filtrations on the localization. Our formula expresses the V-filtration as the filtered D-module underlying a pro-mixed Hodge module.
+  We apply this to the theory of higher multiplier and Hodge ideals. Our first result shows that higher multiplier ideals can be obtained directly from Hodge ideals by taking a suitable limit. As a corollary, we deduce that Hodge ideals are left semi-continuous if and only if they coincide with higher multiplier ideals, thereby improving results of Saito and Musta\c{t}\u{a}--Popa and resolving a folklore question. We further prove a birational transformation formula for higher multiplier ideals, generalising the classical formula for multiplier ideals and answering a question of Schnell and the second author. Finally, we provide very quick proofs of the main vanishing theorems for Hodge ideals, and strengthen a result of B. Chen.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "Morphisms on the modular curve $X_0(p)$ and degree $6$ points", "author": "Maarten Derickx, Petar Orli\\'c", "published": "Thu, 12 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2506.21166", "summary": "arXiv:2506.21166v2 Announce Type: replace \nAbstract: Let $p$ be a prime. We study non-constant morphisms $f:X_0(p)_\\mathbb \\to Y$, where $Y/\\mathbb Q$ is a curve of genus $\\geq 2$. We prove that for $p&lt;3000$ such an $f$ of degree $d&gt;1$ must be isomorphic to the quotient map $X_0(p)\\to X_0^+(p)$. Supported by computational and theoretical evidence, we also conjecture that this is true for all primes $p$.\n  These results allow us to classify all points of degree $\\leq 25$ on $X_0(p)$ that come from a map to some curve of genus $\\geq 2$. As an application, we were able to determine all curves $X_0(p)$ with infinitely many points of degree $6$ over $\\mathbb Q$ except for $p=193$, continuing the previous results on small degree points on $X_0(N)$.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2506.21166" target="_blank">Morphisms on the modular curve $X_0(p)$ and degree $6$ points</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Maarten Derickx, Petar Orli\'c</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 12 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2506.21166" target="_blank">https://arxiv.org/abs/2506.21166</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $p$ be a prime. We study non-constant morphisms $f:X_0(p)_\mathbb \to Y$, where $Y/\mathbb Q$ is a curve of genus $\geq 2$. We prove that for $p&lt;3000$ such an $f$ of degree $d&gt;1$ must be isomorphic to the quotient map $X_0(p)\to X_0^+(p)$. Supported by computational and theoretical evidence, we also conjecture that this is true for all primes $p$.
+  These results allow us to classify all points of degree $\leq 25$ on $X_0(p)$ that come from a map to some curve of genus $\geq 2$. As an application, we were able to determine all curves $X_0(p)$ with infinitely many points of degree $6$ over $\mathbb Q$ except for $p=193$, continuing the previous results on small degree points on $X_0(N)$.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "All genus open mirror symmetry for the projective line", "author": "Jinghao Yu, Zhengyu Zong", "published": "Thu, 12 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2507.15187", "summary": "arXiv:2507.15187v2 Announce Type: replace \nAbstract: We prove that the Chekhov-Eynard-Orantin recursion on the mirror curve of $\\mathbb{P}^1$ encodes all genus equivariant open Gromov-Witten invariants of $(\\mathbb{P}^1, \\mathbb{R}\\mathbb{P}^1)$. This result can be viewed as an all genus equivariant open mirror symmetry for $(\\mathbb{P}^1, \\mathbb{R}\\mathbb{P}^1)$.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2507.15187" target="_blank">All genus open mirror symmetry for the projective line</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jinghao Yu, Zhengyu Zong</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 12 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2507.15187" target="_blank">https://arxiv.org/abs/2507.15187</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove that the Chekhov-Eynard-Orantin recursion on the mirror curve of $\mathbb{P}^1$ encodes all genus equivariant open Gromov-Witten invariants of $(\mathbb{P}^1, \mathbb{R}\mathbb{P}^1)$. This result can be viewed as an all genus equivariant open mirror symmetry for $(\mathbb{P}^1, \mathbb{R}\mathbb{P}^1)$.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "Weak Fano threefolds arising as the blowup of a hyperquadric in $\\mathbb{P}^4$ along a curve", "author": "Anne Schnattinger", "published": "Thu, 12 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.20315", "summary": "arXiv:2512.20315v2 Announce Type: replace \nAbstract: We characterize smooth irreducible curves $C$ on a smooth hyperquadric $Y$ of $\\mathbb{P}^4$ such that the blowup of $Y$ along $C$ is a weak Fano threefold. These are precisely the smooth irreducible curves $C$ of degree $d$ and genus $g$ lying on a smooth hypercubic section of $Y$ such that (i) $C$ has no 4-secant line and no 7-secant conic; (ii) $d&lt; 18$ and $(g,d)\\not \\in \\{(4,7),\\:(10, 11)\\}$; (iii) either $3d-26&lt;g\\leq\\frac{d^2-1}{12}$ or $(g,d)\\in \\{(4,6),\\:(13,12)\\}$. We prove the geometric realizability of each case, thereby proving the existence of weak Fano threefolds and Sarkisov links constructed from them, which were previously known only as numerical possibilities.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2512.20315" target="_blank">Weak Fano threefolds arising as the blowup of a hyperquadric in $\mathbb{P}^4$ along a curve</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Anne Schnattinger</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 12 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.20315" target="_blank">https://arxiv.org/abs/2512.20315</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We characterize smooth irreducible curves $C$ on a smooth hyperquadric $Y$ of $\mathbb{P}^4$ such that the blowup of $Y$ along $C$ is a weak Fano threefold. These are precisely the smooth irreducible curves $C$ of degree $d$ and genus $g$ lying on a smooth hypercubic section of $Y$ such that (i) $C$ has no 4-secant line and no 7-secant conic; (ii) $d&lt; 18$ and $(g,d)\not \in \{(4,7),\:(10, 11)\}$; (iii) either $3d-26&lt;g\leq\frac{d^2-1}{12}$ or $(g,d)\in \{(4,6),\:(13,12)\}$. We prove the geometric realizability of each case, thereby proving the existence of weak Fano threefolds and Sarkisov links constructed from them, which were previously known only as numerical possibilities.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Deformations of the connected sum of Gorenstein algebras", "author": "Piotr Oszer", "published": "Thu, 12 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.03179", "summary": "arXiv:2601.03179v2 Announce Type: replace \nAbstract: We prove that the Gorenstein locus of the Hilbert scheme of points on $\\mathbb A^n$ is non-reduced for $n\\geq 12$; we construct examples of non-reduced points that come from apolar algebras of the sum of general cubics. As a corollary, we get a non-reducedness result for the cactus scheme. We generalise the Bia{\\l}ynicki-Birula decomposition to abstract deformation functors, providing a new method of studying deformation theory. Our construction gives us fractal structures on the nested Hilbert scheme.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2601.03179" target="_blank">Deformations of the connected sum of Gorenstein algebras</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Piotr Oszer</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 12 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.03179" target="_blank">https://arxiv.org/abs/2601.03179</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove that the Gorenstein locus of the Hilbert scheme of points on $\mathbb A^n$ is non-reduced for $n\geq 12$; we construct examples of non-reduced points that come from apolar algebras of the sum of general cubics. As a corollary, we get a non-reducedness result for the cactus scheme. We generalise the Bia{\l}ynicki-Birula decomposition to abstract deformation functors, providing a new method of studying deformation theory. Our construction gives us fractal structures on the nested Hilbert scheme.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "Hensel's lemma for the norm principle for spinor groups", "author": "Amin Soofiani", "published": "Thu, 12 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2412.15737", "summary": "arXiv:2412.15737v2 Announce Type: replace-cross \nAbstract: Let $K$ be a complete discretely valued field with residue field $k$ with $char \\ k \\ne 2$. Assuming that the norm principle holds for spinor groups $Spin(\\mathfrak{h})$ for every regular skew-hermitian form $\\mathfrak{h}$ over every quaternion algebra $\\mathfrak{D}$ (with respect to the canonical involution on $\\mathfrak{D}$) defined over any finite extension of $k$, we show that the norm principle holds for spinor groups $Spin(h)$ for every regular skew-hermitian form $h$ over every quaternion algebra $D$ (with respect to the canonical involution on $D$) defined over $K$.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2412.15737" target="_blank">Hensel's lemma for the norm principle for spinor groups</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Amin Soofiani</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 12 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2412.15737" target="_blank">https://arxiv.org/abs/2412.15737</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $K$ be a complete discretely valued field with residue field $k$ with $char \ k \ne 2$. Assuming that the norm principle holds for spinor groups $Spin(\mathfrak{h})$ for every regular skew-hermitian form $\mathfrak{h}$ over every quaternion algebra $\mathfrak{D}$ (with respect to the canonical involution on $\mathfrak{D}$) defined over any finite extension of $k$, we show that the norm principle holds for spinor groups $Spin(h)$ for every regular skew-hermitian form $h$ over every quaternion algebra $D$ (with respect to the canonical involution on $D$) defined over $K$.
+            </div>
+        </div>
+        <div class="paper" id="paper-21">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-21" data-paper-data='{"title": "Index from a point", "author": "Monica Jinwoo Kang, Craig Lawrie, Jaewon Song", "published": "Thu, 12 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2507.12510", "summary": "arXiv:2507.12510v2 Announce Type: replace-cross \nAbstract: We propose an algebro-geometric interpretation of the Schur and Macdonald indices of four-dimensional $\\mathcal{N}=2$ superconformal field theories (SCFTs). We conjecture that there exists an affine scheme $X$, which reduces to the Higgs branch as a variety, such that the Hilbert series of the (appropriately-graded) arc space of its polynomial ring $J_\\infty(\\mathbb{C}[X])$ encodes the indices. Distinct local descriptions of a (singular) point correspond to distinct choices of $X$, giving rise to families of $\\mathcal{N}=2$ SCFTs each without a Higgs branch. These local descriptions directly translate into nilpotency relations in the operator product expansions. We test our conjecture across a variety of (generalized) Argyres--Douglas theories.", "number": 21, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#21</span>
+                <a href="https://arxiv.org/abs/2507.12510" target="_blank">Index from a point</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Monica Jinwoo Kang, Craig Lawrie, Jaewon Song</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 12 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2507.12510" target="_blank">https://arxiv.org/abs/2507.12510</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We propose an algebro-geometric interpretation of the Schur and Macdonald indices of four-dimensional $\mathcal{N}=2$ superconformal field theories (SCFTs). We conjecture that there exists an affine scheme $X$, which reduces to the Higgs branch as a variety, such that the Hilbert series of the (appropriately-graded) arc space of its polynomial ring $J_\infty(\mathbb{C}[X])$ encodes the indices. Distinct local descriptions of a (singular) point correspond to distinct choices of $X$, giving rise to families of $\mathcal{N}=2$ SCFTs each without a Higgs branch. These local descriptions directly translate into nilpotency relations in the operator product expansions. We test our conjecture across a variety of (generalized) Argyres--Douglas theories.
+            </div>
+        </div>
+        <div class="paper" id="paper-22">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-22" data-paper-data='{"title": "Sandwiched singularities and nearly Lefschetz fibrations", "author": "Olga Plamenevskaya, Laura Starkston", "published": "Thu, 12 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2507.21293", "summary": "arXiv:2507.21293v3 Announce Type: replace-cross \nAbstract: We study Milnor fibers and symplectic fillings of links of sandwiched singularities, with the goal of contrasting their algebro-geometric deformation theory and symplectic topology. In the algebro-geometric setting, smoothings of sandwiched singularities are described by de Jong--van Straten's theory: all Milnor fibers are generated from deformations of a singular plane curve germ associated to the surface singularity. We develop an analog of this theory in the symplectic setting, showing that all minimal symplectic fillings of the links are generated by certain immersed disk arrangements resembling de Jong--van Straten's picture deformations. This paper continues our previous work for a special subclass of singularities; the general case has additional difficulties and new features. The key new ingredient in the present paper is given by spinal open books and nearly Lefschetz fibrations: we use recent work of Min--Roy--Wang to understand symplectic fillings and encode them via multisections of certain Lefschetz fibrations. As an application, we discuss arrangements that generate unexpected Stein fillings that are different from all Milnor fibers, showing that the links of a large class of sandwiched singularities admit unexpected fillings.", "number": 22, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#22</span>
+                <a href="https://arxiv.org/abs/2507.21293" target="_blank">Sandwiched singularities and nearly Lefschetz fibrations</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Olga Plamenevskaya, Laura Starkston</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 12 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2507.21293" target="_blank">https://arxiv.org/abs/2507.21293</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study Milnor fibers and symplectic fillings of links of sandwiched singularities, with the goal of contrasting their algebro-geometric deformation theory and symplectic topology. In the algebro-geometric setting, smoothings of sandwiched singularities are described by de Jong--van Straten's theory: all Milnor fibers are generated from deformations of a singular plane curve germ associated to the surface singularity. We develop an analog of this theory in the symplectic setting, showing that all minimal symplectic fillings of the links are generated by certain immersed disk arrangements resembling de Jong--van Straten's picture deformations. This paper continues our previous work for a special subclass of singularities; the general case has additional difficulties and new features. The key new ingredient in the present paper is given by spinal open books and nearly Lefschetz fibrations: we use recent work of Min--Roy--Wang to understand symplectic fillings and encode them via multisections of certain Lefschetz fibrations. As an application, we discuss arrangements that generate unexpected Stein fillings that are different from all Milnor fibers, showing that the links of a large class of sandwiched singularities admit unexpected fillings.
+            </div>
+        </div>
+        <div class="paper" id="paper-23">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-23" data-paper-data='{"title": "Curves of genus two with maps of every degree to a fixed elliptic curve", "author": "Everett W. Howe", "published": "Thu, 12 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.19050", "summary": "arXiv:2601.19050v2 Announce Type: replace-cross \nAbstract: We show that up to isomorphism there are exactly twenty pairs $(C,E)$, where $C$ is a genus-$2$ curve over ${\\mathbf C}$, where $E$ is an elliptic curve over ${\\mathbf C}$, and where for every integer $n&gt;1$ there is a map of degree $n$ from $C$ to $E$. We also show that the intersection of the Humbert surfaces $H_{n^2}$, for $n$ ranging from 2 to 1811, is empty.", "number": 23, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#23</span>
+                <a href="https://arxiv.org/abs/2601.19050" target="_blank">Curves of genus two with maps of every degree to a fixed elliptic curve</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Everett W. Howe</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 12 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.19050" target="_blank">https://arxiv.org/abs/2601.19050</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We show that up to isomorphism there are exactly twenty pairs $(C,E)$, where $C$ is a genus-$2$ curve over ${\mathbf C}$, where $E$ is an elliptic curve over ${\mathbf C}$, and where for every integer $n&gt;1$ there is a map of degree $n$ from $C$ to $E$. We also show that the intersection of the Humbert surfaces $H_{n^2}$, for $n$ ranging from 2 to 1811, is empty.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-02-12 18:00:04
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>

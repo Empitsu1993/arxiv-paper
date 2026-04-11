@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Mon, 15 Dec 2025 05:00:46 +0000<br>
+        <strong>論文数:</strong> 20件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">$p$-adic hypergeometric $\mathscr{D}^{\dagger}(\infty)$-module and exponential sums on reductive groups</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">The multiplicity-one theorem for the superspeciality of hyperelliptic curves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">On {\L}ojasiewicz Ideals and Flatness for Zero Sets with Infinite Tangential Geometry</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">Virtual invariants from the non-associative Hilbert scheme</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">Coordinate rings of regular semisimple Hessenberg varieties and cohomology rings of regular nilpotent Hessenberg varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">Chern character of Schur bundles</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Logarithmic Cartier Transform</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Genus-One Fibrations and the Jacobian of Linear Slices in the Quintic Equal-Sum Problem</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">Finite Convergence of the Moment-SOS Hierarchy on the Product of Spheres</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">Arithmetic Period Map and Complex Multiplication for Cubic Fourfolds</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">On strongly Koszul algebras and tidy Gr\"obner bases</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">A log-motivic cohomology for semistable varieties and its $p$-adic deformation theory</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">Geometry of the mirror models dual to the complete intersection of two cubics</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Minimal model program for log canonical pairs on complex analytic spaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Topological triviality and link-constancy in deformations of inner Khovanskii non-degenerate maps</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">Dimensional vanishing of the saturated de Rham-Witt complex</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">Note on Iitaka Conjecture $C_{n,m}$</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">Weddle loci of linear systems of quadrics and the rank of partially symmetric tensors</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Maximal variation of linear systems</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">Fermat near misses and the integral Hilbert Property</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "$p$-adic hypergeometric $\\mathscr{D}^{\\dagger}(\\infty)$-module and exponential sums on reductive groups", "author": "Xuanyou Li, Chenhan Liu", "published": "Mon, 15 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.11302", "summary": "arXiv:2512.11302v1 Announce Type: new \nAbstract: We study the $p$-adic analogue of the $\\ell$-adic hypergeometric sheaves for reductive groups, called the hypergeometric $\\mathscr{D}^{\\dagger}(\\infty)$-modules. They are overholonomic objects in the derived category of arithmetic $\\mathscr{D}$-modules with Frobenius structures. Over the non-degenerate locus, the hypergeometric $\\mathscr{D}^{\\dagger}(\\infty)$-modules define $F$-isocrystals overconvergent along the complement of the non-degenerate locus. As an application, we use the theory of $L$-functions of overholonomic arithmetic $\\mathscr{D}$-modules to study hypergeometric exponential sums on reductive groups.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2512.11302" target="_blank">$p$-adic hypergeometric $\mathscr{D}^{\dagger}(\infty)$-module and exponential sums on reductive groups</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Xuanyou Li, Chenhan Liu</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 15 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.11302" target="_blank">https://arxiv.org/abs/2512.11302</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the $p$-adic analogue of the $\ell$-adic hypergeometric sheaves for reductive groups, called the hypergeometric $\mathscr{D}^{\dagger}(\infty)$-modules. They are overholonomic objects in the derived category of arithmetic $\mathscr{D}$-modules with Frobenius structures. Over the non-degenerate locus, the hypergeometric $\mathscr{D}^{\dagger}(\infty)$-modules define $F$-isocrystals overconvergent along the complement of the non-degenerate locus. As an application, we use the theory of $L$-functions of overholonomic arithmetic $\mathscr{D}$-modules to study hypergeometric exponential sums on reductive groups.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "The multiplicity-one theorem for the superspeciality of hyperelliptic curves", "author": "Yuya Yamamoto", "published": "Mon, 15 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.11385", "summary": "arXiv:2512.11385v1 Announce Type: new \nAbstract: The multiplicity-one theorem for the simultaneous equations characterizing the superspeciality of hyperelliptic curves was established by Igusa in 1958 for genus one, and later extended by Harashita and Yamamoto in 2026 to genus two. In this paper, we generalize this result to arbitrary genus. Our approach employs the Lauricella system of type D for hypergeometric series in $2g-1$ variables, whose truncations (up to scalar multiplication) give the entries of a Cartier-Manin matrix. The multiplicity-one theorem is obtained through an analysis of equalities involving partial derivatives of these entries.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2512.11385" target="_blank">The multiplicity-one theorem for the superspeciality of hyperelliptic curves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yuya Yamamoto</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 15 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.11385" target="_blank">https://arxiv.org/abs/2512.11385</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The multiplicity-one theorem for the simultaneous equations characterizing the superspeciality of hyperelliptic curves was established by Igusa in 1958 for genus one, and later extended by Harashita and Yamamoto in 2026 to genus two. In this paper, we generalize this result to arbitrary genus. Our approach employs the Lauricella system of type D for hypergeometric series in $2g-1$ variables, whose truncations (up to scalar multiplication) give the entries of a Cartier-Manin matrix. The multiplicity-one theorem is obtained through an analysis of equalities involving partial derivatives of these entries.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "On {\\L}ojasiewicz Ideals and Flatness for Zero Sets with Infinite Tangential Geometry", "author": "Abdelhafed El Khadiri", "published": "Mon, 15 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.11432", "summary": "arXiv:2512.11432v1 Announce Type: new \nAbstract: Let $\\Omega \\subset \\mathbb{R}^n $ be an open set, and let $\\mathcal{E}(\\Omega)$ be the ring of infinitely differentiable functions on $\\Omega$. For an ideal $I \\subset \\mathcal{E}(\\Omega)$, we denote by $Z(I)$ its zero set. A classical result of Ren\\'e Thom asserts that if $I$ is a finitely generated {\\L}ojasiewicz ideal, then $Z(I)$ contains an open dense subset of smooth points. The goal of this note is to examine a converse question: does the existence of an open dense set of smooth points in $Z(I)$ ( $I\\subset\\mathcal{E}(\\Omega) $ is a finitely generated ideal) imply that the ideal $I$ is \\L{}ojasiewicz? We analyze obstructions to such a converse and identify geometric conditions under which it fails.\n  As an application, we study smooth real-valued functions of two variables whose zero set coincides with the classical Hawaiian earring, the union of infinitely many tangent circles accumulating at the origin. We show that any such function must be flat at the origin, in the sense that all partial derivatives vanish there. We formulate a geometric criterion concerning families of smooth arcs tangent at a point with unbounded or infinitely varying curvature, and derive from it a degenerate form of the {\\L}ojasiewicz inequality adapted to this non-analytic setting.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2512.11432" target="_blank">On {\L}ojasiewicz Ideals and Flatness for Zero Sets with Infinite Tangential Geometry</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Abdelhafed El Khadiri</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 15 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.11432" target="_blank">https://arxiv.org/abs/2512.11432</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $\Omega \subset \mathbb{R}^n $ be an open set, and let $\mathcal{E}(\Omega)$ be the ring of infinitely differentiable functions on $\Omega$. For an ideal $I \subset \mathcal{E}(\Omega)$, we denote by $Z(I)$ its zero set. A classical result of Ren\'e Thom asserts that if $I$ is a finitely generated {\L}ojasiewicz ideal, then $Z(I)$ contains an open dense subset of smooth points. The goal of this note is to examine a converse question: does the existence of an open dense set of smooth points in $Z(I)$ ( $I\subset\mathcal{E}(\Omega) $ is a finitely generated ideal) imply that the ideal $I$ is \L{}ojasiewicz? We analyze obstructions to such a converse and identify geometric conditions under which it fails.
+  As an application, we study smooth real-valued functions of two variables whose zero set coincides with the classical Hawaiian earring, the union of infinitely many tangent circles accumulating at the origin. We show that any such function must be flat at the origin, in the sense that all partial derivatives vanish there. We formulate a geometric criterion concerning families of smooth arcs tangent at a point with unbounded or infinitely varying curvature, and derive from it a degenerate form of the {\L}ojasiewicz inequality adapted to this non-analytic setting.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "Virtual invariants from the non-associative Hilbert scheme", "author": "Gergely B\\'erczi, Felix Minddal", "published": "Mon, 15 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.11538", "summary": "arXiv:2512.11538v1 Announce Type: new \nAbstract: We introduce a non-associative model for the Hilbert scheme of points in arbitrary dimension. We define a smooth ambient space, which we call the non-associative Hilbert scheme, containing the classical nested Hilbert scheme $\\mathrm{NHilb}^{\\underline{d}}(\\mathbb{A}^n)$ as the associativity, cut out by an explicit section of an associativity bundle. This construction yields canonical perfect obstruction theories and virtual fundamental classes on $\\mathrm{NHilb}^{\\underline{d}}(\\mathbb{A}^n)$ for all $(n,\\underline d)$. Using virtual localization, we obtain closed formulas for these virtual classes as sums over admissible nested partitions. Over the punctual locus, we rewrite these as a single multivariable iterated residue formula governing all virtual integrals. Our construction works for all $n$, produces positive-dimensional virtual classes when $n$ is large compared to the number of points, and we expect that they extend the non-commutative matrix model and virtual class construction on Calabi-Yau threefolds.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2512.11538" target="_blank">Virtual invariants from the non-associative Hilbert scheme</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Gergely B\'erczi, Felix Minddal</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 15 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.11538" target="_blank">https://arxiv.org/abs/2512.11538</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We introduce a non-associative model for the Hilbert scheme of points in arbitrary dimension. We define a smooth ambient space, which we call the non-associative Hilbert scheme, containing the classical nested Hilbert scheme $\mathrm{NHilb}^{\underline{d}}(\mathbb{A}^n)$ as the associativity, cut out by an explicit section of an associativity bundle. This construction yields canonical perfect obstruction theories and virtual fundamental classes on $\mathrm{NHilb}^{\underline{d}}(\mathbb{A}^n)$ for all $(n,\underline d)$. Using virtual localization, we obtain closed formulas for these virtual classes as sums over admissible nested partitions. Over the punctual locus, we rewrite these as a single multivariable iterated residue formula governing all virtual integrals. Our construction works for all $n$, produces positive-dimensional virtual classes when $n$ is large compared to the number of points, and we expect that they extend the non-commutative matrix model and virtual class construction on Calabi-Yau threefolds.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "Coordinate rings of regular semisimple Hessenberg varieties and cohomology rings of regular nilpotent Hessenberg varieties", "author": "Tatsuya Horiguchi", "published": "Mon, 15 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.11565", "summary": "arXiv:2512.11565v1 Announce Type: new \nAbstract: The polynomials $f_{i,j}$ are introduced by Abe-Harada-Horiguchi-Masuda to produce an explicit presentation by generators and relations of the cohomology rings of regular nilpotent Hessenberg varieties. In this paper we quantize the polynomials $f_{i,j}$ by a method of Fomin-Gelfand-Postnikov. Our main result states that their quantizations $F_{i,j}$ are related to the coordinate rings of regular semisimple Hessenberg varieties. This result yields a connection between the coordinate rings of regular semisimple Hessenberg varieties and the cohomology rings of regular nilpotent Hessenberg varieties. We also provide the quantized recursive formula for $F_{i,j}$.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2512.11565" target="_blank">Coordinate rings of regular semisimple Hessenberg varieties and cohomology rings of regular nilpotent Hessenberg varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Tatsuya Horiguchi</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 15 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.11565" target="_blank">https://arxiv.org/abs/2512.11565</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The polynomials $f_{i,j}$ are introduced by Abe-Harada-Horiguchi-Masuda to produce an explicit presentation by generators and relations of the cohomology rings of regular nilpotent Hessenberg varieties. In this paper we quantize the polynomials $f_{i,j}$ by a method of Fomin-Gelfand-Postnikov. Our main result states that their quantizations $F_{i,j}$ are related to the coordinate rings of regular semisimple Hessenberg varieties. This result yields a connection between the coordinate rings of regular semisimple Hessenberg varieties and the cohomology rings of regular nilpotent Hessenberg varieties. We also provide the quantized recursive formula for $F_{i,j}$.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "Chern character of Schur bundles", "author": "Alessandro D'Andrea, Enrico Fatighenti, Claudio Onorati", "published": "Mon, 15 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.11657", "summary": "arXiv:2512.11657v1 Announce Type: new \nAbstract: Given a vector bundle $E$, we give an explicit formula to compute Chern classes of Schur bundles $\\operatorname{S}^\\alpha E$ in terms of those of $E$.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2512.11657" target="_blank">Chern character of Schur bundles</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Alessandro D'Andrea, Enrico Fatighenti, Claudio Onorati</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 15 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.11657" target="_blank">https://arxiv.org/abs/2512.11657</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Given a vector bundle $E$, we give an explicit formula to compute Chern classes of Schur bundles $\operatorname{S}^\alpha E$ in terms of those of $E$.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Logarithmic Cartier Transform", "author": "Sami Fersi", "published": "Mon, 15 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.11660", "summary": "arXiv:2512.11660v1 Announce Type: new \nAbstract: We generalize the Cartier transform of Ogus and Vologodsky to log smooth schemes. More precisely, we generalize a local version of this transform, due to Shiho, and a topos-theoretic version, due to Oyama. Let $k$ be a perfect field of positive characteristic $p$ and equip $S=\\operatorname{Spec}k$ with the trivial log structure. For a log smooth scheme $X$ over $S,$ we obtain, under the assumption that the exact relative Frobenius lifts to the Witt vectors, a fully faithful functor from the category of quasi-coherent modules on the base change $X'=X\\times_{S,F_S}S$ of $X$ by the Frobenius $F_S$ of $S,$ equipped with a quasi-nilpotent Higgs field, to the category of quasi-coherent modules on $X$ equipped with a quasi-nilpotent integrable connection. In another direction, we construct crystalline-like topoi and subcategories of crystals $\\mathcal{C}'$ and $\\underline{\\mathcal{C}},$ equivalent respectively to modules with Higgs fields and integrable connections, and a fully faithful functor $\\mathcal{C}' \\rightarrow \\underline{\\mathcal{C}}.$ Since the Frobenius morphism is not, in general, flat in the log smooth setting, it is not clear that these functors are essentially surjective. To address this issue, we refine the topoi and crystals mentioned above by endowing them with an indexed structure, inspired by Lorenzon's extension of Cartier descent to smooth logarithmic schemes. Using the Azumaya property of the ring of logarithmic differential operators, we then obtain an equivalence between the corresponding categories of indexed crystals, thereby generalizing the Cartier transform.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2512.11660" target="_blank">Logarithmic Cartier Transform</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sami Fersi</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 15 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.11660" target="_blank">https://arxiv.org/abs/2512.11660</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We generalize the Cartier transform of Ogus and Vologodsky to log smooth schemes. More precisely, we generalize a local version of this transform, due to Shiho, and a topos-theoretic version, due to Oyama. Let $k$ be a perfect field of positive characteristic $p$ and equip $S=\operatorname{Spec}k$ with the trivial log structure. For a log smooth scheme $X$ over $S,$ we obtain, under the assumption that the exact relative Frobenius lifts to the Witt vectors, a fully faithful functor from the category of quasi-coherent modules on the base change $X'=X\times_{S,F_S}S$ of $X$ by the Frobenius $F_S$ of $S,$ equipped with a quasi-nilpotent Higgs field, to the category of quasi-coherent modules on $X$ equipped with a quasi-nilpotent integrable connection. In another direction, we construct crystalline-like topoi and subcategories of crystals $\mathcal{C}'$ and $\underline{\mathcal{C}},$ equivalent respectively to modules with Higgs fields and integrable connections, and a fully faithful functor $\mathcal{C}' \rightarrow \underline{\mathcal{C}}.$ Since the Frobenius morphism is not, in general, flat in the log smooth setting, it is not clear that these functors are essentially surjective. To address this issue, we refine the topoi and crystals mentioned above by endowing them with an indexed structure, inspired by Lorenzon's extension of Cartier descent to smooth logarithmic schemes. Using the Azumaya property of the ring of logarithmic differential operators, we then obtain an equivalence between the corresponding categories of indexed crystals, thereby generalizing the Cartier transform.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Genus-One Fibrations and the Jacobian of Linear Slices in the Quintic Equal-Sum Problem", "author": "Valery Asiryan", "published": "Mon, 15 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.11072", "summary": "arXiv:2512.11072v1 Announce Type: cross \nAbstract: We study the Diophantine equation $a^5+b^5=c^5+d^5$ subject to the linear constraint $(c+d)-(a+b)=h$. We establish the necessary modular condition $30 \\mid h$ and focus on the first admissible slice $h=30$. The problem reduces to finding rational sections on a genus-one fibration over $\\mathbb{Q}(S)$, which need not admit a section. We explicitly construct the associated Jacobian elliptic surface $E/\\mathbb{Q}(S)$. By exploiting a global rational $2$-torsion point and applying the Gusi\\'c-Tadi\\'c injectivity criterion for the specialization homomorphism, we prove the upper bound $\\mathrm{rank}\\,E(\\mathbb{Q}(S))\\le 1$. This result severely restricts the possible structure of infinite families of integer solutions within the slice.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2512.11072" target="_blank">Genus-One Fibrations and the Jacobian of Linear Slices in the Quintic Equal-Sum Problem</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Valery Asiryan</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 15 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.11072" target="_blank">https://arxiv.org/abs/2512.11072</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the Diophantine equation $a^5+b^5=c^5+d^5$ subject to the linear constraint $(c+d)-(a+b)=h$. We establish the necessary modular condition $30 \mid h$ and focus on the first admissible slice $h=30$. The problem reduces to finding rational sections on a genus-one fibration over $\mathbb{Q}(S)$, which need not admit a section. We explicitly construct the associated Jacobian elliptic surface $E/\mathbb{Q}(S)$. By exploiting a global rational $2$-torsion point and applying the Gusi\'c-Tadi\'c injectivity criterion for the specialization homomorphism, we prove the upper bound $\mathrm{rank}\,E(\mathbb{Q}(S))\le 1$. This result severely restricts the possible structure of infinite families of integer solutions within the slice.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "Finite Convergence of the Moment-SOS Hierarchy on the Product of Spheres", "author": "Sami Halaseh, Victor Magron, Mateusz Skomra", "published": "Mon, 15 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.11119", "summary": "arXiv:2512.11119v1 Announce Type: cross \nAbstract: We study the polynomial optimization problem of minimizing a multihomogeneous polynomial over the product of spheres. This polynomial optimization problem models the tensor optimization problem of finding the best rank one approximation of an arbitrary tensor. We show that the moment-SOS hierarchy has finite convergence in this case, for a generic multihomogeneous objective function. To show finite convergence of the hierarchy, we use a result of Huang et al. [SIAM J.Optim. 34(4) (2024), pp 3399-3428], which relies on local optimality conditions. To prove that the local optimality conditions hold generically, we use techniques from differential geometry and Morse theory. This work generalizes the main result of Huang [Optim. Lett. 17(5) (2023), pp 1263-1270], which shows finite convergence for the case of a homogeneous polynomial over a single sphere.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2512.11119" target="_blank">Finite Convergence of the Moment-SOS Hierarchy on the Product of Spheres</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sami Halaseh, Victor Magron, Mateusz Skomra</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 15 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.11119" target="_blank">https://arxiv.org/abs/2512.11119</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the polynomial optimization problem of minimizing a multihomogeneous polynomial over the product of spheres. This polynomial optimization problem models the tensor optimization problem of finding the best rank one approximation of an arbitrary tensor. We show that the moment-SOS hierarchy has finite convergence in this case, for a generic multihomogeneous objective function. To show finite convergence of the hierarchy, we use a result of Huang et al. [SIAM J.Optim. 34(4) (2024), pp 3399-3428], which relies on local optimality conditions. To prove that the local optimality conditions hold generically, we use techniques from differential geometry and Morse theory. This work generalizes the main result of Huang [Optim. Lett. 17(5) (2023), pp 1263-1270], which shows finite convergence for the case of a homogeneous polynomial over a single sphere.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "Arithmetic Period Map and Complex Multiplication for Cubic Fourfolds", "author": "Rikuto Ito", "published": "Mon, 15 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.11355", "summary": "arXiv:2512.11355v1 Announce Type: cross \nAbstract: We construct an arithmetic period map for cubic fourfolds, in direct analogy with Rizov's work on K3 surfaces. For each $N\\geq 1$, we introduce a Deligne-Mumford stack $\\widetilde{\\mathcal{C}^{[N]}}$ of cubic fourfolds with level structure and prove that the associated period map $j_{N}:\\widetilde{\\mathcal{C}^{[N]}}_{\\mathbb{C}}\\to {\\rm Sh}_{K_{N}}(L)_{\\mathbb{C}}$ is algebraic, \\'etale, and descends to $\\mathbb{Q}$ whenever $N$ is coprime to $2310$. As an application, we develop complex multiplication theory for cubic fourfolds and show that every cubic fourfold of CM type is defined over an abelian extension of its reflex field. Moreover, using the CM theory for rank-21 cubic fourfolds, we provide an alternative proof of the modularity of rank-21 cubic fourfolds established by Livn\\'e.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2512.11355" target="_blank">Arithmetic Period Map and Complex Multiplication for Cubic Fourfolds</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Rikuto Ito</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 15 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.11355" target="_blank">https://arxiv.org/abs/2512.11355</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We construct an arithmetic period map for cubic fourfolds, in direct analogy with Rizov's work on K3 surfaces. For each $N\geq 1$, we introduce a Deligne-Mumford stack $\widetilde{\mathcal{C}^{[N]}}$ of cubic fourfolds with level structure and prove that the associated period map $j_{N}:\widetilde{\mathcal{C}^{[N]}}_{\mathbb{C}}\to {\rm Sh}_{K_{N}}(L)_{\mathbb{C}}$ is algebraic, \'etale, and descends to $\mathbb{Q}$ whenever $N$ is coprime to $2310$. As an application, we develop complex multiplication theory for cubic fourfolds and show that every cubic fourfold of CM type is defined over an abelian extension of its reflex field. Moreover, using the CM theory for rank-21 cubic fourfolds, we provide an alternative proof of the modularity of rank-21 cubic fourfolds established by Livn\'e.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "On strongly Koszul algebras and tidy Gr\\\"obner bases", "author": "Alessio D'Al\\`i", "published": "Mon, 15 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.11778", "summary": "arXiv:2512.11778v1 Announce Type: cross \nAbstract: Strongly Koszul algebras were introduced by Herzog, Hibi and Restuccia in 2000. The goal of the present paper is to provide an in-depth study of such algebras and to investigate how strong Koszulness interacts with the existence of a quadratic Gr\\\"obner basis for the defining ideal. Firstly, we prove that the existence of a quadratic revlex-universal Gr\\\"obner basis with a strong sparsity condition (that we name \"tidiness\") is a sufficient condition for strong Koszulness, and exhibit several concrete examples arising from determinantal objects and Macaulay's inverse system. We then prove that there exist standard graded algebras that are strongly Koszul but do not admit a Gr\\\"obner basis of quadrics even after a linear change of coordinates, thus answering negatively a question posed by Conca, De Negri and Rossi. As a bonus, we prove that strong Koszulness behaves well under tensor and fiber products of algebras and illustrate how Severi varieties and Macaulay's inverse system interact to produce examples of strongly Koszul algebras with a geometric flavor.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2512.11778" target="_blank">On strongly Koszul algebras and tidy Gr\"obner bases</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Alessio D'Al\`i</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 15 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.11778" target="_blank">https://arxiv.org/abs/2512.11778</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Strongly Koszul algebras were introduced by Herzog, Hibi and Restuccia in 2000. The goal of the present paper is to provide an in-depth study of such algebras and to investigate how strong Koszulness interacts with the existence of a quadratic Gr\"obner basis for the defining ideal. Firstly, we prove that the existence of a quadratic revlex-universal Gr\"obner basis with a strong sparsity condition (that we name "tidiness") is a sufficient condition for strong Koszulness, and exhibit several concrete examples arising from determinantal objects and Macaulay's inverse system. We then prove that there exist standard graded algebras that are strongly Koszul but do not admit a Gr\"obner basis of quadrics even after a linear change of coordinates, thus answering negatively a question posed by Conca, De Negri and Rossi. As a bonus, we prove that strong Koszulness behaves well under tensor and fiber products of algebras and illustrate how Severi varieties and Macaulay's inverse system interact to produce examples of strongly Koszul algebras with a geometric flavor.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "A log-motivic cohomology for semistable varieties and its $p$-adic deformation theory", "author": "Oliver Gregory, Andreas Langer", "published": "Mon, 15 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2108.02845", "summary": "arXiv:2108.02845v5 Announce Type: replace \nAbstract: We construct log-motivic cohomology groups for semistable varieties and study the $p$-adic deformation theory of log-motivic cohomology classes. Our main result is the deformational part of a $p$-adic variational Hodge conjecture for varieties with semistable reduction: a rational log-motivic cohomology class in bidegree $(2n,n)$ lifts to a continuous pro-class if and only if its Hyodo-Kato class lies in the $n$-th step of the Hodge filtration. This generalises a theorem of Bloch-Esnault-Kerz which treats the good reduction case. In the case $n=1$ the lifting criterion is the one obtained by Yamashita for the logarithmic Picard group. Along the way, we relate log-motivic cohomology to logarithmic Milnor $K$-theory and the logarithmic Hyodo-Kato Hodge-Witt sheaves.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2108.02845" target="_blank">A log-motivic cohomology for semistable varieties and its $p$-adic deformation theory</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Oliver Gregory, Andreas Langer</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 15 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2108.02845" target="_blank">https://arxiv.org/abs/2108.02845</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We construct log-motivic cohomology groups for semistable varieties and study the $p$-adic deformation theory of log-motivic cohomology classes. Our main result is the deformational part of a $p$-adic variational Hodge conjecture for varieties with semistable reduction: a rational log-motivic cohomology class in bidegree $(2n,n)$ lifts to a continuous pro-class if and only if its Hyodo-Kato class lies in the $n$-th step of the Hodge filtration. This generalises a theorem of Bloch-Esnault-Kerz which treats the good reduction case. In the case $n=1$ the lifting criterion is the one obtained by Yamashita for the logarithmic Picard group. Along the way, we relate log-motivic cohomology to logarithmic Milnor $K$-theory and the logarithmic Hyodo-Kato Hodge-Witt sheaves.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "Geometry of the mirror models dual to the complete intersection of two cubics", "author": "Mykola Pochekai", "published": "Mon, 15 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2311.15103", "summary": "arXiv:2311.15103v4 Announce Type: replace \nAbstract: In many cases involving mirror symmetry, it is important to have concrete mirror dual families. In this paper, we construct a natural crepant resolutions of the Batyrev-Borisov mirror dual family to the complete intersection of two cubic hypersurfaces in $\\mathbb P^5$. It is, similarly to the mirrors of quintic threefolds, a family over $\\mathbb{P}^1$ with singular fibers over the set $\\{0, \\infty\\} \\cup \\mu_6$. We compute the Picard-Fuchs equation and limiting mixed Hodge structures of the singular fibers. We find that the singular fiber over $\\infty$ has maximal unipotent monodromy, and $0$ is of a new type compared to the quintic case.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2311.15103" target="_blank">Geometry of the mirror models dual to the complete intersection of two cubics</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Mykola Pochekai</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 15 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2311.15103" target="_blank">https://arxiv.org/abs/2311.15103</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In many cases involving mirror symmetry, it is important to have concrete mirror dual families. In this paper, we construct a natural crepant resolutions of the Batyrev-Borisov mirror dual family to the complete intersection of two cubic hypersurfaces in $\mathbb P^5$. It is, similarly to the mirrors of quintic threefolds, a family over $\mathbb{P}^1$ with singular fibers over the set $\{0, \infty\} \cup \mu_6$. We compute the Picard-Fuchs equation and limiting mixed Hodge structures of the singular fibers. We find that the singular fiber over $\infty$ has maximal unipotent monodromy, and $0$ is of a new type compared to the quintic case.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Minimal model program for log canonical pairs on complex analytic spaces", "author": "Makoto Enokizono, Kenta Hashizume", "published": "Mon, 15 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2404.05126", "summary": "arXiv:2404.05126v2 Announce Type: replace \nAbstract: We study the minimal model program for lc pairs on projective morphism between complex analytic spaces. More precisely, we generalize the results by Birkar and the second author to the setup by Fujino.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2404.05126" target="_blank">Minimal model program for log canonical pairs on complex analytic spaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Makoto Enokizono, Kenta Hashizume</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 15 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2404.05126" target="_blank">https://arxiv.org/abs/2404.05126</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the minimal model program for lc pairs on projective morphism between complex analytic spaces. More precisely, we generalize the results by Birkar and the second author to the setup by Fujino.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Topological triviality and link-constancy in deformations of inner Khovanskii non-degenerate maps", "author": "Julian D. Espinel Leal, Eder L. Sanchez Quiceno", "published": "Mon, 15 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2504.18816", "summary": "arXiv:2504.18816v3 Announce Type: replace \nAbstract: For real polynomial maps and mixed polynomial maps $f=(f^1,\\dots,f^p)$, with $f(0)=0$, we introduce the notion of \\textit{Inner Khovanskii Non-Degeneracy} (IKND), which generalize a previous non-degeneracy condition for complex polynomial functions introduced by Wall Wall (J. Reine Angew. Math. 509 (1999), 1-19.). We prove that IKND is a sufficient condition that ensures the link of the singularity of $f$ at the origin is smooth and well-defined. We then study one-parameter deformations of an IKND map $f$, given by $F(\\bm{x},\\varepsilon)=f(\\bm{x})+\\theta(\\bm{x},\\varepsilon),\\ F(0,\\varepsilon)=0$. We prove that the deformation is \\textit{link-constant} under suitable conditions on $f$ and $\\theta$, meaning that the ambient isotopy type of the link remains unchanged along the deformation. Furthermore, by employing a strong version of this non-degeneracy, \\textit{Strong Inner Khovanskii Non-Degeneracy} (SIKND), we obtain results on topological triviality. Finally, as an application of our link-constancy results, we provide a complete characterization of the links arising from IKND mixed polynomial functions in two variables, thereby extending and refining the characterization previously established by Bode (Bull. Braz. Math. Soc. (N.S.) 56 (2025), no. 4, Paper No. 55).", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2504.18816" target="_blank">Topological triviality and link-constancy in deformations of inner Khovanskii non-degenerate maps</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Julian D. Espinel Leal, Eder L. Sanchez Quiceno</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 15 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2504.18816" target="_blank">https://arxiv.org/abs/2504.18816</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                For real polynomial maps and mixed polynomial maps $f=(f^1,\dots,f^p)$, with $f(0)=0$, we introduce the notion of \textit{Inner Khovanskii Non-Degeneracy} (IKND), which generalize a previous non-degeneracy condition for complex polynomial functions introduced by Wall Wall (J. Reine Angew. Math. 509 (1999), 1-19.). We prove that IKND is a sufficient condition that ensures the link of the singularity of $f$ at the origin is smooth and well-defined. We then study one-parameter deformations of an IKND map $f$, given by $F(\bm{x},\varepsilon)=f(\bm{x})+\theta(\bm{x},\varepsilon),\ F(0,\varepsilon)=0$. We prove that the deformation is \textit{link-constant} under suitable conditions on $f$ and $\theta$, meaning that the ambient isotopy type of the link remains unchanged along the deformation. Furthermore, by employing a strong version of this non-degeneracy, \textit{Strong Inner Khovanskii Non-Degeneracy} (SIKND), we obtain results on topological triviality. Finally, as an application of our link-constancy results, we provide a complete characterization of the links arising from IKND mixed polynomial functions in two variables, thereby extending and refining the characterization previously established by Bode (Bull. Braz. Math. Soc. (N.S.) 56 (2025), no. 4, Paper No. 55).
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "Dimensional vanishing of the saturated de Rham-Witt complex", "author": "Ravi Fernando", "published": "Mon, 15 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2507.22314", "summary": "arXiv:2507.22314v2 Announce Type: replace \nAbstract: The saturated de Rham-Witt complex, introduced by Bhatt-Lurie-Mathew in arXiv:1805.05501, is a variant of the classical de Rham-Witt complex which is expected to behave better for singular schemes. We provide partial justification for this expectation by showing that the saturated de Rham-Witt complex satisfies a dimensional vanishing property even in the presence of singularities. This is stronger than the vanishing properties of the classical de Rham-Witt complex, crystalline cohomology, or de Rham cohomology, and is instead comparable to \\'etale cohomology.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2507.22314" target="_blank">Dimensional vanishing of the saturated de Rham-Witt complex</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ravi Fernando</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 15 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2507.22314" target="_blank">https://arxiv.org/abs/2507.22314</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The saturated de Rham-Witt complex, introduced by Bhatt-Lurie-Mathew in arXiv:1805.05501, is a variant of the classical de Rham-Witt complex which is expected to behave better for singular schemes. We provide partial justification for this expectation by showing that the saturated de Rham-Witt complex satisfies a dimensional vanishing property even in the presence of singularities. This is stronger than the vanishing properties of the classical de Rham-Witt complex, crystalline cohomology, or de Rham cohomology, and is instead comparable to \'etale cohomology.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "Note on Iitaka Conjecture $C_{n,m}$", "author": "Houari Benammar Ammar", "published": "Mon, 15 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2510.06412", "summary": "arXiv:2510.06412v2 Announce Type: replace \nAbstract: Let \\( f: X \\to Y \\) be an algebraic fiber space, where \\( X \\) and \\( Y \\) are smooth projective varieties of dimensions \\( n \\) and \\( m \\), respectively. In \\cite{Caopaun}, Cao and P\\u{a}un proved \\( C_{n,m} \\) when \\( Y \\) has maximal Albanese dimension. In this paper, we prove \\( C_{n,m} \\) in the case where the Albanese dimension $\\alpha(Y)$ of \\( Y \\) satisfies \\( \\alpha(Y) \\geq m-2 \\).", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2510.06412" target="_blank">Note on Iitaka Conjecture $C_{n,m}$</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Houari Benammar Ammar</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 15 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.06412" target="_blank">https://arxiv.org/abs/2510.06412</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let \( f: X \to Y \) be an algebraic fiber space, where \( X \) and \( Y \) are smooth projective varieties of dimensions \( n \) and \( m \), respectively. In \cite{Caopaun}, Cao and P\u{a}un proved \( C_{n,m} \) when \( Y \) has maximal Albanese dimension. In this paper, we prove \( C_{n,m} \) in the case where the Albanese dimension $\alpha(Y)$ of \( Y \) satisfies \( \alpha(Y) \geq m-2 \).
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "Weddle loci of linear systems of quadrics and the rank of partially symmetric tensors", "author": "Luca Chiantini, Filippo Fagioli", "published": "Mon, 15 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2510.16571", "summary": "arXiv:2510.16571v2 Announce Type: replace \nAbstract: We establish a connection between properties of partially symmetric tensors (i.e. tensors associated to linear systems of quadric hypersurfaces) and the geometry of some related loci, generalization of the Weddle loci introduced in \\cite{CFF+22} for their role in the study of configurations of points and interpolation problems. In particular, we consider linear systems of plane conics and linear systems of quadric surfaces, and show that when the associated tensors have low rank, then the singularities of the corresponding Weddle loci satisfy a (sharp) lower bound. Thus, we obtain a criterion to exclude that the rank of some partially symmetric tensors is too low. In the final section, devoted to partially symmetric $n\\times n\\times n$ tensors which lie in one component $M$ of a standard decomposition of the space of $3$-dimensional tensors (\\cite{IR22}), we prove that the number of singular points of the Weddle locus associated to a general tensor in $M$ equals the (recursively defined) $n$-th Jacobsthal number.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2510.16571" target="_blank">Weddle loci of linear systems of quadrics and the rank of partially symmetric tensors</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Luca Chiantini, Filippo Fagioli</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 15 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.16571" target="_blank">https://arxiv.org/abs/2510.16571</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We establish a connection between properties of partially symmetric tensors (i.e. tensors associated to linear systems of quadric hypersurfaces) and the geometry of some related loci, generalization of the Weddle loci introduced in \cite{CFF+22} for their role in the study of configurations of points and interpolation problems. In particular, we consider linear systems of plane conics and linear systems of quadric surfaces, and show that when the associated tensors have low rank, then the singularities of the corresponding Weddle loci satisfy a (sharp) lower bound. Thus, we obtain a criterion to exclude that the rank of some partially symmetric tensors is too low. In the final section, devoted to partially symmetric $n\times n\times n$ tensors which lie in one component $M$ of a standard decomposition of the space of $3$-dimensional tensors (\cite{IR22}), we prove that the number of singular points of the Weddle locus associated to a general tensor in $M$ equals the (recursively defined) $n$-th Jacobsthal number.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Maximal variation of linear systems", "author": "Arnaud Beauville", "published": "Mon, 15 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.22329", "summary": "arXiv:2511.22329v2 Announce Type: replace \nAbstract: Let X be a smooth projective complex variety, and L a line bundle on X . We say that the linear system |L| has maximal variation if its elements have the maximum number dim|L| of moduli. We discuss four cases where this situation is expected: hypersurfaces, double coverings of the projective space, K3 surfaces, and abelian varieties.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2511.22329" target="_blank">Maximal variation of linear systems</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Arnaud Beauville</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 15 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.22329" target="_blank">https://arxiv.org/abs/2511.22329</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let X be a smooth projective complex variety, and L a line bundle on X . We say that the linear system |L| has maximal variation if its elements have the maximum number dim|L| of moduli. We discuss four cases where this situation is expected: hypersurfaces, double coverings of the projective space, K3 surfaces, and abelian varieties.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "Fermat near misses and the integral Hilbert Property", "author": "Jessica Alessandr\\`i, Daniel Loughran", "published": "Mon, 15 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.17456", "summary": "arXiv:2511.17456v2 Announce Type: replace-cross \nAbstract: We consider the Diophantine equation $x^4 + y^4 - w^2 = n$ for $n \\in \\mathbb{Z}$, which is related to near misses for the quartic case of Fermat's Last Theorem. For certain $n$ we show that the set of solutions is infinite, or more generally not thin. Our approach is via the geometry of del Pezzo surfaces of degree $2$, and we prove a more general result on non-thinness of integral points on double conic bundle surfaces.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2511.17456" target="_blank">Fermat near misses and the integral Hilbert Property</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jessica Alessandr\`i, Daniel Loughran</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 15 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.17456" target="_blank">https://arxiv.org/abs/2511.17456</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We consider the Diophantine equation $x^4 + y^4 - w^2 = n$ for $n \in \mathbb{Z}$, which is related to near misses for the quartic case of Fermat's Last Theorem. For certain $n$ we show that the set of solutions is infinite, or more generally not thin. Our approach is via the geometry of del Pezzo surfaces of degree $2$, and we prove a more general result on non-thinness of integral points on double conic bundle surfaces.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2025-12-15 18:00:03
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>

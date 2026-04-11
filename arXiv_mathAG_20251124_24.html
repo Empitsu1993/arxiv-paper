@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Mon, 24 Nov 2025 05:00:28 +0000<br>
+        <strong>論文数:</strong> 24件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">On O'Grady's generalized Franchetta conjecture for genus 11 K3 surfaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Notes on twisted period relations for the Wirtinger integral</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Logarithmic geometry and Frobenius, II</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">Parity and symmetry of polarized endomorphisms on cohomology</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">On the unirationality of conic bundles with discriminant of degree eight</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">Fedder type criteria for quasi-$F$-splitting II</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">A note on zero-cycles on bielliptic surfaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Harder-Narasimhan filtrations of decorated vector bundles</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">Milnor number of invariant singularity: generalization of Chulkov's inequality</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">A complete proof of the geometric Bombieri-Lang conjecture for ramified covers of abelian varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">Geometry of Deformations via Incidence Varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">Superconformal topological recursion</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">Fermat near misses and the integral Hilbert Property</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Fedder type criteria for quasi-$F$-splitting I</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Unramified Grothendieck-Serre for isotropic groups</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">Compact Subvarieties of the Moduli Space of Complex Abelian Varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">Explicit Computation of The Generic Component of the Analytic Moduli of a Plane Branch</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">Bitangent surfaces and involutions of quartic surfaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Noether-Lefschetz cycles on the moduli space of abelian varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">Bounding minimal log discrepancies of general arrangement varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-21" onchange="updateSelectedCount()">
+            <span class="title-number">21.</span>
+            <a href="#paper-21">Toda-Type Presentations for the Quantum K Theory of Partial Flag Varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-22" onchange="updateSelectedCount()">
+            <span class="title-number">22.</span>
+            <a href="#paper-22">BPS Lie algebras for totally negative 2-Calabi-Yau categories and nonabelian Hodge theory for stacks</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-23" onchange="updateSelectedCount()">
+            <span class="title-number">23.</span>
+            <a href="#paper-23">BPS algebras and generalised Kac-Moody algebras from 2-Calabi-Yau categories</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-24" onchange="updateSelectedCount()">
+            <span class="title-number">24.</span>
+            <a href="#paper-24">Les Houches lectures on two-dimensional gravity and holography</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "On O'Grady's generalized Franchetta conjecture for genus 11 K3 surfaces", "author": "Yuan Lu", "published": "Mon, 24 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.16875", "summary": "arXiv:2511.16875v1 Announce Type: new \nAbstract: O'Grady's generalized Franchetta conjecture asks whether any codimension two cycle on the universal polarized K3 surface restricts to a multiple of the Beauville--Voisin class on a given K3 surface. We apply Mukai's program for genus 11 curves and K3 surfaces, together with a result on the tautological generation of the second Chow group of the moduli space of curves, to give an affirmative answer to this conjecture in genus 11.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2511.16875" target="_blank">On O'Grady's generalized Franchetta conjecture for genus 11 K3 surfaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yuan Lu</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 24 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.16875" target="_blank">https://arxiv.org/abs/2511.16875</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                O'Grady's generalized Franchetta conjecture asks whether any codimension two cycle on the universal polarized K3 surface restricts to a multiple of the Beauville--Voisin class on a given K3 surface. We apply Mukai's program for genus 11 curves and K3 surfaces, together with a result on the tautological generation of the second Chow group of the moduli space of curves, to give an affirmative answer to this conjecture in genus 11.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Notes on twisted period relations for the Wirtinger integral", "author": "Yoshiaki Goto, Genki Shibukawa", "published": "Mon, 24 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.17016", "summary": "arXiv:2511.17016v1 Announce Type: new \nAbstract: The Wirtinger integral is one of the integral representations of the Gauss hypergeometric function. Its integrand is given by a product of complex powers of theta functions. The twisted homology and cohomology groups associated with this integral yield twisted period relations. By studying the structure of the twisted homology and cohomology groups in detail, we obtain simple forms of the relations.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2511.17016" target="_blank">Notes on twisted period relations for the Wirtinger integral</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yoshiaki Goto, Genki Shibukawa</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 24 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.17016" target="_blank">https://arxiv.org/abs/2511.17016</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The Wirtinger integral is one of the integral representations of the Gauss hypergeometric function. Its integrand is given by a product of complex powers of theta functions. The twisted homology and cohomology groups associated with this integral yield twisted period relations. By studying the structure of the twisted homology and cohomology groups in detail, we obtain simple forms of the relations.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Logarithmic geometry and Frobenius, II", "author": "Kazuya Kato, Chikara Nakayama, Sampei Usui", "published": "Mon, 24 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.17019", "summary": "arXiv:2511.17019v1 Announce Type: new \nAbstract: Based on the strong analogy between the category of log mixed Hodge structures and the category ${\\cal A}_X$ of $\\ell$-adic nature, which we have introduced in the previous part and is closely related to the weight-monodromy conjecture, we prove the $\\ell$-adic analogues of some theorems in Hodge theory related to the SL(2)-orbit theorem.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2511.17019" target="_blank">Logarithmic geometry and Frobenius, II</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Kazuya Kato, Chikara Nakayama, Sampei Usui</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 24 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.17019" target="_blank">https://arxiv.org/abs/2511.17019</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Based on the strong analogy between the category of log mixed Hodge structures and the category ${\cal A}_X$ of $\ell$-adic nature, which we have introduced in the previous part and is closely related to the weight-monodromy conjecture, we prove the $\ell$-adic analogues of some theorems in Hodge theory related to the SL(2)-orbit theorem.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "Parity and symmetry of polarized endomorphisms on cohomology", "author": "Fei Hu", "published": "Mon, 24 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.17109", "summary": "arXiv:2511.17109v1 Announce Type: new \nAbstract: We show that the eigenvalues of any polarized endomorphism acting on the $\\ell$-adic \\'etale cohomology of a smooth projective variety satisfy certain parity and symmetry properties, as predicted by the standard conjectures. These properties were previously known for Frobenius endomorphisms. Besides the hard Lefschetz theorem, a key new ingredient is a recent Weil's Riemann hypothesis-type result due to J.~Xie. We also prove a \"Newton over Hodge\" type property for abelian varieties and Grassmannians.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2511.17109" target="_blank">Parity and symmetry of polarized endomorphisms on cohomology</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Fei Hu</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 24 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.17109" target="_blank">https://arxiv.org/abs/2511.17109</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We show that the eigenvalues of any polarized endomorphism acting on the $\ell$-adic \'etale cohomology of a smooth projective variety satisfy certain parity and symmetry properties, as predicted by the standard conjectures. These properties were previously known for Frobenius endomorphisms. Besides the hard Lefschetz theorem, a key new ingredient is a recent Weil's Riemann hypothesis-type result due to J.~Xie. We also prove a "Newton over Hodge" type property for abelian varieties and Grassmannians.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "On the unirationality of conic bundles with discriminant of degree eight", "author": "Alex Casarotti, S{\\o}ren Gammelgaard, Alex Massarenti", "published": "Mon, 24 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.17213", "summary": "arXiv:2511.17213v1 Announce Type: new \nAbstract: We study the unirationality of surface conic bundles $\\pi\\colon S\\to\\mathbb P^1$ over an arbitrary field $k$ with discriminant degree $d_S=8$, the first case beyond the del Pezzo range. We divide these surfaces in four families and produce explicit rational multisections via tangent constructions and Cremona transformations. Over $C_1$ fields we obtain Zariski dense loci of minimal, hence non $k$-rational, yet $k$-unirational conic bundles in each family; for one of the types we prove that the dense unirational locus is indeed Zariski open. Finally, we investigate the deformation theory of these conic bundles and how their unirationality behaves under specialization.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2511.17213" target="_blank">On the unirationality of conic bundles with discriminant of degree eight</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Alex Casarotti, S{\o}ren Gammelgaard, Alex Massarenti</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 24 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.17213" target="_blank">https://arxiv.org/abs/2511.17213</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the unirationality of surface conic bundles $\pi\colon S\to\mathbb P^1$ over an arbitrary field $k$ with discriminant degree $d_S=8$, the first case beyond the del Pezzo range. We divide these surfaces in four families and produce explicit rational multisections via tangent constructions and Cremona transformations. Over $C_1$ fields we obtain Zariski dense loci of minimal, hence non $k$-rational, yet $k$-unirational conic bundles in each family; for one of the types we prove that the dense unirational locus is indeed Zariski open. Finally, we investigate the deformation theory of these conic bundles and how their unirationality behaves under specialization.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "Fedder type criteria for quasi-$F$-splitting II", "author": "Tatsuro Kawakami, Teppei Takamatsu, Shou Yoshikawa", "published": "Mon, 24 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.17270", "summary": "arXiv:2511.17270v1 Announce Type: new \nAbstract: In this paper, we apply Fedder-type criteria for quasi-$F$-splitting to provide explicit computations of quasi-$F$-split heights for Calabi-Yau hypersurfaces, bielliptic surfaces, Fano varieties, and rational double points. We also find interesting phenomena concerned with inversion of adjunction, fiber products, Fano varieties, and general fibers of fibrations.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2511.17270" target="_blank">Fedder type criteria for quasi-$F$-splitting II</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Tatsuro Kawakami, Teppei Takamatsu, Shou Yoshikawa</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 24 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.17270" target="_blank">https://arxiv.org/abs/2511.17270</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we apply Fedder-type criteria for quasi-$F$-splitting to provide explicit computations of quasi-$F$-split heights for Calabi-Yau hypersurfaces, bielliptic surfaces, Fano varieties, and rational double points. We also find interesting phenomena concerned with inversion of adjunction, fiber products, Fano varieties, and general fibers of fibrations.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "A note on zero-cycles on bielliptic surfaces", "author": "Evangelia Gazaki", "published": "Mon, 24 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.17365", "summary": "arXiv:2511.17365v1 Announce Type: new \nAbstract: We study the Chow group of zero-cycles $\\text{CH}_0(S)$ of a bielliptic surface $S=(E_1\\times E_2)/G$, where $E_1, E_2$ are elliptic curves and $G$ is a finite group acting on $E_1$ by translations and on $E_2$ by automorphisms such that $E_2/G\\simeq\\mathbb{P}^1$. We show that if $S$ is defined over an arbitrary field $k$ of characteristic not equal to $2,3$, then the kernel of the Albanese map $\\text{alb}_S:\\text{CH}_0(S)^{\\text{deg}=0}\\rightarrow \\text{Alb}_S(k)$ is a torsion group of exponent $2^2\\cdot|G|$ or $3^2\\cdot|G|$, depending on the type of bielliptic surface. We also construct explicit examples over $p$-adic fields that illustrate that this kernel can have nontrivial elements obtained by push-forward from the abelian surface.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2511.17365" target="_blank">A note on zero-cycles on bielliptic surfaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Evangelia Gazaki</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 24 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.17365" target="_blank">https://arxiv.org/abs/2511.17365</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the Chow group of zero-cycles $\text{CH}_0(S)$ of a bielliptic surface $S=(E_1\times E_2)/G$, where $E_1, E_2$ are elliptic curves and $G$ is a finite group acting on $E_1$ by translations and on $E_2$ by automorphisms such that $E_2/G\simeq\mathbb{P}^1$. We show that if $S$ is defined over an arbitrary field $k$ of characteristic not equal to $2,3$, then the kernel of the Albanese map $\text{alb}_S:\text{CH}_0(S)^{\text{deg}=0}\rightarrow \text{Alb}_S(k)$ is a torsion group of exponent $2^2\cdot|G|$ or $3^2\cdot|G|$, depending on the type of bielliptic surface. We also construct explicit examples over $p$-adic fields that illustrate that this kernel can have nontrivial elements obtained by push-forward from the abelian surface.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Harder-Narasimhan filtrations of decorated vector bundles", "author": "Emanuel Roth, Florent Schaffhauser", "published": "Mon, 24 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.17371", "summary": "arXiv:2511.17371v1 Announce Type: new \nAbstract: A decorated vector bundle is a vector bundle equipped with a reduction of structure group to a complex reductive subgroup $G \\subseteq \\mathbf{GL}(r;\\mathbb{C})$. Examples include symplectic and special-orthogonal vector bundles, as well as vector bundles with trivial determinants. In this expository paper, we provide direct constructions of Harder-Narasimhan filtrations of symplectic and special-orthogonal vector bundles, and use them to construct canonical reductions as done by Atiyah and Bott. We compare these canonical reductions to those constructed by Biswas and Holla. Lastly, we set up the obstruction theory necessary to define Harder-Narasimhan types of principal bundles, and stratify the moduli stack of principal $G$-bundles.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2511.17371" target="_blank">Harder-Narasimhan filtrations of decorated vector bundles</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Emanuel Roth, Florent Schaffhauser</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 24 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.17371" target="_blank">https://arxiv.org/abs/2511.17371</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                A decorated vector bundle is a vector bundle equipped with a reduction of structure group to a complex reductive subgroup $G \subseteq \mathbf{GL}(r;\mathbb{C})$. Examples include symplectic and special-orthogonal vector bundles, as well as vector bundles with trivial determinants. In this expository paper, we provide direct constructions of Harder-Narasimhan filtrations of symplectic and special-orthogonal vector bundles, and use them to construct canonical reductions as done by Atiyah and Bott. We compare these canonical reductions to those constructed by Biswas and Holla. Lastly, we set up the obstruction theory necessary to define Harder-Narasimhan types of principal bundles, and stratify the moduli stack of principal $G$-bundles.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "Milnor number of invariant singularity: generalization of Chulkov's inequality", "author": "Ivan Proskurnin", "published": "Mon, 24 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.17453", "summary": "arXiv:2511.17453v1 Announce Type: new \nAbstract: S.P. Chulkov has proven that if the Taylor series of $f$ contains no monomials of degree $\\leq 2$ then $\\mu(f) \\geq p-1$ for any function germ $f$ invariant with respect to a nontrivial action of $\\mathbb{Z}_p$ for prime $p$. Here we present a generalization of this inequality for actions of arbitrary abelian groups.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2511.17453" target="_blank">Milnor number of invariant singularity: generalization of Chulkov's inequality</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ivan Proskurnin</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 24 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.17453" target="_blank">https://arxiv.org/abs/2511.17453</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                S.P. Chulkov has proven that if the Taylor series of $f$ contains no monomials of degree $\leq 2$ then $\mu(f) \geq p-1$ for any function germ $f$ invariant with respect to a nontrivial action of $\mathbb{Z}_p$ for prime $p$. Here we present a generalization of this inequality for actions of arbitrary abelian groups.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "A complete proof of the geometric Bombieri-Lang conjecture for ramified covers of abelian varieties", "author": "Guoquan Gao", "published": "Mon, 24 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.17010", "summary": "arXiv:2511.17010v1 Announce Type: cross \nAbstract: We prove the geometric Bombieri-Lang conjecture for projective varieties which have finite maps to abelian varieties over function fields of characteristic 0. This generalizes the recent results of Xie-Yuan, which require either the hyperbolicity assumption or the non-isotriviality assumption. The proof is based on their strategy for constructing entire curves, but requires some new ingredients from algebraic geometry and Nevanlinna theory.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2511.17010" target="_blank">A complete proof of the geometric Bombieri-Lang conjecture for ramified covers of abelian varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Guoquan Gao</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 24 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.17010" target="_blank">https://arxiv.org/abs/2511.17010</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove the geometric Bombieri-Lang conjecture for projective varieties which have finite maps to abelian varieties over function fields of characteristic 0. This generalizes the recent results of Xie-Yuan, which require either the hyperbolicity assumption or the non-isotriviality assumption. The proof is based on their strategy for constructing entire curves, but requires some new ingredients from algebraic geometry and Nevanlinna theory.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "Geometry of Deformations via Incidence Varieties", "author": "Atabey Kaygun", "published": "Mon, 24 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.17169", "summary": "arXiv:2511.17169v1 Announce Type: cross \nAbstract: We provide a unified geometric realization of the classical deformation complexes. We construct GL-equivariant bilinear incidence varieties whose diagonal slices recover the varieties of associative, commutative, Leibniz, and Lie algebra structures on a finite-dimensional vector space. We prove that the fiber of the incidence map at a given algebra law is canonically isomorphic to the space of 2-cocycles in the corresponding cohomology theory (Hochschild, Harrison, Leibniz, or Chevalley--Eilenberg). Furthermore, we introduce invariant bilinear forms to define open strata of separable and semisimple algebras, and demonstrate that these strata consist of open GL-orbits, establishing the rigidity of generic points in the coarse moduli spaces for all four geometries.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2511.17169" target="_blank">Geometry of Deformations via Incidence Varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Atabey Kaygun</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 24 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.17169" target="_blank">https://arxiv.org/abs/2511.17169</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We provide a unified geometric realization of the classical deformation complexes. We construct GL-equivariant bilinear incidence varieties whose diagonal slices recover the varieties of associative, commutative, Leibniz, and Lie algebra structures on a finite-dimensional vector space. We prove that the fiber of the incidence map at a given algebra law is canonically isomorphic to the space of 2-cocycles in the corresponding cohomology theory (Hochschild, Harrison, Leibniz, or Chevalley--Eilenberg). Furthermore, we introduce invariant bilinear forms to define open strata of separable and semisimple algebras, and demonstrate that these strata consist of open GL-orbits, establishing the rigidity of generic points in the coarse moduli spaces for all four geometries.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "Superconformal topological recursion", "author": "Nezhla Aghaei, Reinier Kramer, Nicolas Orantin, Kento Osuga", "published": "Mon, 24 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.17320", "summary": "arXiv:2511.17320v1 Announce Type: cross \nAbstract: We investigate a supersymmetric generalisation of topological recursion from two perspectives: algebraic and geometric. The algebraic side concerns a recursive structure encoded in modules of a super Virasoro algebra, and the geometric counterpart is what we call superconformal topological recursion defined on a super Riemann surface. Superconformal topological recursion indicates that odd holomorphic one-forms on a super Riemann surface are related to zero modes of copies of the Clifford algebras, and it also provides a tool to study deformation of non-split super Riemann surfaces, e.g. certain families of super Riemann surfaces carrying odd parameters. On a super Riemann surface over a non-reduced base, the formalism is recursive not only in terms of pants-decomposition but also in terms of odd parameters in a suitable sense.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2511.17320" target="_blank">Superconformal topological recursion</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Nezhla Aghaei, Reinier Kramer, Nicolas Orantin, Kento Osuga</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 24 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.17320" target="_blank">https://arxiv.org/abs/2511.17320</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We investigate a supersymmetric generalisation of topological recursion from two perspectives: algebraic and geometric. The algebraic side concerns a recursive structure encoded in modules of a super Virasoro algebra, and the geometric counterpart is what we call superconformal topological recursion defined on a super Riemann surface. Superconformal topological recursion indicates that odd holomorphic one-forms on a super Riemann surface are related to zero modes of copies of the Clifford algebras, and it also provides a tool to study deformation of non-split super Riemann surfaces, e.g. certain families of super Riemann surfaces carrying odd parameters. On a super Riemann surface over a non-reduced base, the formalism is recursive not only in terms of pants-decomposition but also in terms of odd parameters in a suitable sense.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "Fermat near misses and the integral Hilbert Property", "author": "Jessica Alessandr\\`i, Daniel Loughran", "published": "Mon, 24 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.17456", "summary": "arXiv:2511.17456v1 Announce Type: cross \nAbstract: We consider the Diophantine equation $x^4 + y^4 - w^2 = n$ for $n \\in \\mathbb{Z}$, which is related to near misses for the quartic case of Fermat's Last Theorem. For certain $n$ we show that the set of solutions is infinite, or more generally not thin. Our approach is via the geometry of del Pezzo surfaces of degree $2$, and we prove a more general result on non-thinness of integral points on double conic bundle surfaces.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2511.17456" target="_blank">Fermat near misses and the integral Hilbert Property</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jessica Alessandr\`i, Daniel Loughran</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 24 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.17456" target="_blank">https://arxiv.org/abs/2511.17456</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We consider the Diophantine equation $x^4 + y^4 - w^2 = n$ for $n \in \mathbb{Z}$, which is related to near misses for the quartic case of Fermat's Last Theorem. For certain $n$ we show that the set of solutions is infinite, or more generally not thin. Our approach is via the geometry of del Pezzo surfaces of degree $2$, and we prove a more general result on non-thinness of integral points on double conic bundle surfaces.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Fedder type criteria for quasi-$F$-splitting I", "author": "Tatsuro Kawakami, Teppei Takamatsu, Shou Yoshikawa", "published": "Mon, 24 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2204.10076", "summary": "arXiv:2204.10076v3 Announce Type: replace \nAbstract: Yobuko recently introduced the notion of quasi-$F$-splitting and quasi-$F$-split heights, which generalize and quantify the notion of Frobenius-splitting, and proved that quasi-$F$-split heights coincide with Artin-Mazur heights for Calabi-Yau varieties. In this paper, we prove Fedder type criteria for quasi-$F$-splittings of complete intersections, and in particular, obtain a simple formula to compute Artin-Mazur heights of Calabi-Yau hypersurfaces. As one of its applications, we prove that there exist Calabi-Yau varieties of arbitrarily high Artin-Mazur height over $\\mathbb{F}_2$. We also give explicit defining equations of quartic K3 surfaces over $\\mathbb{F}_{3}$ realizing all the possible Artin-Mazur heights.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2204.10076" target="_blank">Fedder type criteria for quasi-$F$-splitting I</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Tatsuro Kawakami, Teppei Takamatsu, Shou Yoshikawa</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 24 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2204.10076" target="_blank">https://arxiv.org/abs/2204.10076</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Yobuko recently introduced the notion of quasi-$F$-splitting and quasi-$F$-split heights, which generalize and quantify the notion of Frobenius-splitting, and proved that quasi-$F$-split heights coincide with Artin-Mazur heights for Calabi-Yau varieties. In this paper, we prove Fedder type criteria for quasi-$F$-splittings of complete intersections, and in particular, obtain a simple formula to compute Artin-Mazur heights of Calabi-Yau hypersurfaces. As one of its applications, we prove that there exist Calabi-Yau varieties of arbitrarily high Artin-Mazur height over $\mathbb{F}_2$. We also give explicit defining equations of quartic K3 surfaces over $\mathbb{F}_{3}$ realizing all the possible Artin-Mazur heights.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Unramified Grothendieck-Serre for isotropic groups", "author": "Kestutis Cesnavicius, Roman Fedorov", "published": "Mon, 24 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2311.08660", "summary": "arXiv:2311.08660v3 Announce Type: replace \nAbstract: The Grothendieck-Serre conjecture predicts that every generically trivial torsor under a reductive group $G$ over a regular semilocal ring $R$ is trivial. We establish this for unramified $R$ granted that $G^{\\mathrm{ad}}$ is totally isotropic, that is, has a \"maximally transversal\" parabolic $R$-subgroup. We also use purity for the Brauer group to reduce the conjecture for unramified $R$ to simply connected $G$--a much less direct such reduction of Panin had been a step in solving the equal characteristic case of Grothendieck-Serre. We base the group-theoretic aspects of our arguments on the geometry of the stack $\\mathrm{Bun}_G$, instead of the affine Grassmannian used previously, and we quickly reprove the crucial weak $\\mathbb{P}^1$-invariance input: for any reductive group $H$ over a semilocal ring $A$, every $H$-torsor $\\mathscr{E}$ on $\\mathbb{P}^1_A$ satisfies $\\mathscr{E}|_{\\{t = 0\\}} \\simeq \\mathscr{E}|_{\\{t = \\infty\\}}$. For the geometric aspects, we develop reembedding and excision techniques for relative curves with finiteness weakened to quasi-finiteness, thus overcoming a known obstacle in mixed characteristic, and show that every generically trivial torsor over $R$ under a totally isotropic $G$ trivializes over every affine open of $\\mathrm{Spec}(R) \\setminus Z$ for some closed $Z$ of codimension $\\ge 2$.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2311.08660" target="_blank">Unramified Grothendieck-Serre for isotropic groups</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Kestutis Cesnavicius, Roman Fedorov</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 24 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2311.08660" target="_blank">https://arxiv.org/abs/2311.08660</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The Grothendieck-Serre conjecture predicts that every generically trivial torsor under a reductive group $G$ over a regular semilocal ring $R$ is trivial. We establish this for unramified $R$ granted that $G^{\mathrm{ad}}$ is totally isotropic, that is, has a "maximally transversal" parabolic $R$-subgroup. We also use purity for the Brauer group to reduce the conjecture for unramified $R$ to simply connected $G$--a much less direct such reduction of Panin had been a step in solving the equal characteristic case of Grothendieck-Serre. We base the group-theoretic aspects of our arguments on the geometry of the stack $\mathrm{Bun}_G$, instead of the affine Grassmannian used previously, and we quickly reprove the crucial weak $\mathbb{P}^1$-invariance input: for any reductive group $H$ over a semilocal ring $A$, every $H$-torsor $\mathscr{E}$ on $\mathbb{P}^1_A$ satisfies $\mathscr{E}|_{\{t = 0\}} \simeq \mathscr{E}|_{\{t = \infty\}}$. For the geometric aspects, we develop reembedding and excision techniques for relative curves with finiteness weakened to quasi-finiteness, thus overcoming a known obstacle in mixed characteristic, and show that every generically trivial torsor over $R$ under a totally isotropic $G$ trivializes over every affine open of $\mathrm{Spec}(R) \setminus Z$ for some closed $Z$ of codimension $\ge 2$.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "Compact Subvarieties of the Moduli Space of Complex Abelian Varieties", "author": "Samuel Grushevsky, Gabriele Mondello, Riccardo Salvati Manni, Jacob Tsimerman", "published": "Mon, 24 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2404.06009", "summary": "arXiv:2404.06009v3 Announce Type: replace \nAbstract: We determine the maximal dimension of compact subvarieties of $\\mathcal{A}_g$, the moduli space of complex principally polarized abelian varieties of dimension $g$, and the maximal dimension of a compact subvariety through a very general point of $\\mathcal{A}_g$. This also allows us to draw some conclusions for compact subvarieties of the moduli space of complex curves of compact type.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2404.06009" target="_blank">Compact Subvarieties of the Moduli Space of Complex Abelian Varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Samuel Grushevsky, Gabriele Mondello, Riccardo Salvati Manni, Jacob Tsimerman</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 24 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2404.06009" target="_blank">https://arxiv.org/abs/2404.06009</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We determine the maximal dimension of compact subvarieties of $\mathcal{A}_g$, the moduli space of complex principally polarized abelian varieties of dimension $g$, and the maximal dimension of a compact subvariety through a very general point of $\mathcal{A}_g$. This also allows us to draw some conclusions for compact subvarieties of the moduli space of complex curves of compact type.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "Explicit Computation of The Generic Component of the Analytic Moduli of a Plane Branch", "author": "Pedro Fortuny Ayuso, Javier Rib\\'on", "published": "Mon, 24 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2405.09684", "summary": "arXiv:2405.09684v3 Announce Type: replace \nAbstract: Let ${\\mathcal C}$ be a fixed equisingularity class of irreducible germs of complex analytic plane curves. We compute a basis of the ${\\mathbb C}[[x]]$-module of K\\\"ahler differentials for generic $\\Gamma \\in {\\mathcal C}$, algorithmically, and study its behaviour under blow-up.\n  As a first application, we give an algorithm providing the generic semimodule in an equisingularity class in terms of its multiplicity and its Puiseux characteristic exponents. As another application, we give an alternative proof for a formula of Genzmer, that provides the dimension of the moduli of analytic classes in the equisingularity class of $\\Gamma$.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2405.09684" target="_blank">Explicit Computation of The Generic Component of the Analytic Moduli of a Plane Branch</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Pedro Fortuny Ayuso, Javier Rib\'on</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 24 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2405.09684" target="_blank">https://arxiv.org/abs/2405.09684</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let ${\mathcal C}$ be a fixed equisingularity class of irreducible germs of complex analytic plane curves. We compute a basis of the ${\mathbb C}[[x]]$-module of K\"ahler differentials for generic $\Gamma \in {\mathcal C}$, algorithmically, and study its behaviour under blow-up.
+  As a first application, we give an algorithm providing the generic semimodule in an equisingularity class in terms of its multiplicity and its Puiseux characteristic exponents. As another application, we give an alternative proof for a formula of Genzmer, that provides the dimension of the moduli of analytic classes in the equisingularity class of $\Gamma$.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "Bitangent surfaces and involutions of quartic surfaces", "author": "Igor Dolgachev, Shigeyuki Kond\\=o", "published": "Mon, 24 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2406.16246", "summary": "arXiv:2406.16246v5 Announce Type: replace \nAbstract: We study the congruence of bitangent lines of an irreducible surface in the 3-dimensional projective space in arbitrary characteristic, with special attention to quartic surfaces with rational double points and, in particular, Kummer quartic surfaces.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2406.16246" target="_blank">Bitangent surfaces and involutions of quartic surfaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Igor Dolgachev, Shigeyuki Kond\=o</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 24 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2406.16246" target="_blank">https://arxiv.org/abs/2406.16246</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the congruence of bitangent lines of an irreducible surface in the 3-dimensional projective space in arbitrary characteristic, with special attention to quartic surfaces with rational double points and, in particular, Kummer quartic surfaces.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Noether-Lefschetz cycles on the moduli space of abelian varieties", "author": "Aitor Iribar Lopez", "published": "Mon, 24 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2411.09910", "summary": "arXiv:2411.09910v2 Announce Type: replace \nAbstract: The locus of non-simple abelian varieties in the moduli space of principally polarized abelian varieties gives rise to Noether-Lefschetz cycles. We study their intersection theoretic properties using the tautological projection constructed in [CMOP24], and show that projection defines a homomorphism when restricted to cycles supported on that locus. Using Hecke correspondences and the pullback by Torelli we prove that $[\\mathcal {A}_1 \\times \\mathcal A_{g-1}]$ is not tautological in the sense of [vdG99] for $g=12$ and $g\\geq 16$ even. We also explore the connections between Noether-Lefschetz cycles and the Gromov-Witten theory of a moving elliptic curve.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2411.09910" target="_blank">Noether-Lefschetz cycles on the moduli space of abelian varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Aitor Iribar Lopez</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 24 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2411.09910" target="_blank">https://arxiv.org/abs/2411.09910</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The locus of non-simple abelian varieties in the moduli space of principally polarized abelian varieties gives rise to Noether-Lefschetz cycles. We study their intersection theoretic properties using the tautological projection constructed in [CMOP24], and show that projection defines a homomorphism when restricted to cycles supported on that locus. Using Hecke correspondences and the pullback by Torelli we prove that $[\mathcal {A}_1 \times \mathcal A_{g-1}]$ is not tautological in the sense of [vdG99] for $g=12$ and $g\geq 16$ even. We also explore the connections between Noether-Lefschetz cycles and the Gromov-Witten theory of a moving elliptic curve.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "Bounding minimal log discrepancies of general arrangement varieties", "author": "Leandro Meier", "published": "Mon, 24 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2503.02681", "summary": "arXiv:2503.02681v2 Announce Type: replace \nAbstract: The minimal log discrepancy is an invariant of singularities that plays an important role in the birational classification of algebraic varieties. Shokurov conjectured that the minimal log discrepancy can always be bounded from above in terms of the dimension of the variety. We prove this conjecture for general arrangement varieties, a particular class of T-varieties, adding to previous results on this conjecture which include threefolds, toric varieties, and local complete intersection varieties.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2503.02681" target="_blank">Bounding minimal log discrepancies of general arrangement varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Leandro Meier</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 24 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2503.02681" target="_blank">https://arxiv.org/abs/2503.02681</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The minimal log discrepancy is an invariant of singularities that plays an important role in the birational classification of algebraic varieties. Shokurov conjectured that the minimal log discrepancy can always be bounded from above in terms of the dimension of the variety. We prove this conjecture for general arrangement varieties, a particular class of T-varieties, adding to previous results on this conjecture which include threefolds, toric varieties, and local complete intersection varieties.
+            </div>
+        </div>
+        <div class="paper" id="paper-21">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-21" data-paper-data='{"title": "Toda-Type Presentations for the Quantum K Theory of Partial Flag Varieties", "author": "Kamyar Amini, Irit Huq-Kuruvilla, Leonardo C. Mihalcea, Daniel Orr, Weihong Xu", "published": "Mon, 24 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2504.07412", "summary": "arXiv:2504.07412v2 Announce Type: replace \nAbstract: We prove a determinantal, Toda-type, presentation for the equivariant K theory of a partial flag variety ${\\rm Fl}(r_1, \\dots, r_k;n)$. The proof relies on pushing forward the Toda presentation obtained by Maeno, Naito and Sagaki for the complete flag variety ${\\rm Fl}(n)$, via Kato's ${\\rm K}_T({\\rm pt})$-algebra homomorphism from the quantum K ring of ${\\rm Fl}(n)$ to that of ${\\rm Fl}(r_1, \\dots, r_k;n)$. Starting instead from the Whitney presentation for ${\\rm Fl}(n)$, we show that the same pushforward technique gives a recursive formula for polynomial representatives of quantum K Schubert classes in any partial flag variety which do not depend on quantum parameters. In an appendix, we include another proof of the Toda presentation for the equivariant quantum K ring of ${\\rm Fl}(n)$, following Anderson, Chen, and Tseng, which is based on the fact that the ${\\rm K}$-theoretic $J$-function is an eigenfunction of the finite difference Toda Hamiltonians.", "number": 21, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#21</span>
+                <a href="https://arxiv.org/abs/2504.07412" target="_blank">Toda-Type Presentations for the Quantum K Theory of Partial Flag Varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Kamyar Amini, Irit Huq-Kuruvilla, Leonardo C. Mihalcea, Daniel Orr, Weihong Xu</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 24 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2504.07412" target="_blank">https://arxiv.org/abs/2504.07412</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove a determinantal, Toda-type, presentation for the equivariant K theory of a partial flag variety ${\rm Fl}(r_1, \dots, r_k;n)$. The proof relies on pushing forward the Toda presentation obtained by Maeno, Naito and Sagaki for the complete flag variety ${\rm Fl}(n)$, via Kato's ${\rm K}_T({\rm pt})$-algebra homomorphism from the quantum K ring of ${\rm Fl}(n)$ to that of ${\rm Fl}(r_1, \dots, r_k;n)$. Starting instead from the Whitney presentation for ${\rm Fl}(n)$, we show that the same pushforward technique gives a recursive formula for polynomial representatives of quantum K Schubert classes in any partial flag variety which do not depend on quantum parameters. In an appendix, we include another proof of the Toda presentation for the equivariant quantum K ring of ${\rm Fl}(n)$, following Anderson, Chen, and Tseng, which is based on the fact that the ${\rm K}$-theoretic $J$-function is an eigenfunction of the finite difference Toda Hamiltonians.
+            </div>
+        </div>
+        <div class="paper" id="paper-22">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-22" data-paper-data='{"title": "BPS Lie algebras for totally negative 2-Calabi-Yau categories and nonabelian Hodge theory for stacks", "author": "Ben Davison, Lucien Hennecart, Sebastian Schlegel Mejia", "published": "Mon, 24 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2212.07668", "summary": "arXiv:2212.07668v3 Announce Type: replace-cross \nAbstract: We define and study a sheaf-theoretic cohomological Hall algebra for suitably geometric Abelian categories $\\mathcal{A}$ of homological dimension at most two, and a sheaf-theoretic BPS algebra under the conditions that $\\mathcal{A}$ is 2-Calabi-Yau and has a good moduli space. We show that the BPS algebra for the preprojective algebra $\\Pi_Q$ of a totally negative quiver is the free algebra generated by the intersection cohomology of the closure of the locus parameterising simple $\\Pi_Q$-modules in the coarse moduli space.\n  We define and study the BPS Lie algebra of arbitrary 2-Calabi-Yau categories $\\mathcal{A}$ for which the Euler form is negative on all pairs of non-zero objects, which recovers the BPS algebra as its universal enveloping algebra for such \"totally negative\" 2CY categories. We show that for totally negative 2CY categories the BPS algebra is freely generated by intersection complexes of certain coarse moduli spaces as above, and the Borel-Moore homology of the stack of objects in such $\\mathcal{A}$ satisfies a Yangian-type PBW theorem for the BPS Lie algebra. In this way we prove the cohomological integrality theorem for these categories.\n  We use our results to prove that for $C$ a smooth projective curve, and for $r$ and $d$ not necessarily coprime, there is a nonabelian Hodge isomorphism between the Borel-Moore homologies of the stack of rank $r$ and degree $d$ Higgs bundles, and the appropriate stack of twisted representations of the fundamental group of $C$. In addition we prove the Bozec-Schiffmann positivity conjecture for totally negative quivers; we prove that their polynomials counting cuspidal functions in the constructible Hall algebra for $Q$ have positive coefficients, strengthening the positivity theorem for the Kac polynomials of such quivers.", "number": 22, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#22</span>
+                <a href="https://arxiv.org/abs/2212.07668" target="_blank">BPS Lie algebras for totally negative 2-Calabi-Yau categories and nonabelian Hodge theory for stacks</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ben Davison, Lucien Hennecart, Sebastian Schlegel Mejia</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 24 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2212.07668" target="_blank">https://arxiv.org/abs/2212.07668</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We define and study a sheaf-theoretic cohomological Hall algebra for suitably geometric Abelian categories $\mathcal{A}$ of homological dimension at most two, and a sheaf-theoretic BPS algebra under the conditions that $\mathcal{A}$ is 2-Calabi-Yau and has a good moduli space. We show that the BPS algebra for the preprojective algebra $\Pi_Q$ of a totally negative quiver is the free algebra generated by the intersection cohomology of the closure of the locus parameterising simple $\Pi_Q$-modules in the coarse moduli space.
+  We define and study the BPS Lie algebra of arbitrary 2-Calabi-Yau categories $\mathcal{A}$ for which the Euler form is negative on all pairs of non-zero objects, which recovers the BPS algebra as its universal enveloping algebra for such "totally negative" 2CY categories. We show that for totally negative 2CY categories the BPS algebra is freely generated by intersection complexes of certain coarse moduli spaces as above, and the Borel-Moore homology of the stack of objects in such $\mathcal{A}$ satisfies a Yangian-type PBW theorem for the BPS Lie algebra. In this way we prove the cohomological integrality theorem for these categories.
+  We use our results to prove that for $C$ a smooth projective curve, and for $r$ and $d$ not necessarily coprime, there is a nonabelian Hodge isomorphism between the Borel-Moore homologies of the stack of rank $r$ and degree $d$ Higgs bundles, and the appropriate stack of twisted representations of the fundamental group of $C$. In addition we prove the Bozec-Schiffmann positivity conjecture for totally negative quivers; we prove that their polynomials counting cuspidal functions in the constructible Hall algebra for $Q$ have positive coefficients, strengthening the positivity theorem for the Kac polynomials of such quivers.
+            </div>
+        </div>
+        <div class="paper" id="paper-23">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-23" data-paper-data='{"title": "BPS algebras and generalised Kac-Moody algebras from 2-Calabi-Yau categories", "author": "Ben Davison, Lucien Hennecart, Sebastian Schlegel Mejia", "published": "Mon, 24 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2303.12592", "summary": "arXiv:2303.12592v5 Announce Type: replace-cross \nAbstract: We determine the structure of the BPS algebra of 2-Calabi-Yau Abelian categories for which the stack of objects admits a good moduli space. We prove that this algebra is isomorphic to the positive part of the enveloping algebra of a generalised Kac-Moody Lie algebra generated by the intersection cohomology of certain connected components (corresponding to roots) of the good moduli space. Some major examples include the BPS algebras of (1) the category of semistable coherent sheaves of given slope on a K3 surface or, more generally, quasiprojective symplectic surface, (2) semistable Higgs bundles on a smooth projective curve, (3) preprojective algebras of quivers, (4) multiplicative preprojective algebras and (5) fundamental groups of (quiver) Riemann surfaces. We define the BPS Lie algebras of 2-Calabi-Yau categories and prove that they coincide with the ones obtained by dimensional reduction from the critical cohomological Hall algebra in the case in which the 2-Calabi-Yau category is the category of representations of a preprojective algebra. Consequences include (1) A proof in full generality of the Bozec-Schiffmann positivity conjecture for absolutely cuspidal polynomials, a strengthening of the Kac positivity conjecture (2) A proof of the cohomological integrality conjecture for the category of semistable coherent sheaves on local K3 surfaces (3) A description of the cohomology (in all degrees) of Nakajima quiver varieties as direct sums of irreducible lowest weight representations over the BPS Lie algebra.", "number": 23, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#23</span>
+                <a href="https://arxiv.org/abs/2303.12592" target="_blank">BPS algebras and generalised Kac-Moody algebras from 2-Calabi-Yau categories</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ben Davison, Lucien Hennecart, Sebastian Schlegel Mejia</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 24 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2303.12592" target="_blank">https://arxiv.org/abs/2303.12592</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We determine the structure of the BPS algebra of 2-Calabi-Yau Abelian categories for which the stack of objects admits a good moduli space. We prove that this algebra is isomorphic to the positive part of the enveloping algebra of a generalised Kac-Moody Lie algebra generated by the intersection cohomology of certain connected components (corresponding to roots) of the good moduli space. Some major examples include the BPS algebras of (1) the category of semistable coherent sheaves of given slope on a K3 surface or, more generally, quasiprojective symplectic surface, (2) semistable Higgs bundles on a smooth projective curve, (3) preprojective algebras of quivers, (4) multiplicative preprojective algebras and (5) fundamental groups of (quiver) Riemann surfaces. We define the BPS Lie algebras of 2-Calabi-Yau categories and prove that they coincide with the ones obtained by dimensional reduction from the critical cohomological Hall algebra in the case in which the 2-Calabi-Yau category is the category of representations of a preprojective algebra. Consequences include (1) A proof in full generality of the Bozec-Schiffmann positivity conjecture for absolutely cuspidal polynomials, a strengthening of the Kac positivity conjecture (2) A proof of the cohomological integrality conjecture for the category of semistable coherent sheaves on local K3 surfaces (3) A description of the cohomology (in all degrees) of Nakajima quiver varieties as direct sums of irreducible lowest weight representations over the BPS Lie algebra.
+            </div>
+        </div>
+        <div class="paper" id="paper-24">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-24" data-paper-data='{"title": "Les Houches lectures on two-dimensional gravity and holography", "author": "Gustavo J. Turiaci", "published": "Mon, 24 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2412.09537", "summary": "arXiv:2412.09537v2 Announce Type: replace-cross \nAbstract: Lecture notes prepared for the Les Houches school \"Quantum Geometry: Mathematical Methods for Gravity, Gauge Theories and Non-Perturbative Physics\" that took place during the summer 2024. We cover the techniques to perform the exact gravitational path integral of two-dimensional dilaton-gravity, and supergravity, over spacetimes with arbitrary topology, with an application to black holes. We discuss the connection with random matrix models and moduli spaces of hyperbolic surfaces briefly, since those concepts were covered in other lectures of the school.", "number": 24, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#24</span>
+                <a href="https://arxiv.org/abs/2412.09537" target="_blank">Les Houches lectures on two-dimensional gravity and holography</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Gustavo J. Turiaci</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 24 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2412.09537" target="_blank">https://arxiv.org/abs/2412.09537</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Lecture notes prepared for the Les Houches school "Quantum Geometry: Mathematical Methods for Gravity, Gauge Theories and Non-Perturbative Physics" that took place during the summer 2024. We cover the techniques to perform the exact gravitational path integral of two-dimensional dilaton-gravity, and supergravity, over spacetimes with arbitrary topology, with an application to black holes. We discuss the connection with random matrix models and moduli spaces of hyperbolic surfaces briefly, since those concepts were covered in other lectures of the school.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2025-11-24 18:00:03
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>

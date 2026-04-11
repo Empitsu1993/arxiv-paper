@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Fri, 06 Feb 2026 05:00:42 +0000<br>
+        <strong>論文数:</strong> 25件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Local Cohomological Defect and a Conjecture of Mustata-Popa</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Regions surrounded by parabolas in the plane and trees representing their shapes respecting their natural projection to the line</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Generalized nearby cycles via relative and logarithmic $\mathscr{D}$-modules</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">On the boundedness of some real line arrangements of type at most one</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">Characterising Ball Quotients through their (higher) Chern Numbers</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">Vector bundles on Olsson fans</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">A Dieudonn\'e theory for analytic p-divisible groups and applications to Shimura varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Algebro-geometric bootstrapping from OPE decoupling</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">Courbes et fibr\'es vectoriels en th\'eorie de Hodge $z$-adique globale</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">Causal Representation Meets Stochastic Modeling under Generic Geometry</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">On QC and GQC algebraic geometry codes</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">First Proof</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">Rational Interpreters for Discrete Dynamics: Existence, Exactness, and Decomposition over $p$-adic Fields</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">On symmetries of hyperbolic lattices of large rank</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Thin sets in weighted projective stacks</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">Diagonal F-thresholds for determinants and Pfaffians</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">Mertens products in arithmetic progressions over function fields</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">Descent properties for an abelian variety with extended Galois representation</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Convex unions and completions from simplicial pseudomanifolds</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">$A$-hypergeometric Series with Parameters in the Core</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-21" onchange="updateSelectedCount()">
+            <span class="title-number">21.</span>
+            <a href="#paper-21">Transitivity of the $\mathbb{B}^+_\mathrm{dR}$-loop group action on Schubert cells</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-22" onchange="updateSelectedCount()">
+            <span class="title-number">22.</span>
+            <a href="#paper-22">Toward the noncommutative minimal model program for Fano varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-23" onchange="updateSelectedCount()">
+            <span class="title-number">23.</span>
+            <a href="#paper-23">Polylogarithmic motivic Chabauty-Kim for $\mathbb{P}^1 \setminus \{ 0,1,\infty \}$: the geometric step via resultants</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-24" onchange="updateSelectedCount()">
+            <span class="title-number">24.</span>
+            <a href="#paper-24">On the multiplier spectrum of polynomials</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-25" onchange="updateSelectedCount()">
+            <span class="title-number">25.</span>
+            <a href="#paper-25">Algebraic Geometry for Spin-Adapted Coupled Cluster Theory</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Local Cohomological Defect and a Conjecture of Mustata-Popa", "author": "Andrew Burke", "published": "Fri, 06 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.05197", "summary": "arXiv:2602.05197v1 Announce Type: new \nAbstract: We prove a general result on the depth of Du Bois complexes of a singular variety. We apply it to prove a conjecture of Mustata-Popa and to study the local cohomological defect, extending results of Ogus and Dao-Takagi over the complex numbers.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2602.05197" target="_blank">Local Cohomological Defect and a Conjecture of Mustata-Popa</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Andrew Burke</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 06 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.05197" target="_blank">https://arxiv.org/abs/2602.05197</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove a general result on the depth of Du Bois complexes of a singular variety. We apply it to prove a conjecture of Mustata-Popa and to study the local cohomological defect, extending results of Ogus and Dao-Takagi over the complex numbers.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Regions surrounded by parabolas in the plane and trees representing their shapes respecting their natural projection to the line", "author": "Naoki Kitazawa", "published": "Fri, 06 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.05276", "summary": "arXiv:2602.05276v1 Announce Type: new \nAbstract: The author has been interested in regions surrounded by real algebraic curves of degree $1$ or $2$ in the plane. The author is mainly interested in their shapes and combinatorics. This is a fundamental and natural problem in mathematics being also elementary and connected to various fields. The shapes are understood via graphs the regions collapsing to respecting the canonical projection onto the 1st component.\n  Our main result is the following: each tree is realized by regions surrounded by parabolas of two types, here.\n  Related studies are elementary and interesting and surprisingly, this explicit field is started very recently, by Bodin, Popescu-Pampu and Sorea in the 2020s. After that, this is developing, due to the author. The author also investigates this motivated by studies on explicit construction of real algebraic maps onto the regions locally so-called moment maps: this comes from singularity theory of differentiable maps and real algebraic geometry.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2602.05276" target="_blank">Regions surrounded by parabolas in the plane and trees representing their shapes respecting their natural projection to the line</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Naoki Kitazawa</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 06 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.05276" target="_blank">https://arxiv.org/abs/2602.05276</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The author has been interested in regions surrounded by real algebraic curves of degree $1$ or $2$ in the plane. The author is mainly interested in their shapes and combinatorics. This is a fundamental and natural problem in mathematics being also elementary and connected to various fields. The shapes are understood via graphs the regions collapsing to respecting the canonical projection onto the 1st component.
+  Our main result is the following: each tree is realized by regions surrounded by parabolas of two types, here.
+  Related studies are elementary and interesting and surprisingly, this explicit field is started very recently, by Bodin, Popescu-Pampu and Sorea in the 2020s. After that, this is developing, due to the author. The author also investigates this motivated by studies on explicit construction of real algebraic maps onto the regions locally so-called moment maps: this comes from singularity theory of differentiable maps and real algebraic geometry.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Generalized nearby cycles via relative and logarithmic $\\mathscr{D}$-modules", "author": "Lei Wu", "published": "Fri, 06 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.05314", "summary": "arXiv:2602.05314v1 Announce Type: new \nAbstract: For a regular map $F$ from a complex smooth affine variety $X$ to $\\mathbb A^r_\\mathbb C$, we construct generalized nearby-cycle modules of a regular holonomic $\\mathscr D$-modules $\\mathcal M$ along log strata with the log structure induced by the graph of $F$, whose relative supports are infinite unions of translated linear subvarieties of $\\mathbb C^r$ determined by the zero loci of Bernstein-Sato ideals along monoid ideals. For a fixed log stratum, the nearby-cycle module corresponds to the Sabbah specialization complex of DR$(\\mathcal M)$ under the relative regular Riemann-Hilbert correspondence of Fiorot-Fernandes-Sabbah, which generalizes the classical comparison theorem of Kashiwara-Malgrange for Deligne's nearby cycles. As an application, when $\\mathcal M=\\mathcal O_X$, we give a topological interpretation of the zero loci of Bernstein-Sato ideals of $F$ along monoid ideals under the exponential map, which answers a question of Budur-Shi-Zuo.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2602.05314" target="_blank">Generalized nearby cycles via relative and logarithmic $\mathscr{D}$-modules</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Lei Wu</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 06 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.05314" target="_blank">https://arxiv.org/abs/2602.05314</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                For a regular map $F$ from a complex smooth affine variety $X$ to $\mathbb A^r_\mathbb C$, we construct generalized nearby-cycle modules of a regular holonomic $\mathscr D$-modules $\mathcal M$ along log strata with the log structure induced by the graph of $F$, whose relative supports are infinite unions of translated linear subvarieties of $\mathbb C^r$ determined by the zero loci of Bernstein-Sato ideals along monoid ideals. For a fixed log stratum, the nearby-cycle module corresponds to the Sabbah specialization complex of DR$(\mathcal M)$ under the relative regular Riemann-Hilbert correspondence of Fiorot-Fernandes-Sabbah, which generalizes the classical comparison theorem of Kashiwara-Malgrange for Deligne's nearby cycles. As an application, when $\mathcal M=\mathcal O_X$, we give a topological interpretation of the zero loci of Bernstein-Sato ideals of $F$ along monoid ideals under the exponential map, which answers a question of Budur-Shi-Zuo.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "On the boundedness of some real line arrangements of type at most one", "author": "Marek Janasz", "published": "Fri, 06 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.05409", "summary": "arXiv:2602.05409v1 Announce Type: new \nAbstract: In this note, we show that real line arrangements of type at most one, admitting only intersection points of multiplicity at most five, satisfy certain boundedness properties. In particular, we prove that a free real arrangement of $d$ lines with intersection multiplicities bounded by $5$ can have at most $522$ lines and consequently there exist only finitely many combinatorial types of such arrangements.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2602.05409" target="_blank">On the boundedness of some real line arrangements of type at most one</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Marek Janasz</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 06 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.05409" target="_blank">https://arxiv.org/abs/2602.05409</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this note, we show that real line arrangements of type at most one, admitting only intersection points of multiplicity at most five, satisfy certain boundedness properties. In particular, we prove that a free real arrangement of $d$ lines with intersection multiplicities bounded by $5$ can have at most $522$ lines and consequently there exist only finitely many combinatorial types of such arrangements.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "Characterising Ball Quotients through their (higher) Chern Numbers", "author": "Niklas M\\\"uller", "published": "Fri, 06 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.05509", "summary": "arXiv:2602.05509v1 Announce Type: new \nAbstract: In this short note we provide a characterisation of ball quotients among all minimal smooth projective varieties of general type purely in terms of their characteristic numbers. This generalises earlier work of Miyaoka, Yau and Greb--Kebekus--Peternell--Taji.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2602.05509" target="_blank">Characterising Ball Quotients through their (higher) Chern Numbers</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Niklas M\"uller</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 06 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.05509" target="_blank">https://arxiv.org/abs/2602.05509</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this short note we provide a characterisation of ball quotients among all minimal smooth projective varieties of general type purely in terms of their characteristic numbers. This generalises earlier work of Miyaoka, Yau and Greb--Kebekus--Peternell--Taji.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "Vector bundles on Olsson fans", "author": "Luca Battistella, Francesca Carocci, Jonathan Wise", "published": "Fri, 06 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.05685", "summary": "arXiv:2602.05685v1 Announce Type: new \nAbstract: Artin fans are algebro-geometric incarnations of cone complexes. We study weakly convex Olsson fans, generalising Artin fans in two ways: first, they admit lineality spaces, thus including tropical tori as well; second, they are defined over a base logarithmic scheme, thus providing a relative version of equivariant toric geometries. We determine conditions under which Olsson fans are well-behaved, in the sense that their geometry is determined combinatorially. We undertake the study of quasicoherent sheaves, and in particular vector bundles, on Olsson fans: we describe their moduli stack in the case of a (subdivided) cone, and some failures of algebraicity in the general case; Weyl convexity shows up naturally in this context.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2602.05685" target="_blank">Vector bundles on Olsson fans</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Luca Battistella, Francesca Carocci, Jonathan Wise</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 06 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.05685" target="_blank">https://arxiv.org/abs/2602.05685</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Artin fans are algebro-geometric incarnations of cone complexes. We study weakly convex Olsson fans, generalising Artin fans in two ways: first, they admit lineality spaces, thus including tropical tori as well; second, they are defined over a base logarithmic scheme, thus providing a relative version of equivariant toric geometries. We determine conditions under which Olsson fans are well-behaved, in the sense that their geometry is determined combinatorially. We undertake the study of quasicoherent sheaves, and in particular vector bundles, on Olsson fans: we describe their moduli stack in the case of a (subdivided) cone, and some failures of algebraicity in the general case; Weyl convexity shows up naturally in this context.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "A Dieudonn\\'e theory for analytic p-divisible groups and applications to Shimura varieties", "author": "Lucas Gerth", "published": "Fri, 06 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.05764", "summary": "arXiv:2602.05764v1 Announce Type: new \nAbstract: We study families of analytic $p$-divisible groups over adic spaces $S$ defined over $\\mathbb{Q}_p$. We prove an equivalence between such families and Hodge-Tate triples, generalizing a theorem of Fargues. For a perfectoid space $S$, we construct a functor associating to an analytic $p$-divisible group $\\mathcal{G} \\rightarrow S$ a coherent sheaf $\\mathcal{E}(\\mathcal{G})$ on the relative Fargues--Fontaine curve $X_S$. Restricting to analytic $p$-divisible groups admitting a Cartier dual, we obtain an equivalence of categories with local shtukas satisfying a minuscule condition, compatible with the prismatic Dieudonn\\'e theory of Ansch\\\"utz--Le Bras. We conclude with applications to moduli spaces: we show that the local Shimura varieties of EL and PEL types of Scholze--Weinstein are moduli spaces of analytic $p$-divisible groups with extra structure, and we give a reinterpretation of the Hodge--Tate period map of Scholze in terms of topologically $p$-torsion subgroups of abelian varieties.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2602.05764" target="_blank">A Dieudonn\'e theory for analytic p-divisible groups and applications to Shimura varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Lucas Gerth</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 06 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.05764" target="_blank">https://arxiv.org/abs/2602.05764</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study families of analytic $p$-divisible groups over adic spaces $S$ defined over $\mathbb{Q}_p$. We prove an equivalence between such families and Hodge-Tate triples, generalizing a theorem of Fargues. For a perfectoid space $S$, we construct a functor associating to an analytic $p$-divisible group $\mathcal{G} \rightarrow S$ a coherent sheaf $\mathcal{E}(\mathcal{G})$ on the relative Fargues--Fontaine curve $X_S$. Restricting to analytic $p$-divisible groups admitting a Cartier dual, we obtain an equivalence of categories with local shtukas satisfying a minuscule condition, compatible with the prismatic Dieudonn\'e theory of Ansch\"utz--Le Bras. We conclude with applications to moduli spaces: we show that the local Shimura varieties of EL and PEL types of Scholze--Weinstein are moduli spaces of analytic $p$-divisible groups with extra structure, and we give a reinterpretation of the Hodge--Tate period map of Scholze in terms of topologically $p$-torsion subgroups of abelian varieties.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Algebro-geometric bootstrapping from OPE decoupling", "author": "Monica Jinwoo Kang, Craig Lawrie, Jaewon Song", "published": "Fri, 06 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.04946", "summary": "arXiv:2602.04946v1 Announce Type: cross \nAbstract: We conjecture that decoupling relations in the operator product expansion of a 4d $\\mathcal{N}=2$ superconformal field theory (SCFT) are encoded by an algebro-geometric object: a bifiltered affine scheme. We demonstrate how this scheme reproduces the Macdonald index (thus the Schur index) as well as the Higgs branch. Although the associated scheme typically admits continuous deformations, we find that a geometric extremization principle uniquely fixes these moduli, thereby providing a possible geometric route toward a classification of 4d $\\mathcal{N}=2$ SCFTs.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2602.04946" target="_blank">Algebro-geometric bootstrapping from OPE decoupling</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Monica Jinwoo Kang, Craig Lawrie, Jaewon Song</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 06 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.04946" target="_blank">https://arxiv.org/abs/2602.04946</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We conjecture that decoupling relations in the operator product expansion of a 4d $\mathcal{N}=2$ superconformal field theory (SCFT) are encoded by an algebro-geometric object: a bifiltered affine scheme. We demonstrate how this scheme reproduces the Macdonald index (thus the Schur index) as well as the Higgs branch. Although the associated scheme typically admits continuous deformations, we find that a geometric extremization principle uniquely fixes these moduli, thereby providing a possible geometric route toward a classification of 4d $\mathcal{N}=2$ SCFTs.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "Courbes et fibr\\'es vectoriels en th\\'eorie de Hodge $z$-adique globale", "author": "Siyan Daniel Li-Huerta", "published": "Fri, 06 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.04978", "summary": "arXiv:2602.04978v1 Announce Type: cross \nAbstract: We study the global analogue of the Fargues-Fontaine curve over function fields $F$. We prove some foundational results about its moduli of $G$-bundles $\\operatorname{Bun}_{G,F}$, which is a geometrization of the global Kottwitz set $B(F,G)$. For example, $\\operatorname{Bun}_{G,F}$ plays the role of Igusa stacks over function fields. We use $\\operatorname{Bun}_{G,F}$ to reformulate the global Langlands conjecture for $G$ over $F$ in terms of categorical local Langlands, refining conjectures of Arinkin-Gaitsgory-Kazhdan-Raskin-Rozenblyum-Varshavsky and Zhu. Finally, we verify this conjecture when $G$ is commutative. Along the way, we prove a GAGA theorem for smooth proper schemes over sousperfectoid spaces, which is of independent interest.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2602.04978" target="_blank">Courbes et fibr\'es vectoriels en th\'eorie de Hodge $z$-adique globale</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Siyan Daniel Li-Huerta</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 06 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.04978" target="_blank">https://arxiv.org/abs/2602.04978</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the global analogue of the Fargues-Fontaine curve over function fields $F$. We prove some foundational results about its moduli of $G$-bundles $\operatorname{Bun}_{G,F}$, which is a geometrization of the global Kottwitz set $B(F,G)$. For example, $\operatorname{Bun}_{G,F}$ plays the role of Igusa stacks over function fields. We use $\operatorname{Bun}_{G,F}$ to reformulate the global Langlands conjecture for $G$ over $F$ in terms of categorical local Langlands, refining conjectures of Arinkin-Gaitsgory-Kazhdan-Raskin-Rozenblyum-Varshavsky and Zhu. Finally, we verify this conjecture when $G$ is commutative. Along the way, we prove a GAGA theorem for smooth proper schemes over sousperfectoid spaces, which is of independent interest.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "Causal Representation Meets Stochastic Modeling under Generic Geometry", "author": "Jiaxu Ren, Yixin Wang, Biwei Huang", "published": "Fri, 06 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.05033", "summary": "arXiv:2602.05033v1 Announce Type: cross \nAbstract: Learning meaningful causal representations from observations has emerged as a crucial task for facilitating machine learning applications and driving scientific discoveries in fields such as climate science, biology, and physics. This process involves disentangling high-level latent variables and their causal relationships from low-level observations. Previous work in this area that achieves identifiability typically focuses on cases where the observations are either i.i.d. or follow a latent discrete-time process. Nevertheless, many real-world settings require identifying latent variables that are continuous-time stochastic processes (e.g., multivariate point processes). To this end, we develop identifiable causal representation learning for continuous-time latent stochastic point processes. We study its identifiability by analyzing the geometry of the parameter space. Furthermore, we develop MUTATE, an identifiable variational autoencoder framework with a time-adaptive transition module to infer stochastic dynamics. Across simulated and empirical studies, we find that MUTATE can effectively answer scientific questions, such as the accumulation of mutations in genomics and the mechanisms driving neuron spike triggers in response to time-varying dynamics.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2602.05033" target="_blank">Causal Representation Meets Stochastic Modeling under Generic Geometry</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jiaxu Ren, Yixin Wang, Biwei Huang</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 06 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.05033" target="_blank">https://arxiv.org/abs/2602.05033</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Learning meaningful causal representations from observations has emerged as a crucial task for facilitating machine learning applications and driving scientific discoveries in fields such as climate science, biology, and physics. This process involves disentangling high-level latent variables and their causal relationships from low-level observations. Previous work in this area that achieves identifiability typically focuses on cases where the observations are either i.i.d. or follow a latent discrete-time process. Nevertheless, many real-world settings require identifying latent variables that are continuous-time stochastic processes (e.g., multivariate point processes). To this end, we develop identifiable causal representation learning for continuous-time latent stochastic point processes. We study its identifiability by analyzing the geometry of the parameter space. Furthermore, we develop MUTATE, an identifiable variational autoencoder framework with a time-adaptive transition module to infer stochastic dynamics. Across simulated and empirical studies, we find that MUTATE can effectively answer scientific questions, such as the accumulation of mutations in genomics and the mechanisms driving neuron spike triggers in response to time-varying dynamics.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "On QC and GQC algebraic geometry codes", "author": "Matteo Bonini, Arianna Dionigi, Francesco Ghiandoni", "published": "Fri, 06 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.05097", "summary": "arXiv:2602.05097v1 Announce Type: cross \nAbstract: We present new constructions of quasi-cyclic (QC) and generalized quasi-cyclic (GQC) codes from algebraic curves. Unlike previous approaches based on elliptic curves, our method applies to curves that are Kummer extensions of the rational function field, including hyperelliptic, norm-trace, and Hermitian curves. This allows QC codes with flexible co-index. Explicit parameter formulas are derived using known automorphism-group classifications.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2602.05097" target="_blank">On QC and GQC algebraic geometry codes</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Matteo Bonini, Arianna Dionigi, Francesco Ghiandoni</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 06 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.05097" target="_blank">https://arxiv.org/abs/2602.05097</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We present new constructions of quasi-cyclic (QC) and generalized quasi-cyclic (GQC) codes from algebraic curves. Unlike previous approaches based on elliptic curves, our method applies to curves that are Kummer extensions of the rational function field, including hyperelliptic, norm-trace, and Hermitian curves. This allows QC codes with flexible co-index. Explicit parameter formulas are derived using known automorphism-group classifications.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "First Proof", "author": "Mohammed Abouzaid, Andrew J. Blumberg, Martin Hairer, Joe Kileel, Tamara G. Kolda, Paul D. Nelson, Daniel Spielman, Nikhil Srivastava, Rachel Ward, Shmuel Weinberger, Lauren Williams", "published": "Fri, 06 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.05192", "summary": "arXiv:2602.05192v1 Announce Type: cross \nAbstract: To assess the ability of current AI systems to correctly answer research-level mathematics questions, we share a set of ten math questions which have arisen naturally in the research process of the authors. The questions had not been shared publicly until now; the answers are known to the authors of the questions but will remain encrypted for a short time.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2602.05192" target="_blank">First Proof</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Mohammed Abouzaid, Andrew J. Blumberg, Martin Hairer, Joe Kileel, Tamara G. Kolda, Paul D. Nelson, Daniel Spielman, Nikhil Srivastava, Rachel Ward, Shmuel Weinberger, Lauren Williams</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 06 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.05192" target="_blank">https://arxiv.org/abs/2602.05192</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                To assess the ability of current AI systems to correctly answer research-level mathematics questions, we share a set of ten math questions which have arisen naturally in the research process of the authors. The questions had not been shared publicly until now; the answers are known to the authors of the questions but will remain encrypted for a short time.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "Rational Interpreters for Discrete Dynamics: Existence, Exactness, and Decomposition over $p$-adic Fields", "author": "J. Rogelio P\\'erez-Buend\\'ia", "published": "Fri, 06 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.05433", "summary": "arXiv:2602.05433v1 Announce Type: cross \nAbstract: We address an inverse problem in non-Archimedean dynamics: given a finite discrete dynamical system (equivalently, a functional graph on $N$ states), construct a continuous $p$-adic dynamical system whose residue-level behavior reproduces the prescribed transitions. Using the cylinder partition of $\\mathcal{O}_K$ (viewed as \\emph{Witt cylinders} for unramified $K/\\mathbb{Q}_p$), we encode states by pairwise disjoint closed balls and formalize an \\textbf{interpreter} as a map sending each state ball into its target ball.\n  Our main existence result constructs rational interpreters that are analytic (hence pole-free) on the prescribed state cylinders, combining rigid-analytic Runge approximation with finite interpolation constraints. Under a linear-dominance condition on each cylinder, ball images are explicit and locally affine, leading to a robust classification of discrete behavior into contractive, indifferent, and expansive regimes. Good reduction provides a selection principle for natural interpreters; effective degree and height bounds for general rational interpreters remain open.\n  For composite alphabets we prove a \\textbf{Dynamic Chinese Remainder Theorem} for congruence-preserving systems: the CRT isomorphism $\\Theta:\\mathbb{Z}/m\\mathbb{Z}\\xrightarrow{\\sim}\\prod_i\\mathbb{Z}/p_i^{k_i}\\mathbb{Z}$ (for $m=\\prod p_i^{k_i}$) yields a factorization of the \\emph{dynamics} (equivalently, the functional graph) on $\\mathbb{Z}/m\\mathbb{Z}$ into dynamics on the prime-power components, compatible with reduction. Finally, we discuss an inverse-limit (profinite) extension: compatible towers define a $1$-Lipschitz map on $\\mathbb{Z}_p$, while selecting compatible analytic/rational interpreters across levels becomes a separate problem.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2602.05433" target="_blank">Rational Interpreters for Discrete Dynamics: Existence, Exactness, and Decomposition over $p$-adic Fields</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> J. Rogelio P\'erez-Buend\'ia</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 06 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.05433" target="_blank">https://arxiv.org/abs/2602.05433</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We address an inverse problem in non-Archimedean dynamics: given a finite discrete dynamical system (equivalently, a functional graph on $N$ states), construct a continuous $p$-adic dynamical system whose residue-level behavior reproduces the prescribed transitions. Using the cylinder partition of $\mathcal{O}_K$ (viewed as \emph{Witt cylinders} for unramified $K/\mathbb{Q}_p$), we encode states by pairwise disjoint closed balls and formalize an \textbf{interpreter} as a map sending each state ball into its target ball.
+  Our main existence result constructs rational interpreters that are analytic (hence pole-free) on the prescribed state cylinders, combining rigid-analytic Runge approximation with finite interpolation constraints. Under a linear-dominance condition on each cylinder, ball images are explicit and locally affine, leading to a robust classification of discrete behavior into contractive, indifferent, and expansive regimes. Good reduction provides a selection principle for natural interpreters; effective degree and height bounds for general rational interpreters remain open.
+  For composite alphabets we prove a \textbf{Dynamic Chinese Remainder Theorem} for congruence-preserving systems: the CRT isomorphism $\Theta:\mathbb{Z}/m\mathbb{Z}\xrightarrow{\sim}\prod_i\mathbb{Z}/p_i^{k_i}\mathbb{Z}$ (for $m=\prod p_i^{k_i}$) yields a factorization of the \emph{dynamics} (equivalently, the functional graph) on $\mathbb{Z}/m\mathbb{Z}$ into dynamics on the prime-power components, compatible with reduction. Finally, we discuss an inverse-limit (profinite) extension: compatible towers define a $1$-Lipschitz map on $\mathbb{Z}_p$, while selecting compatible analytic/rational interpreters across levels becomes a separate problem.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "On symmetries of hyperbolic lattices of large rank", "author": "Torben Grabbel, Gebhard Martin, Giacomo Mezzedimi, Maia Raitz von Frentz, Paul Jakob Schmidt", "published": "Fri, 06 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.05652", "summary": "arXiv:2602.05652v1 Announce Type: cross \nAbstract: For an even, integral hyperbolic lattice $L$, the symmetry group of $L$ is the quotient of the group of isometries of $L$ by the Weyl subgroup of $(-2)$-reflections. Following Nikulin, the exceptional lattice of $L$ is defined as the sublattice generated by elements that have finite orbit under the symmetry group of $L$. We prove that every hyperbolic lattice of rank at least $46$ has trivial exceptional lattice. In particular, every such lattice admits a symmetry of maximal Salem degree.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2602.05652" target="_blank">On symmetries of hyperbolic lattices of large rank</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Torben Grabbel, Gebhard Martin, Giacomo Mezzedimi, Maia Raitz von Frentz, Paul Jakob Schmidt</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 06 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.05652" target="_blank">https://arxiv.org/abs/2602.05652</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                For an even, integral hyperbolic lattice $L$, the symmetry group of $L$ is the quotient of the group of isometries of $L$ by the Weyl subgroup of $(-2)$-reflections. Following Nikulin, the exceptional lattice of $L$ is defined as the sublattice generated by elements that have finite orbit under the symmetry group of $L$. We prove that every hyperbolic lattice of rank at least $46$ has trivial exceptional lattice. In particular, every such lattice admits a symmetry of maximal Salem degree.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Thin sets in weighted projective stacks", "author": "Stephanie Chan, Daniel Loughran, Nick Rome", "published": "Fri, 06 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.05705", "summary": "arXiv:2602.05705v1 Announce Type: cross \nAbstract: We prove an upper bound for the number of rational points of bounded height in a weighted projective stack which lie in a given thin subset. As a consequence, we show that $100\\%$ of hyperelliptic curves do not admit a prescribed on-trivial level structure.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2602.05705" target="_blank">Thin sets in weighted projective stacks</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Stephanie Chan, Daniel Loughran, Nick Rome</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 06 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.05705" target="_blank">https://arxiv.org/abs/2602.05705</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove an upper bound for the number of rational points of bounded height in a weighted projective stack which lie in a given thin subset. As a consequence, we show that $100\%$ of hyperelliptic curves do not admit a prescribed on-trivial level structure.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "Diagonal F-thresholds for determinants and Pfaffians", "author": "Barbara Betti, Claudiu Raicu, Francesco Romeo, Jyoti Singh", "published": "Fri, 06 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.05761", "summary": "arXiv:2602.05761v1 Announce Type: cross \nAbstract: We compute the diagonal F-thresholds of determinantal hypersurfaces arising from a generic matrix and from a generic symmetric matrix, as well as of the Pfaffian hypersurface arising from a generic skew-symmetric matrix of even size. The main ingredient is a cohomology vanishing theorem for certain line bundles on flag varieties in characteristic $p$. In the cases of the generic matrix and the generic skew-symmetric matrix, we show that the diagonal F-threshold attains its minimal possible value, namely the negative of the a-invariant. The symmetric case is more subtle and relies in addition on a polynomiality result for representations afforded by cohomology, building on work of the second author with VandeBogert.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2602.05761" target="_blank">Diagonal F-thresholds for determinants and Pfaffians</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Barbara Betti, Claudiu Raicu, Francesco Romeo, Jyoti Singh</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 06 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.05761" target="_blank">https://arxiv.org/abs/2602.05761</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We compute the diagonal F-thresholds of determinantal hypersurfaces arising from a generic matrix and from a generic symmetric matrix, as well as of the Pfaffian hypersurface arising from a generic skew-symmetric matrix of even size. The main ingredient is a cohomology vanishing theorem for certain line bundles on flag varieties in characteristic $p$. In the cases of the generic matrix and the generic skew-symmetric matrix, we show that the diagonal F-threshold attains its minimal possible value, namely the negative of the a-invariant. The symmetric case is more subtle and relies in addition on a polynomiality result for representations afforded by cohomology, building on work of the second author with VandeBogert.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "Mertens products in arithmetic progressions over function fields", "author": "Hwanyup Jung", "published": "Fri, 06 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.05788", "summary": "arXiv:2602.05788v1 Announce Type: cross \nAbstract: We establish a function field analogue of Mertens' formula for Euler products restricted to primes in arithmetic progressions over the polynomial ring F_q[t]. Our results are in direct correspondence with those of Languasco and Zaccagnini for arithmetic progressions in the integers.\n  Over function fields, Weil's Riemann hypothesis for Dirichlet L-functions holds unconditionally, and consequently the analogue of the GRH-strength asymptotic is obtained without any exceptional zero correction term.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2602.05788" target="_blank">Mertens products in arithmetic progressions over function fields</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Hwanyup Jung</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 06 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.05788" target="_blank">https://arxiv.org/abs/2602.05788</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We establish a function field analogue of Mertens' formula for Euler products restricted to primes in arithmetic progressions over the polynomial ring F_q[t]. Our results are in direct correspondence with those of Languasco and Zaccagnini for arithmetic progressions in the integers.
+  Over function fields, Weil's Riemann hypothesis for Dirichlet L-functions holds unconditionally, and consequently the analogue of the GRH-strength asymptotic is obtained without any exceptional zero correction term.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "Descent properties for an abelian variety with extended Galois representation", "author": "Ludovic Felder", "published": "Fri, 06 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.05834", "summary": "arXiv:2602.05834v1 Announce Type: cross \nAbstract: Let $K$ be a field, $L$ a finite Galois extension of $K$, and $X$ an abelian variety defined over $L$. If $X$ is isogenous over $L$ to an abelian variety defined over $K$, then the $\\ell$-adic Galois representations associated to $X$ extend to representations $\\bar{\\rho}_{\\ell,X}:\\mathrm{Gal}(\\bar{L}/K)\\to\\mathrm{Aut}(V_\\ell X)$ for every prime $\\ell$. This paper aims to show that the converse is true for abelian varieties of Type I, with some supplementary conditions needed on the endomorphisms of $X$, when $L$ is either a number field or a function field of prime characteristic different from $2$.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2602.05834" target="_blank">Descent properties for an abelian variety with extended Galois representation</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ludovic Felder</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 06 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.05834" target="_blank">https://arxiv.org/abs/2602.05834</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $K$ be a field, $L$ a finite Galois extension of $K$, and $X$ an abelian variety defined over $L$. If $X$ is isogenous over $L$ to an abelian variety defined over $K$, then the $\ell$-adic Galois representations associated to $X$ extend to representations $\bar{\rho}_{\ell,X}:\mathrm{Gal}(\bar{L}/K)\to\mathrm{Aut}(V_\ell X)$ for every prime $\ell$. This paper aims to show that the converse is true for abelian varieties of Type I, with some supplementary conditions needed on the endomorphisms of $X$, when $L$ is either a number field or a function field of prime characteristic different from $2$.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Convex unions and completions from simplicial pseudomanifolds", "author": "Soohyun Park", "published": "Fri, 06 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.06016", "summary": "arXiv:2602.06016v1 Announce Type: cross \nAbstract: While intersections of convex sets are convex, their unions have rather complicated behavior. Some natural contexts where they appear include duality arguments involving boundaries of convex sets and valuations, which have an Euler characteristic-like structure. However, there are certain settings where the convexity property itself is important to consider. For example, this includes (preservation of) positivity properties of divisors on toric varieties under blowdowns. In the case of (restrictions of) conormal bundles, this can be interpreted in terms of interactions between local convexity data stored in rational equivalence relations. We consider generalizations to realizations of simplicial pseudomanifolds and replace rational equivalence with effects of PL homeomorphisms.\n  Decomposing the PL homeomorphisms into edge subdivisions and contractions, we characterize the space of suitable contraction points compatible with local convexity properties in terms of convex unions and completions. This gives rise to certain external edge subdivisions that make this ``contraction space'' of the starting edge empty, which is unexpected given the expected ``increased convexity'' from edge subdivisions. We also obtain strong affine/linear restrictions on realizations of facets containing nearby edges preserving local convexity. This implies that contracting certain nearby edges results in a very large or very small contraction space of the starting edge. As for boundary behavior, there are parallels between effects of PL homeomorphisms on induced 4-cycles in the 1-skeleton. Finally, we find effects of PL homeomorphisms and suspensions on analogues of local convexity properties stored by linear systems of parameters. This indicates that simplicial spheres PL homeomorphic to the boundary of a cross polytope store record local convexity changes in the most natural way.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2602.06016" target="_blank">Convex unions and completions from simplicial pseudomanifolds</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Soohyun Park</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 06 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.06016" target="_blank">https://arxiv.org/abs/2602.06016</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                While intersections of convex sets are convex, their unions have rather complicated behavior. Some natural contexts where they appear include duality arguments involving boundaries of convex sets and valuations, which have an Euler characteristic-like structure. However, there are certain settings where the convexity property itself is important to consider. For example, this includes (preservation of) positivity properties of divisors on toric varieties under blowdowns. In the case of (restrictions of) conormal bundles, this can be interpreted in terms of interactions between local convexity data stored in rational equivalence relations. We consider generalizations to realizations of simplicial pseudomanifolds and replace rational equivalence with effects of PL homeomorphisms.
+  Decomposing the PL homeomorphisms into edge subdivisions and contractions, we characterize the space of suitable contraction points compatible with local convexity properties in terms of convex unions and completions. This gives rise to certain external edge subdivisions that make this ``contraction space'' of the starting edge empty, which is unexpected given the expected ``increased convexity'' from edge subdivisions. We also obtain strong affine/linear restrictions on realizations of facets containing nearby edges preserving local convexity. This implies that contracting certain nearby edges results in a very large or very small contraction space of the starting edge. As for boundary behavior, there are parallels between effects of PL homeomorphisms on induced 4-cycles in the 1-skeleton. Finally, we find effects of PL homeomorphisms and suspensions on analogues of local convexity properties stored by linear systems of parameters. This indicates that simplicial spheres PL homeomorphic to the boundary of a cross polytope store record local convexity changes in the most natural way.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "$A$-hypergeometric Series with Parameters in the Core", "author": "Mao Nagamine", "published": "Fri, 06 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2404.11085", "summary": "arXiv:2404.11085v3 Announce Type: replace \nAbstract: In this paper, we discuss the computational approach to the results established by Okuyama and Saito. Although their results are often difficult to compute, we prove that, when the negative support of a fake exponent $v$ with respect to a generic weight $w$ is included in a certain set, solutions can be computed using only the reduced Gr\\\"{o}bner basis, and we can construct all $A$-hypergeometric series with exponent $v$ in the direction $w$ by Frobenius's method. As an example, we describe the Aomoto-Gel'fand system of type $3 \\times 3$ in details.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2404.11085" target="_blank">$A$-hypergeometric Series with Parameters in the Core</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Mao Nagamine</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 06 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2404.11085" target="_blank">https://arxiv.org/abs/2404.11085</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we discuss the computational approach to the results established by Okuyama and Saito. Although their results are often difficult to compute, we prove that, when the negative support of a fake exponent $v$ with respect to a generic weight $w$ is included in a certain set, solutions can be computed using only the reduced Gr\"{o}bner basis, and we can construct all $A$-hypergeometric series with exponent $v$ in the direction $w$ by Frobenius's method. As an example, we describe the Aomoto-Gel'fand system of type $3 \times 3$ in details.
+            </div>
+        </div>
+        <div class="paper" id="paper-21">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-21" data-paper-data='{"title": "Transitivity of the $\\mathbb{B}^+_\\mathrm{dR}$-loop group action on Schubert cells", "author": "Sean Howe", "published": "Fri, 06 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2505.01204", "summary": "arXiv:2505.01204v2 Announce Type: replace \nAbstract: For $G$ a connected linear algebraic group over a $p$-adic field, we show that the action of $G(\\mathbb{B}^+_{\\mathrm{dR}})$ on each Schubert cell in the $\\mathbb{B}_{\\mathrm{dR}}^+$-affine Grassmannian is transitive in the \\'{e}tale topology on affinoid perfectoids, generalizing a result in the reductive case due to Fargues and Scholze.", "number": 21, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#21</span>
+                <a href="https://arxiv.org/abs/2505.01204" target="_blank">Transitivity of the $\mathbb{B}^+_\mathrm{dR}$-loop group action on Schubert cells</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sean Howe</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 06 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2505.01204" target="_blank">https://arxiv.org/abs/2505.01204</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                For $G$ a connected linear algebraic group over a $p$-adic field, we show that the action of $G(\mathbb{B}^+_{\mathrm{dR}})$ on each Schubert cell in the $\mathbb{B}_{\mathrm{dR}}^+$-affine Grassmannian is transitive in the \'{e}tale topology on affinoid perfectoids, generalizing a result in the reductive case due to Fargues and Scholze.
+            </div>
+        </div>
+        <div class="paper" id="paper-22">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-22" data-paper-data='{"title": "Toward the noncommutative minimal model program for Fano varieties", "author": "Tomohiro Karube, Antonios-Alexandros Robotis, Vanja Zuliani", "published": "Fri, 06 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.20739", "summary": "arXiv:2601.20739v2 Announce Type: replace \nAbstract: We study the noncommutative minimal model program, as proposed by Halpern-Leistner, for Fano varieties. We construct lifts of Iritani's quantum cohomology central charge in the following examples: Grassmannians, smooth quadrics, and smooth cubic threefolds and fourfolds. Moreover, we verify that these lifted paths are quasi-convergent and give rise to the expected semiorthogonal decompositions of the bounded derived category. We also construct geometric stability conditions in the examples above and observe that, after suitable isomonodromic deformation of the quantum cohomology central charge, the quasi-convergent paths for Grassmannians and quadrics can be chosen to start in the geometric region.", "number": 22, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#22</span>
+                <a href="https://arxiv.org/abs/2601.20739" target="_blank">Toward the noncommutative minimal model program for Fano varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Tomohiro Karube, Antonios-Alexandros Robotis, Vanja Zuliani</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 06 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.20739" target="_blank">https://arxiv.org/abs/2601.20739</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the noncommutative minimal model program, as proposed by Halpern-Leistner, for Fano varieties. We construct lifts of Iritani's quantum cohomology central charge in the following examples: Grassmannians, smooth quadrics, and smooth cubic threefolds and fourfolds. Moreover, we verify that these lifted paths are quasi-convergent and give rise to the expected semiorthogonal decompositions of the bounded derived category. We also construct geometric stability conditions in the examples above and observe that, after suitable isomonodromic deformation of the quantum cohomology central charge, the quasi-convergent paths for Grassmannians and quadrics can be chosen to start in the geometric region.
+            </div>
+        </div>
+        <div class="paper" id="paper-23">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-23" data-paper-data='{"title": "Polylogarithmic motivic Chabauty-Kim for $\\mathbb{P}^1 \\setminus \\{ 0,1,\\infty \\}$: the geometric step via resultants", "author": "David Jarossay, David T. -B. G. Lilienfeldt, Francesco Maria Saettone, Ariel Weiss, Sa'ar Zehavi", "published": "Fri, 06 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2408.07400", "summary": "arXiv:2408.07400v3 Announce Type: replace-cross \nAbstract: Given a finite set $S$ of distinct primes, we propose a method to construct polylogarithmic motivic Chabauty-Kim functions for $\\mathbb{P}^1 \\setminus \\{ 0,1,\\infty \\}$ using resultants. For a prime $p\\not\\in S$, the vanishing loci of the images of such functions under the $p$-adic period map contain the solutions of the $S$-unit equation. In the case $\\vert S\\vert=2$, we explicitly construct a non-trivial motivic Chabauty-Kim function in depth 6 of degree 18, and prove that there do not exist any other Chabauty-Kim functions with smaller depth and degree. The method, inspired by work of Dan-Cohen and the first author, enhances the geometric step algorithm developed by Corwin and Dan-Cohen, providing a more efficient approach.", "number": 23, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#23</span>
+                <a href="https://arxiv.org/abs/2408.07400" target="_blank">Polylogarithmic motivic Chabauty-Kim for $\mathbb{P}^1 \setminus \{ 0,1,\infty \}$: the geometric step via resultants</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> David Jarossay, David T. -B. G. Lilienfeldt, Francesco Maria Saettone, Ariel Weiss, Sa'ar Zehavi</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 06 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2408.07400" target="_blank">https://arxiv.org/abs/2408.07400</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Given a finite set $S$ of distinct primes, we propose a method to construct polylogarithmic motivic Chabauty-Kim functions for $\mathbb{P}^1 \setminus \{ 0,1,\infty \}$ using resultants. For a prime $p\not\in S$, the vanishing loci of the images of such functions under the $p$-adic period map contain the solutions of the $S$-unit equation. In the case $\vert S\vert=2$, we explicitly construct a non-trivial motivic Chabauty-Kim function in depth 6 of degree 18, and prove that there do not exist any other Chabauty-Kim functions with smaller depth and degree. The method, inspired by work of Dan-Cohen and the first author, enhances the geometric step algorithm developed by Corwin and Dan-Cohen, providing a more efficient approach.
+            </div>
+        </div>
+        <div class="paper" id="paper-24">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-24" data-paper-data='{"title": "On the multiplier spectrum of polynomials", "author": "Geng-Rui Zhang", "published": "Fri, 06 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.13437", "summary": "arXiv:2511.13437v2 Announce Type: replace-cross \nAbstract: We prove several results on the multiplier spectrum of polynomials. We provide a detailed proof of the theorem stating that the multiplier spectrum morphism is generically injective on the moduli space of polynomials. We obtain a description of the non-injective locus of the multiplier spectrum morphism for polynomials of degree $d\\geq2$. Roughly speaking, we prove that, apart from isolated exceptions, polynomials with the same multiplier spectrum are intertwined. More precisely, we show that, up to iteration and isolated exceptions, the polynomials are either equivalent or related by Ritt moves. We also investigate the relationship between Ritt moves and multiplier spectra over arithmetic progressions.", "number": 24, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#24</span>
+                <a href="https://arxiv.org/abs/2511.13437" target="_blank">On the multiplier spectrum of polynomials</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Geng-Rui Zhang</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 06 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.13437" target="_blank">https://arxiv.org/abs/2511.13437</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove several results on the multiplier spectrum of polynomials. We provide a detailed proof of the theorem stating that the multiplier spectrum morphism is generically injective on the moduli space of polynomials. We obtain a description of the non-injective locus of the multiplier spectrum morphism for polynomials of degree $d\geq2$. Roughly speaking, we prove that, apart from isolated exceptions, polynomials with the same multiplier spectrum are intertwined. More precisely, we show that, up to iteration and isolated exceptions, the polynomials are either equivalent or related by Ritt moves. We also investigate the relationship between Ritt moves and multiplier spectra over arithmetic progressions.
+            </div>
+        </div>
+        <div class="paper" id="paper-25">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-25" data-paper-data='{"title": "Algebraic Geometry for Spin-Adapted Coupled Cluster Theory", "author": "Fabian M. Faulstich, Svala Sverrisd\\'ottir", "published": "Fri, 06 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.16646", "summary": "arXiv:2601.16646v3 Announce Type: replace-cross \nAbstract: We develop and numerically analyze an algebraic-geometric framework for spin-adapted coupled-cluster (CC) theory. Since the electronic Hamiltonian is SU(2)-invariant, physically relevant quantum states lie in the spin singlet sector. We give an explicit description of the SU(2)-invariant (spin singlet) many-body space by identifying it with an Artinian commutative ring, called the excitation ring, whose dimension is governed by a Narayana number. We define spin-adapted truncation varieties via embeddings of graded subspaces of this ring, and we identify the CCS truncation variety with the Veronese square of the Grassmannian. Compared to the spin-generalized formulation, this approach yields a substantial reduction in dimension and degree, with direct computational consequences. In particular, the CC degree of the truncation variety -- governing the number of homotopy paths required to compute all CC solutions -- is reduced by orders of magnitude. We present scaling studies demonstrating asymptotic improvements and we exploit this reduction to compute the full solution landscape of spin-adapted CC equations for water and lithium hydride.", "number": 25, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#25</span>
+                <a href="https://arxiv.org/abs/2601.16646" target="_blank">Algebraic Geometry for Spin-Adapted Coupled Cluster Theory</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Fabian M. Faulstich, Svala Sverrisd\'ottir</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 06 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.16646" target="_blank">https://arxiv.org/abs/2601.16646</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We develop and numerically analyze an algebraic-geometric framework for spin-adapted coupled-cluster (CC) theory. Since the electronic Hamiltonian is SU(2)-invariant, physically relevant quantum states lie in the spin singlet sector. We give an explicit description of the SU(2)-invariant (spin singlet) many-body space by identifying it with an Artinian commutative ring, called the excitation ring, whose dimension is governed by a Narayana number. We define spin-adapted truncation varieties via embeddings of graded subspaces of this ring, and we identify the CCS truncation variety with the Veronese square of the Grassmannian. Compared to the spin-generalized formulation, this approach yields a substantial reduction in dimension and degree, with direct computational consequences. In particular, the CC degree of the truncation variety -- governing the number of homotopy paths required to compute all CC solutions -- is reduced by orders of magnitude. We present scaling studies demonstrating asymptotic improvements and we exploit this reduction to compute the full solution landscape of spin-adapted CC equations for water and lithium hydride.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-02-06 18:00:02
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>

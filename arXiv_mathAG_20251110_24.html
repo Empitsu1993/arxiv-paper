@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Mon, 10 Nov 2025 05:02:18 +0000<br>
+        <strong>論文数:</strong> 24件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Log algebraic hyperbolicity of $\overline{M}_{0,n}$</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Algebraic hyperbolicity of very general hypersurfaces in weighted projective spaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">On a Grauert-Riemenschneider vanishing theorem in dimension 3</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">Normal forms for ordinary differential operators, II</a>
+            <span class="title-label-badge" style="background-color: #ff69b4;">privacy</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">A Looming of phantoms</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">Pullback and direct image of parabolic Higgs bundles and parabolic connections with symplectic and orthogonal structures</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Tropical reductive groups and principal bundles on metric graphs</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Finite groupoids of configurations of lines in $\mathbb{P}^{3}_{\mathbb{C}}$</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">Algebraic hyperbolicity of subvarieties of homogeneous varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">On anti-hyperbolicity for hyperk\"ahler varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">The local obstruction to semi-stable reduction for abelian varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">Stability of the $C^q_i$ properties under field extensions</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">Counting points on surfaces in polynomial time</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Infinitely many primes of basic reduction for some abelian fourfolds</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Universal Deformations of a Curve and a Differential</a>
+            <span class="title-label-badge" style="background-color: #ff69b4;">privacy</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">Nash blowup fails to resolve singularities in dimensions four and higher</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">Topological and bilipschitz types of complex surface singularities and their links</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">Birational geometry of weighted complete intersections of type $(12, 14)$ in $\mathbb{P} (1, 2, 3, 4, 7, 11)$</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Normal forms for ordinary differential operators, III</a>
+            <span class="title-label-badge" style="background-color: #ff69b4;">privacy</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">Locally trivial monodromy of moduli spaces of sheaves on Abelian surfaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-21" onchange="updateSelectedCount()">
+            <span class="title-number">21.</span>
+            <a href="#paper-21">Bourbaki degree of pairs of projective surfaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-22" onchange="updateSelectedCount()">
+            <span class="title-number">22.</span>
+            <a href="#paper-22">Cox-Gorenstein algebras</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-23" onchange="updateSelectedCount()">
+            <span class="title-number">23.</span>
+            <a href="#paper-23">Abhyankar valuations, Pr\"ufer-Manis valuations, and perfectoid Tate algebras</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-24" onchange="updateSelectedCount()">
+            <span class="title-number">24.</span>
+            <a href="#paper-24">$F$-intersection flatness of dagger and Berkovich affinoid algebras</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Log algebraic hyperbolicity of $\\overline{M}_{0,n}$", "author": "Jiahe Wang", "published": "Mon, 10 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.04889", "summary": "arXiv:2511.04889v1 Announce Type: new \nAbstract: We show that the moduli space of stable n-pointed rational curves $\\overline{M}_{0,n}$ with its boundary $\\Delta$ is algebraically hyperbolic.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2511.04889" target="_blank">Log algebraic hyperbolicity of $\overline{M}_{0,n}$</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jiahe Wang</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 10 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.04889" target="_blank">https://arxiv.org/abs/2511.04889</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We show that the moduli space of stable n-pointed rational curves $\overline{M}_{0,n}$ with its boundary $\Delta$ is algebraically hyperbolic.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Algebraic hyperbolicity of very general hypersurfaces in weighted projective spaces", "author": "Jiahe Wang", "published": "Mon, 10 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.04890", "summary": "arXiv:2511.04890v1 Announce Type: new \nAbstract: We provide a bound for $m$ such that the zero locus of a very general section of an $m$-multiple of some ample line bundle on a weighted projective space with isolated singularities is algebraically hyperbolic.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2511.04890" target="_blank">Algebraic hyperbolicity of very general hypersurfaces in weighted projective spaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jiahe Wang</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 10 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.04890" target="_blank">https://arxiv.org/abs/2511.04890</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We provide a bound for $m$ such that the zero locus of a very general section of an $m$-multiple of some ample line bundle on a weighted projective space with isolated singularities is algebraically hyperbolic.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "On a Grauert-Riemenschneider vanishing theorem in dimension 3", "author": "Rahul Ajit", "published": "Mon, 10 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.04906", "summary": "arXiv:2511.04906v1 Announce Type: new \nAbstract: Suppose $R$ is an excellent ring of dimension $3$ and has rational singularities. Let $\\pi:X \\longrightarrow \\mathrm{Spec} \\ R$ be a blow-up and $\\phi: W \\longrightarrow X$ be any projective, birational morphism such that $X$ and $W$ are both normal, Cohen-Macaulay, and have pseudorational singularities in codimension $2$. Then $R^{i}\\phi_{*}\\omega_{W}=0 \\ \\text{ and }R^{i}\\pi_{*}\\omega_{X} = 0$ for all $i&gt;0$ and $X$ has rational singularities. We use this result to prove Lipman's vanishing conjecture in dimension $3$ for arbitrary characteristics and provide a few applications.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2511.04906" target="_blank">On a Grauert-Riemenschneider vanishing theorem in dimension 3</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Rahul Ajit</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 10 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.04906" target="_blank">https://arxiv.org/abs/2511.04906</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Suppose $R$ is an excellent ring of dimension $3$ and has rational singularities. Let $\pi:X \longrightarrow \mathrm{Spec} \ R$ be a blow-up and $\phi: W \longrightarrow X$ be any projective, birational morphism such that $X$ and $W$ are both normal, Cohen-Macaulay, and have pseudorational singularities in codimension $2$. Then $R^{i}\phi_{*}\omega_{W}=0 \ \text{ and }R^{i}\pi_{*}\omega_{X} = 0$ for all $i&gt;0$ and $X$ has rational singularities. We use this result to prove Lipman's vanishing conjecture in dimension $3$ for arbitrary characteristics and provide a few applications.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "Normal forms for ordinary differential operators, II", "author": "J. Guo, A. B. Zheglov", "published": "Mon, 10 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.05117", "summary": "arXiv:2511.05117v1 Announce Type: new \nAbstract: In this paper, which is a follow-up of our first paper \"Normal forms for ordinary differential operators, I\", we extend the theory of normal forms for non-commuting operators, and obtain as an application a commutativity criterion for operators in the Weyl algebra or, more generally, in the ring of ordinary differential operators, which we prove in the case when operators have a normal form with the restriction top line (for details see Introduction).", "number": 4, "labels": [{"name": "privacy", "color": "#ff69b4"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2511.05117" target="_blank">Normal forms for ordinary differential operators, II</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #ff69b4;">privacy</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> J. Guo, A. B. Zheglov</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 10 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.05117" target="_blank">https://arxiv.org/abs/2511.05117</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, which is a follow-up of our first paper "Normal forms for ordinary differential operators, I", we extend the theory of normal forms for non-commuting operators, and obtain as an application a commutativity criterion for operators in the Weyl algebra or, more generally, in the ring of ordinary differential operators, which we prove in the case when operators have a normal form with the restriction top line (for details see Introduction).
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "A Looming of phantoms", "author": "Kimoi Kemboi, Daniel Krashen, Tianle Liu, Yeqin Liu, Eoin Mackall, Svetlana Makarova, Alexander Perry, Antonios-Alexandros Robotis, Sridhar Venkatesh", "published": "Mon, 10 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.05381", "summary": "arXiv:2511.05381v1 Announce Type: new \nAbstract: Following Krah's method, we construct new examples of phantom categories as semiorthogonal components of the derived categories of two types of rational surfaces: the blowup of the plane at 11 points in general position, and the blowup of the second Hirzebruch surface at 9 points in general position. We also pose conjectures about the existence of phantom subcategories in the derived categories of other rational surfaces, obtained as the blowups of the other Hirzebruch surfaces.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2511.05381" target="_blank">A Looming of phantoms</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Kimoi Kemboi, Daniel Krashen, Tianle Liu, Yeqin Liu, Eoin Mackall, Svetlana Makarova, Alexander Perry, Antonios-Alexandros Robotis, Sridhar Venkatesh</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 10 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.05381" target="_blank">https://arxiv.org/abs/2511.05381</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Following Krah's method, we construct new examples of phantom categories as semiorthogonal components of the derived categories of two types of rational surfaces: the blowup of the plane at 11 points in general position, and the blowup of the second Hirzebruch surface at 9 points in general position. We also pose conjectures about the existence of phantom subcategories in the derived categories of other rational surfaces, obtained as the blowups of the other Hirzebruch surfaces.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "Pullback and direct image of parabolic Higgs bundles and parabolic connections with symplectic and orthogonal structures", "author": "David Alfaya, Indranil Biswas, Francois-Xavier Machu", "published": "Mon, 10 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.05387", "summary": "arXiv:2511.05387v1 Announce Type: new \nAbstract: Given a symplectic (respectively, orthogonal) parabolic vector bundle over a compact Riemann surface, we prove that its pullback and direct image through a map between compact Riemann surfaces inherit a natural symplectic (respectively, orthogonal) structure. If the parabolic bundle is endowed with a parabolic Higgs field or a parabolic connection which are compatible with the symplectic (respectively, orthogonal) structure, then its pullback and direct image are also compatible with the resulting symplectic (respectively, orthogonal) structure. We also show that these constructions are preserved through the Nonabelian Hodge Correspondence.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2511.05387" target="_blank">Pullback and direct image of parabolic Higgs bundles and parabolic connections with symplectic and orthogonal structures</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> David Alfaya, Indranil Biswas, Francois-Xavier Machu</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 10 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.05387" target="_blank">https://arxiv.org/abs/2511.05387</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Given a symplectic (respectively, orthogonal) parabolic vector bundle over a compact Riemann surface, we prove that its pullback and direct image through a map between compact Riemann surfaces inherit a natural symplectic (respectively, orthogonal) structure. If the parabolic bundle is endowed with a parabolic Higgs field or a parabolic connection which are compatible with the symplectic (respectively, orthogonal) structure, then its pullback and direct image are also compatible with the resulting symplectic (respectively, orthogonal) structure. We also show that these constructions are preserved through the Nonabelian Hodge Correspondence.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Tropical reductive groups and principal bundles on metric graphs", "author": "Andreas Gross, Arne Kuhrs, Martin Ulirsch, Dmitry Zakharov", "published": "Mon, 10 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.05422", "summary": "arXiv:2511.05422v1 Announce Type: new \nAbstract: We propose an elementary tropical analogue of a reductive group that combines the datum of a Weyl group and the tropicalization of a fixed maximal torus. For the classical groups, as well as $G_2$, these tropical reductive groups admit descriptions as tropical matrix groups that resemble their classical counterparts. Employing this perspective, we introduce tropical principal bundles on metric graphs and study their explicit presentations as pushforwards of line bundles along covers with symmetries and extra data. Our main result identifies the essential skeleton of the moduli space of semistable principal bundles on a Tate curve with its tropical analogue.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2511.05422" target="_blank">Tropical reductive groups and principal bundles on metric graphs</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Andreas Gross, Arne Kuhrs, Martin Ulirsch, Dmitry Zakharov</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 10 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.05422" target="_blank">https://arxiv.org/abs/2511.05422</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We propose an elementary tropical analogue of a reductive group that combines the datum of a Weyl group and the tropicalization of a fixed maximal torus. For the classical groups, as well as $G_2$, these tropical reductive groups admit descriptions as tropical matrix groups that resemble their classical counterparts. Employing this perspective, we introduce tropical principal bundles on metric graphs and study their explicit presentations as pushforwards of line bundles along covers with symmetries and extra data. Our main result identifies the essential skeleton of the moduli space of semistable principal bundles on a Tate curve with its tropical analogue.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Finite groupoids of configurations of lines in $\\mathbb{P}^{3}_{\\mathbb{C}}$", "author": "Jake Kettinger", "published": "Mon, 10 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.05454", "summary": "arXiv:2511.05454v1 Announce Type: new \nAbstract: In this paper, we investigate groupoids coming from configurations of lines in three-dimensional space. Given a point and two skew lines in $\\mathbb{P}^{3}_{K}$ over a field $K$, there exists a unique line containing the given point and meeting the two given lines. We use this construction to define a projection function from one line to another by using a skew line as an auxiliary. This way, we may create a groupoid whose objects are lines in a configuration, and whose morphisms are induced by these projection functions. We look at specific configurations for $K=\\mathbb{C}$ that yield groupoids with finite automorphism groups.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2511.05454" target="_blank">Finite groupoids of configurations of lines in $\mathbb{P}^{3}_{\mathbb{C}}$</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jake Kettinger</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 10 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.05454" target="_blank">https://arxiv.org/abs/2511.05454</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we investigate groupoids coming from configurations of lines in three-dimensional space. Given a point and two skew lines in $\mathbb{P}^{3}_{K}$ over a field $K$, there exists a unique line containing the given point and meeting the two given lines. We use this construction to define a projection function from one line to another by using a skew line as an auxiliary. This way, we may create a groupoid whose objects are lines in a configuration, and whose morphisms are induced by these projection functions. We look at specific configurations for $K=\mathbb{C}$ that yield groupoids with finite automorphism groups.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "Algebraic hyperbolicity of subvarieties of homogeneous varieties", "author": "Andy B. Day, Neelarnab Raha", "published": "Mon, 10 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.05488", "summary": "arXiv:2511.05488v1 Announce Type: new \nAbstract: We study the algebraic hyperbolicity of certain subvarieties of homogeneous varieties, building on the techniques introduced by Coskun-Riedl, Yeong and Mioranci. This generalizes earlier known results for hypersurfaces to higher codimensions. In particular, we observe that if $X=X_1\\cap\\cdots\\cap X_k$ is a very general complete intersection of degree $d_j$ hypersurfaces $X_j$ in $\\mathbb{P}^n$ with $k\\leq n-2$, then $X$ is algebraically hyperbolic if $\\sum d_j\\ge 2n-k$, and $X$ is not algebraically hyperbolic if $\\sum d_j\\le 2n-k-2$.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2511.05488" target="_blank">Algebraic hyperbolicity of subvarieties of homogeneous varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Andy B. Day, Neelarnab Raha</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 10 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.05488" target="_blank">https://arxiv.org/abs/2511.05488</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the algebraic hyperbolicity of certain subvarieties of homogeneous varieties, building on the techniques introduced by Coskun-Riedl, Yeong and Mioranci. This generalizes earlier known results for hypersurfaces to higher codimensions. In particular, we observe that if $X=X_1\cap\cdots\cap X_k$ is a very general complete intersection of degree $d_j$ hypersurfaces $X_j$ in $\mathbb{P}^n$ with $k\leq n-2$, then $X$ is algebraically hyperbolic if $\sum d_j\ge 2n-k$, and $X$ is not algebraically hyperbolic if $\sum d_j\le 2n-k-2$.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "On anti-hyperbolicity for hyperk\\\"ahler varieties", "author": "Ljudmila Kamenova, Steven Lu", "published": "Mon, 10 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.04714", "summary": "arXiv:2511.04714v1 Announce Type: cross \nAbstract: By restricting to (a linear subspace of) an affine chart in projective space, a complex stably rational or unirational manifold of dimension $m$ is meromorphically dominable by $\\mathbb C^m$, i.e., admits a meromorphic dominating map from $\\mathbb C^m$. So are varieties that are birational to abelian varieties and Kummer K3 surfaces. G. Buzzard and the second author have shown that elliptic K3 surfaces are holomorphically dominable by $\\mathbb C^2$, i.e. admitting a holomorphic map with nontrivial Jacobian. In this paper we explore various examples and criteria for meromorphic and holomorphic dominability by $\\mathbb C^m$ of certain hyperk\\\"ahler manifolds, generalizing some known results about K3 surfaces. Anti-hyperbolicity has several interpretations in the sense of vanishing of the Kobayashi-Royden metrics, admitting dense entire holomorphic curves, or dominating holomorphic or meromorphic maps from the complex affine space of the same dimension.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2511.04714" target="_blank">On anti-hyperbolicity for hyperk\"ahler varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ljudmila Kamenova, Steven Lu</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 10 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.04714" target="_blank">https://arxiv.org/abs/2511.04714</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                By restricting to (a linear subspace of) an affine chart in projective space, a complex stably rational or unirational manifold of dimension $m$ is meromorphically dominable by $\mathbb C^m$, i.e., admits a meromorphic dominating map from $\mathbb C^m$. So are varieties that are birational to abelian varieties and Kummer K3 surfaces. G. Buzzard and the second author have shown that elliptic K3 surfaces are holomorphically dominable by $\mathbb C^2$, i.e. admitting a holomorphic map with nontrivial Jacobian. In this paper we explore various examples and criteria for meromorphic and holomorphic dominability by $\mathbb C^m$ of certain hyperk\"ahler manifolds, generalizing some known results about K3 surfaces. Anti-hyperbolicity has several interpretations in the sense of vanishing of the Kobayashi-Royden metrics, admitting dense entire holomorphic curves, or dominating holomorphic or meromorphic maps from the complex affine space of the same dimension.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "The local obstruction to semi-stable reduction for abelian varieties", "author": "S\\'everin Philip", "published": "Mon, 10 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.05127", "summary": "arXiv:2511.05127v1 Announce Type: cross \nAbstract: Grothendieck defined a group that represents the local obstruction for an abelian variety to have semi-stable reduction. These groups were studied by Silverberg and Zarhin and more recently by the author in order to give a group theoretic characterization of them depending only on the dimension. We give an overview of the developments since Grothendieck's definition with the added novelty of the case of equal characteristic local fields.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2511.05127" target="_blank">The local obstruction to semi-stable reduction for abelian varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> S\'everin Philip</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 10 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.05127" target="_blank">https://arxiv.org/abs/2511.05127</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Grothendieck defined a group that represents the local obstruction for an abelian variety to have semi-stable reduction. These groups were studied by Silverberg and Zarhin and more recently by the author in order to give a group theoretic characterization of them depending only on the dimension. We give an overview of the developments since Grothendieck's definition with the added novelty of the case of equal characteristic local fields.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "Stability of the $C^q_i$ properties under field extensions", "author": "Felipe Gambardella, Harry C. Shaw", "published": "Mon, 10 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.05201", "summary": "arXiv:2511.05201v1 Announce Type: cross \nAbstract: In this paper we study the stability of variations of Kato-Kuzumaki's $C_i^q$ property under transcendental and algebraic field extensions. As an application, we obtain the $C_n^1$ property for the field ${\\bf F}_p(x_1,\\dots,x_n)$.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2511.05201" target="_blank">Stability of the $C^q_i$ properties under field extensions</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Felipe Gambardella, Harry C. Shaw</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 10 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.05201" target="_blank">https://arxiv.org/abs/2511.05201</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper we study the stability of variations of Kato-Kuzumaki's $C_i^q$ property under transcendental and algebraic field extensions. As an application, we obtain the $C_n^1$ property for the field ${\bf F}_p(x_1,\dots,x_n)$.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "Counting points on surfaces in polynomial time", "author": "Nitin Saxena, Madhavan Venkatesh", "published": "Mon, 10 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.05272", "summary": "arXiv:2511.05272v1 Announce Type: cross \nAbstract: We present a randomised algorithm to compute the local zeta function of a fixed smooth, projective surface over $\\mathbb{Q}$, at any large prime $p$ of good reduction. The runtime of our algorithm is polynomial in $\\log p$, resolving a conjecture of Couveignes and Edixhoven.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2511.05272" target="_blank">Counting points on surfaces in polynomial time</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Nitin Saxena, Madhavan Venkatesh</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 10 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.05272" target="_blank">https://arxiv.org/abs/2511.05272</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We present a randomised algorithm to compute the local zeta function of a fixed smooth, projective surface over $\mathbb{Q}$, at any large prime $p$ of good reduction. The runtime of our algorithm is polynomial in $\log p$, resolving a conjecture of Couveignes and Edixhoven.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Infinitely many primes of basic reduction for some abelian fourfolds", "author": "Wanlin Li, Elena Mantovan, Rachel Pries, Yunqing Tang", "published": "Mon, 10 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.05322", "summary": "arXiv:2511.05322v1 Announce Type: cross \nAbstract: If $E$ is an elliptic curve, defined over $\\mathbb{Q}$ or a number field having at least one real embedding, then Elkies proved that $E$ has supersingular reduction at infinitely many primes $p$. Baba and Granath extended this result to certain curves $C$ of genus $2$ with field of moduli $\\mathbb{Q}$, under a condition on the endomorphism ring of the Jacobian. In this paper, we extend these results to certain curves of genus $4$ having an automorphism of order $5$, proving that the Jacobians of these curves have basic reduction (as defined by Kottwitz) for infinitely many primes $p$.\n  To do this, we study the complex uniformization of the Deligne--Mostow Shimura variety $\\mathrm{Sh}$ associated with the one dimensional family of these curves. By analyzing the real points on $\\mathrm{Sh}$, we compute three geodesics in the upper half plane that are edges of a fundamental triangle for the action of the unitary similitude group. Using representations of quadratic forms, we determine the points on $\\mathrm{Sh}$ which represent curves whose Jacobians have complex multiplication by certain quadratic extensions of the cyclotomic field $\\mathbb{Q}(\\zeta_5)$. We conclude by studying the equidistribution of these points and the reduction of these CM cycles on the Shimura variety.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2511.05322" target="_blank">Infinitely many primes of basic reduction for some abelian fourfolds</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Wanlin Li, Elena Mantovan, Rachel Pries, Yunqing Tang</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 10 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.05322" target="_blank">https://arxiv.org/abs/2511.05322</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                If $E$ is an elliptic curve, defined over $\mathbb{Q}$ or a number field having at least one real embedding, then Elkies proved that $E$ has supersingular reduction at infinitely many primes $p$. Baba and Granath extended this result to certain curves $C$ of genus $2$ with field of moduli $\mathbb{Q}$, under a condition on the endomorphism ring of the Jacobian. In this paper, we extend these results to certain curves of genus $4$ having an automorphism of order $5$, proving that the Jacobians of these curves have basic reduction (as defined by Kottwitz) for infinitely many primes $p$.
+  To do this, we study the complex uniformization of the Deligne--Mostow Shimura variety $\mathrm{Sh}$ associated with the one dimensional family of these curves. By analyzing the real points on $\mathrm{Sh}$, we compute three geodesics in the upper half plane that are edges of a fundamental triangle for the action of the unitary similitude group. Using representations of quadratic forms, we determine the points on $\mathrm{Sh}$ which represent curves whose Jacobians have complex multiplication by certain quadratic extensions of the cyclotomic field $\mathbb{Q}(\zeta_5)$. We conclude by studying the equidistribution of these points and the reduction of these CM cycles on the Shimura variety.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Universal Deformations of a Curve and a Differential", "author": "Emma Carberry, Martin Ulrich Schmidt", "published": "Mon, 10 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2211.11442", "summary": "arXiv:2211.11442v2 Announce Type: replace \nAbstract: We construct universal local deformations (Kuranishi families) for pairs consisting of a compact complex curve and a meromorphic 1-form.\n  Each pair is assumed to be locally planar, a condition which in particular forces the periods of the meromorphic differential to be preserved by local deformations. The hyperelliptic case yields universal local deformations for the spectral data of integrable systems such as simply-periodic solutions of the KdV equation or of the sinh-Gordon equation (cylinders of constant mean curvature). This is the first of two papers in which we shall develop a deformation theory of the spectral curve data of an integrable system.", "number": 15, "labels": [{"name": "privacy", "color": "#ff69b4"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2211.11442" target="_blank">Universal Deformations of a Curve and a Differential</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #ff69b4;">privacy</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Emma Carberry, Martin Ulrich Schmidt</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 10 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2211.11442" target="_blank">https://arxiv.org/abs/2211.11442</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We construct universal local deformations (Kuranishi families) for pairs consisting of a compact complex curve and a meromorphic 1-form.
+  Each pair is assumed to be locally planar, a condition which in particular forces the periods of the meromorphic differential to be preserved by local deformations. The hyperelliptic case yields universal local deformations for the spectral data of integrable systems such as simply-periodic solutions of the KdV equation or of the sinh-Gordon equation (cylinders of constant mean curvature). This is the first of two papers in which we shall develop a deformation theory of the spectral curve data of an integrable system.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "Nash blowup fails to resolve singularities in dimensions four and higher", "author": "Federico Castillo, Daniel Duarte, Maximiliano Leyton-\\'Alvarez, Alvaro Liendo", "published": "Mon, 10 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2409.19767", "summary": "arXiv:2409.19767v3 Announce Type: replace \nAbstract: In this paper we show that iterating Nash blowups or normalized Nash blowups does not resolve the singularities of algebraic varieties of dimension four or higher over an algebraically closed field of arbitrary characteristic.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2409.19767" target="_blank">Nash blowup fails to resolve singularities in dimensions four and higher</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Federico Castillo, Daniel Duarte, Maximiliano Leyton-\'Alvarez, Alvaro Liendo</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 10 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2409.19767" target="_blank">https://arxiv.org/abs/2409.19767</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper we show that iterating Nash blowups or normalized Nash blowups does not resolve the singularities of algebraic varieties of dimension four or higher over an algebraically closed field of arbitrary characteristic.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "Topological and bilipschitz types of complex surface singularities and their links", "author": "Lorenzo Fantini, Anne Pichon", "published": "Mon, 10 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2501.03110", "summary": "arXiv:2501.03110v2 Announce Type: replace \nAbstract: In this paper, we prove that two normal complex surface germs that are inner bilipschitz--but not necessarily orientation-preserving--homeomorphic, have in fact the same oriented topological type and the same minimal plumbing graph. Along the way, we show that the oriented homeomorphism type of an isolated complex surface singularity germ determines the oriented homeomorphism type of its link, providing a converse to the classical Conical Structure Theorem. These results require to study the topology first, and the inner lipschitz geometry later, of Hirzebruch-Jung and cusp singularities, the normal surface singularities whose links are lens spaces and fiber bundles over the circle.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2501.03110" target="_blank">Topological and bilipschitz types of complex surface singularities and their links</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Lorenzo Fantini, Anne Pichon</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 10 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2501.03110" target="_blank">https://arxiv.org/abs/2501.03110</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we prove that two normal complex surface germs that are inner bilipschitz--but not necessarily orientation-preserving--homeomorphic, have in fact the same oriented topological type and the same minimal plumbing graph. Along the way, we show that the oriented homeomorphism type of an isolated complex surface singularity germ determines the oriented homeomorphism type of its link, providing a converse to the classical Conical Structure Theorem. These results require to study the topology first, and the inner lipschitz geometry later, of Hirzebruch-Jung and cusp singularities, the normal surface singularities whose links are lens spaces and fiber bundles over the circle.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "Birational geometry of weighted complete intersections of type $(12, 14)$ in $\\mathbb{P} (1, 2, 3, 4, 7, 11)$", "author": "Takuzo Okada", "published": "Mon, 10 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2506.00323", "summary": "arXiv:2506.00323v3 Announce Type: replace \nAbstract: We show that any quasismooth Fano threefold weighted complete intersections of type $(12, 14)$ in $\\mathbb{P} (1, 2, 3, 4, 7, 11)$ is birationally solid.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2506.00323" target="_blank">Birational geometry of weighted complete intersections of type $(12, 14)$ in $\mathbb{P} (1, 2, 3, 4, 7, 11)$</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Takuzo Okada</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 10 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2506.00323" target="_blank">https://arxiv.org/abs/2506.00323</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We show that any quasismooth Fano threefold weighted complete intersections of type $(12, 14)$ in $\mathbb{P} (1, 2, 3, 4, 7, 11)$ is birationally solid.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Normal forms for ordinary differential operators, III", "author": "Junhu Guo, A. B. Zheglov", "published": "Mon, 10 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2506.19799", "summary": "arXiv:2506.19799v2 Announce Type: replace \nAbstract: In this paper, which is a follow-up of our first paper \"Normal forms for ordinary differential operators, I\", we extend the explicit parametrisation of torsion free rank one sheaves on projective irreducible curves with vanishing cohomology groups obtained earlier to analogous parametrisation of torsion free sheaves of arbitrary rank with vanishing cohomology groups on projective irreducible curves.\n  As an illustration of our theorem we calculate one explicit example of such parametrisation, namely for rank two sheaves on a Weierstrass cubic curve.", "number": 19, "labels": [{"name": "privacy", "color": "#ff69b4"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2506.19799" target="_blank">Normal forms for ordinary differential operators, III</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #ff69b4;">privacy</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Junhu Guo, A. B. Zheglov</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 10 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2506.19799" target="_blank">https://arxiv.org/abs/2506.19799</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, which is a follow-up of our first paper "Normal forms for ordinary differential operators, I", we extend the explicit parametrisation of torsion free rank one sheaves on projective irreducible curves with vanishing cohomology groups obtained earlier to analogous parametrisation of torsion free sheaves of arbitrary rank with vanishing cohomology groups on projective irreducible curves.
+  As an illustration of our theorem we calculate one explicit example of such parametrisation, namely for rank two sheaves on a Weierstrass cubic curve.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "Locally trivial monodromy of moduli spaces of sheaves on Abelian surfaces", "author": "Ludovica Buelli", "published": "Mon, 10 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2510.23193", "summary": "arXiv:2510.23193v2 Announce Type: replace \nAbstract: The aim of this work is to give a description of the locally trivial monodromy group of irreducible symplectic varieties arising from moduli spaces of semistable sheaves on Abelian surfaces with non-primitive Mukai vector. The outcome is that the locally trivial monodromy group of a singular moduli space of this type is isomorphic to the monodromy group of a smooth moduli space, extending Markman's and Mongardi's description to the non-primitive case. As a consequence, we also prove the SYZ conjecture for any singular moduli space of this type.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2510.23193" target="_blank">Locally trivial monodromy of moduli spaces of sheaves on Abelian surfaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ludovica Buelli</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 10 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.23193" target="_blank">https://arxiv.org/abs/2510.23193</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The aim of this work is to give a description of the locally trivial monodromy group of irreducible symplectic varieties arising from moduli spaces of semistable sheaves on Abelian surfaces with non-primitive Mukai vector. The outcome is that the locally trivial monodromy group of a singular moduli space of this type is isomorphic to the monodromy group of a smooth moduli space, extending Markman's and Mongardi's description to the non-primitive case. As a consequence, we also prove the SYZ conjecture for any singular moduli space of this type.
+            </div>
+        </div>
+        <div class="paper" id="paper-21">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-21" data-paper-data='{"title": "Bourbaki degree of pairs of projective surfaces", "author": "Felipe Monteiro", "published": "Mon, 10 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.00372", "summary": "arXiv:2511.00372v2 Announce Type: replace \nAbstract: The logarithmic tangent sheaf associated to an algebraically independent sequence of homogeneous polynomials - defined as the kernel of the associated Jacobian matrix - naturally generalizes the classical logarithmic tangent sheaf of a divisor in a projective space to the case of subvarieties defined by more than one equation. As is the case for divisors, one may investigate the freeness of such sequences, and other weaker notions.\n  The present work focuses on sequences of two homogeneous polynomials in four variables. We introduce two positive discrete invariants: the invariant m and the Bourbaki degree of a sequence, inspired by the framework of the Bourbaki degree recently developed for projective plane curves by Jardim-Nejad-Simis. The invariant m plays the role of the Tjurina number of plane projective curves and is bounded by a quadratic relation. We establish results concerning the interplay of minimal degree for syzygies of the Jacobian matrix and the introduced discrete invariants. Our approach uses tools from foliation theory, taking advantage of the fact that the logarithmic sheaf is, up to a twist, the tangent sheaf of a codimension one foliation in projective three-space.\n  We provide examples and classification results for pencils of cubics and for pairs of a quadric and a cubic polynomials, relating stability and Chern classes with the discrete invariants introduced, while classifying free and nearly-free cases. In particular, one of the nearly-free examples induces an unstable, non-split tangent sheaf for a codimension one foliation of degree 3, answering, in the negative, a conjecture of Calvo-Andrade, Correa and Jardim from 2018.", "number": 21, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#21</span>
+                <a href="https://arxiv.org/abs/2511.00372" target="_blank">Bourbaki degree of pairs of projective surfaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Felipe Monteiro</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 10 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.00372" target="_blank">https://arxiv.org/abs/2511.00372</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The logarithmic tangent sheaf associated to an algebraically independent sequence of homogeneous polynomials - defined as the kernel of the associated Jacobian matrix - naturally generalizes the classical logarithmic tangent sheaf of a divisor in a projective space to the case of subvarieties defined by more than one equation. As is the case for divisors, one may investigate the freeness of such sequences, and other weaker notions.
+  The present work focuses on sequences of two homogeneous polynomials in four variables. We introduce two positive discrete invariants: the invariant m and the Bourbaki degree of a sequence, inspired by the framework of the Bourbaki degree recently developed for projective plane curves by Jardim-Nejad-Simis. The invariant m plays the role of the Tjurina number of plane projective curves and is bounded by a quadratic relation. We establish results concerning the interplay of minimal degree for syzygies of the Jacobian matrix and the introduced discrete invariants. Our approach uses tools from foliation theory, taking advantage of the fact that the logarithmic sheaf is, up to a twist, the tangent sheaf of a codimension one foliation in projective three-space.
+  We provide examples and classification results for pencils of cubics and for pairs of a quadric and a cubic polynomials, relating stability and Chern classes with the discrete invariants introduced, while classifying free and nearly-free cases. In particular, one of the nearly-free examples induces an unstable, non-split tangent sheaf for a codimension one foliation of degree 3, answering, in the negative, a conjecture of Calvo-Andrade, Correa and Jardim from 2018.
+            </div>
+        </div>
+        <div class="paper" id="paper-22">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-22" data-paper-data='{"title": "Cox-Gorenstein algebras", "author": "Ugo Bruzzo, Rodrigo Gondim, Rafael Holanda, William D. Montoya", "published": "Mon, 10 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2407.17811", "summary": "arXiv:2407.17811v4 Announce Type: replace-cross \nAbstract: We study G-graded Artinian algebras having Poincar\\'e duality, considering in particular their Lefschetz properties. We also prove a correspondence between the toric setup and the G-graded one, provide an application to toric geometry, and prove a Hessian criterion in the G-graded setup", "number": 22, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#22</span>
+                <a href="https://arxiv.org/abs/2407.17811" target="_blank">Cox-Gorenstein algebras</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ugo Bruzzo, Rodrigo Gondim, Rafael Holanda, William D. Montoya</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 10 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2407.17811" target="_blank">https://arxiv.org/abs/2407.17811</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study G-graded Artinian algebras having Poincar\'e duality, considering in particular their Lefschetz properties. We also prove a correspondence between the toric setup and the G-graded one, provide an application to toric geometry, and prove a Hessian criterion in the G-graded setup
+            </div>
+        </div>
+        <div class="paper" id="paper-23">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-23" data-paper-data='{"title": "Abhyankar valuations, Pr\\\"ufer-Manis valuations, and perfectoid Tate algebras", "author": "Dimitri Dine, Jack J Garzella", "published": "Mon, 10 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2510.22678", "summary": "arXiv:2510.22678v2 Announce Type: replace-cross \nAbstract: Let $K$ be a perfectoid field. We describe all quotient fields of the perfectoid Tate algebra\\begin{equation*}T_{n,K}^{\\text{perfd}}=K\\langle X_{1}^{1/p^{\\infty}},\\dots, X_{n}^{1/p^{\\infty}}\\rangle\\end{equation*}in any number $n\\geq1$ of variables in terms of (completed perfections of) the nonarchimedean fields $K_{r_1,\\dots,r_l}$ occuring in Berkovich geometry. We prove that every quotient field\\begin{equation*}L=T_{n,K}^{\\text{perfd}}/\\mathfrak{m}\\end{equation*}is a so-called \\textit{semi-immediate} extension of $K_{r_1,\\dots,r_l}^{\\text{perfd}}$ for some\\begin{equation*}l\\leq\\min(n-\\text{ht}(\\mathfrak{m}^{\\flat}\\cap (T_{n,K^{\\flat}})^{\\text{coperf}}),n-1), \\end{equation*}which pins down the value groups and the residue fields of the possible quotient fields $L$. Moreover, we show that if\\begin{equation*}\\mathfrak{m}^{\\flat}\\cap(T_{n,K^{\\flat}})^{\\text{coperf}}\\neq 0,\\end{equation*} at least one of the radii $r_{i}$ has to be irrational, i.e.,\\begin{equation*}r_{i}\\not\\in\\sqrt{|K^{\\times}|}.\\end{equation*} The main ingredient in our proof is the notion of \\textit{topologically simple} valuations, which generalize type (IV) points in the classification of points on $\\text{Spa}(K\\langle T\\rangle)$ to the case of higher-dimensional polydisks. We also consider \\textit{rational Abhyankar} valuations and \\textit{irrational Abhyankar} valuations, which generalize type (II) and (III) points, respectively. We deduce our main result from a description of topologically simple absolute values and of Abhyankar absolute values on usual Tate algebra. Along the way, we also show that our topologically simple valuations are the same as Pr\\\"ufer-Manis valuations in the sense of Knebusch-Zhang.\n  Finally, we also show that all allowed possibilities for the quotient fields $L$ do indeed occur (i.e., the above bound $l\\leq n-1$ is optimal) by generalizing an example of Gleason.", "number": 23, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#23</span>
+                <a href="https://arxiv.org/abs/2510.22678" target="_blank">Abhyankar valuations, Pr\"ufer-Manis valuations, and perfectoid Tate algebras</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Dimitri Dine, Jack J Garzella</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 10 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.22678" target="_blank">https://arxiv.org/abs/2510.22678</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $K$ be a perfectoid field. We describe all quotient fields of the perfectoid Tate algebra\begin{equation*}T_{n,K}^{\text{perfd}}=K\langle X_{1}^{1/p^{\infty}},\dots, X_{n}^{1/p^{\infty}}\rangle\end{equation*}in any number $n\geq1$ of variables in terms of (completed perfections of) the nonarchimedean fields $K_{r_1,\dots,r_l}$ occuring in Berkovich geometry. We prove that every quotient field\begin{equation*}L=T_{n,K}^{\text{perfd}}/\mathfrak{m}\end{equation*}is a so-called \textit{semi-immediate} extension of $K_{r_1,\dots,r_l}^{\text{perfd}}$ for some\begin{equation*}l\leq\min(n-\text{ht}(\mathfrak{m}^{\flat}\cap (T_{n,K^{\flat}})^{\text{coperf}}),n-1), \end{equation*}which pins down the value groups and the residue fields of the possible quotient fields $L$. Moreover, we show that if\begin{equation*}\mathfrak{m}^{\flat}\cap(T_{n,K^{\flat}})^{\text{coperf}}\neq 0,\end{equation*} at least one of the radii $r_{i}$ has to be irrational, i.e.,\begin{equation*}r_{i}\not\in\sqrt{|K^{\times}|}.\end{equation*} The main ingredient in our proof is the notion of \textit{topologically simple} valuations, which generalize type (IV) points in the classification of points on $\text{Spa}(K\langle T\rangle)$ to the case of higher-dimensional polydisks. We also consider \textit{rational Abhyankar} valuations and \textit{irrational Abhyankar} valuations, which generalize type (II) and (III) points, respectively. We deduce our main result from a description of topologically simple absolute values and of Abhyankar absolute values on usual Tate algebra. Along the way, we also show that our topologically simple valuations are the same as Pr\"ufer-Manis valuations in the sense of Knebusch-Zhang.
+  Finally, we also show that all allowed possibilities for the quotient fields $L$ do indeed occur (i.e., the above bound $l\leq n-1$ is optimal) by generalizing an example of Gleason.
+            </div>
+        </div>
+        <div class="paper" id="paper-24">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-24" data-paper-data='{"title": "$F$-intersection flatness of dagger and Berkovich affinoid algebras", "author": "Rankeya Datta, Jack J Garzella, Kevin Tucker", "published": "Mon, 10 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.00753", "summary": "arXiv:2511.00753v2 Announce Type: replace-cross \nAbstract: We show, using the techniques developed in arXiv:2504.06444 and arXiv:2305.11139, that dagger algebras and Tate algebras in the sense of Berkovich in prime characteristic $p &gt; 0$ have intersection flat Frobenius. Equivalently, if $S$ is such a ring, then $S^{1/p}$ is a flat and Mittag-Leffler $S$-module. As a consequence, we deduce that any ideal-adic completion of a reduced ring that is essentially of finite type over a dagger algebra or a Berkovich Tate algebra in prime characteristic has big test elements from tight closure theory.", "number": 24, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#24</span>
+                <a href="https://arxiv.org/abs/2511.00753" target="_blank">$F$-intersection flatness of dagger and Berkovich affinoid algebras</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Rankeya Datta, Jack J Garzella, Kevin Tucker</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 10 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.00753" target="_blank">https://arxiv.org/abs/2511.00753</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We show, using the techniques developed in arXiv:2504.06444 and arXiv:2305.11139, that dagger algebras and Tate algebras in the sense of Berkovich in prime characteristic $p &gt; 0$ have intersection flat Frobenius. Equivalently, if $S$ is such a ring, then $S^{1/p}$ is a flat and Mittag-Leffler $S$-module. As a consequence, we deduce that any ideal-adic completion of a reduced ring that is essentially of finite type over a dagger algebra or a Berkovich Tate algebra in prime characteristic has big test elements from tight closure theory.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2025-11-10 18:00:03
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>

@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Mon, 02 Feb 2026 05:00:10 +0000<br>
+        <strong>論文数:</strong> 22件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Smooth correspondences between quiver varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Compactification of Reductive Group Schemes</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Note on Euler characteristic of a toric vector bundle</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">Corrigendum: Strong $\mathbb A^1$-invariance of $\mathbb A^1$-connected components of reductive algebraic groups (J. Topol. 16 (2023), no. 2, 634--649.)</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">Kernels of Arithmetic Jet Spaces and Frobenius Morphism</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">Distance Optimization in the Grassmannian of Lines</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">A Remark on Stability Conditions on Smooth Projective Varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">The Coxeter Flag Variety</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">On the b-function with respect to weights of annihilating ideals in the Weyl algebra</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">Lifts of endomorphisms of Weyl algebras modulo $p^2$</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">The Total Chromatic Quasisymmetric Functions of a Graph</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">Noetherianity for powers of algebraic representations</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">Ramification theory from homotopical point of view, I</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Families of singular algebraic varieties that are rationally elliptic spaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Geometry of regular semisimple Lusztig varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">On finiteness properties of separating semigroup of real curve</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">L-equivalence and Fourier--Mukai partners of cubic fourfolds</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">Kov\'acs' conjecture on characterization of projective space and hyperquadrics</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Volume polynomials</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">A universal sheaf of algebras governing representations of vector fields on quasi-projective varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-21" onchange="updateSelectedCount()">
+            <span class="title-number">21.</span>
+            <a href="#paper-21">The complexity of solving a system of equations of the same degree</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-22" onchange="updateSelectedCount()">
+            <span class="title-number">22.</span>
+            <a href="#paper-22">Gelfand-Fuks cohomology of vector fields on algebraic varieties</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Smooth correspondences between quiver varieties", "author": "Nicolle Gonz\\'alez, Eugene Gorsky, Jos\\'e Simental", "published": "Mon, 02 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.22287", "summary": "arXiv:2601.22287v1 Announce Type: new \nAbstract: We introduce a new class of smooth correspondences between Nakajima quiver varieties called split parabolic quiver varieties, and study their properties. We use these correspondences to construct an explicit resolution of singularities of quiver Brill--Noether loci and prove that the latter are irreducible and Cohen-Macaulay of expected dimension (if non-empty). This generalizes the results of Nakajima--Yoshioka and Bayer--Chen--Jiang for Hilbert schemes of points on surfaces.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2601.22287" target="_blank">Smooth correspondences between quiver varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Nicolle Gonz\'alez, Eugene Gorsky, Jos\'e Simental</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.22287" target="_blank">https://arxiv.org/abs/2601.22287</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We introduce a new class of smooth correspondences between Nakajima quiver varieties called split parabolic quiver varieties, and study their properties. We use these correspondences to construct an explicit resolution of singularities of quiver Brill--Noether loci and prove that the latter are irreducible and Cohen-Macaulay of expected dimension (if non-empty). This generalizes the results of Nakajima--Yoshioka and Bayer--Chen--Jiang for Hilbert schemes of points on surfaces.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Compactification of Reductive Group Schemes", "author": "Ayan Nath", "published": "Mon, 02 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.22462", "summary": "arXiv:2601.22462v1 Announce Type: new \nAbstract: Let $\\mathrm G$ be an isotrivial reductive group over a scheme $S$. We construct a smooth projective $S$-scheme containing $\\mathrm G$ as a fiberwise-dense open subscheme equipped with left and right actions of $\\mathrm G$ which extend the translation actions of $\\mathrm G$ on itself. This verifies a conjecture of \\v{C}esnavi\\v{c}ius (arXiv:2201.06424). When $\\mathrm G$ is adjoint, we recover fiberwise the wonderful compactification. Finally, we give an example of a non-isotrivial torus admitting no equivariant compactification.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2601.22462" target="_blank">Compactification of Reductive Group Schemes</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ayan Nath</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.22462" target="_blank">https://arxiv.org/abs/2601.22462</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $\mathrm G$ be an isotrivial reductive group over a scheme $S$. We construct a smooth projective $S$-scheme containing $\mathrm G$ as a fiberwise-dense open subscheme equipped with left and right actions of $\mathrm G$ which extend the translation actions of $\mathrm G$ on itself. This verifies a conjecture of \v{C}esnavi\v{c}ius (arXiv:2201.06424). When $\mathrm G$ is adjoint, we recover fiberwise the wonderful compactification. Finally, we give an example of a non-isotrivial torus admitting no equivariant compactification.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Note on Euler characteristic of a toric vector bundle", "author": "Suhyon Chong, Shaoyu Huang, Kiumars Kaveh", "published": "Mon, 02 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.22514", "summary": "arXiv:2601.22514v1 Announce Type: new \nAbstract: A convex chain is a finite integer linear combination of indicator functions of convex polytopes. Khovanskii-Pukhlikov extend the Ehrhart theory of convex lattice polytopes to the setting of convex chains. Extending the relationship between equivariant line bundles on projective toric varieties and virtual lattice polytopes, we associate a lattice convex chain to a torus equivariant vector bundle on a toric variety and show that sum of values of this convex chain on lattice points gives the Euler characteristic of the bundle.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2601.22514" target="_blank">Note on Euler characteristic of a toric vector bundle</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Suhyon Chong, Shaoyu Huang, Kiumars Kaveh</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.22514" target="_blank">https://arxiv.org/abs/2601.22514</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                A convex chain is a finite integer linear combination of indicator functions of convex polytopes. Khovanskii-Pukhlikov extend the Ehrhart theory of convex lattice polytopes to the setting of convex chains. Extending the relationship between equivariant line bundles on projective toric varieties and virtual lattice polytopes, we associate a lattice convex chain to a torus equivariant vector bundle on a toric variety and show that sum of values of this convex chain on lattice points gives the Euler characteristic of the bundle.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "Corrigendum: Strong $\\mathbb A^1$-invariance of $\\mathbb A^1$-connected components of reductive algebraic groups (J. Topol. 16 (2023), no. 2, 634--649.)", "author": "Chetan Balwe, Amit Hogadi, Anand Sawant", "published": "Mon, 02 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.22555", "summary": "arXiv:2601.22555v1 Announce Type: new \nAbstract: The proof of Lemma 5.1 in the paper Strong $\\mathbb A^1$-invariance of $\\mathbb A^1$-connected components of reductive algebraic groups (J. Topol. 16 (2023), no. 2, 634--649) is incomplete as it relies on some results of Choudhury-Hagadi, the proof of which contains a gap. The goal of this note is to give a complete and self-contained proof of this lemma.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2601.22555" target="_blank">Corrigendum: Strong $\mathbb A^1$-invariance of $\mathbb A^1$-connected components of reductive algebraic groups (J. Topol. 16 (2023), no. 2, 634--649.)</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Chetan Balwe, Amit Hogadi, Anand Sawant</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.22555" target="_blank">https://arxiv.org/abs/2601.22555</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The proof of Lemma 5.1 in the paper Strong $\mathbb A^1$-invariance of $\mathbb A^1$-connected components of reductive algebraic groups (J. Topol. 16 (2023), no. 2, 634--649) is incomplete as it relies on some results of Choudhury-Hagadi, the proof of which contains a gap. The goal of this note is to give a complete and self-contained proof of this lemma.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "Kernels of Arithmetic Jet Spaces and Frobenius Morphism", "author": "Rajat Kumar Mishra, Arnab Saha", "published": "Mon, 02 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.22591", "summary": "arXiv:2601.22591v1 Announce Type: new \nAbstract: For any $\\pi$-formal group scheme $G$, the Frobenius morphism between arithmetic jet spaces restricts to generalized kernels of the projection map. Using the functorial properties of such kernels of arithmetic jet spaces, we show that this morphism is indeed induced by a natural ring map between shifted $\\pi$-typical Witt vectors.\n  In the special case when $G = \\hat{\\mathbb{G}}_a$, the arithmetic jet space, as well as the generalized kernels are affine $\\pi$-formal planes with Witt vector addition as the group law. In that case the above morphism is the multiplication by $\\pi$ map on Witt vector schemes. In fact, the system of arithmetic jet spaces and generalized kernels of any $\\pi$-formal group scheme $G$ along with their maps and identitites satisfied among them are a generalization of the case of the Witt vector scheme with the system of maps such as the Frobenius, Verschiebung and multiplication by $\\pi$.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2601.22591" target="_blank">Kernels of Arithmetic Jet Spaces and Frobenius Morphism</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Rajat Kumar Mishra, Arnab Saha</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.22591" target="_blank">https://arxiv.org/abs/2601.22591</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                For any $\pi$-formal group scheme $G$, the Frobenius morphism between arithmetic jet spaces restricts to generalized kernels of the projection map. Using the functorial properties of such kernels of arithmetic jet spaces, we show that this morphism is indeed induced by a natural ring map between shifted $\pi$-typical Witt vectors.
+  In the special case when $G = \hat{\mathbb{G}}_a$, the arithmetic jet space, as well as the generalized kernels are affine $\pi$-formal planes with Witt vector addition as the group law. In that case the above morphism is the multiplication by $\pi$ map on Witt vector schemes. In fact, the system of arithmetic jet spaces and generalized kernels of any $\pi$-formal group scheme $G$ along with their maps and identitites satisfied among them are a generalization of the case of the Witt vector scheme with the system of maps such as the Frobenius, Verschiebung and multiplication by $\pi$.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "Distance Optimization in the Grassmannian of Lines", "author": "Hannah Friedman, Andrea Rosana, Bernd Sturmfels", "published": "Mon, 02 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.22843", "summary": "arXiv:2601.22843v1 Announce Type: new \nAbstract: The square of a skew-symmetric matrix is a symmetric matrix whose eigenvalues have even multiplicities. When the matrices have rank two, they represent the Grassmannian of lines, and the squaring operation takes Pl\\\"ucker coordinates to projection coordinates. We develop metric algebraic geometry for varieties of lines in this linear algebra setting. The Grassmann distance (GD) degree is introduced as a new invariant for subvarieties of a Grassmannian. We study the GD degree for Schubert varieties and other models.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2601.22843" target="_blank">Distance Optimization in the Grassmannian of Lines</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Hannah Friedman, Andrea Rosana, Bernd Sturmfels</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.22843" target="_blank">https://arxiv.org/abs/2601.22843</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The square of a skew-symmetric matrix is a symmetric matrix whose eigenvalues have even multiplicities. When the matrices have rank two, they represent the Grassmannian of lines, and the squaring operation takes Pl\"ucker coordinates to projection coordinates. We develop metric algebraic geometry for varieties of lines in this linear algebra setting. The Grassmann distance (GD) degree is introduced as a new invariant for subvarieties of a Grassmannian. We study the GD degree for Schubert varieties and other models.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "A Remark on Stability Conditions on Smooth Projective Varieties", "author": "Chunyi Li", "published": "Mon, 02 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.22994", "summary": "arXiv:2601.22994v1 Announce Type: new \nAbstract: Let $X$ be a smooth projective variety over $\\mathbb C$. In this paper, we prove that $\\mathrm{D}^b(X)$, the bounded derived category of coherent sheaves on $X$, always admits stability conditions in the sense of Bridgeland.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2601.22994" target="_blank">A Remark on Stability Conditions on Smooth Projective Varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Chunyi Li</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.22994" target="_blank">https://arxiv.org/abs/2601.22994</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $X$ be a smooth projective variety over $\mathbb C$. In this paper, we prove that $\mathrm{D}^b(X)$, the bounded derived category of coherent sheaves on $X$, always admits stability conditions in the sense of Bridgeland.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "The Coxeter Flag Variety", "author": "Nantel Bergeron, Lucas Gagnon, Hunter Spink, Vasu Tewari", "published": "Mon, 02 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.23111", "summary": "arXiv:2601.23111v1 Announce Type: new \nAbstract: For a Coxeter element $c$ in a Weyl group $W$, we define the $c$-Coxeter flag variety $\\operatorname{CFl}_c\\subset G/B$ as the union of left-translated Richardson varieties $w^{-1}X^{wc}_w$. This is a complex of toric varieties whose geometry is governed by the lattice $\\operatorname{NC}(W,c)$ of $c$-noncrossing partitions. We show that $\\operatorname{CFl}_c$ is the common vanishing locus of the generalized Pl\\\"ucker coordinates indexed by $W\\setminus\\operatorname{NC}(W,c)$. We also construct an explicit affine paving of $\\operatorname{CFl}_c$ and identify the $T$-weights of each cell in terms of $c$-clusters. This paving gives a GKM description of $H^\\bullet(\\operatorname{CFl}_c)$ and $H^\\bullet_{T_{ad}}(\\operatorname{CFl}_c)$ in terms of the induced Cayley subgraph on $\\operatorname{NC}(W,c)$, and we show these rings are naturally isomorphic for different choices of $c$. In type $\\mathrm{A}$, this recovers the quasisymmetric flag variety for a special $c$, and for general $c$ we show the cohomology ring has a presentation as permuted quasisymmetric coinvariants.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2601.23111" target="_blank">The Coxeter Flag Variety</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Nantel Bergeron, Lucas Gagnon, Hunter Spink, Vasu Tewari</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.23111" target="_blank">https://arxiv.org/abs/2601.23111</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                For a Coxeter element $c$ in a Weyl group $W$, we define the $c$-Coxeter flag variety $\operatorname{CFl}_c\subset G/B$ as the union of left-translated Richardson varieties $w^{-1}X^{wc}_w$. This is a complex of toric varieties whose geometry is governed by the lattice $\operatorname{NC}(W,c)$ of $c$-noncrossing partitions. We show that $\operatorname{CFl}_c$ is the common vanishing locus of the generalized Pl\"ucker coordinates indexed by $W\setminus\operatorname{NC}(W,c)$. We also construct an explicit affine paving of $\operatorname{CFl}_c$ and identify the $T$-weights of each cell in terms of $c$-clusters. This paving gives a GKM description of $H^\bullet(\operatorname{CFl}_c)$ and $H^\bullet_{T_{ad}}(\operatorname{CFl}_c)$ in terms of the induced Cayley subgraph on $\operatorname{NC}(W,c)$, and we show these rings are naturally isomorphic for different choices of $c$. In type $\mathrm{A}$, this recovers the quasisymmetric flag variety for a special $c$, and for general $c$ we show the cohomology ring has a presentation as permuted quasisymmetric coinvariants.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "On the b-function with respect to weights of annihilating ideals in the Weyl algebra", "author": "Helena Cobo", "published": "Mon, 02 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.23125", "summary": "arXiv:2601.23125v1 Announce Type: new \nAbstract: Given a polynomial $f\\in\\mathbb{C}[x_1,\\ldots,x_n]$ and an integer $\\ell\\in\\mathbb{Z}$, we study some properties of the b-function with respect to weights of the annihilating ideal Ann$(f^\\ell)$. In some particular cases the expression of the b-function is given explicitly.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2601.23125" target="_blank">On the b-function with respect to weights of annihilating ideals in the Weyl algebra</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Helena Cobo</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.23125" target="_blank">https://arxiv.org/abs/2601.23125</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Given a polynomial $f\in\mathbb{C}[x_1,\ldots,x_n]$ and an integer $\ell\in\mathbb{Z}$, we study some properties of the b-function with respect to weights of the annihilating ideal Ann$(f^\ell)$. In some particular cases the expression of the b-function is given explicitly.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "Lifts of endomorphisms of Weyl algebras modulo $p^2$", "author": "Niels Lauritzen, Jesper Funch Thomsen", "published": "Mon, 02 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.23110", "summary": "arXiv:2601.23110v1 Announce Type: cross \nAbstract: Let $\\varphi$ denote a $k$-algebra endomorphism of the $n$-th Weyl algebra $A_n(k)$ over a perfect field $k$ of positive characteristic $p$. We prove that $\\varphi$ can be lifted to an endomorphism of the Weyl algebra $A_n(W_2(k))$ over the Witt vectors $W_2(k)$ of length two over $k$ if and only if $\\varphi$ induces a Poisson morphism of the center of $A_n(k)$. Furthermore, we improve a result of Tsuchimoto, which enables us to conclude that these equivalent statements hold at least when ${\\rm deg}(\\varphi) &lt; p$. In particular, we conclude that $\\varphi$ is injective if ${\\rm deg}(\\varphi) &lt; p$.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2601.23110" target="_blank">Lifts of endomorphisms of Weyl algebras modulo $p^2$</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Niels Lauritzen, Jesper Funch Thomsen</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.23110" target="_blank">https://arxiv.org/abs/2601.23110</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $\varphi$ denote a $k$-algebra endomorphism of the $n$-th Weyl algebra $A_n(k)$ over a perfect field $k$ of positive characteristic $p$. We prove that $\varphi$ can be lifted to an endomorphism of the Weyl algebra $A_n(W_2(k))$ over the Witt vectors $W_2(k)$ of length two over $k$ if and only if $\varphi$ induces a Poisson morphism of the center of $A_n(k)$. Furthermore, we improve a result of Tsuchimoto, which enables us to conclude that these equivalent statements hold at least when ${\rm deg}(\varphi) &lt; p$. In particular, we conclude that $\varphi$ is injective if ${\rm deg}(\varphi) &lt; p$.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "The Total Chromatic Quasisymmetric Functions of a Graph", "author": "Laura Colmenarejo, Ian Klein", "published": "Mon, 02 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.23170", "summary": "arXiv:2601.23170v1 Announce Type: cross \nAbstract: In this paper, we introduce and study two variants of the chromatic quasisymmetric function of a graph: the total chromatic quasisymmetric function via vertex labeling and via acyclic orientations. The original definition of the chromatic quasisymmetric function of a graph by Shareshian and Wachs depends on a labeling of the vertices of the graph, which directly affects the properties of the coefficients appearing in the decomposition of the chromatic quasisymmetric function of a graph into different bases. Motivated by this, we construct the first variant of the chromatic quasisymmetric function of a graph by normalizing it with respect to all the labelings of the vertices. The second variant is motivated by the \\emph{tree isomorphism conjecture} and is constructed in terms of acyclic orientations.\n  We investigate the properties of the coefficients in the expansion in the monomial quasisymmetric basis for both variants and provide a comparative analysis. Furthermore, we derive explicit formulas for the coefficients in the monomial decomposition of the two variants for the star graph. For the labeling-based variant, these coefficients arise from a binomial identity for which we provide a combinatorial proof.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2601.23170" target="_blank">The Total Chromatic Quasisymmetric Functions of a Graph</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Laura Colmenarejo, Ian Klein</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.23170" target="_blank">https://arxiv.org/abs/2601.23170</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we introduce and study two variants of the chromatic quasisymmetric function of a graph: the total chromatic quasisymmetric function via vertex labeling and via acyclic orientations. The original definition of the chromatic quasisymmetric function of a graph by Shareshian and Wachs depends on a labeling of the vertices of the graph, which directly affects the properties of the coefficients appearing in the decomposition of the chromatic quasisymmetric function of a graph into different bases. Motivated by this, we construct the first variant of the chromatic quasisymmetric function of a graph by normalizing it with respect to all the labelings of the vertices. The second variant is motivated by the \emph{tree isomorphism conjecture} and is constructed in terms of acyclic orientations.
+  We investigate the properties of the coefficients in the expansion in the monomial quasisymmetric basis for both variants and provide a comparative analysis. Furthermore, we derive explicit formulas for the coefficients in the monomial decomposition of the two variants for the star graph. For the labeling-based variant, these coefficients arise from a binomial identity for which we provide a combinatorial proof.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "Noetherianity for powers of algebraic representations", "author": "Alessandro Danelon", "published": "Mon, 02 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.23186", "summary": "arXiv:2601.23186v1 Announce Type: cross \nAbstract: Powers of a polynomial $\\operatorname{GL}$-representation are topologically Noetherian under the action of $\\operatorname{Sym} \\times \\operatorname{GL}$. We show that this result extends to powers of algebraic representations of the orthogonal and the symplectic groups. This work is a natural follow-up to arXiv:2212.05790 and to arXiv:1708.06420.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2601.23186" target="_blank">Noetherianity for powers of algebraic representations</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Alessandro Danelon</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.23186" target="_blank">https://arxiv.org/abs/2601.23186</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Powers of a polynomial $\operatorname{GL}$-representation are topologically Noetherian under the action of $\operatorname{Sym} \times \operatorname{GL}$. We show that this result extends to powers of algebraic representations of the orthogonal and the symplectic groups. This work is a natural follow-up to arXiv:2212.05790 and to arXiv:1708.06420.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "Ramification theory from homotopical point of view, I", "author": "Tomoyuki Abe", "published": "Mon, 02 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2206.02401", "summary": "arXiv:2206.02401v2 Announce Type: replace \nAbstract: We prove the compatibility of pushforward along a proper morphism of an \\'{e}tale constructible sheaf and the pushforward of its characteristic cycle up to $p$-torsion. This was conjectured by Takeshi Saito. For this, we revisit the construction of the characteristic cycle, due to Saito and Beilinson, from more homotopical point of view. In particular, the language of $\\infty$-categories is indispensable to carry this out.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2206.02401" target="_blank">Ramification theory from homotopical point of view, I</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Tomoyuki Abe</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2206.02401" target="_blank">https://arxiv.org/abs/2206.02401</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove the compatibility of pushforward along a proper morphism of an \'{e}tale constructible sheaf and the pushforward of its characteristic cycle up to $p$-torsion. This was conjectured by Takeshi Saito. For this, we revisit the construction of the characteristic cycle, due to Saito and Beilinson, from more homotopical point of view. In particular, the language of $\infty$-categories is indispensable to carry this out.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Families of singular algebraic varieties that are rationally elliptic spaces", "author": "A. Libgober", "published": "Mon, 02 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2501.17970", "summary": "arXiv:2501.17970v3 Announce Type: replace \nAbstract: We discuss families of hypersurfaces with isolated singularities in projective space with the property that the sum of the ranks of the rational homotopy and the homology groups is finite. They represent infinitely many distinct homotopy types with all hypersurfaces having a nef canonical or anti-canonical class. In the appendix we show that such an infinite family of smooth rationally elliptic 3-folds does not exist.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2501.17970" target="_blank">Families of singular algebraic varieties that are rationally elliptic spaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> A. Libgober</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2501.17970" target="_blank">https://arxiv.org/abs/2501.17970</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We discuss families of hypersurfaces with isolated singularities in projective space with the property that the sum of the ranks of the rational homotopy and the homology groups is finite. They represent infinitely many distinct homotopy types with all hypersurfaces having a nef canonical or anti-canonical class. In the appendix we show that such an infinite family of smooth rationally elliptic 3-folds does not exist.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Geometry of regular semisimple Lusztig varieties", "author": "Patrick Brosnan, Jaehyun Hong, Donggun Lee", "published": "Mon, 02 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2504.15868", "summary": "arXiv:2504.15868v2 Announce Type: replace \nAbstract: Lusztig varieties are subvarieties in flag manifolds $G/B$ associated to an element $w$ in the Weyl group $W$ and an element $x$ in $G$, introduced in Lusztig's papers on character sheaves. We study the geometry of these varieties when $x$ is regular semisimple.\n  In the first part, we establish that they are normal, Cohen-Macaulay, of pure expected dimension and have rational singularities. We then show that the cohomology of ample line bundles vanishes in positive degrees, in arbitrary characteristic. This extends to nef line bundles when the base field has characteristic zero or sufficiently large characteristic. Along the way, we prove that Lusztig varieties are Frobenius split in positive characteristic and that their open cells are affine. We also prove that the open cells in Deligne-Lusztig varieties are affine, settling a question that has been open since the foundational paper of Deligne and Lusztig.\n  In the second part, we explore their relationship with regular semisimple Hessenberg varieties. Both varieties admit Tymoczko's dot action of $W$ on their (intersection) cohomology. We associate to each element $w$ in $W$ a Hessenberg space using the tangent cone of the Schubert variety associated with $w$, and show that the cohomology of the associated regular semisimple Lusztig varieties and Hessenberg varieties is isomorphic as graded $W$-representations when they are smooth.\n  This relationship extends to the level of varieties: we construct a flat degeneration of regular semisimple Lusztig varieties to regular semisimple Hessenberg varieties. In particular, this proves a conjecture of Abreu and Nigro on the homeomorphism types of regular semisimple Lusztig varieties in type $A$, and generalizes it to arbitrary Lie types.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2504.15868" target="_blank">Geometry of regular semisimple Lusztig varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Patrick Brosnan, Jaehyun Hong, Donggun Lee</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2504.15868" target="_blank">https://arxiv.org/abs/2504.15868</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Lusztig varieties are subvarieties in flag manifolds $G/B$ associated to an element $w$ in the Weyl group $W$ and an element $x$ in $G$, introduced in Lusztig's papers on character sheaves. We study the geometry of these varieties when $x$ is regular semisimple.
+  In the first part, we establish that they are normal, Cohen-Macaulay, of pure expected dimension and have rational singularities. We then show that the cohomology of ample line bundles vanishes in positive degrees, in arbitrary characteristic. This extends to nef line bundles when the base field has characteristic zero or sufficiently large characteristic. Along the way, we prove that Lusztig varieties are Frobenius split in positive characteristic and that their open cells are affine. We also prove that the open cells in Deligne-Lusztig varieties are affine, settling a question that has been open since the foundational paper of Deligne and Lusztig.
+  In the second part, we explore their relationship with regular semisimple Hessenberg varieties. Both varieties admit Tymoczko's dot action of $W$ on their (intersection) cohomology. We associate to each element $w$ in $W$ a Hessenberg space using the tangent cone of the Schubert variety associated with $w$, and show that the cohomology of the associated regular semisimple Lusztig varieties and Hessenberg varieties is isomorphic as graded $W$-representations when they are smooth.
+  This relationship extends to the level of varieties: we construct a flat degeneration of regular semisimple Lusztig varieties to regular semisimple Hessenberg varieties. In particular, this proves a conjecture of Abreu and Nigro on the homeomorphism types of regular semisimple Lusztig varieties in type $A$, and generalizes it to arbitrary Lie types.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "On finiteness properties of separating semigroup of real curve", "author": "Matthew Magin", "published": "Mon, 02 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.18545", "summary": "arXiv:2511.18545v2 Announce Type: replace \nAbstract: A real morphism $f$ from a real algebraic curve $X$ to $\\mathbb{P}^1$ is called separating if $f^{-1}(\\mathbb{R} \\mathbb{P}^1) = \\mathbb{R} X$. A separating morphism defines a covering $\\mathbb{R} X \\to \\mathbb{R} \\mathbb{P}^1$. Let $X_1, \\ldots, X_r$ denote the components of $\\mathbb{R} X$. M. Kummer and K. Shaw~\\cite{kummer_separating_2020} defined the separating semigroup of a curve $X$ as the set of all vectors $d(f) = (d_1(f), \\ldots, d_r(f)) \\in \\mathbb{N}^{r}$ where $f$ is a separating morphism $X \\to \\mathbb{P}^1$ and $d_i(f)$ is the degree of the restriction of $f$ to $X_i$.\n  In the present paper we prove that for a non-negative integer number $g$ the set of all separating semigroups of genus $g$ curves is finite.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2511.18545" target="_blank">On finiteness properties of separating semigroup of real curve</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Matthew Magin</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.18545" target="_blank">https://arxiv.org/abs/2511.18545</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                A real morphism $f$ from a real algebraic curve $X$ to $\mathbb{P}^1$ is called separating if $f^{-1}(\mathbb{R} \mathbb{P}^1) = \mathbb{R} X$. A separating morphism defines a covering $\mathbb{R} X \to \mathbb{R} \mathbb{P}^1$. Let $X_1, \ldots, X_r$ denote the components of $\mathbb{R} X$. M. Kummer and K. Shaw~\cite{kummer_separating_2020} defined the separating semigroup of a curve $X$ as the set of all vectors $d(f) = (d_1(f), \ldots, d_r(f)) \in \mathbb{N}^{r}$ where $f$ is a separating morphism $X \to \mathbb{P}^1$ and $d_i(f)$ is the degree of the restriction of $f$ to $X_i$.
+  In the present paper we prove that for a non-negative integer number $g$ the set of all separating semigroups of genus $g$ curves is finite.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "L-equivalence and Fourier--Mukai partners of cubic fourfolds", "author": "Reinder Meinsma, Riccardo Moschetti", "published": "Mon, 02 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.08651", "summary": "arXiv:2512.08651v2 Announce Type: replace \nAbstract: We study L-equivalence in the Grothendieck ring of varieties and its interaction with categorical invariants of cubic fourfolds. Assuming a Derived Torelli-type criterion for Kuznetsov components and a mild condition on the discriminant of the transcendental lattice, we prove a counting formula for Fourier--Mukai partners of such cubic fourfolds. As an application, we exhibit cubic fourfolds with a fixed algebraic lattice admitting a unique non-trivial Fourier--Mukai partner, which is trivially L-equivalent to the original. Finally, we show that L-equivalence classes of cubic fourfolds are finite.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2512.08651" target="_blank">L-equivalence and Fourier--Mukai partners of cubic fourfolds</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Reinder Meinsma, Riccardo Moschetti</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.08651" target="_blank">https://arxiv.org/abs/2512.08651</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study L-equivalence in the Grothendieck ring of varieties and its interaction with categorical invariants of cubic fourfolds. Assuming a Derived Torelli-type criterion for Kuznetsov components and a mild condition on the discriminant of the transcendental lattice, we prove a counting formula for Fourier--Mukai partners of such cubic fourfolds. As an application, we exhibit cubic fourfolds with a fixed algebraic lattice admitting a unique non-trivial Fourier--Mukai partner, which is trivially L-equivalent to the original. Finally, we show that L-equivalence classes of cubic fourfolds are finite.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "Kov\\'acs' conjecture on characterization of projective space and hyperquadrics", "author": "Soham Ghosh", "published": "Mon, 02 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.10055", "summary": "arXiv:2601.10055v2 Announce Type: replace \nAbstract: We prove Kov\\'acs' conjecture that claims that if the $p^{th}$ exterior power of the tangent bundle of a smooth complex projective variety contains the $p^{th}$ exterior power of an ample vector bundle then the variety is either projective space or the $p$-dimensional quadric hypersurface. We also prove a similar characterization involving symmetric powers instead of exterior powers. This provides a common generalization of Mori, Wahl, Cho-Sato, Andreatta-Wi\\'sniewski, Kobayashi-Ochiai, and Araujo-Druel-Kov\\'acs type characterizations of such varieties.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2601.10055" target="_blank">Kov\'acs' conjecture on characterization of projective space and hyperquadrics</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Soham Ghosh</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.10055" target="_blank">https://arxiv.org/abs/2601.10055</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove Kov\'acs' conjecture that claims that if the $p^{th}$ exterior power of the tangent bundle of a smooth complex projective variety contains the $p^{th}$ exterior power of an ample vector bundle then the variety is either projective space or the $p$-dimensional quadric hypersurface. We also prove a similar characterization involving symmetric powers instead of exterior powers. This provides a common generalization of Mori, Wahl, Cho-Sato, Andreatta-Wi\'sniewski, Kobayashi-Ochiai, and Araujo-Druel-Kov\'acs type characterizations of such varieties.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Volume polynomials", "author": "June Huh", "published": "Mon, 02 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.13249", "summary": "arXiv:2601.13249v3 Announce Type: replace \nAbstract: Volume polynomials form a distinguished class of log-concave polynomials with remarkable analytic and combinatorial properties. I will survey realization problems related to them, review fundamental inequalities they satisfy, and discuss applications to the combinatorics of algebraic matroids. These notes are based on lectures given at the 2025 Summer Research Institute in Algebraic Geometry at Colorado State University.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2601.13249" target="_blank">Volume polynomials</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> June Huh</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.13249" target="_blank">https://arxiv.org/abs/2601.13249</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Volume polynomials form a distinguished class of log-concave polynomials with remarkable analytic and combinatorial properties. I will survey realization problems related to them, review fundamental inequalities they satisfy, and discuss applications to the combinatorics of algebraic matroids. These notes are based on lectures given at the 2025 Summer Research Institute in Algebraic Geometry at Colorado State University.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "A universal sheaf of algebras governing representations of vector fields on quasi-projective varieties", "author": "Yuly Billig, Colin Ingalls", "published": "Mon, 02 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2302.07918", "summary": "arXiv:2302.07918v2 Announce Type: replace-cross \nAbstract: We construct a quasi-coherent sheaf of associative algebras which controls a category of $AV$-modules over a smooth quasi-projective variety. We establish a local structure theorem, proving that in \\'etale charts these associative algebras decompose into a tensor product of the algebra of differential operators and the universal enveloping algebra of the Lie algebra of power series vector fields vanishing at the origin.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2302.07918" target="_blank">A universal sheaf of algebras governing representations of vector fields on quasi-projective varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yuly Billig, Colin Ingalls</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2302.07918" target="_blank">https://arxiv.org/abs/2302.07918</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We construct a quasi-coherent sheaf of associative algebras which controls a category of $AV$-modules over a smooth quasi-projective variety. We establish a local structure theorem, proving that in \'etale charts these associative algebras decompose into a tensor product of the algebra of differential operators and the universal enveloping algebra of the Lie algebra of power series vector fields vanishing at the origin.
+            </div>
+        </div>
+        <div class="paper" id="paper-21">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-21" data-paper-data='{"title": "The complexity of solving a system of equations of the same degree", "author": "Giulia Gaggero, Elisa Gorla", "published": "Mon, 02 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2309.03855", "summary": "arXiv:2309.03855v3 Announce Type: replace-cross \nAbstract: Many systems of interest in cryptography consist of equations of the same degree. Under the assumption that the degree of regularity is finite, we prove upper bounds on the degree of regularity of a system of equations of the same degree, with or without adding the field equations to the system. The bounds translate into upper bounds on the solving degree of the systems, and hence on the complexity of solving them via Gr\\\"obner bases methods. Our bounds depend on the number of equations in the system, the number of variables, and the degree of the equations.", "number": 21, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#21</span>
+                <a href="https://arxiv.org/abs/2309.03855" target="_blank">The complexity of solving a system of equations of the same degree</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Giulia Gaggero, Elisa Gorla</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2309.03855" target="_blank">https://arxiv.org/abs/2309.03855</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Many systems of interest in cryptography consist of equations of the same degree. Under the assumption that the degree of regularity is finite, we prove upper bounds on the degree of regularity of a system of equations of the same degree, with or without adding the field equations to the system. The bounds translate into upper bounds on the solving degree of the systems, and hence on the complexity of solving them via Gr\"obner bases methods. Our bounds depend on the number of equations in the system, the number of variables, and the degree of the equations.
+            </div>
+        </div>
+        <div class="paper" id="paper-22">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-22" data-paper-data='{"title": "Gelfand-Fuks cohomology of vector fields on algebraic varieties", "author": "Yuly Billig, Kathlyn Dykes", "published": "Mon, 02 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2410.20316", "summary": "arXiv:2410.20316v2 Announce Type: replace-cross \nAbstract: For an affine algebraic variety, we introduce algebraic Gelfand-Fuks cohomology of polynomial vector fields with coefficients in differentiable $AV$-modules. Its complex is given by cochains that are differential operators in the sense of Grothendieck. Using the jets of vector fields, we compute this cohomology for varieties with uniformizing parameters. We prove that in this case, Gelfand-Fuks cohomology with coefficients in a tensor module decomposes as a tensor product of the de Rham cohomology of the variety and the cohomology of the Lie algebra of vector fields on affine space, vanishing at the origin. We explicitly compute this cohomology for affine space, the torus, and Krichever-Novikov algebras.", "number": 22, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#22</span>
+                <a href="https://arxiv.org/abs/2410.20316" target="_blank">Gelfand-Fuks cohomology of vector fields on algebraic varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yuly Billig, Kathlyn Dykes</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2410.20316" target="_blank">https://arxiv.org/abs/2410.20316</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                For an affine algebraic variety, we introduce algebraic Gelfand-Fuks cohomology of polynomial vector fields with coefficients in differentiable $AV$-modules. Its complex is given by cochains that are differential operators in the sense of Grothendieck. Using the jets of vector fields, we compute this cohomology for varieties with uniformizing parameters. We prove that in this case, Gelfand-Fuks cohomology with coefficients in a tensor module decomposes as a tensor product of the de Rham cohomology of the variety and the cohomology of the Lie algebra of vector fields on affine space, vanishing at the origin. We explicitly compute this cohomology for affine space, the torus, and Krichever-Novikov algebras.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-02-02 18:00:03
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>

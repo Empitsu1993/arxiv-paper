@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - stat.ML updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>stat.ML updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Thu, 08 Jan 2026 05:00:01 +0000<br>
+        <strong>論文数:</strong> 23件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">On the Identifiability of Regime-Switching Models with Multi-Lag Dependencies</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Microeconomic Foundations of Multi-Agent Learning</a>
+            <span class="title-label-badge" style="background-color: #e74c3c;">agent</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Online Learning with Limited Information in the Sliding Window Model</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">A Theoretical and Empirical Taxonomy of Imbalance in Binary Classification</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">A path to natural language through tokenisation and transformers</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">A Quantifiable Information-Processing Hierarchy Provides a Necessary Condition for Detecting Agency</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Learning Shrinks the Hard Tail: Training-Dependent Inference Scaling in a Solvable Linear Model</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">A Gap Between Decision Trees and Neural Networks</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">A comprehensive review and analysis of different modeling approaches for financial index tracking problem</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">A discrete Benamou-Brenier formulation of Optimal Transport on graphs</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">An Anytime Algorithm for Good Arm Identification</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">A survey on Clustered Federated Learning: Taxonomy, Analysis and Applications</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">An approach to Fisher-Rao metric for infinite dimensional non-parametric information geometry</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">LASSO Inference for High Dimensional Predictive Regressions</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Correcting Mode Proportion Bias in Generalized Bayesian Inference via a Weighted Kernel Stein Discrepancy</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">Architecture independent generalization bounds for overparametrized deep ReLU networks</a>
+            <span class="title-label-badge" style="background-color: #f1c40f;">model extraction</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">Uncovering Bias Paths with LLM-guided Causal Discovery: An Active Learning and Dynamic Scoring Approach</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">Bridging Prediction and Intervention Problems in Social Systems</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">CNN-based Surface Temperature Forecasts with Ensemble Numerical Weather Prediction over Medium-range Forecast Periods</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">Learning Confidence Ellipsoids and Applications to Robust Subspace Recovery</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-21" onchange="updateSelectedCount()">
+            <span class="title-number">21.</span>
+            <a href="#paper-21">On the Sample Complexity of Learning for Blind Inverse Problems</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-22" onchange="updateSelectedCount()">
+            <span class="title-number">22.</span>
+            <a href="#paper-22">Neural Optimal Design of Experiment for Inverse Problems</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-23" onchange="updateSelectedCount()">
+            <span class="title-number">23.</span>
+            <a href="#paper-23">Wittgenstein's Family Resemblance Clustering Algorithm</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "On the Identifiability of Regime-Switching Models with Multi-Lag Dependencies", "author": "Carles Balsells-Rodas, Toshiko Matsui, Pedro A. M. Mediano, Yixin Wang, Yingzhen Li", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.03325", "summary": "arXiv:2601.03325v1 Announce Type: new \nAbstract: Identifiability is central to the interpretability of deep latent variable models, ensuring parameterisations are uniquely determined by the data-generating distribution. However, it remains underexplored for deep regime-switching time series. We develop a general theoretical framework for multi-lag Regime-Switching Models (RSMs), encompassing Markov Switching Models (MSMs) and Switching Dynamical Systems (SDSs). For MSMs, we formulate the model as a temporally structured finite mixture and prove identifiability of both the number of regimes and the multi-lag transitions in a nonlinear-Gaussian setting. For SDSs, we establish identifiability of the latent variables up to permutation and scaling via temporal structure, which in turn yields conditions for identifiability of regime-dependent latent causal graphs (up to regime/node permutations). Our results hold in a fully unsupervised setting through architectural and noise assumptions that are directly enforceable via neural network design. We complement the theory with a flexible variational estimator that satisfies the assumptions and validate the results on synthetic benchmarks. Across real-world datasets from neuroscience, finance, and climate, identifiability leads to more trustworthy interpretability analysis, which is crucial for scientific discovery.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2601.03325" target="_blank">On the Identifiability of Regime-Switching Models with Multi-Lag Dependencies</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Carles Balsells-Rodas, Toshiko Matsui, Pedro A. M. Mediano, Yixin Wang, Yingzhen Li</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.03325" target="_blank">https://arxiv.org/abs/2601.03325</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Identifiability is central to the interpretability of deep latent variable models, ensuring parameterisations are uniquely determined by the data-generating distribution. However, it remains underexplored for deep regime-switching time series. We develop a general theoretical framework for multi-lag Regime-Switching Models (RSMs), encompassing Markov Switching Models (MSMs) and Switching Dynamical Systems (SDSs). For MSMs, we formulate the model as a temporally structured finite mixture and prove identifiability of both the number of regimes and the multi-lag transitions in a nonlinear-Gaussian setting. For SDSs, we establish identifiability of the latent variables up to permutation and scaling via temporal structure, which in turn yields conditions for identifiability of regime-dependent latent causal graphs (up to regime/node permutations). Our results hold in a fully unsupervised setting through architectural and noise assumptions that are directly enforceable via neural network design. We complement the theory with a flexible variational estimator that satisfies the assumptions and validate the results on synthetic benchmarks. Across real-world datasets from neuroscience, finance, and climate, identifiability leads to more trustworthy interpretability analysis, which is crucial for scientific discovery.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Microeconomic Foundations of Multi-Agent Learning", "author": "Nassim Helou", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.03451", "summary": "arXiv:2601.03451v1 Announce Type: new \nAbstract: Modern AI systems increasingly operate inside markets and institutions where data, behavior, and incentives are endogenous. This paper develops an economic foundation for multi-agent learning by studying a principal-agent interaction in a Markov decision process with strategic externalities, where both the principal and the agent learn over time. We propose a two-phase incentive mechanism that first estimates implementable transfers and then uses them to steer long-run dynamics; under mild regret-based rationality and exploration conditions, the mechanism achieves sublinear social-welfare regret and thus asymptotically optimal welfare. Simulations illustrate how even coarse incentives can correct inefficient learning under stateful externalities, highlighting the necessity of incentive-aware design for safe and welfare-aligned AI in markets and insurance.", "number": 2, "labels": [{"name": "agent", "color": "#e74c3c"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2601.03451" target="_blank">Microeconomic Foundations of Multi-Agent Learning</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #e74c3c;">agent</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Nassim Helou</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.03451" target="_blank">https://arxiv.org/abs/2601.03451</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Modern AI systems increasingly operate inside markets and institutions where data, behavior, and incentives are endogenous. This paper develops an economic foundation for multi-agent learning by studying a principal-agent interaction in a Markov decision process with strategic externalities, where both the principal and the agent learn over time. We propose a two-phase incentive mechanism that first estimates implementable transfers and then uses them to steer long-run dynamics; under mild regret-based rationality and exploration conditions, the mechanism achieves sublinear social-welfare regret and thus asymptotically optimal welfare. Simulations illustrate how even coarse incentives can correct inefficient learning under stateful externalities, highlighting the necessity of incentive-aware design for safe and welfare-aligned AI in markets and insurance.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Online Learning with Limited Information in the Sliding Window Model", "author": "Vladimir Braverman, Sumegha Garg, Chen Wang, David P. Woodruff, Samson Zhou", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.03533", "summary": "arXiv:2601.03533v1 Announce Type: new \nAbstract: Motivated by recent work on the experts problem in the streaming model, we consider the experts problem in the sliding window model. The sliding window model is a well-studied model that captures applications such as traffic monitoring, epidemic tracking, and automated trading, where recent information is more valuable than older data. Formally, we have $n$ experts, $T$ days, the ability to query the predictions of $q$ experts on each day, a limited amount of memory, and should achieve the (near-)optimal regret $\\sqrt{nW}\\text{polylog}(nT)$ regret over any window of the last $W$ days. While it is impossible to achieve such regret with $1$ query, we show that with $2$ queries we can achieve such regret and with only $\\text{polylog}(nT)$ bits of memory. Not only are our algorithms optimal for sliding windows, but we also show for every interval $\\mathcal{I}$ of days that we achieve $\\sqrt{n|\\mathcal{I}|}\\text{polylog}(nT)$ regret with $2$ queries and only $\\text{polylog}(nT)$ bits of memory, providing an exponential improvement on the memory of previous interval regret algorithms. Building upon these techniques, we address the bandit problem in data streams, where $q=1$, achieving $n T^{2/3}\\text{polylog}(T)$ regret with $\\text{polylog}(nT)$ memory, which is the first sublinear regret in the streaming model in the bandit setting with polylogarithmic memory; this can be further improved to the optimal $\\mathcal{O}(\\sqrt{nT})$ regret if the best expert's losses are in a random order.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2601.03533" target="_blank">Online Learning with Limited Information in the Sliding Window Model</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Vladimir Braverman, Sumegha Garg, Chen Wang, David P. Woodruff, Samson Zhou</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.03533" target="_blank">https://arxiv.org/abs/2601.03533</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Motivated by recent work on the experts problem in the streaming model, we consider the experts problem in the sliding window model. The sliding window model is a well-studied model that captures applications such as traffic monitoring, epidemic tracking, and automated trading, where recent information is more valuable than older data. Formally, we have $n$ experts, $T$ days, the ability to query the predictions of $q$ experts on each day, a limited amount of memory, and should achieve the (near-)optimal regret $\sqrt{nW}\text{polylog}(nT)$ regret over any window of the last $W$ days. While it is impossible to achieve such regret with $1$ query, we show that with $2$ queries we can achieve such regret and with only $\text{polylog}(nT)$ bits of memory. Not only are our algorithms optimal for sliding windows, but we also show for every interval $\mathcal{I}$ of days that we achieve $\sqrt{n|\mathcal{I}|}\text{polylog}(nT)$ regret with $2$ queries and only $\text{polylog}(nT)$ bits of memory, providing an exponential improvement on the memory of previous interval regret algorithms. Building upon these techniques, we address the bandit problem in data streams, where $q=1$, achieving $n T^{2/3}\text{polylog}(T)$ regret with $\text{polylog}(nT)$ memory, which is the first sublinear regret in the streaming model in the bandit setting with polylogarithmic memory; this can be further improved to the optimal $\mathcal{O}(\sqrt{nT})$ regret if the best expert's losses are in a random order.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "A Theoretical and Empirical Taxonomy of Imbalance in Binary Classification", "author": "Rose Yvette Bandolo Essomba, Ernest Fokou\\'e", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.04149", "summary": "arXiv:2601.04149v1 Announce Type: new \nAbstract: Class imbalance significantly degrades classification performance, yet its effects are rarely analyzed from a unified theoretical perspective. We propose a principled framework based on three fundamental scales: the imbalance coefficient $\\eta$, the sample--dimension ratio $\\kappa$, and the intrinsic separability $\\Delta$. Starting from the Gaussian Bayes classifier, we derive closed-form Bayes errors and show how imbalance shifts the discriminant boundary, yielding a deterioration slope that predicts four regimes: Normal, Mild, Extreme, and Catastrophic. Using a balanced high-dimensional genomic dataset, we vary only $\\eta$ while keeping $\\kappa$ and $\\Delta$ fixed. Across parametric and non-parametric models, empirical degradation closely follows theoretical predictions: minority Recall collapses once $\\log(\\eta)$ exceeds $\\Delta\\sqrt{\\kappa}$, Precision increases asymmetrically, and F1-score and PR-AUC decline in line with the predicted regimes. These results show that the triplet $(\\eta,\\kappa,\\Delta)$ provides a model-agnostic, geometrically grounded explanation of imbalance-induced deterioration.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2601.04149" target="_blank">A Theoretical and Empirical Taxonomy of Imbalance in Binary Classification</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Rose Yvette Bandolo Essomba, Ernest Fokou\'e</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.04149" target="_blank">https://arxiv.org/abs/2601.04149</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Class imbalance significantly degrades classification performance, yet its effects are rarely analyzed from a unified theoretical perspective. We propose a principled framework based on three fundamental scales: the imbalance coefficient $\eta$, the sample--dimension ratio $\kappa$, and the intrinsic separability $\Delta$. Starting from the Gaussian Bayes classifier, we derive closed-form Bayes errors and show how imbalance shifts the discriminant boundary, yielding a deterioration slope that predicts four regimes: Normal, Mild, Extreme, and Catastrophic. Using a balanced high-dimensional genomic dataset, we vary only $\eta$ while keeping $\kappa$ and $\Delta$ fixed. Across parametric and non-parametric models, empirical degradation closely follows theoretical predictions: minority Recall collapses once $\log(\eta)$ exceeds $\Delta\sqrt{\kappa}$, Precision increases asymmetrically, and F1-score and PR-AUC decline in line with the predicted regimes. These results show that the triplet $(\eta,\kappa,\Delta)$ provides a model-agnostic, geometrically grounded explanation of imbalance-induced deterioration.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "A path to natural language through tokenisation and transformers", "author": "David S. Berman, Alexander G. Stapleton", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.03368", "summary": "arXiv:2601.03368v1 Announce Type: cross \nAbstract: Natural languages exhibit striking regularities in their statistical structure, including notably the emergence of Zipf's and Heaps' laws. Despite this, it remains broadly unclear how these properties relate to the modern tokenisation schemes used in contemporary transformer models. In this note, we analyse the information content (as measured by the Shannon entropy) of various corpora under the assumption of a Zipfian frequency distribution, and derive a closed-form expression for the slot entropy expectation value. We then empirically investigate how byte--pair encoding (BPE) transforms corpus statistics, showing that recursive applications of BPE drive token frequencies toward a Zipfian power law while inducing a characteristic growth pattern in empirical entropy. Utilizing the ability of transformers to learn context dependent token probability distributions, we train language models on corpora tokenised at varying BPE depths, revealing that the model predictive entropies increasingly agree with Zipf-derived predictions as the BPE depth increases. Attention-based diagnostics further indicate that deeper tokenisation reduces local token dependencies, bringing the empirical distribution closer to the weakly dependent (near IID) regime. Together, these results clarify how BPE acts not only as a compression mechanism but also as a statistical transform that reconstructs key informational properties of natural language.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2601.03368" target="_blank">A path to natural language through tokenisation and transformers</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> David S. Berman, Alexander G. Stapleton</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.03368" target="_blank">https://arxiv.org/abs/2601.03368</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Natural languages exhibit striking regularities in their statistical structure, including notably the emergence of Zipf's and Heaps' laws. Despite this, it remains broadly unclear how these properties relate to the modern tokenisation schemes used in contemporary transformer models. In this note, we analyse the information content (as measured by the Shannon entropy) of various corpora under the assumption of a Zipfian frequency distribution, and derive a closed-form expression for the slot entropy expectation value. We then empirically investigate how byte--pair encoding (BPE) transforms corpus statistics, showing that recursive applications of BPE drive token frequencies toward a Zipfian power law while inducing a characteristic growth pattern in empirical entropy. Utilizing the ability of transformers to learn context dependent token probability distributions, we train language models on corpora tokenised at varying BPE depths, revealing that the model predictive entropies increasingly agree with Zipf-derived predictions as the BPE depth increases. Attention-based diagnostics further indicate that deeper tokenisation reduces local token dependencies, bringing the empirical distribution closer to the weakly dependent (near IID) regime. Together, these results clarify how BPE acts not only as a compression mechanism but also as a statistical transform that reconstructs key informational properties of natural language.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "A Quantifiable Information-Processing Hierarchy Provides a Necessary Condition for Detecting Agency", "author": "Brett J. Kagan, Valentina Baccetti, Brian D. Earp, J. Lomax Boyd, Julian Savulescu, Adeel Razi", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.03498", "summary": "arXiv:2601.03498v1 Announce Type: cross \nAbstract: As intelligent systems are developed across diverse substrates - from machine learning models and neuromorphic hardware to in vitro neural cultures - understanding what gives a system agency has become increasingly important. Existing definitions, however, tend to rely on top-down descriptions that are difficult to quantify. We propose a bottom-up framework grounded in a system's information-processing order: the extent to which its transformation of input evolves over time. We identify three orders of information processing. Class I systems are reactive and memoryless, mapping inputs directly to outputs. Class II systems incorporate internal states that provide memory but follow fixed transformation rules. Class III systems are adaptive; their transformation rules themselves change as a function of prior activity. While not sufficient on their own, these dynamics represent necessary informational conditions for genuine agency. This hierarchy offers a measurable, substrate-independent way to identify the informational precursors of agency. We illustrate the framework with neurophysiological and computational examples, including thermostats and receptor-like memristors, and discuss its implications for the ethical and functional evaluation of systems that may exhibit agency.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2601.03498" target="_blank">A Quantifiable Information-Processing Hierarchy Provides a Necessary Condition for Detecting Agency</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Brett J. Kagan, Valentina Baccetti, Brian D. Earp, J. Lomax Boyd, Julian Savulescu, Adeel Razi</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.03498" target="_blank">https://arxiv.org/abs/2601.03498</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                As intelligent systems are developed across diverse substrates - from machine learning models and neuromorphic hardware to in vitro neural cultures - understanding what gives a system agency has become increasingly important. Existing definitions, however, tend to rely on top-down descriptions that are difficult to quantify. We propose a bottom-up framework grounded in a system's information-processing order: the extent to which its transformation of input evolves over time. We identify three orders of information processing. Class I systems are reactive and memoryless, mapping inputs directly to outputs. Class II systems incorporate internal states that provide memory but follow fixed transformation rules. Class III systems are adaptive; their transformation rules themselves change as a function of prior activity. While not sufficient on their own, these dynamics represent necessary informational conditions for genuine agency. This hierarchy offers a measurable, substrate-independent way to identify the informational precursors of agency. We illustrate the framework with neurophysiological and computational examples, including thermostats and receptor-like memristors, and discuss its implications for the ethical and functional evaluation of systems that may exhibit agency.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Learning Shrinks the Hard Tail: Training-Dependent Inference Scaling in a Solvable Linear Model", "author": "Noam Levi", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.03764", "summary": "arXiv:2601.03764v1 Announce Type: cross \nAbstract: We analyze neural scaling laws in a solvable model of last-layer fine-tuning where targets have intrinsic, instance-heterogeneous difficulty. In our Latent Instance Difficulty (LID) model, each input's target variance is governed by a latent ``precision'' drawn from a heavy-tailed distribution. While generalization loss recovers standard scaling laws, our main contribution connects this to inference. The pass@$k$ failure rate exhibits a power-law decay, $k^{-\\beta_\\text{eff}}$, but the observed exponent $\\beta_\\text{eff}$ is training-dependent. It grows with sample size $N$ before saturating at an intrinsic limit $\\beta$ set by the difficulty distribution's tail. This coupling reveals that learning shrinks the ``hard tail'' of the error distribution: improvements in the model's generalization error steepen the pass@$k$ curve until irreducible target variance dominates. The LID model yields testable, closed-form predictions for this behavior, including a compute-allocation rule that favors training before saturation and inference attempts after. We validate these predictions in simulations and in two real-data proxies: CIFAR-10H (human-label variance) and a maths teacher-student distillation task.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2601.03764" target="_blank">Learning Shrinks the Hard Tail: Training-Dependent Inference Scaling in a Solvable Linear Model</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Noam Levi</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.03764" target="_blank">https://arxiv.org/abs/2601.03764</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We analyze neural scaling laws in a solvable model of last-layer fine-tuning where targets have intrinsic, instance-heterogeneous difficulty. In our Latent Instance Difficulty (LID) model, each input's target variance is governed by a latent ``precision'' drawn from a heavy-tailed distribution. While generalization loss recovers standard scaling laws, our main contribution connects this to inference. The pass@$k$ failure rate exhibits a power-law decay, $k^{-\beta_\text{eff}}$, but the observed exponent $\beta_\text{eff}$ is training-dependent. It grows with sample size $N$ before saturating at an intrinsic limit $\beta$ set by the difficulty distribution's tail. This coupling reveals that learning shrinks the ``hard tail'' of the error distribution: improvements in the model's generalization error steepen the pass@$k$ curve until irreducible target variance dominates. The LID model yields testable, closed-form predictions for this behavior, including a compute-allocation rule that favors training before saturation and inference attempts after. We validate these predictions in simulations and in two real-data proxies: CIFAR-10H (human-label variance) and a maths teacher-student distillation task.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "A Gap Between Decision Trees and Neural Networks", "author": "Akash Kumar", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.03919", "summary": "arXiv:2601.03919v1 Announce Type: cross \nAbstract: We study when geometric simplicity of decision boundaries, used here as a notion of interpretability, can conflict with accurate approximation of axis-aligned decision trees by shallow neural networks. Decision trees induce rule-based, axis-aligned decision regions (finite unions of boxes), whereas shallow ReLU networks are typically trained as score models whose predictions are obtained by thresholding. We analyze the infinite-width, bounded-norm, single-hidden-layer ReLU class through the Radon total variation ($\\mathrm{R}\\mathrm{TV}$) seminorm, which controls the geometric complexity of level sets.\n  We first show that the hard tree indicator $1_A$ has infinite $\\mathrm{R}\\mathrm{TV}$. Moreover, two natural split-wise continuous surrogates--piecewise-linear ramp smoothing and sigmoidal (logistic) smoothing--also have infinite $\\mathrm{R}\\mathrm{TV}$ in dimensions $d&gt;1$, while Gaussian convolution yields finite $\\mathrm{R}\\mathrm{TV}$ but with an explicit exponential dependence on $d$.\n  We then separate two goals that are often conflated: classification after thresholding (recovering the decision set) versus score learning (learning a calibrated score close to $1_A$). For classification, we construct a smooth barrier score $S_A$ with finite $\\mathrm{R}\\mathrm{TV}$ whose fixed threshold $\\tau=1$ exactly recovers the box. Under a mild tube-mass condition near $\\partial A$, we prove an $L_1(P)$ calibration bound that decays polynomially in a sharpness parameter, along with an explicit $\\mathrm{R}\\mathrm{TV}$ upper bound in terms of face measures. Experiments on synthetic unions of rectangles illustrate the resulting accuracy--complexity tradeoff and how threshold selection shifts where training lands along it.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2601.03919" target="_blank">A Gap Between Decision Trees and Neural Networks</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Akash Kumar</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.03919" target="_blank">https://arxiv.org/abs/2601.03919</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study when geometric simplicity of decision boundaries, used here as a notion of interpretability, can conflict with accurate approximation of axis-aligned decision trees by shallow neural networks. Decision trees induce rule-based, axis-aligned decision regions (finite unions of boxes), whereas shallow ReLU networks are typically trained as score models whose predictions are obtained by thresholding. We analyze the infinite-width, bounded-norm, single-hidden-layer ReLU class through the Radon total variation ($\mathrm{R}\mathrm{TV}$) seminorm, which controls the geometric complexity of level sets.
+  We first show that the hard tree indicator $1_A$ has infinite $\mathrm{R}\mathrm{TV}$. Moreover, two natural split-wise continuous surrogates--piecewise-linear ramp smoothing and sigmoidal (logistic) smoothing--also have infinite $\mathrm{R}\mathrm{TV}$ in dimensions $d&gt;1$, while Gaussian convolution yields finite $\mathrm{R}\mathrm{TV}$ but with an explicit exponential dependence on $d$.
+  We then separate two goals that are often conflated: classification after thresholding (recovering the decision set) versus score learning (learning a calibrated score close to $1_A$). For classification, we construct a smooth barrier score $S_A$ with finite $\mathrm{R}\mathrm{TV}$ whose fixed threshold $\tau=1$ exactly recovers the box. Under a mild tube-mass condition near $\partial A$, we prove an $L_1(P)$ calibration bound that decays polynomially in a sharpness parameter, along with an explicit $\mathrm{R}\mathrm{TV}$ upper bound in terms of face measures. Experiments on synthetic unions of rectangles illustrate the resulting accuracy--complexity tradeoff and how threshold selection shifts where training lands along it.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "A comprehensive review and analysis of different modeling approaches for financial index tracking problem", "author": "Vrinda Dhingra, Amita Sharma, Anubha Goel", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.03927", "summary": "arXiv:2601.03927v1 Announce Type: cross \nAbstract: Index tracking, also known as passive investing, has gained significant traction in financial markets due to its cost-effective and efficient approach to replicating the performance of a specific market index. This review paper provides a comprehensive overview of the various modeling approaches and strategies developed for index tracking, highlighting the strengths and limitations of each approach. We categorize the index tracking models into three broad frameworks: optimization-based models, statistical-based models and machine learning based data-driven approach. A comprehensive empirical study conducted on the S\\&amp;amp;P 500 dataset demonstrates that the tracking error volatility model under the optimization-based framework delivers the most precise index tracking, the convex co-integration model, under the statistical-based framework achieves the strongest return-risk balance, and the deep neural network with fixed noise model within the data-driven framework provides a competitive performance with notably low turnover and high computational efficiency. By combining a critical review of the existing literature with comparative empirical analysis, this paper aims to provide insights into the evolving landscape of index tracking and its practical implications for investors and fund managers.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2601.03927" target="_blank">A comprehensive review and analysis of different modeling approaches for financial index tracking problem</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Vrinda Dhingra, Amita Sharma, Anubha Goel</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.03927" target="_blank">https://arxiv.org/abs/2601.03927</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Index tracking, also known as passive investing, has gained significant traction in financial markets due to its cost-effective and efficient approach to replicating the performance of a specific market index. This review paper provides a comprehensive overview of the various modeling approaches and strategies developed for index tracking, highlighting the strengths and limitations of each approach. We categorize the index tracking models into three broad frameworks: optimization-based models, statistical-based models and machine learning based data-driven approach. A comprehensive empirical study conducted on the S\&amp;amp;P 500 dataset demonstrates that the tracking error volatility model under the optimization-based framework delivers the most precise index tracking, the convex co-integration model, under the statistical-based framework achieves the strongest return-risk balance, and the deep neural network with fixed noise model within the data-driven framework provides a competitive performance with notably low turnover and high computational efficiency. By combining a critical review of the existing literature with comparative empirical analysis, this paper aims to provide insights into the evolving landscape of index tracking and its practical implications for investors and fund managers.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "A discrete Benamou-Brenier formulation of Optimal Transport on graphs", "author": "Kieran Morris, Oliver Johnson", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.04193", "summary": "arXiv:2601.04193v1 Announce Type: cross \nAbstract: We propose a discrete transport equation on graphs which connects distributions on both vertices and edges. We then derive a discrete analogue of the Benamou-Brenier formulation for Wasserstein-$1$ distance on a graph and as a result classify all $W_1$ geodesics on graphs.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2601.04193" target="_blank">A discrete Benamou-Brenier formulation of Optimal Transport on graphs</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Kieran Morris, Oliver Johnson</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.04193" target="_blank">https://arxiv.org/abs/2601.04193</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We propose a discrete transport equation on graphs which connects distributions on both vertices and edges. We then derive a discrete analogue of the Benamou-Brenier formulation for Wasserstein-$1$ distance on a graph and as a result classify all $W_1$ geodesics on graphs.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "An Anytime Algorithm for Good Arm Identification", "author": "Marc Jourdan, Andr\\'ee Delahaye-Duriez, Cl\\'emence R\\'eda", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2310.10359", "summary": "arXiv:2310.10359v3 Announce Type: replace \nAbstract: In good arm identification (GAI), the goal is to identify one arm whose average performance exceeds a given threshold, referred to as a good arm, if it exists. Few works have studied GAI in the fixed-budget setting when the sampling budget is fixed beforehand, or in the anytime setting, when a recommendation can be asked at any time. We propose APGAI, an anytime and parameter-free sampling rule for GAI in stochastic bandits. APGAI can be straightforwardly used in fixed-confidence and fixed-budget settings. First, we derive upper bounds on its probability of error at any time. They show that adaptive strategies can be more efficient in detecting the absence of good arms than uniform sampling in several diverse instances. Second, when APGAI is combined with a stopping rule, we prove upper bounds on the expected sampling complexity, holding at any confidence level. Finally, we show the good empirical performance of APGAI on synthetic and real-world data. Our work offers an extensive overview of the GAI problem in all settings.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2310.10359" target="_blank">An Anytime Algorithm for Good Arm Identification</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Marc Jourdan, Andr\'ee Delahaye-Duriez, Cl\'emence R\'eda</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2310.10359" target="_blank">https://arxiv.org/abs/2310.10359</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In good arm identification (GAI), the goal is to identify one arm whose average performance exceeds a given threshold, referred to as a good arm, if it exists. Few works have studied GAI in the fixed-budget setting when the sampling budget is fixed beforehand, or in the anytime setting, when a recommendation can be asked at any time. We propose APGAI, an anytime and parameter-free sampling rule for GAI in stochastic bandits. APGAI can be straightforwardly used in fixed-confidence and fixed-budget settings. First, we derive upper bounds on its probability of error at any time. They show that adaptive strategies can be more efficient in detecting the absence of good arms than uniform sampling in several diverse instances. Second, when APGAI is combined with a stopping rule, we prove upper bounds on the expected sampling complexity, holding at any confidence level. Finally, we show the good empirical performance of APGAI on synthetic and real-world data. Our work offers an extensive overview of the GAI problem in all settings.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "A survey on Clustered Federated Learning: Taxonomy, Analysis and Applications", "author": "Michael Ben Ali (IRIT), Omar El-Rifai (CIS-ENSMSE), Imen Megdiche (IRIT-SIG, INUC), Andr\\'e Peninou (IRIT-SIG, UT2J), Olivier Teste (IRIT-SIG)", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2501.17512", "summary": "arXiv:2501.17512v2 Announce Type: replace \nAbstract: As Federated Learning (FL) expands, the challenge of non-independent and identically distributed (non-IID) data becomes critical. Clustered Federated Learning (CFL) addresses this by training multiple specialized models, each representing a group of clients with similar data distributions. However, the term ''CFL'' has increasingly been applied to operational strategies unrelated to data heterogeneity, creating significant ambiguity. This survey provides a systematic review of the CFL literature and introduces a principled taxonomy that classifies algorithms into Server-side, Client-side, and Metadata-based approaches. Our analysis reveals a distinct dichotomy: while theoretical research prioritizes privacy-preserving Server/Client-side methods, real-world applications in IoT, Mobility, and Energy overwhelmingly favor Metadata-based efficiency. Furthermore, we explicitly distinguish ''Core CFL'' (grouping clients for non-IID data) from ''Clustered X FL'' (operational variants for system heterogeneity). Finally, we outline lessons learned and future directions to bridge the gap between theoretical privacy and practical efficiency.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2501.17512" target="_blank">A survey on Clustered Federated Learning: Taxonomy, Analysis and Applications</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Michael Ben Ali (IRIT), Omar El-Rifai (CIS-ENSMSE), Imen Megdiche (IRIT-SIG, INUC), Andr\'e Peninou (IRIT-SIG, UT2J), Olivier Teste (IRIT-SIG)</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2501.17512" target="_blank">https://arxiv.org/abs/2501.17512</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                As Federated Learning (FL) expands, the challenge of non-independent and identically distributed (non-IID) data becomes critical. Clustered Federated Learning (CFL) addresses this by training multiple specialized models, each representing a group of clients with similar data distributions. However, the term ''CFL'' has increasingly been applied to operational strategies unrelated to data heterogeneity, creating significant ambiguity. This survey provides a systematic review of the CFL literature and introduces a principled taxonomy that classifies algorithms into Server-side, Client-side, and Metadata-based approaches. Our analysis reveals a distinct dichotomy: while theoretical research prioritizes privacy-preserving Server/Client-side methods, real-world applications in IoT, Mobility, and Energy overwhelmingly favor Metadata-based efficiency. Furthermore, we explicitly distinguish ''Core CFL'' (grouping clients for non-IID data) from ''Clustered X FL'' (operational variants for system heterogeneity). Finally, we outline lessons learned and future directions to bridge the gap between theoretical privacy and practical efficiency.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "An approach to Fisher-Rao metric for infinite dimensional non-parametric information geometry", "author": "Bing Cheng, Howell Tong", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.21451", "summary": "arXiv:2512.21451v2 Announce Type: replace \nAbstract: Being infinite dimensional, non-parametric information geometry has long faced an \"intractability barrier\" due to the fact that the Fisher-Rao metric is now a functional incurring difficulties in defining its inverse. This paper introduces a novel framework to resolve the intractability with an Orthogonal Decomposition of the Tangent Space ($T_fM = S \\oplus S^{\\perp}$), where $S$ represents an observable covariate subspace. Through the decomposition, we derive the Covariate Fisher Information Matrix (cFIM), denoted as ${\\bf G}_f$, which is a finite-dimensional and computable representative of information extractable from the manifold's geometry. Significantly, by proving the Trace Theorem: $H_G(f) = \\text{Tr}({\\bf G}_f)$, we establish a rigorous foundation for the G-entropy previously introduced by us, thereby identifying it as a fundamental geometric invariant representing the total explainable statistical information captured by the probability distribution associated with a model. Furthermore, we establish a link between ${\\bf G}_f$ and the second derivative (i.e. the curvature) of the KL-divergence, leading to the notion of Covariate Cram\\'er-Rao Lower Bound(CRLB). We demonstrate that ${\\bf G}_f$ is congruent to the Efficient Fisher Information Matrix, thereby providing fundamental limits of variance for semi-parametric estimators. Finally, we apply our geometric framework to the Manifold Hypothesis, lifting the latter from a heuristic assumption into a testable condition of rank-deficiency within the cFIM. By defining the Information Capture Ratio, we provide a rigorous method for estimating intrinsic dimensionality in high-dimensional data. In short, our work bridges the gap between abstract information geometry and the demand of explainable AI, by providing a tractable path for assessing the statistical coverage and the efficiency of non-parametric models.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2512.21451" target="_blank">An approach to Fisher-Rao metric for infinite dimensional non-parametric information geometry</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Bing Cheng, Howell Tong</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.21451" target="_blank">https://arxiv.org/abs/2512.21451</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Being infinite dimensional, non-parametric information geometry has long faced an "intractability barrier" due to the fact that the Fisher-Rao metric is now a functional incurring difficulties in defining its inverse. This paper introduces a novel framework to resolve the intractability with an Orthogonal Decomposition of the Tangent Space ($T_fM = S \oplus S^{\perp}$), where $S$ represents an observable covariate subspace. Through the decomposition, we derive the Covariate Fisher Information Matrix (cFIM), denoted as ${\bf G}_f$, which is a finite-dimensional and computable representative of information extractable from the manifold's geometry. Significantly, by proving the Trace Theorem: $H_G(f) = \text{Tr}({\bf G}_f)$, we establish a rigorous foundation for the G-entropy previously introduced by us, thereby identifying it as a fundamental geometric invariant representing the total explainable statistical information captured by the probability distribution associated with a model. Furthermore, we establish a link between ${\bf G}_f$ and the second derivative (i.e. the curvature) of the KL-divergence, leading to the notion of Covariate Cram\'er-Rao Lower Bound(CRLB). We demonstrate that ${\bf G}_f$ is congruent to the Efficient Fisher Information Matrix, thereby providing fundamental limits of variance for semi-parametric estimators. Finally, we apply our geometric framework to the Manifold Hypothesis, lifting the latter from a heuristic assumption into a testable condition of rank-deficiency within the cFIM. By defining the Information Capture Ratio, we provide a rigorous method for estimating intrinsic dimensionality in high-dimensional data. In short, our work bridges the gap between abstract information geometry and the demand of explainable AI, by providing a tractable path for assessing the statistical coverage and the efficiency of non-parametric models.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "LASSO Inference for High Dimensional Predictive Regressions", "author": "Zhan Gao, Ji Hyung Lee, Ziwei Mei, Zhentao Shi", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2409.10030", "summary": "arXiv:2409.10030v3 Announce Type: replace-cross \nAbstract: LASSO inflicts shrinkage bias on estimated coefficients, which undermines asymptotic normality and invalidates standard inferential procedures based on the t-statistic. Given cross sectional data, the desparsified LASSO has emerged as a well-known remedy for correcting the shrinkage bias. In the context of high dimensional predictive regression, the desparsified LASSO faces an additional challenge: the Stambaugh bias arising from nonstationary regressors modeled as local unit roots. To restore standard inference, we propose a novel estimator called IVX-desparsified LASSO (XDlasso). XDlasso simultaneously eliminates both shrinkage bias and Stambaugh bias and does not require prior knowledge about the identities of nonstationary and stationary regressors. We establish the asymptotic properties of XDlasso for hypothesis testing, and our theoretical findings are supported by Monte Carlo simulations. Applying our method to real-world applications from the FRED-MD database, we investigate two important empirical questions: (i) the predictability of the U.S. stock returns based on the earnings-price ratio, and (ii) the predictability of the U.S. inflation using the unemployment.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2409.10030" target="_blank">LASSO Inference for High Dimensional Predictive Regressions</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Zhan Gao, Ji Hyung Lee, Ziwei Mei, Zhentao Shi</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2409.10030" target="_blank">https://arxiv.org/abs/2409.10030</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                LASSO inflicts shrinkage bias on estimated coefficients, which undermines asymptotic normality and invalidates standard inferential procedures based on the t-statistic. Given cross sectional data, the desparsified LASSO has emerged as a well-known remedy for correcting the shrinkage bias. In the context of high dimensional predictive regression, the desparsified LASSO faces an additional challenge: the Stambaugh bias arising from nonstationary regressors modeled as local unit roots. To restore standard inference, we propose a novel estimator called IVX-desparsified LASSO (XDlasso). XDlasso simultaneously eliminates both shrinkage bias and Stambaugh bias and does not require prior knowledge about the identities of nonstationary and stationary regressors. We establish the asymptotic properties of XDlasso for hypothesis testing, and our theoretical findings are supported by Monte Carlo simulations. Applying our method to real-world applications from the FRED-MD database, we investigate two important empirical questions: (i) the predictability of the U.S. stock returns based on the earnings-price ratio, and (ii) the predictability of the U.S. inflation using the unemployment.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Correcting Mode Proportion Bias in Generalized Bayesian Inference via a Weighted Kernel Stein Discrepancy", "author": "Elham Afzali, Saman Muthukumarana, Liqun Wang", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2503.02108", "summary": "arXiv:2503.02108v2 Announce Type: replace-cross \nAbstract: Generalized Bayesian Inference (GBI) provides a flexible framework for updating prior distributions using various loss functions instead of the traditional likelihoods, thereby enhancing the model robustness to model misspecification. However, GBI often suffers the problem associated with intractable likelihoods. Kernelized Stein Discrepancy (KSD), as utilized in a recent study, addresses this challenge by relying only on the gradient of the log-likelihood. Despite this innovation, KSD-Bayes suffers from critical pathologies, including insensitivity to well-separated modes in multimodal posteriors. To address this limitation, we propose a weighted KSD method that retains computational efficiency while effectively capturing multimodal structures. Our method improves the GBI framework for handling intractable multimodal posteriors while maintaining key theoretical properties such as posterior consistency and asymptotic normality. Experimental results demonstrate that our method substantially improves mode sensitivity compared to standard KSD-Bayes, while retaining robust performance in unimodal settings and in the presence of outliers.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2503.02108" target="_blank">Correcting Mode Proportion Bias in Generalized Bayesian Inference via a Weighted Kernel Stein Discrepancy</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Elham Afzali, Saman Muthukumarana, Liqun Wang</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2503.02108" target="_blank">https://arxiv.org/abs/2503.02108</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Generalized Bayesian Inference (GBI) provides a flexible framework for updating prior distributions using various loss functions instead of the traditional likelihoods, thereby enhancing the model robustness to model misspecification. However, GBI often suffers the problem associated with intractable likelihoods. Kernelized Stein Discrepancy (KSD), as utilized in a recent study, addresses this challenge by relying only on the gradient of the log-likelihood. Despite this innovation, KSD-Bayes suffers from critical pathologies, including insensitivity to well-separated modes in multimodal posteriors. To address this limitation, we propose a weighted KSD method that retains computational efficiency while effectively capturing multimodal structures. Our method improves the GBI framework for handling intractable multimodal posteriors while maintaining key theoretical properties such as posterior consistency and asymptotic normality. Experimental results demonstrate that our method substantially improves mode sensitivity compared to standard KSD-Bayes, while retaining robust performance in unimodal settings and in the presence of outliers.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "Architecture independent generalization bounds for overparametrized deep ReLU networks", "author": "Anandatheertha Bapu, Thomas Chen, Chun-Kai Kevin Chien, Patricia Mu\\~noz Ewald, Andrew G. Moore", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2504.05695", "summary": "arXiv:2504.05695v4 Announce Type: replace-cross \nAbstract: We prove that overparametrized neural networks are able to generalize with a test error that is independent of the level of overparametrization, and independent of the Vapnik-Chervonenkis (VC) dimension. We prove explicit bounds that only depend on the metric geometry of the test and training sets, on the regularity properties of the activation function, and on the operator norms of the weights and norms of biases. For overparametrized deep ReLU networks with a training sample size bounded by the input space dimension, we explicitly construct zero loss minimizers without use of gradient descent, and prove a uniform generalization bound that is independent of the network architecture. We perform computational experiments of our theoretical results with MNIST, and obtain agreement with the true test error within a 22 % margin on average.", "number": 16, "labels": [{"name": "model extraction", "color": "#f1c40f"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2504.05695" target="_blank">Architecture independent generalization bounds for overparametrized deep ReLU networks</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #f1c40f;">model extraction</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Anandatheertha Bapu, Thomas Chen, Chun-Kai Kevin Chien, Patricia Mu\~noz Ewald, Andrew G. Moore</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2504.05695" target="_blank">https://arxiv.org/abs/2504.05695</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove that overparametrized neural networks are able to generalize with a test error that is independent of the level of overparametrization, and independent of the Vapnik-Chervonenkis (VC) dimension. We prove explicit bounds that only depend on the metric geometry of the test and training sets, on the regularity properties of the activation function, and on the operator norms of the weights and norms of biases. For overparametrized deep ReLU networks with a training sample size bounded by the input space dimension, we explicitly construct zero loss minimizers without use of gradient descent, and prove a uniform generalization bound that is independent of the network architecture. We perform computational experiments of our theoretical results with MNIST, and obtain agreement with the true test error within a 22 % margin on average.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "Uncovering Bias Paths with LLM-guided Causal Discovery: An Active Learning and Dynamic Scoring Approach", "author": "Khadija Zanna, Akane Sano", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2506.12227", "summary": "arXiv:2506.12227v2 Announce Type: replace-cross \nAbstract: Ensuring fairness in machine learning requires understanding how sensitive attributes like race or gender causally influence outcomes. Existing causal discovery (CD) methods often struggle to recover fairness-relevant pathways in the presence of noise, confounding, or data corruption. Large language models (LLMs) offer a complementary signal by leveraging semantic priors from variable metadata. We propose a hybrid LLM-guided CD framework that extends a breadth-first search strategy with active learning and dynamic scoring. Variable pairs are prioritized for querying using a composite score combining mutual information, partial correlation, and LLM confidence, enabling more efficient and robust structure discovery. To evaluate fairness sensitivity, we introduce a semi-synthetic benchmark based on the UCI Adult dataset, embedding domain-informed bias pathways alongside noise and latent confounders. We assess how well CD methods recover both global graph structure and fairness-critical paths (e.g., sex--&gt;education--&gt;income). Our results demonstrate that LLM-guided methods, including our active, dynamically scored variant, outperform baselines in recovering fairness-relevant structure under noisy conditions. We analyze when LLM-driven insights complement statistical dependencies and discuss implications for fairness auditing in high-stakes domains.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2506.12227" target="_blank">Uncovering Bias Paths with LLM-guided Causal Discovery: An Active Learning and Dynamic Scoring Approach</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Khadija Zanna, Akane Sano</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2506.12227" target="_blank">https://arxiv.org/abs/2506.12227</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Ensuring fairness in machine learning requires understanding how sensitive attributes like race or gender causally influence outcomes. Existing causal discovery (CD) methods often struggle to recover fairness-relevant pathways in the presence of noise, confounding, or data corruption. Large language models (LLMs) offer a complementary signal by leveraging semantic priors from variable metadata. We propose a hybrid LLM-guided CD framework that extends a breadth-first search strategy with active learning and dynamic scoring. Variable pairs are prioritized for querying using a composite score combining mutual information, partial correlation, and LLM confidence, enabling more efficient and robust structure discovery. To evaluate fairness sensitivity, we introduce a semi-synthetic benchmark based on the UCI Adult dataset, embedding domain-informed bias pathways alongside noise and latent confounders. We assess how well CD methods recover both global graph structure and fairness-critical paths (e.g., sex--&gt;education--&gt;income). Our results demonstrate that LLM-guided methods, including our active, dynamically scored variant, outperform baselines in recovering fairness-relevant structure under noisy conditions. We analyze when LLM-driven insights complement statistical dependencies and discuss implications for fairness auditing in high-stakes domains.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "Bridging Prediction and Intervention Problems in Social Systems", "author": "Lydia T. Liu, Inioluwa Deborah Raji, Angela Zhou, Luke Guerdan, Jessica Hullman, Daniel Malinsky, Bryan Wilder, Simone Zhang, Hammaad Adam, Amanda Coston, Ben Laufer, Ezinne Nwankwo, Michael Zanger-Tishler, Eli Ben-Michael, Solon Barocas, Avi Feller, Marissa Gerchick, Talia Gillis, Shion Guha, Daniel Ho, Lily Hu, Kosuke Imai, Sayash Kapoor, Joshua Loftus, Razieh Nabi, Arvind Narayanan, Ben Recht, Juan Carlos Perdomo, Matthew Salganik, Mark Sendak, Alexander Tolbert, Berk Ustun, Suresh Venkatasubramanian, Angelina Wang, Ashia Wilson", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2507.05216", "summary": "arXiv:2507.05216v3 Announce Type: replace-cross \nAbstract: Many automated decision systems (ADS) are designed to solve prediction problems -- where the goal is to learn patterns from a sample of the population and apply them to individuals from the same population. In reality, these prediction systems operationalize holistic policy interventions in deployment. Once deployed, ADS can shape impacted population outcomes through an effective policy change in how decision-makers operate, while also being defined by past and present interactions between stakeholders and the limitations of existing organizational, as well as societal, infrastructure and context. In this work, we consider the ways in which we must shift from a prediction-focused paradigm to an intervention-oriented paradigm when considering the impact of ADS within social systems. We argue this requires a new default problem setup for ADS beyond prediction, to instead consider predictions as decision support, final decisions, and outcomes. We highlight how this perspective unifies modern statistical frameworks and other tools to study the design, implementation, and evaluation of ADS systems, and point to the research directions necessary to operationalize this paradigm shift. Using these tools, we characterize the limitations of focusing on isolated prediction tasks, and lay the foundation for a more intervention-oriented approach to developing and deploying ADS.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2507.05216" target="_blank">Bridging Prediction and Intervention Problems in Social Systems</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Lydia T. Liu, Inioluwa Deborah Raji, Angela Zhou, Luke Guerdan, Jessica Hullman, Daniel Malinsky, Bryan Wilder, Simone Zhang, Hammaad Adam, Amanda Coston, Ben Laufer, Ezinne Nwankwo, Michael Zanger-Tishler, Eli Ben-Michael, Solon Barocas, Avi Feller, Marissa Gerchick, Talia Gillis, Shion Guha, Daniel Ho, Lily Hu, Kosuke Imai, Sayash Kapoor, Joshua Loftus, Razieh Nabi, Arvind Narayanan, Ben Recht, Juan Carlos Perdomo, Matthew Salganik, Mark Sendak, Alexander Tolbert, Berk Ustun, Suresh Venkatasubramanian, Angelina Wang, Ashia Wilson</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2507.05216" target="_blank">https://arxiv.org/abs/2507.05216</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Many automated decision systems (ADS) are designed to solve prediction problems -- where the goal is to learn patterns from a sample of the population and apply them to individuals from the same population. In reality, these prediction systems operationalize holistic policy interventions in deployment. Once deployed, ADS can shape impacted population outcomes through an effective policy change in how decision-makers operate, while also being defined by past and present interactions between stakeholders and the limitations of existing organizational, as well as societal, infrastructure and context. In this work, we consider the ways in which we must shift from a prediction-focused paradigm to an intervention-oriented paradigm when considering the impact of ADS within social systems. We argue this requires a new default problem setup for ADS beyond prediction, to instead consider predictions as decision support, final decisions, and outcomes. We highlight how this perspective unifies modern statistical frameworks and other tools to study the design, implementation, and evaluation of ADS systems, and point to the research directions necessary to operationalize this paradigm shift. Using these tools, we characterize the limitations of focusing on isolated prediction tasks, and lay the foundation for a more intervention-oriented approach to developing and deploying ADS.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "CNN-based Surface Temperature Forecasts with Ensemble Numerical Weather Prediction over Medium-range Forecast Periods", "author": "Takuya Inoue (Meteorological Research Institute, Tsukuba, Japan), Takuya Kawabata (Meteorological Research Institute, Tsukuba, Japan)", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2507.18937", "summary": "arXiv:2507.18937v2 Announce Type: replace-cross \nAbstract: In this study, a method that integrates convolutional neural networks (CNNs) with ensemble numerical weather prediction (NWP) models is proposed. This method enables surface temperature forecasting with lead times beyond the short-range, extending up to five days. Due to limited computational resources, operational medium-range temperature forecasts typically rely on low-resolution NWP models, which are prone to systematic and random errors. To resolve these limitations, the proposed method applies CNN-based post-processing (bias correction and spatial super-resolution) to an ensemble NWP system. First, the post-processing is applied to each ensemble member to reduce systematic errors and reconstruct high-resolution temperature fields from low-resolution model outputs. This approach reduces the systematic and random errors in NWP model outputs and outperforms operational post-processing. Second, the CNN is applied to all ensemble members to construct a new ensemble forecasting system, in which deterministic forecast accuracy, probabilistic reliability, and representation of ensemble spread are improved compared with those of the original system. We demonstrate that this CNN-based post-processing is fundamentally different from the artificial error reduction caused by smoothing inherent in ensemble averaging because the post-processing reduces forecast errors without degrading the forecast information. These results indicate that the proposed method provides a practical and scalable solution for improving medium-range temperature forecasts and is particularly valuable for use in operational centers with limited computational resources.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2507.18937" target="_blank">CNN-based Surface Temperature Forecasts with Ensemble Numerical Weather Prediction over Medium-range Forecast Periods</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Takuya Inoue (Meteorological Research Institute, Tsukuba, Japan), Takuya Kawabata (Meteorological Research Institute, Tsukuba, Japan)</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2507.18937" target="_blank">https://arxiv.org/abs/2507.18937</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this study, a method that integrates convolutional neural networks (CNNs) with ensemble numerical weather prediction (NWP) models is proposed. This method enables surface temperature forecasting with lead times beyond the short-range, extending up to five days. Due to limited computational resources, operational medium-range temperature forecasts typically rely on low-resolution NWP models, which are prone to systematic and random errors. To resolve these limitations, the proposed method applies CNN-based post-processing (bias correction and spatial super-resolution) to an ensemble NWP system. First, the post-processing is applied to each ensemble member to reduce systematic errors and reconstruct high-resolution temperature fields from low-resolution model outputs. This approach reduces the systematic and random errors in NWP model outputs and outperforms operational post-processing. Second, the CNN is applied to all ensemble members to construct a new ensemble forecasting system, in which deterministic forecast accuracy, probabilistic reliability, and representation of ensemble spread are improved compared with those of the original system. We demonstrate that this CNN-based post-processing is fundamentally different from the artificial error reduction caused by smoothing inherent in ensemble averaging because the post-processing reduces forecast errors without degrading the forecast information. These results indicate that the proposed method provides a practical and scalable solution for improving medium-range temperature forecasts and is particularly valuable for use in operational centers with limited computational resources.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "Learning Confidence Ellipsoids and Applications to Robust Subspace Recovery", "author": "Chao Gao, Liren Shan, Vaidehi Srinivas, Aravindan Vijayaraghavan", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.16875", "summary": "arXiv:2512.16875v3 Announce Type: replace-cross \nAbstract: We study the problem of finding confidence ellipsoids for an arbitrary distribution in high dimensions. Given samples from a distribution $\\mathcal{D}$ and a confidence parameter $\\alpha$, the goal is to find the smallest volume ellipsoid $E$ which has probability mass $\\Pr_{\\mathcal{D}}[E] \\ge 1-\\alpha$. Ellipsoids are a highly expressive class of confidence sets as they can capture correlations in the distribution, and can approximate any convex set. This problem has been studied in many different communities. In statistics, this is the classic minimum volume estimator introduced by Rousseeuw as a robust non-parametric estimator of location and scatter. However in high dimensions, it becomes NP-hard to obtain any non-trivial approximation factor in volume when the condition number $\\beta$ of the ellipsoid (ratio of the largest to the smallest axis length) goes to $\\infty$. This motivates the focus of our paper: can we efficiently find confidence ellipsoids with volume approximation guarantees when compared to ellipsoids of bounded condition number $\\beta$?\n  Our main result is a polynomial time algorithm that finds an ellipsoid $E$ whose volume is within a $O(\\beta)^{\\gamma d}$ multiplicative factor of the volume of best $\\beta$-conditioned ellipsoid while covering at least $1-O(\\alpha/\\gamma)$ probability mass for any $\\gamma \\in (0,1)$. We complement this with a computational hardness result that shows that such a dependence seems necessary up to constants in the exponent. The algorithm and analysis uses the rich primal-dual structure of the minimum volume enclosing ellipsoid and the geometric Brascamp-Lieb inequality. As a consequence, we obtain the first polynomial time algorithm with approximation guarantees on worst-case instances of the robust subspace recovery problem.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2512.16875" target="_blank">Learning Confidence Ellipsoids and Applications to Robust Subspace Recovery</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Chao Gao, Liren Shan, Vaidehi Srinivas, Aravindan Vijayaraghavan</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.16875" target="_blank">https://arxiv.org/abs/2512.16875</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the problem of finding confidence ellipsoids for an arbitrary distribution in high dimensions. Given samples from a distribution $\mathcal{D}$ and a confidence parameter $\alpha$, the goal is to find the smallest volume ellipsoid $E$ which has probability mass $\Pr_{\mathcal{D}}[E] \ge 1-\alpha$. Ellipsoids are a highly expressive class of confidence sets as they can capture correlations in the distribution, and can approximate any convex set. This problem has been studied in many different communities. In statistics, this is the classic minimum volume estimator introduced by Rousseeuw as a robust non-parametric estimator of location and scatter. However in high dimensions, it becomes NP-hard to obtain any non-trivial approximation factor in volume when the condition number $\beta$ of the ellipsoid (ratio of the largest to the smallest axis length) goes to $\infty$. This motivates the focus of our paper: can we efficiently find confidence ellipsoids with volume approximation guarantees when compared to ellipsoids of bounded condition number $\beta$?
+  Our main result is a polynomial time algorithm that finds an ellipsoid $E$ whose volume is within a $O(\beta)^{\gamma d}$ multiplicative factor of the volume of best $\beta$-conditioned ellipsoid while covering at least $1-O(\alpha/\gamma)$ probability mass for any $\gamma \in (0,1)$. We complement this with a computational hardness result that shows that such a dependence seems necessary up to constants in the exponent. The algorithm and analysis uses the rich primal-dual structure of the minimum volume enclosing ellipsoid and the geometric Brascamp-Lieb inequality. As a consequence, we obtain the first polynomial time algorithm with approximation guarantees on worst-case instances of the robust subspace recovery problem.
+            </div>
+        </div>
+        <div class="paper" id="paper-21">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-21" data-paper-data='{"title": "On the Sample Complexity of Learning for Blind Inverse Problems", "author": "Nathan Buskulic, Luca Calatroni, Lorenzo Rosasco, Silvia Villa", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.23405", "summary": "arXiv:2512.23405v2 Announce Type: replace-cross \nAbstract: Blind inverse problems arise in many experimental settings where the forward operator is partially or entirely unknown. In this context, methods developed for the non-blind case cannot be adapted in a straightforward manner. Recently, data-driven approaches have been proposed to address blind inverse problems, demonstrating strong empirical performance and adaptability. However, these methods often lack interpretability and are not supported by rigorous theoretical guarantees, limiting their reliability in applied domains such as imaging inverse problems. In this work, we shed light on learning in blind inverse problems within the simplified yet insightful framework of Linear Minimum Mean Square Estimators (LMMSEs). We provide an in-depth theoretical analysis, deriving closed-form expressions for optimal estimators and extending classical results. In particular, we establish equivalences with suitably chosen Tikhonov-regularized formulations, where the regularization depends explicitly on the distributions of the unknown signal, the noise, and the random forward operators. We also prove convergence results under appropriate source condition assumptions. Furthermore, we derive rigorous finite-sample error bounds that characterize the performance of learned estimators as a function of the noise level, problem conditioning, and number of available samples. These bounds explicitly quantify the impact of operator randomness and reveal the associated convergence rates as this randomness vanishes. Finally, we validate our theoretical findings through illustrative numerical experiments that confirm the predicted convergence behavior.", "number": 21, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#21</span>
+                <a href="https://arxiv.org/abs/2512.23405" target="_blank">On the Sample Complexity of Learning for Blind Inverse Problems</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Nathan Buskulic, Luca Calatroni, Lorenzo Rosasco, Silvia Villa</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.23405" target="_blank">https://arxiv.org/abs/2512.23405</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Blind inverse problems arise in many experimental settings where the forward operator is partially or entirely unknown. In this context, methods developed for the non-blind case cannot be adapted in a straightforward manner. Recently, data-driven approaches have been proposed to address blind inverse problems, demonstrating strong empirical performance and adaptability. However, these methods often lack interpretability and are not supported by rigorous theoretical guarantees, limiting their reliability in applied domains such as imaging inverse problems. In this work, we shed light on learning in blind inverse problems within the simplified yet insightful framework of Linear Minimum Mean Square Estimators (LMMSEs). We provide an in-depth theoretical analysis, deriving closed-form expressions for optimal estimators and extending classical results. In particular, we establish equivalences with suitably chosen Tikhonov-regularized formulations, where the regularization depends explicitly on the distributions of the unknown signal, the noise, and the random forward operators. We also prove convergence results under appropriate source condition assumptions. Furthermore, we derive rigorous finite-sample error bounds that characterize the performance of learned estimators as a function of the noise level, problem conditioning, and number of available samples. These bounds explicitly quantify the impact of operator randomness and reveal the associated convergence rates as this randomness vanishes. Finally, we validate our theoretical findings through illustrative numerical experiments that confirm the predicted convergence behavior.
+            </div>
+        </div>
+        <div class="paper" id="paper-22">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-22" data-paper-data='{"title": "Neural Optimal Design of Experiment for Inverse Problems", "author": "John E. Darges, Babak Maboudi Afkham, Matthias Chung", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.23763", "summary": "arXiv:2512.23763v2 Announce Type: replace-cross \nAbstract: We introduce Neural Optimal Design of Experiments, a learning-based framework for optimal experimental design in inverse problems that avoids classical bilevel optimization and indirect sparsity regularization. NODE jointly trains a neural reconstruction model and a fixed-budget set of continuous design variables representing sensor locations, sampling times, or measurement angles, within a single optimization loop. By optimizing measurement locations directly rather than weighting a dense grid of candidates, the proposed approach enforces sparsity by design, eliminates the need for l1 tuning, and substantially reduces computational complexity. We validate NODE on an analytically tractable exponential growth benchmark, on MNIST image sampling, and illustrate its effectiveness on a real world sparse view X ray CT example. In all cases, NODE outperforms baseline approaches, demonstrating improved reconstruction accuracy and task-specific performance.", "number": 22, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#22</span>
+                <a href="https://arxiv.org/abs/2512.23763" target="_blank">Neural Optimal Design of Experiment for Inverse Problems</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> John E. Darges, Babak Maboudi Afkham, Matthias Chung</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.23763" target="_blank">https://arxiv.org/abs/2512.23763</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We introduce Neural Optimal Design of Experiments, a learning-based framework for optimal experimental design in inverse problems that avoids classical bilevel optimization and indirect sparsity regularization. NODE jointly trains a neural reconstruction model and a fixed-budget set of continuous design variables representing sensor locations, sampling times, or measurement angles, within a single optimization loop. By optimizing measurement locations directly rather than weighting a dense grid of candidates, the proposed approach enforces sparsity by design, eliminates the need for l1 tuning, and substantially reduces computational complexity. We validate NODE on an analytically tractable exponential growth benchmark, on MNIST image sampling, and illustrate its effectiveness on a real world sparse view X ray CT example. In all cases, NODE outperforms baseline approaches, demonstrating improved reconstruction accuracy and task-specific performance.
+            </div>
+        </div>
+        <div class="paper" id="paper-23">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-23" data-paper-data='{"title": "Wittgenstein's Family Resemblance Clustering Algorithm", "author": "Golbahar Amanpour, Benyamin Ghojogh", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.01127", "summary": "arXiv:2601.01127v2 Announce Type: replace-cross \nAbstract: This paper, introducing a novel method in philomatics, draws on Wittgenstein's concept of family resemblance from analytic philosophy to develop a clustering algorithm for machine learning. According to Wittgenstein's Philosophical Investigations (1953), family resemblance holds that members of a concept or category are connected by overlapping similarities rather than a single defining property. Consequently, a family of entities forms a chain of items sharing overlapping traits. This philosophical idea naturally lends itself to a graph-based approach in machine learning. Accordingly, we propose the Wittgenstein's Family Resemblance (WFR) clustering algorithm and its kernel variant, kernel WFR. This algorithm computes resemblance scores between neighboring data instances, and after thresholding these scores, a resemblance graph is constructed. The connected components of this graph define the resulting clusters. Simulations on benchmark datasets demonstrate that WFR is an effective nonlinear clustering algorithm that does not require prior knowledge of the number of clusters or assumptions about their shapes.", "number": 23, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#23</span>
+                <a href="https://arxiv.org/abs/2601.01127" target="_blank">Wittgenstein's Family Resemblance Clustering Algorithm</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Golbahar Amanpour, Benyamin Ghojogh</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.01127" target="_blank">https://arxiv.org/abs/2601.01127</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This paper, introducing a novel method in philomatics, draws on Wittgenstein's concept of family resemblance from analytic philosophy to develop a clustering algorithm for machine learning. According to Wittgenstein's Philosophical Investigations (1953), family resemblance holds that members of a concept or category are connected by overlapping similarities rather than a single defining property. Consequently, a family of entities forms a chain of items sharing overlapping traits. This philosophical idea naturally lends itself to a graph-based approach in machine learning. Accordingly, we propose the Wittgenstein's Family Resemblance (WFR) clustering algorithm and its kernel variant, kernel WFR. This algorithm computes resemblance scores between neighboring data instances, and after thresholding these scores, a resemblance graph is constructed. The connected components of this graph define the resulting clusters. Simulations on benchmark datasets demonstrate that WFR is an effective nonlinear clustering algorithm that does not require prior knowledge of the number of clusters or assumptions about their shapes.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-01-08 18:00:02
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>

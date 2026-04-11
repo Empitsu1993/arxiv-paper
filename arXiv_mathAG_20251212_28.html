@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Fri, 12 Dec 2025 05:00:13 +0000<br>
+        <strong>論文数:</strong> 28件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Kobayashi hyperbolicity of complete linear systems on abelian varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">The effective Chen ranks conjecture</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">A dynamical characterisation of smooth cubic affine surfaces of Markov type</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">Non-Stable K1-Functors Of Discrete Valuation Rings Containing A Field</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">Local rigidity of projective smooth horospherical varieties of Picard number two</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">$\mathbb{A}^1$-connectivity of motivic spaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Geometric quantization on big line bundles</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Free plane curves with a linear Jacobian syzygy</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">A Jacobian Criterion for Artin $v$-stacks</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">The Nash-Tognoli theorem over the rationals and its version for isolated singularities</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">Crystalline representations and $p$-adic Hodge theory for non-commutative algebraic varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">Algebraic cycles and Hitchin systems</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">A proof of generic Green's conjecture in odd genus</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">On a Riemann-Roch formula for stacks with finite cyclotomic inertia</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Proof of a magnificent conjecture</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">A Nakayama result for the quantum K theory of homogeneous spaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">Quotients of flag varieties and their birational geometry</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">The BPS decomposition theorem</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Motivic DT/PT Correspondence</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">Minimal model program on the generic fiber of log Calabi-Yau type fibration</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-21" onchange="updateSelectedCount()">
+            <span class="title-number">21.</span>
+            <a href="#paper-21">Flexibility of affine spherical varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-22" onchange="updateSelectedCount()">
+            <span class="title-number">22.</span>
+            <a href="#paper-22">The de Jong fundamental group of $\mathbb{P}^1_C$ depends on $C$ and is not always topologically countably generated</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-23" onchange="updateSelectedCount()">
+            <span class="title-number">23.</span>
+            <a href="#paper-23">The de Jong fundamental group of a non-trivial abelian variety is non-abelian</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-24" onchange="updateSelectedCount()">
+            <span class="title-number">24.</span>
+            <a href="#paper-24">Reflexive dg categories in algebra and topology</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-25" onchange="updateSelectedCount()">
+            <span class="title-number">25.</span>
+            <a href="#paper-25">The Beilinson-Bloch conjecture for some non-isotrivial varieties over global function fields</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-26" onchange="updateSelectedCount()">
+            <span class="title-number">26.</span>
+            <a href="#paper-26">Wild genus-zero quantum de Rham spaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-27" onchange="updateSelectedCount()">
+            <span class="title-number">27.</span>
+            <a href="#paper-27">An effective van der Corput-type method in higher dimensions</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-28" onchange="updateSelectedCount()">
+            <span class="title-number">28.</span>
+            <a href="#paper-28">$\mathcal{M}$-points of bounded height</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Kobayashi hyperbolicity of complete linear systems on abelian varieties", "author": "Federico Caucci", "published": "Fri, 12 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.10082", "summary": "arXiv:2512.10082v1 Announce Type: new \nAbstract: We provide a geometric condition ensuring that a very general element of a complete linear system on an abelian variety is Kobayashi hyperbolic. Some related conjectures are also given.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2512.10082" target="_blank">Kobayashi hyperbolicity of complete linear systems on abelian varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Federico Caucci</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 12 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.10082" target="_blank">https://arxiv.org/abs/2512.10082</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We provide a geometric condition ensuring that a very general element of a complete linear system on an abelian variety is Kobayashi hyperbolic. Some related conjectures are also given.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "The effective Chen ranks conjecture", "author": "Marian Aprodu, Gavril Farkas, Claudiu Raicu, Alexander I. Suciu", "published": "Fri, 12 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.10160", "summary": "arXiv:2512.10160v1 Announce Type: new \nAbstract: Koszul modules and their associated resonance schemes are objects appearing in a variety of contexts in algebraic geometry, topology, and combinatorics. We present a proof of an effective version of the Chen ranks conjecture describing the Hilbert function of any Koszul module verifying natural conditions inspired by geometry. We give applications to hyperplane arrangements, describing in a uniform effective manner the Chen ranks of the fundamental group of the complement of every arrangement whose projective resonance is reduced. Finally, we formulate a sharp generic vanishing conjecture for Koszul modules and present a parallel between this statement and the Prym--Green Conjecture on syzygies of general Prym canonical curves.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2512.10160" target="_blank">The effective Chen ranks conjecture</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Marian Aprodu, Gavril Farkas, Claudiu Raicu, Alexander I. Suciu</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 12 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.10160" target="_blank">https://arxiv.org/abs/2512.10160</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Koszul modules and their associated resonance schemes are objects appearing in a variety of contexts in algebraic geometry, topology, and combinatorics. We present a proof of an effective version of the Chen ranks conjecture describing the Hilbert function of any Koszul module verifying natural conditions inspired by geometry. We give applications to hyperplane arrangements, describing in a uniform effective manner the Chen ranks of the fundamental group of the complement of every arrangement whose projective resonance is reduced. Finally, we formulate a sharp generic vanishing conjecture for Koszul modules and present a parallel between this statement and the Prym--Green Conjecture on syzygies of general Prym canonical curves.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "A dynamical characterisation of smooth cubic affine surfaces of Markov type", "author": "Marc Abboud", "published": "Fri, 12 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.10455", "summary": "arXiv:2512.10455v1 Announce Type: new \nAbstract: Using valuative techniques, we show that a smooth affine surface with a non-elementary automorphism group and completable by a cycle of rational curves is either the algebraic torus or a smooth cubic affine surface of Markov type. Furthermore we show that smooth cubic affine surfaces of Markov type do no admit dominant endomorphisms which are not automorphisms.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2512.10455" target="_blank">A dynamical characterisation of smooth cubic affine surfaces of Markov type</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Marc Abboud</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 12 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.10455" target="_blank">https://arxiv.org/abs/2512.10455</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Using valuative techniques, we show that a smooth affine surface with a non-elementary automorphism group and completable by a cycle of rational curves is either the algebraic torus or a smooth cubic affine surface of Markov type. Furthermore we show that smooth cubic affine surfaces of Markov type do no admit dominant endomorphisms which are not automorphisms.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "Non-Stable K1-Functors Of Discrete Valuation Rings Containing A Field", "author": "Philippe Gille (ICJ, AGL, IMAR), Anastasia Stavrova (PDMI RAS)", "published": "Fri, 12 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.10681", "summary": "arXiv:2512.10681v1 Announce Type: new \nAbstract: Let k be a field, and let G be a simply connected semisimple k-group which is isotropic and contains a strictly proper parabolic k-subgroup P . Let D be a discrete valuation ring which is a local ring of a smooth algebraic curve over k. Let K be the fraction field of D. We show that the corresponding non-stable K 1 -functor (for G and P,, also called the Whitehead group of G) coincide over D and K.. As a consequence, K\\_G^P 1 (D) coincides with the (generalized) Manin's R-equivalence class group of G(D).", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2512.10681" target="_blank">Non-Stable K1-Functors Of Discrete Valuation Rings Containing A Field</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Philippe Gille (ICJ, AGL, IMAR), Anastasia Stavrova (PDMI RAS)</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 12 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.10681" target="_blank">https://arxiv.org/abs/2512.10681</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let k be a field, and let G be a simply connected semisimple k-group which is isotropic and contains a strictly proper parabolic k-subgroup P . Let D be a discrete valuation ring which is a local ring of a smooth algebraic curve over k. Let K be the fraction field of D. We show that the corresponding non-stable K 1 -functor (for G and P,, also called the Whitehead group of G) coincide over D and K.. As a consequence, K\_G^P 1 (D) coincides with the (generalized) Manin's R-equivalence class group of G(D).
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "Local rigidity of projective smooth horospherical varieties of Picard number two", "author": "Boris Pasquier (LMA), L\\'ea Villeneuve (LMA)", "published": "Fri, 12 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.10694", "summary": "arXiv:2512.10694v1 Announce Type: new \nAbstract: We study the local rigidity of projective smooth horospherical varieties of rank one and Picard number two. These varieties have been already considered by the second author in a work where their automorphism groups are computed. The results given here are a natural continuation of this work.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2512.10694" target="_blank">Local rigidity of projective smooth horospherical varieties of Picard number two</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Boris Pasquier (LMA), L\'ea Villeneuve (LMA)</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 12 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.10694" target="_blank">https://arxiv.org/abs/2512.10694</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the local rigidity of projective smooth horospherical varieties of rank one and Picard number two. These varieties have been already considered by the second author in a work where their automorphism groups are computed. The results given here are a natural continuation of this work.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "$\\mathbb{A}^1$-connectivity of motivic spaces", "author": "Tess Bouis, Arnab Kundu", "published": "Fri, 12 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.10712", "summary": "arXiv:2512.10712v1 Announce Type: new \nAbstract: We prove an unstable version of Morel's $\\mathbb{A}^1$-connectivity theorem over arbitrary base schemes. In the stable setting, this recovers (and simplifies the proof of) the known connectivity bounds due to Morel, Schmidt--Strunk, Deshmukh--Hogadi--Kulkarni--Yadav, and Druzhinin, and extends them to possibly non-noetherian schemes. Using the recent work of Bachmann--Elmanto--Morrow, this also implies that the slice filtration on homotopy $K$-theory is convergent for qcqs schemes of finite valuative dimension.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2512.10712" target="_blank">$\mathbb{A}^1$-connectivity of motivic spaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Tess Bouis, Arnab Kundu</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 12 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.10712" target="_blank">https://arxiv.org/abs/2512.10712</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove an unstable version of Morel's $\mathbb{A}^1$-connectivity theorem over arbitrary base schemes. In the stable setting, this recovers (and simplifies the proof of) the known connectivity bounds due to Morel, Schmidt--Strunk, Deshmukh--Hogadi--Kulkarni--Yadav, and Druzhinin, and extends them to possibly non-noetherian schemes. Using the recent work of Bachmann--Elmanto--Morrow, this also implies that the slice filtration on homotopy $K$-theory is convergent for qcqs schemes of finite valuative dimension.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Geometric quantization on big line bundles", "author": "Siarhei Finski", "published": "Fri, 12 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.10466", "summary": "arXiv:2512.10466v1 Announce Type: cross \nAbstract: We extend several geometric quantization results to the setting of big line bundles. More precisely, we prove the asymptotic isometry property for the map that associates to a metric on a big line bundle the corresponding sup-norms on the spaces of holomorphic sections of its tensor powers. Building on this, we show that submultiplicative norms on section rings of big line bundles are asymptotically equivalent to sup-norms. As an application, we show that any bounded submultiplicative filtration on the section ring of a big line bundle naturally gives rise to a Mabuchi geodesic ray, and the speed of this ray encodes the statistical invariants of the filtration.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2512.10466" target="_blank">Geometric quantization on big line bundles</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Siarhei Finski</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 12 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.10466" target="_blank">https://arxiv.org/abs/2512.10466</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We extend several geometric quantization results to the setting of big line bundles. More precisely, we prove the asymptotic isometry property for the map that associates to a metric on a big line bundle the corresponding sup-norms on the spaces of holomorphic sections of its tensor powers. Building on this, we show that submultiplicative norms on section rings of big line bundles are asymptotically equivalent to sup-norms. As an application, we show that any bounded submultiplicative filtration on the section ring of a big line bundle naturally gives rise to a Mabuchi geodesic ray, and the speed of this ray encodes the statistical invariants of the filtration.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Free plane curves with a linear Jacobian syzygy", "author": "Valentina Beorchia, Matteo Gallet, Alessandro Logar", "published": "Fri, 12 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.10928", "summary": "arXiv:2512.10928v1 Announce Type: cross \nAbstract: The study of planar free curves is a very active area of research, but a structural study of such a class is missing. We give a complete classification of the possible generators of the Jacobian syzygy module of a plane free curve under the assumption that one of them is linear. Specifically, we prove that, up to similarities, there are two possible forms for the Hilbert-Burch matrix. Our strategy relies on a translation of the problem into the accurate study of the geometry of maximal segments of a suitable triangle with integer points. Following this description, we are able to determine precisely the equations of free curves and the associated Hilbert-Burch matrices.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2512.10928" target="_blank">Free plane curves with a linear Jacobian syzygy</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Valentina Beorchia, Matteo Gallet, Alessandro Logar</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 12 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.10928" target="_blank">https://arxiv.org/abs/2512.10928</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The study of planar free curves is a very active area of research, but a structural study of such a class is missing. We give a complete classification of the possible generators of the Jacobian syzygy module of a plane free curve under the assumption that one of them is linear. Specifically, we prove that, up to similarities, there are two possible forms for the Hilbert-Burch matrix. Our strategy relies on a translation of the problem into the accurate study of the geometry of maximal segments of a suitable triangle with integer points. Following this description, we are able to determine precisely the equations of free curves and the associated Hilbert-Burch matrices.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "A Jacobian Criterion for Artin $v$-stacks", "author": "Linus Hamann", "published": "Fri, 12 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2209.07495", "summary": "arXiv:2209.07495v3 Announce Type: replace \nAbstract: We prove a generalization of the Jacobian criterion of Fargues-Scholze for spaces of sections of a smooth quasi-projective variety over the Fargues-Fontaine curve. Namely, we show how to use their criterion to deduce an analogue for spaces of sections of a smooth Artin stack over the (schematic) Fargues-Fontaine curve obtained by taking the stack quotient of a smooth quasi-projective variety by the action of a linear algebraic group. As an application, we show various moduli stacks appearing in the Fargues-Scholze geometric Langlands program are cohomologically smooth Artin $v$-stacks and compute their $\\ell$-dimensions.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2209.07495" target="_blank">A Jacobian Criterion for Artin $v$-stacks</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Linus Hamann</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 12 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2209.07495" target="_blank">https://arxiv.org/abs/2209.07495</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove a generalization of the Jacobian criterion of Fargues-Scholze for spaces of sections of a smooth quasi-projective variety over the Fargues-Fontaine curve. Namely, we show how to use their criterion to deduce an analogue for spaces of sections of a smooth Artin stack over the (schematic) Fargues-Fontaine curve obtained by taking the stack quotient of a smooth quasi-projective variety by the action of a linear algebraic group. As an application, we show various moduli stacks appearing in the Fargues-Scholze geometric Langlands program are cohomologically smooth Artin $v$-stacks and compute their $\ell$-dimensions.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "The Nash-Tognoli theorem over the rationals and its version for isolated singularities", "author": "Riccardo Ghiloni, Enrico Savi", "published": "Fri, 12 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2302.04142", "summary": "arXiv:2302.04142v3 Announce Type: replace \nAbstract: Let $\\mathbb{Q}$ be the field of rational numbers and let $X$ be a subset of $\\mathbb{R}^n$. We say that $X$ is $\\mathbb{Q}$-algebraic if it is the common zero set in $\\mathbb{R}^n$ of a family of polynomials in $\\mathbb{Q}[\\mathtt{x}_1,\\ldots,\\mathtt{x}_n]$. If $X$ is $\\mathbb{Q}$-algebraic and of dimension $d$, then we say that $X$ is $\\mathbb{Q}$-nonsingular if, for all $a\\in X$, there exist a neighborhood $U$ of $a$ in $\\mathbb{R}^n$ and $f_1,\\ldots,f_{n-d}\\in\\mathbb{Q}[\\mathtt{x}_1,\\ldots,\\mathtt{x}_n]$ such that $\\nabla f_1(a),\\ldots,\\nabla f_{n-d}(a)$ are linearly independent and $X\\cap U=\\{x\\in U:f_1(x)=0,\\cdots,f_{n-d}(x)=0\\}$.\n  The celebrated Nash-Tognoli theorem asserts the following: if $M$ is a compact smooth manifold of dimension $d$ and $\\psi:M\\to\\mathbb{R}^{2d+1}$ is a smooth embedding, then $\\psi$ can be approximated by an arbitrarily close smooth embedding $\\phi:M\\to\\mathbb{R}^{2d+1}$ whose image $\\phi(M)$ is a nonsingular algebraic subset of $\\mathbb{R}^{2d+1}$. In this article, we prove that $\\phi$ can be chosen in such a way that $\\phi(M)$ is a $\\mathbb{Q}$-nonsingular $\\mathbb{Q}$-algebraic subset of $\\mathbb{R}^{2d+1}$. This guarantees for the first time that, up to smooth diffeomorphisms, every compact smooth manifold $M$ can be described both globally and locally by means of finitely many exact data, such as a finite system of generators of the ideal of polynomials in $\\mathbb{Q}[\\mathtt{x}_1,\\ldots,\\mathtt{x}_{2d+1}]$ vanishing on $\\phi(M)$. We extend our result to the singular setting by proving that every real algebraic set with finitely many singularities is semialgebraically homeomorphic to a $\\mathbb{Q}$-algebraic set with the same number of singularities.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2302.04142" target="_blank">The Nash-Tognoli theorem over the rationals and its version for isolated singularities</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Riccardo Ghiloni, Enrico Savi</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 12 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2302.04142" target="_blank">https://arxiv.org/abs/2302.04142</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $\mathbb{Q}$ be the field of rational numbers and let $X$ be a subset of $\mathbb{R}^n$. We say that $X$ is $\mathbb{Q}$-algebraic if it is the common zero set in $\mathbb{R}^n$ of a family of polynomials in $\mathbb{Q}[\mathtt{x}_1,\ldots,\mathtt{x}_n]$. If $X$ is $\mathbb{Q}$-algebraic and of dimension $d$, then we say that $X$ is $\mathbb{Q}$-nonsingular if, for all $a\in X$, there exist a neighborhood $U$ of $a$ in $\mathbb{R}^n$ and $f_1,\ldots,f_{n-d}\in\mathbb{Q}[\mathtt{x}_1,\ldots,\mathtt{x}_n]$ such that $\nabla f_1(a),\ldots,\nabla f_{n-d}(a)$ are linearly independent and $X\cap U=\{x\in U:f_1(x)=0,\cdots,f_{n-d}(x)=0\}$.
+  The celebrated Nash-Tognoli theorem asserts the following: if $M$ is a compact smooth manifold of dimension $d$ and $\psi:M\to\mathbb{R}^{2d+1}$ is a smooth embedding, then $\psi$ can be approximated by an arbitrarily close smooth embedding $\phi:M\to\mathbb{R}^{2d+1}$ whose image $\phi(M)$ is a nonsingular algebraic subset of $\mathbb{R}^{2d+1}$. In this article, we prove that $\phi$ can be chosen in such a way that $\phi(M)$ is a $\mathbb{Q}$-nonsingular $\mathbb{Q}$-algebraic subset of $\mathbb{R}^{2d+1}$. This guarantees for the first time that, up to smooth diffeomorphisms, every compact smooth manifold $M$ can be described both globally and locally by means of finitely many exact data, such as a finite system of generators of the ideal of polynomials in $\mathbb{Q}[\mathtt{x}_1,\ldots,\mathtt{x}_{2d+1}]$ vanishing on $\phi(M)$. We extend our result to the singular setting by proving that every real algebraic set with finitely many singularities is semialgebraically homeomorphic to a $\mathbb{Q}$-algebraic set with the same number of singularities.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "Crystalline representations and $p$-adic Hodge theory for non-commutative algebraic varieties", "author": "Keiho Matsumoto", "published": "Fri, 12 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2309.13654", "summary": "arXiv:2309.13654v3 Announce Type: replace \nAbstract: Let $\\mathcal{T}$ be an $\\mathcal{O}_K$-linear idempotent-complete, small smooth proper stable $\\infty$-category, where $K$ is a finite extension of $\\mathbb{Q}_p$. We give a Breuil-Kisin module structure on the topological negative cyclic homology $\\pi_i{\\rm TC}^-(\\mathcal{T}/\\mathbb{S}[z];\\mathbb{Z}_p)$, and prove a $K$-theory version of Bhatt-Morrow-Scholze's comparison theorems. Moreover, using Gao's Breuil-Kisin $G_K$-module theory and Du-Liu's $(\\varphi,\\hat{G})$-module theory, we prove the $\\mathbb{Z}_p[G_K]$-module $T_{A_{\\rm inf}}(\\pi_i{\\rm TC}^-(\\mathcal{T}/\\mathbb{S}[z];\\mathbb{Z}_p)^{\\vee})$ is a $\\mathbb{Z}_p$-lattice of a crystalline representation. As a corollary, if the generic fibre of $\\mathcal{T}$ admits a geometric realization in the sense of Orlov, we prove a comparison theorem between $K(1)$-local $K$ theory of the generic fibre and topological cyclic periodic homology theory of the special fibre with $B_{\\rm crys}$-coefficients, in particular, we prove the $p$-adic representation of the $K(1)$-local $K$-theory of the generic fibre is a crystalline representation, this can be regarded as a non-commutative analogue of $p$-adic Hodge theory for smooth proper varieties proved by Tsuji and Faltings. This is the full version of arXiv:2305.00292, containing additional details and results.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2309.13654" target="_blank">Crystalline representations and $p$-adic Hodge theory for non-commutative algebraic varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Keiho Matsumoto</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 12 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2309.13654" target="_blank">https://arxiv.org/abs/2309.13654</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $\mathcal{T}$ be an $\mathcal{O}_K$-linear idempotent-complete, small smooth proper stable $\infty$-category, where $K$ is a finite extension of $\mathbb{Q}_p$. We give a Breuil-Kisin module structure on the topological negative cyclic homology $\pi_i{\rm TC}^-(\mathcal{T}/\mathbb{S}[z];\mathbb{Z}_p)$, and prove a $K$-theory version of Bhatt-Morrow-Scholze's comparison theorems. Moreover, using Gao's Breuil-Kisin $G_K$-module theory and Du-Liu's $(\varphi,\hat{G})$-module theory, we prove the $\mathbb{Z}_p[G_K]$-module $T_{A_{\rm inf}}(\pi_i{\rm TC}^-(\mathcal{T}/\mathbb{S}[z];\mathbb{Z}_p)^{\vee})$ is a $\mathbb{Z}_p$-lattice of a crystalline representation. As a corollary, if the generic fibre of $\mathcal{T}$ admits a geometric realization in the sense of Orlov, we prove a comparison theorem between $K(1)$-local $K$ theory of the generic fibre and topological cyclic periodic homology theory of the special fibre with $B_{\rm crys}$-coefficients, in particular, we prove the $p$-adic representation of the $K(1)$-local $K$-theory of the generic fibre is a crystalline representation, this can be regarded as a non-commutative analogue of $p$-adic Hodge theory for smooth proper varieties proved by Tsuji and Faltings. This is the full version of arXiv:2305.00292, containing additional details and results.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "Algebraic cycles and Hitchin systems", "author": "Davesh Maulik, Junliang Shen, Qizheng Yin", "published": "Fri, 12 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2407.05177", "summary": "arXiv:2407.05177v3 Announce Type: replace \nAbstract: The purpose of this paper is to study motivic aspects of the Hitchin system for $\\mathrm{GL}_n$. Our results include the following. (a) We prove the motivic decomposition conjecture of Corti-Hanamura for the Hitchin system; in particular, the decomposition theorem associated with the Hitchin system is induced by algebraic cycles. This yields an unconditional construction of the motivic perverse filtration for the Hitchin system, which lifts the cohomological/sheaf-theoretic perverse filtration. (b) We prove that the inverse of the relative Hard Lefschetz symmetry is induced by a relative algebraic correspondence, confirming the relative Lefschetz standard conjecture for the Hitchin system. (c) We show a strong perversity bound for the normalized Chern classes of a universal bundle with respect to the motivic perverse filtration; this specializes to the sheaf-theoretic result obtained earlier by Maulik-Shen. (d) We prove a $\\chi$-independence result for the relative Chow motives associated with Hitchin systems.\n  Our methods combine Fourier transforms for compactified Jacobian fibrations associated with integral locally planar curves, nearby and vanishing cycle techniques, and a Springer-theoretic interpretation of parabolic Hitchin moduli spaces.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2407.05177" target="_blank">Algebraic cycles and Hitchin systems</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Davesh Maulik, Junliang Shen, Qizheng Yin</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 12 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2407.05177" target="_blank">https://arxiv.org/abs/2407.05177</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The purpose of this paper is to study motivic aspects of the Hitchin system for $\mathrm{GL}_n$. Our results include the following. (a) We prove the motivic decomposition conjecture of Corti-Hanamura for the Hitchin system; in particular, the decomposition theorem associated with the Hitchin system is induced by algebraic cycles. This yields an unconditional construction of the motivic perverse filtration for the Hitchin system, which lifts the cohomological/sheaf-theoretic perverse filtration. (b) We prove that the inverse of the relative Hard Lefschetz symmetry is induced by a relative algebraic correspondence, confirming the relative Lefschetz standard conjecture for the Hitchin system. (c) We show a strong perversity bound for the normalized Chern classes of a universal bundle with respect to the motivic perverse filtration; this specializes to the sheaf-theoretic result obtained earlier by Maulik-Shen. (d) We prove a $\chi$-independence result for the relative Chow motives associated with Hitchin systems.
+  Our methods combine Fourier transforms for compactified Jacobian fibrations associated with integral locally planar curves, nearby and vanishing cycle techniques, and a Springer-theoretic interpretation of parabolic Hitchin moduli spaces.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "A proof of generic Green's conjecture in odd genus", "author": "Michael Kemeny", "published": "Fri, 12 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2502.09735", "summary": "arXiv:2502.09735v4 Announce Type: replace \nAbstract: In this note, we give a new proof of Voisin's theorem on Green's conjecture for generic curves of odd genus resembling the first two sections of \"Universal Secant Bundles and Syzygies of Canonical Curves\" by the author, and so avoiding the need for difficult computations.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2502.09735" target="_blank">A proof of generic Green's conjecture in odd genus</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Michael Kemeny</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 12 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2502.09735" target="_blank">https://arxiv.org/abs/2502.09735</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this note, we give a new proof of Voisin's theorem on Green's conjecture for generic curves of odd genus resembling the first two sections of "Universal Secant Bundles and Syzygies of Canonical Curves" by the author, and so avoiding the need for difficult computations.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "On a Riemann-Roch formula for stacks with finite cyclotomic inertia", "author": "Francesco Sala", "published": "Fri, 12 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2505.12364", "summary": "arXiv:2505.12364v3 Announce Type: replace \nAbstract: B. Toen defined a Riemann-Roch map from the rational algebraic K-theory of a tame Deligne-Mumford quotient stack to the \\'etale K-theory of its inertia. He proved that this map is an isomorphism and that it is covariant with respect to proper maps. Moreover G. Vezzosi and A. Vistoli proved a decomposition theorem for the equivariant K-theory of a noetherian scheme. In this paper we give a geometric definition of the Vezzosi-Vistoli decomposition, interpreting the pieces as corresponding to the components of the cyclotomic inertia. When the map from the cyclotomic inertia to the stack is finite, we can define a Riemann-Roch map in Toen's style. We prove that this map is an isomorphism and it is covariant with respect to proper relatively tame maps; moreover in some favourable circumstances we explicitly compute its inverse map, and show that we can recover Toen's one when the stack is tame Deligne-Mumford.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2505.12364" target="_blank">On a Riemann-Roch formula for stacks with finite cyclotomic inertia</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Francesco Sala</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 12 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2505.12364" target="_blank">https://arxiv.org/abs/2505.12364</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                B. Toen defined a Riemann-Roch map from the rational algebraic K-theory of a tame Deligne-Mumford quotient stack to the \'etale K-theory of its inertia. He proved that this map is an isomorphism and that it is covariant with respect to proper maps. Moreover G. Vezzosi and A. Vistoli proved a decomposition theorem for the equivariant K-theory of a noetherian scheme. In this paper we give a geometric definition of the Vezzosi-Vistoli decomposition, interpreting the pieces as corresponding to the components of the cyclotomic inertia. When the map from the cyclotomic inertia to the stack is finite, we can define a Riemann-Roch map in Toen's style. We prove that this map is an isomorphism and it is covariant with respect to proper relatively tame maps; moreover in some favourable circumstances we explicitly compute its inverse map, and show that we can recover Toen's one when the stack is tame Deligne-Mumford.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Proof of a magnificent conjecture", "author": "M. Kool, J. V. Rennemo", "published": "Fri, 12 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2507.02852", "summary": "arXiv:2507.02852v2 Announce Type: replace \nAbstract: Motivated by super-Yang-Mills theory on a Calabi-Yau 4-fold, Nekrasov and Piazzalunga have assigned weights to $r$-tuples of solid partitions and conjectured a formula for their weighted generating function.\n  We define $K$-theoretic virtual invariants of Quot schemes of 0-dimensional quotients of $\\mathcal{O}_{\\mathbb{C}^4}^{\\oplus r}$ by realizing them as zero loci of isotropic sections of orthogonal bundles on non-commutative Quot schemes. Via the Oh-Thomas localization formula, we recover Nekrasov-Piazzalunga's weights and derive their sign rule.\n  Our proof passes through refining the $K$-theoretic invariants to sheaves and describing them via Clifford modules, which lets us show that they arise from a factorizable sequence of sheaves in the sense of Okounkov. Taking limits of the equivariant parameters, we then deduce the Nekrasov-Piazzalunga conjecture from its 3-dimensional analog.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2507.02852" target="_blank">Proof of a magnificent conjecture</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> M. Kool, J. V. Rennemo</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 12 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2507.02852" target="_blank">https://arxiv.org/abs/2507.02852</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Motivated by super-Yang-Mills theory on a Calabi-Yau 4-fold, Nekrasov and Piazzalunga have assigned weights to $r$-tuples of solid partitions and conjectured a formula for their weighted generating function.
+  We define $K$-theoretic virtual invariants of Quot schemes of 0-dimensional quotients of $\mathcal{O}_{\mathbb{C}^4}^{\oplus r}$ by realizing them as zero loci of isotropic sections of orthogonal bundles on non-commutative Quot schemes. Via the Oh-Thomas localization formula, we recover Nekrasov-Piazzalunga's weights and derive their sign rule.
+  Our proof passes through refining the $K$-theoretic invariants to sheaves and describing them via Clifford modules, which lets us show that they arise from a factorizable sequence of sheaves in the sense of Okounkov. Taking limits of the equivariant parameters, we then deduce the Nekrasov-Piazzalunga conjecture from its 3-dimensional analog.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "A Nakayama result for the quantum K theory of homogeneous spaces", "author": "Wei Gu, Leonardo C. Mihalcea, Eric Sharpe, Weihong Xu, Hao Zhang, Hao Zou", "published": "Fri, 12 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2507.15183", "summary": "arXiv:2507.15183v2 Announce Type: replace \nAbstract: We prove that the ideal of relations in the (equivariant) quantum K ring of a homogeneous space is generated by quantizations of each of the generators of the ideal in the classical (equivariant) K ring. This extends to quantum K theory a result of Siebert and Tian in quantum cohomology. We illustrate this technique in the case of the quantum K ring of partial flag manifolds, using a set of quantum K Whitney relations conjectured by the authors, and recently proved by Huq-Kuruvilla.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2507.15183" target="_blank">A Nakayama result for the quantum K theory of homogeneous spaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Wei Gu, Leonardo C. Mihalcea, Eric Sharpe, Weihong Xu, Hao Zhang, Hao Zou</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 12 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2507.15183" target="_blank">https://arxiv.org/abs/2507.15183</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove that the ideal of relations in the (equivariant) quantum K ring of a homogeneous space is generated by quantizations of each of the generators of the ideal in the classical (equivariant) K ring. This extends to quantum K theory a result of Siebert and Tian in quantum cohomology. We illustrate this technique in the case of the quantum K ring of partial flag manifolds, using a set of quantum K Whitney relations conjectured by the authors, and recently proved by Huq-Kuruvilla.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "Quotients of flag varieties and their birational geometry", "author": "Lorenzo Barban, Gianluca Occhetta, Luis E. Sol\\'a Conde", "published": "Fri, 12 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2509.05063", "summary": "arXiv:2509.05063v2 Announce Type: replace \nAbstract: We compute the Chow quotient of the complete flag variety of subspaces of a four dimensional complex vector space, show that it is smooth and a Mori Dream Space, and describe in detail its birational geometry.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2509.05063" target="_blank">Quotients of flag varieties and their birational geometry</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Lorenzo Barban, Gianluca Occhetta, Luis E. Sol\'a Conde</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 12 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2509.05063" target="_blank">https://arxiv.org/abs/2509.05063</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We compute the Chow quotient of the complete flag variety of subspaces of a four dimensional complex vector space, show that it is smooth and a Mori Dream Space, and describe in detail its birational geometry.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "The BPS decomposition theorem", "author": "Lucien Hennecart, Tasuki Kinjo", "published": "Fri, 12 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2509.21298", "summary": "arXiv:2509.21298v3 Announce Type: replace \nAbstract: We prove the BPS decomposition theorem (a.k.a. cohomological integrality theorem) decomposing the cohomology of smooth symmetric stacks into the Weyl-invariant part of the cohomological Hall induction of the intersection cohomology of good moduli spaces. As a consequence, we establish the BPS decomposition theorem for the Borel--Moore homology of $0$-shifted symplectic stacks and for the critical cohomology of symmetric $(-1)$-shifted symplectic stacks, thereby generalizing the main result of Bu--Davison--Ib\\'a\\~nez Nu\\~nez--Kinjo--P\\u{a}durariu to the non-orthogonal setting.\n  We will present three applications of our main result. First, we confirm Halpern-Leistner's conjecture on the purity of the Borel--Moore homology of $0$-shifted symplectic stacks admitting proper good moduli spaces, extending Davison's work on the moduli stack of objects in $2$-Calabi--Yau categories. Second, we prove versions of Kirwan surjectivity for the critical cohomology of symmetric $(-1)$-shifted symplectic stacks and for the Borel--Moore homology of $0$-shifted symplectic stacks. Finally, by applying our main result to the character stacks associated with compact oriented $3$-manifolds, we reduce the quantum geometric Langlands duality conjecture for $3$-manifolds, as formulated by Safronov, from an isomorphism between infinite-dimensional critical cohomologies to a comparison of finite-dimensional BPS cohomologies.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2509.21298" target="_blank">The BPS decomposition theorem</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Lucien Hennecart, Tasuki Kinjo</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 12 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2509.21298" target="_blank">https://arxiv.org/abs/2509.21298</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove the BPS decomposition theorem (a.k.a. cohomological integrality theorem) decomposing the cohomology of smooth symmetric stacks into the Weyl-invariant part of the cohomological Hall induction of the intersection cohomology of good moduli spaces. As a consequence, we establish the BPS decomposition theorem for the Borel--Moore homology of $0$-shifted symplectic stacks and for the critical cohomology of symmetric $(-1)$-shifted symplectic stacks, thereby generalizing the main result of Bu--Davison--Ib\'a\~nez Nu\~nez--Kinjo--P\u{a}durariu to the non-orthogonal setting.
+  We will present three applications of our main result. First, we confirm Halpern-Leistner's conjecture on the purity of the Borel--Moore homology of $0$-shifted symplectic stacks admitting proper good moduli spaces, extending Davison's work on the moduli stack of objects in $2$-Calabi--Yau categories. Second, we prove versions of Kirwan surjectivity for the critical cohomology of symmetric $(-1)$-shifted symplectic stacks and for the Borel--Moore homology of $0$-shifted symplectic stacks. Finally, by applying our main result to the character stacks associated with compact oriented $3$-manifolds, we reduce the quantum geometric Langlands duality conjecture for $3$-manifolds, as formulated by Safronov, from an isomorphism between infinite-dimensional critical cohomologies to a comparison of finite-dimensional BPS cohomologies.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Motivic DT/PT Correspondence", "author": "Chih-Huan Chang", "published": "Fri, 12 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.22213", "summary": "arXiv:2511.22213v2 Announce Type: replace \nAbstract: We prove a motivic version of the Donaldson--Thomas/Pandharipande--Thomas (DT/PT) correspondence on Calabi--Yau threefolds. The proof combines Toda's wall crossing framework and the motivic integral identity recently proved by Bu. This provides a refinement of the numerical DT/PT correspondence.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2511.22213" target="_blank">Motivic DT/PT Correspondence</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Chih-Huan Chang</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 12 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.22213" target="_blank">https://arxiv.org/abs/2511.22213</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove a motivic version of the Donaldson--Thomas/Pandharipande--Thomas (DT/PT) correspondence on Calabi--Yau threefolds. The proof combines Toda's wall crossing framework and the motivic integral identity recently proved by Bu. This provides a refinement of the numerical DT/PT correspondence.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "Minimal model program on the generic fiber of log Calabi-Yau type fibration", "author": "Donghyeon Kim, Dae-Won Lee", "published": "Fri, 12 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.02429", "summary": "arXiv:2512.02429v2 Announce Type: replace \nAbstract: We study the minimal model program on the geometric generic fiber of a fibration $f:X\\to S$ such that for a Zariski dense subset $S'\\subseteq S$, $X_s$ is an $\\varepsilon$-lc log Calabi--Yau type for every $s\\in S'$. We prove that for a fibration $f:X\\to S$ of varieties, if the fibers are of $\\varepsilon$-lc log Calabi--Yau type, then the geometric generic fiber $X_{\\overline{\\eta}}$ is pklt. In particular, for any big divisor $D$ on $X_{\\overline{\\eta}}$, we can run the anticanonical MMP and $D$-MMP with scaling of an ample divisor on $X_{\\overline{\\eta}}$.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2512.02429" target="_blank">Minimal model program on the generic fiber of log Calabi-Yau type fibration</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Donghyeon Kim, Dae-Won Lee</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 12 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.02429" target="_blank">https://arxiv.org/abs/2512.02429</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the minimal model program on the geometric generic fiber of a fibration $f:X\to S$ such that for a Zariski dense subset $S'\subseteq S$, $X_s$ is an $\varepsilon$-lc log Calabi--Yau type for every $s\in S'$. We prove that for a fibration $f:X\to S$ of varieties, if the fibers are of $\varepsilon$-lc log Calabi--Yau type, then the geometric generic fiber $X_{\overline{\eta}}$ is pklt. In particular, for any big divisor $D$ on $X_{\overline{\eta}}$, we can run the anticanonical MMP and $D$-MMP with scaling of an ample divisor on $X_{\overline{\eta}}$.
+            </div>
+        </div>
+        <div class="paper" id="paper-21">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-21" data-paper-data='{"title": "Flexibility of affine spherical varieties", "author": "Anton Shafarevich", "published": "Fri, 12 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.07031", "summary": "arXiv:2512.07031v2 Announce Type: replace \nAbstract: We prove that the automorphism group $\\mathrm{Aut}(X)$ of an affine spherical variety $X$ acts transitively on the set of smooth points $X^{reg}.$ If every invertible regular function on $X$ is constant, we prove that $X$ is flexible, i.e., the subgroup of $\\mathrm{Aut}(X)$ generated by all $\\mathbb{G}_a$-subgroups acts transitively on $X^{reg}.$", "number": 21, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#21</span>
+                <a href="https://arxiv.org/abs/2512.07031" target="_blank">Flexibility of affine spherical varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Anton Shafarevich</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 12 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.07031" target="_blank">https://arxiv.org/abs/2512.07031</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove that the automorphism group $\mathrm{Aut}(X)$ of an affine spherical variety $X$ acts transitively on the set of smooth points $X^{reg}.$ If every invertible regular function on $X$ is constant, we prove that $X$ is flexible, i.e., the subgroup of $\mathrm{Aut}(X)$ generated by all $\mathbb{G}_a$-subgroups acts transitively on $X^{reg}.$
+            </div>
+        </div>
+        <div class="paper" id="paper-22">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-22" data-paper-data='{"title": "The de Jong fundamental group of $\\mathbb{P}^1_C$ depends on $C$ and is not always topologically countably generated", "author": "Sean Howe", "published": "Fri, 12 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.09651", "summary": "arXiv:2512.09651v2 Announce Type: replace \nAbstract: For $C/\\mathbb{Q}_p$ a complete algebraically closed field, we construct a collection of non-isomorphic rank two $\\mathbb{Q}_p$-local systems on $\\mathbb{P}^1_C$ indexed by $C$. This implies that the de Jong fundamental group $\\pi_{1,\\mathrm{dJ}}(\\mathbb{P}^1_C)$ depends on $C$ and, if $C$ has cardinality $&gt;2^{\\mathbb{N}}$, that $\\pi_{1,\\mathrm{dJ}}(\\mathbb{P}^1_C)$ is not topologically countably generated. The argument in fact applies to any connected rigid analytic variety over $C$ with a non-constant function to $\\mathbb{P}^1_C$.", "number": 22, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#22</span>
+                <a href="https://arxiv.org/abs/2512.09651" target="_blank">The de Jong fundamental group of $\mathbb{P}^1_C$ depends on $C$ and is not always topologically countably generated</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sean Howe</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 12 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.09651" target="_blank">https://arxiv.org/abs/2512.09651</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                For $C/\mathbb{Q}_p$ a complete algebraically closed field, we construct a collection of non-isomorphic rank two $\mathbb{Q}_p$-local systems on $\mathbb{P}^1_C$ indexed by $C$. This implies that the de Jong fundamental group $\pi_{1,\mathrm{dJ}}(\mathbb{P}^1_C)$ depends on $C$ and, if $C$ has cardinality $&gt;2^{\mathbb{N}}$, that $\pi_{1,\mathrm{dJ}}(\mathbb{P}^1_C)$ is not topologically countably generated. The argument in fact applies to any connected rigid analytic variety over $C$ with a non-constant function to $\mathbb{P}^1_C$.
+            </div>
+        </div>
+        <div class="paper" id="paper-23">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-23" data-paper-data='{"title": "The de Jong fundamental group of a non-trivial abelian variety is non-abelian", "author": "Sean Howe", "published": "Fri, 12 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.09661", "summary": "arXiv:2512.09661v2 Announce Type: replace \nAbstract: We show the de Jong fundamental group of any non-trivial abelian variety over a complete algebraically closed extension $C/\\mathbb{Q}_p$ is non-abelian. Generalizing an argument for $\\mathbb{P}^1_C$, we also show the de Jong fundamental groups of positive-dimensional quasi-projective rigid analytic varieties over $C$ (including abelian varieties) depend on $C$ and can be arbitrarily large.", "number": 23, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#23</span>
+                <a href="https://arxiv.org/abs/2512.09661" target="_blank">The de Jong fundamental group of a non-trivial abelian variety is non-abelian</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sean Howe</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 12 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.09661" target="_blank">https://arxiv.org/abs/2512.09661</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We show the de Jong fundamental group of any non-trivial abelian variety over a complete algebraically closed extension $C/\mathbb{Q}_p$ is non-abelian. Generalizing an argument for $\mathbb{P}^1_C$, we also show the de Jong fundamental groups of positive-dimensional quasi-projective rigid analytic varieties over $C$ (including abelian varieties) depend on $C$ and can be arbitrarily large.
+            </div>
+        </div>
+        <div class="paper" id="paper-24">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-24" data-paper-data='{"title": "Reflexive dg categories in algebra and topology", "author": "Matt Booth, Isambard Goodbody, Sebastian Opper", "published": "Fri, 12 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2506.11213", "summary": "arXiv:2506.11213v2 Announce Type: replace-cross \nAbstract: Reflexive dg categories were introduced by Kuznetsov and Shinder to abstract the duality between bounded and perfect derived categories. In particular this duality relates their Hochschild cohomologies, autoequivalence groups, and semiorthogonal decompositions. We establish reflexivity in a variety of settings including affine schemes, simple-minded collections, chain and cochain dg algebras of topological spaces, Ginzburg dg algebras, and Fukaya categories of cotangent bundles and surfaces as well as the closely related class of graded gentle algebras. Our proofs are based on the interplay of reflexivity with gluings, derived completions, and Koszul duality. In particular we show that for certain (co)connective dg algebras, reflexivity is equivalent to derived completeness.", "number": 24, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#24</span>
+                <a href="https://arxiv.org/abs/2506.11213" target="_blank">Reflexive dg categories in algebra and topology</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Matt Booth, Isambard Goodbody, Sebastian Opper</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 12 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2506.11213" target="_blank">https://arxiv.org/abs/2506.11213</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Reflexive dg categories were introduced by Kuznetsov and Shinder to abstract the duality between bounded and perfect derived categories. In particular this duality relates their Hochschild cohomologies, autoequivalence groups, and semiorthogonal decompositions. We establish reflexivity in a variety of settings including affine schemes, simple-minded collections, chain and cochain dg algebras of topological spaces, Ginzburg dg algebras, and Fukaya categories of cotangent bundles and surfaces as well as the closely related class of graded gentle algebras. Our proofs are based on the interplay of reflexivity with gluings, derived completions, and Koszul duality. In particular we show that for certain (co)connective dg algebras, reflexivity is equivalent to derived completeness.
+            </div>
+        </div>
+        <div class="paper" id="paper-25">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-25" data-paper-data='{"title": "The Beilinson-Bloch conjecture for some non-isotrivial varieties over global function fields", "author": "Matt Broe", "published": "Fri, 12 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2509.03602", "summary": "arXiv:2509.03602v2 Announce Type: replace-cross \nAbstract: The Beilinson-Bloch conjecture is a generalization of the Birch and Swinnerton-Dyer conjecture, which relates the ranks of Chow groups of smooth projective varieties over global fields to the order of vanishing of $L$-functions. We prove the conjecture for certain classes of non-isotrivial varieties over $\\mathbb{F}_q(t)$, including some cubic threefolds. We deduce the Birch and Swinnerton-Dyer conjecture for their intermediate Jacobians, and use it to establish new cases of the Tate conjecture over finite fields. We also prove some additional results on the arithmetic of these intermediate Jacobians.", "number": 25, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#25</span>
+                <a href="https://arxiv.org/abs/2509.03602" target="_blank">The Beilinson-Bloch conjecture for some non-isotrivial varieties over global function fields</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Matt Broe</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 12 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2509.03602" target="_blank">https://arxiv.org/abs/2509.03602</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The Beilinson-Bloch conjecture is a generalization of the Birch and Swinnerton-Dyer conjecture, which relates the ranks of Chow groups of smooth projective varieties over global fields to the order of vanishing of $L$-functions. We prove the conjecture for certain classes of non-isotrivial varieties over $\mathbb{F}_q(t)$, including some cubic threefolds. We deduce the Birch and Swinnerton-Dyer conjecture for their intermediate Jacobians, and use it to establish new cases of the Tate conjecture over finite fields. We also prove some additional results on the arithmetic of these intermediate Jacobians.
+            </div>
+        </div>
+        <div class="paper" id="paper-26">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-26" data-paper-data='{"title": "Wild genus-zero quantum de Rham spaces", "author": "Matthew Chaffe, Gabriele Rembado, Daisuke Yamakawa", "published": "Fri, 12 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2510.17666", "summary": "arXiv:2510.17666v3 Announce Type: replace-cross \nAbstract: The wild de Rham spaces parameterize isomorphism classes of (stable) meromorphic connections, defined on principal bundles over wild Riemann surfaces. Working on the Riemann sphere, we will deformation-quantize the standard open part of de Rham spaces, which corresponds to the moduli of linear partial differential equations with meromorphic coefficients. We treat the general (typically nongeneric) untwisted/unramified case with semisimple formal residue, for any polar divisor and reductive structure group, without using parabolic/parahoric structures on the trivial bundle. The main ingredients are: (i) constructing the quantum Hamiltonian reduction of a (tensor) product of quantized coadjoint orbits in dual truncated-current Lie algebras, involving the corresponding category-O Verma modules; and (ii) establishing sufficient conditions on the coadjoint orbits, so that generically all meromorphic connections are stable, and the (semiclassical) moment map for the gauge-group action is faithfully flat.", "number": 26, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#26</span>
+                <a href="https://arxiv.org/abs/2510.17666" target="_blank">Wild genus-zero quantum de Rham spaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Matthew Chaffe, Gabriele Rembado, Daisuke Yamakawa</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 12 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.17666" target="_blank">https://arxiv.org/abs/2510.17666</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The wild de Rham spaces parameterize isomorphism classes of (stable) meromorphic connections, defined on principal bundles over wild Riemann surfaces. Working on the Riemann sphere, we will deformation-quantize the standard open part of de Rham spaces, which corresponds to the moduli of linear partial differential equations with meromorphic coefficients. We treat the general (typically nongeneric) untwisted/unramified case with semisimple formal residue, for any polar divisor and reductive structure group, without using parabolic/parahoric structures on the trivial bundle. The main ingredients are: (i) constructing the quantum Hamiltonian reduction of a (tensor) product of quantized coadjoint orbits in dual truncated-current Lie algebras, involving the corresponding category-O Verma modules; and (ii) establishing sufficient conditions on the coadjoint orbits, so that generically all meromorphic connections are stable, and the (semiclassical) moment map for the gauge-group action is faithfully flat.
+            </div>
+        </div>
+        <div class="paper" id="paper-27">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-27" data-paper-data='{"title": "An effective van der Corput-type method in higher dimensions", "author": "Shaozhen Xu", "published": "Fri, 12 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.19922", "summary": "arXiv:2511.19922v2 Announce Type: replace-cross \nAbstract: Using the birational map between a smooth toric variety (adapted to the phase function of the oscillatory integral) and $\\mathbb{R}^n\\textbackslash\\{0\\}$, we can effectively carry out the van der Corput-type analysis in higher dimensions. This allows us to give an elegant derivation of the leading term in Varchenko's asymptotic expansion \\cite{Var76}. We expect that this observation may have further applications to other problems involving oscillatory integrals.", "number": 27, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#27</span>
+                <a href="https://arxiv.org/abs/2511.19922" target="_blank">An effective van der Corput-type method in higher dimensions</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Shaozhen Xu</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 12 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.19922" target="_blank">https://arxiv.org/abs/2511.19922</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Using the birational map between a smooth toric variety (adapted to the phase function of the oscillatory integral) and $\mathbb{R}^n\textbackslash\{0\}$, we can effectively carry out the van der Corput-type analysis in higher dimensions. This allows us to give an elegant derivation of the leading term in Varchenko's asymptotic expansion \cite{Var76}. We expect that this observation may have further applications to other problems involving oscillatory integrals.
+            </div>
+        </div>
+        <div class="paper" id="paper-28">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-28" data-paper-data='{"title": "$\\mathcal{M}$-points of bounded height", "author": "Boaz Moerman", "published": "Fri, 12 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.07654", "summary": "arXiv:2512.07654v2 Announce Type: replace-cross \nAbstract: We initiate a general quantitative study of sets of $\\mathcal{M}$-points, which are special subsets of rational points, generalizing Campana points, Darmon points, and squarefree solutions of Diophantine equations. We propose an asymptotic formula for the number of $\\mathcal{M}$-points of bounded height on rationally connected varieties, extending Manin's conjecture as well as its generalization to Campana points by Pieropan, Smeets, Tanimoto and V\\'arilly-Alvarado. Finally, we show that the conjecture explains several previously established results in arithmetic statistics.", "number": 28, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#28</span>
+                <a href="https://arxiv.org/abs/2512.07654" target="_blank">$\mathcal{M}$-points of bounded height</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Boaz Moerman</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 12 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.07654" target="_blank">https://arxiv.org/abs/2512.07654</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We initiate a general quantitative study of sets of $\mathcal{M}$-points, which are special subsets of rational points, generalizing Campana points, Darmon points, and squarefree solutions of Diophantine equations. We propose an asymptotic formula for the number of $\mathcal{M}$-points of bounded height on rationally connected varieties, extending Manin's conjecture as well as its generalization to Campana points by Pieropan, Smeets, Tanimoto and V\'arilly-Alvarado. Finally, we show that the conjecture explains several previously established results in arithmetic statistics.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2025-12-12 18:00:04
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>

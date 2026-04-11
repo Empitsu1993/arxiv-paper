@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - cs.CR updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>cs.CR updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Mon, 08 Dec 2025 05:00:13 +0000<br>
+        <strong>論文数:</strong> 21件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Beyond Detection: A Comprehensive Benchmark and Study on Representation Learning for Fine-Grained Webshell Family Classification</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">A Practical Honeypot-Based Threat Intelligence Framework for Cyber Defence in the Cloud</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Please Don't Kill My Vibe: Empowering Agents with Data Flow Control</a>
+            <span class="title-label-badge" style="background-color: #e74c3c;">agent</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">PrivCode: When Code Generation Meets Differential Privacy</a>
+            <span class="title-label-badge" style="background-color: #ff69b4;">privacy</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">TeleAI-Safety: A comprehensive LLM jailbreaking benchmark towards attacks, defenses, and evaluations</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">Matching Ranks Over Probability Yields Truly Deep Safety Alignment</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Evaluating Concept Filtering Defenses against Child Sexual Abuse Material Generation by Text-to-Image Models</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">ARGUS: Defending Against Multimodal Indirect Prompt Injection via Steering Instruction-Following Behavior</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">Trusted AI Agents in the Cloud</a>
+            <span class="title-label-badge" style="background-color: #e74c3c;">agent</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">When Ads Become Profiles: Uncovering the Invisible Risk of Web Advertising at Scale with LLMs</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">Combined Quantum and Post-Quantum Security Performance Under Finite Keys</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">Edge-Only Universal Adversarial Attacks in Distributed Learning</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">Analyzing PDFs like Binaries: Adversarially Robust PDF Malware Analysis via Intermediate Representation and Language Model</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Yours or Mine? Overwriting Attacks Against Neural Audio Watermarking</a>
+            <span class="title-label-badge" style="background-color: #27ae60;">intellectual property</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Finding Phones Fast: Low-Latency and Scalable Monitoring of Cellular Communications in Sensitive Areas</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">Concept-Guided Backdoor Attack on Vision Language Models</a>
+            <span class="title-label-badge" style="background-color: #3498db;">backdoor</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">Towards practical secure delegated quantum computing with semi-classical light</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">IF-GUIDE: Influence Function-Guided Detoxification of LLMs</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Self-Supervised Learning of Graph Representations for Network Intrusion Detection</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">Towards a Generalisable Cyber Defence Agent for Real-World Computer Networks</a>
+            <span class="title-label-badge" style="background-color: #e74c3c;">agent</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-21" onchange="updateSelectedCount()">
+            <span class="title-number">21.</span>
+            <a href="#paper-21">Observational Auditing of Label Privacy</a>
+            <span class="title-label-badge" style="background-color: #ff69b4;">privacy</span>
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Beyond Detection: A Comprehensive Benchmark and Study on Representation Learning for Fine-Grained Webshell Family Classification", "author": "Feijiang Han", "published": "Mon, 08 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.05288", "summary": "arXiv:2512.05288v1 Announce Type: new \nAbstract: Malicious WebShells pose a significant and evolving threat by compromising critical digital infrastructures and endangering public services in sectors such as healthcare and finance. While the research community has made significant progress in WebShell detection (i.e., distinguishing malicious samples from benign ones), we argue that it is time to transition from passive detection to in-depth analysis and proactive defense. One promising direction is the automation of WebShell family classification, which involves identifying the specific malware lineage in order to understand an adversary's tactics and enable a precise, rapid response. This crucial task, however, remains a largely unexplored area that currently relies on slow, manual expert analysis. To address this gap, we present the first systematic study to automate WebShell family classification. Our method begins with extracting dynamic function call traces to capture inherent behaviors that are resistant to common encryption and obfuscation. To enhance the scale and diversity of our dataset for a more stable evaluation, we augment these real-world traces with new variants synthesized by Large Language Models. These augmented traces are then abstracted into sequences, graphs, and trees, providing a foundation to benchmark a comprehensive suite of representation methods. Our evaluation spans classic sequence-based embeddings (CBOW, GloVe), transformers (BERT, SimCSE), and a range of structure-aware algorithms, including Graph Kernels, Graph Edit Distance, Graph2Vec, and various Graph Neural Networks. Through extensive experiments on four real-world, family-annotated datasets under both supervised and unsupervised settings, we establish a robust baseline and provide practical insights into the most effective combinations of data abstractions, representation models, and learning paradigms for this challenge.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2512.05288" target="_blank">Beyond Detection: A Comprehensive Benchmark and Study on Representation Learning for Fine-Grained Webshell Family Classification</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Feijiang Han</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 08 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.05288" target="_blank">https://arxiv.org/abs/2512.05288</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Malicious WebShells pose a significant and evolving threat by compromising critical digital infrastructures and endangering public services in sectors such as healthcare and finance. While the research community has made significant progress in WebShell detection (i.e., distinguishing malicious samples from benign ones), we argue that it is time to transition from passive detection to in-depth analysis and proactive defense. One promising direction is the automation of WebShell family classification, which involves identifying the specific malware lineage in order to understand an adversary's tactics and enable a precise, rapid response. This crucial task, however, remains a largely unexplored area that currently relies on slow, manual expert analysis. To address this gap, we present the first systematic study to automate WebShell family classification. Our method begins with extracting dynamic function call traces to capture inherent behaviors that are resistant to common encryption and obfuscation. To enhance the scale and diversity of our dataset for a more stable evaluation, we augment these real-world traces with new variants synthesized by Large Language Models. These augmented traces are then abstracted into sequences, graphs, and trees, providing a foundation to benchmark a comprehensive suite of representation methods. Our evaluation spans classic sequence-based embeddings (CBOW, GloVe), transformers (BERT, SimCSE), and a range of structure-aware algorithms, including Graph Kernels, Graph Edit Distance, Graph2Vec, and various Graph Neural Networks. Through extensive experiments on four real-world, family-annotated datasets under both supervised and unsupervised settings, we establish a robust baseline and provide practical insights into the most effective combinations of data abstractions, representation models, and learning paradigms for this challenge.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "A Practical Honeypot-Based Threat Intelligence Framework for Cyber Defence in the Cloud", "author": "Darren Malvern Chin, Bilal Isfaq, Simon Yusuf Enoch", "published": "Mon, 08 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.05321", "summary": "arXiv:2512.05321v1 Announce Type: new \nAbstract: In cloud environments, conventional firewalls rely on predefined rules and manual configurations, limiting their ability to respond effectively to evolving or zero-day threats. As organizations increasingly adopt platforms such as Microsoft Azure, this static defense model exposes cloud assets to zero-day exploits, botnets, and advanced persistent threats. In this paper, we introduce an automated defense framework that leverages medium- to high-interaction honeypot telemetry to dynamically update firewall rules in real time. The framework integrates deception sensors (Cowrie), Azure-native automation tools (Monitor, Sentinel, Logic Apps), and MITRE ATT&amp;amp;CK-aligned detection within a closed-loop feedback mechanism. We developed a testbed to automatically observe adversary tactics, classify them using the MITRE ATT&amp;amp;CK framework, and mitigate network-level threats automatically with minimal human intervention.\n  To assess the framework's effectiveness, we defined and applied a set of attack- and defense-oriented security metrics. Building on existing adaptive defense strategies, our solution extends automated capabilities into cloud-native environments. The experimental results show an average Mean Time to Block of 0.86 seconds - significantly faster than benchmark systems - while accurately classifying over 12,000 SSH attempts across multiple MITRE ATT&amp;amp;CK tactics. These findings demonstrate that integrating deception telemetry with Azure-native automation reduces attacker dwell time, enhances SOC visibility, and provides a scalable, actionable defense model for modern cloud infrastructures.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2512.05321" target="_blank">A Practical Honeypot-Based Threat Intelligence Framework for Cyber Defence in the Cloud</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Darren Malvern Chin, Bilal Isfaq, Simon Yusuf Enoch</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 08 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.05321" target="_blank">https://arxiv.org/abs/2512.05321</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In cloud environments, conventional firewalls rely on predefined rules and manual configurations, limiting their ability to respond effectively to evolving or zero-day threats. As organizations increasingly adopt platforms such as Microsoft Azure, this static defense model exposes cloud assets to zero-day exploits, botnets, and advanced persistent threats. In this paper, we introduce an automated defense framework that leverages medium- to high-interaction honeypot telemetry to dynamically update firewall rules in real time. The framework integrates deception sensors (Cowrie), Azure-native automation tools (Monitor, Sentinel, Logic Apps), and MITRE ATT&amp;amp;CK-aligned detection within a closed-loop feedback mechanism. We developed a testbed to automatically observe adversary tactics, classify them using the MITRE ATT&amp;amp;CK framework, and mitigate network-level threats automatically with minimal human intervention.
+  To assess the framework's effectiveness, we defined and applied a set of attack- and defense-oriented security metrics. Building on existing adaptive defense strategies, our solution extends automated capabilities into cloud-native environments. The experimental results show an average Mean Time to Block of 0.86 seconds - significantly faster than benchmark systems - while accurately classifying over 12,000 SSH attempts across multiple MITRE ATT&amp;amp;CK tactics. These findings demonstrate that integrating deception telemetry with Azure-native automation reduces attacker dwell time, enhances SOC visibility, and provides a scalable, actionable defense model for modern cloud infrastructures.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Please Don't Kill My Vibe: Empowering Agents with Data Flow Control", "author": "Charlie Summers, Haneen Mohammed, Eugene Wu", "published": "Mon, 08 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.05374", "summary": "arXiv:2512.05374v1 Announce Type: new \nAbstract: The promise of Large Language Model (LLM) agents is to perform complex, stateful tasks. This promise is stunted by significant risks - policy violations, process corruption, and security flaws - that stem from the lack of visibility and mechanisms to manage undesirable data flows produced by agent actions. Today, agent workflows are responsible for enforcing these policies in ad hoc ways. Just as data validation and access controls shifted from the application to the DBMS, freeing application developers from these concerns, we argue that systems should support Data Flow Controls (DFCs) and enforce DFC policies natively. This paper describes early work developing a portable instance of DFC for DBMSes and outlines a broader research agenda toward DFC for agent ecosystems.", "number": 3, "labels": [{"name": "agent", "color": "#e74c3c"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2512.05374" target="_blank">Please Don't Kill My Vibe: Empowering Agents with Data Flow Control</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #e74c3c;">agent</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Charlie Summers, Haneen Mohammed, Eugene Wu</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 08 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.05374" target="_blank">https://arxiv.org/abs/2512.05374</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The promise of Large Language Model (LLM) agents is to perform complex, stateful tasks. This promise is stunted by significant risks - policy violations, process corruption, and security flaws - that stem from the lack of visibility and mechanisms to manage undesirable data flows produced by agent actions. Today, agent workflows are responsible for enforcing these policies in ad hoc ways. Just as data validation and access controls shifted from the application to the DBMS, freeing application developers from these concerns, we argue that systems should support Data Flow Controls (DFCs) and enforce DFC policies natively. This paper describes early work developing a portable instance of DFC for DBMSes and outlines a broader research agenda toward DFC for agent ecosystems.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "PrivCode: When Code Generation Meets Differential Privacy", "author": "Zheng Liu, Chen Gong, Terry Yue Zhuo, Kecen Li, Weichen Yu, Matt Fredrikson, Tianhao Wang", "published": "Mon, 08 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.05459", "summary": "arXiv:2512.05459v1 Announce Type: new \nAbstract: Large language models (LLMs) have presented outstanding performance in code generation and completion. However, fine-tuning these models on private datasets can raise privacy and proprietary concerns, such as the leakage of sensitive personal information. Differentially private (DP) code generation provides theoretical guarantees for protecting sensitive code by generating synthetic datasets that preserve statistical properties while reducing privacy leakage concerns. However, DP code generation faces significant challenges due to the strict syntactic dependencies and the privacy-utility trade-off.\n  We propose PrivCode, the first DP synthesizer specifically designed for code datasets. It incorporates a two-stage framework to improve both privacy and utility. In the first stage, termed \"privacy-sanitizing\", PrivCode generates DP-compliant synthetic code by training models using DP-SGD while introducing syntactic information to preserve code structure. The second stage, termed \"utility-boosting\", fine-tunes a larger pre-trained LLM on the synthetic privacy-free code to mitigate the utility loss caused by DP, enhancing the utility of the generated code. Extensive experiments on four LLMs show that PrivCode generates higher-utility code across various testing tasks under four benchmarks. The experiments also confirm its ability to protect sensitive data under varying privacy budgets. We provide the replication package at the anonymous link.", "number": 4, "labels": [{"name": "privacy", "color": "#ff69b4"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2512.05459" target="_blank">PrivCode: When Code Generation Meets Differential Privacy</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #ff69b4;">privacy</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Zheng Liu, Chen Gong, Terry Yue Zhuo, Kecen Li, Weichen Yu, Matt Fredrikson, Tianhao Wang</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 08 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.05459" target="_blank">https://arxiv.org/abs/2512.05459</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Large language models (LLMs) have presented outstanding performance in code generation and completion. However, fine-tuning these models on private datasets can raise privacy and proprietary concerns, such as the leakage of sensitive personal information. Differentially private (DP) code generation provides theoretical guarantees for protecting sensitive code by generating synthetic datasets that preserve statistical properties while reducing privacy leakage concerns. However, DP code generation faces significant challenges due to the strict syntactic dependencies and the privacy-utility trade-off.
+  We propose PrivCode, the first DP synthesizer specifically designed for code datasets. It incorporates a two-stage framework to improve both privacy and utility. In the first stage, termed "privacy-sanitizing", PrivCode generates DP-compliant synthetic code by training models using DP-SGD while introducing syntactic information to preserve code structure. The second stage, termed "utility-boosting", fine-tunes a larger pre-trained LLM on the synthetic privacy-free code to mitigate the utility loss caused by DP, enhancing the utility of the generated code. Extensive experiments on four LLMs show that PrivCode generates higher-utility code across various testing tasks under four benchmarks. The experiments also confirm its ability to protect sensitive data under varying privacy budgets. We provide the replication package at the anonymous link.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "TeleAI-Safety: A comprehensive LLM jailbreaking benchmark towards attacks, defenses, and evaluations", "author": "Xiuyuan Chen, Jian Zhao, Yuxiang He, Yuan Xun, Xinwei Liu, Yanshu Li, Huilin Zhou, Wei Cai, Ziyan Shi, Yuchen Yuan, Tianle Zhang, Chi Zhang, Xuelong Li", "published": "Mon, 08 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.05485", "summary": "arXiv:2512.05485v1 Announce Type: new \nAbstract: While the deployment of large language models (LLMs) in high-value industries continues to expand, the systematic assessment of their safety against jailbreak and prompt-based attacks remains insufficient. Existing safety evaluation benchmarks and frameworks are often limited by an imbalanced integration of core components (attack, defense, and evaluation methods) and an isolation between flexible evaluation frameworks and standardized benchmarking capabilities. These limitations hinder reliable cross-study comparisons and create unnecessary overhead for comprehensive risk assessment. To address these gaps, we present TeleAI-Safety, a modular and reproducible framework coupled with a systematic benchmark for rigorous LLM safety evaluation. Our framework integrates a broad collection of 19 attack methods (including one self-developed method), 29 defense methods, and 19 evaluation methods (including one self-developed method). With a curated attack corpus of 342 samples spanning 12 distinct risk categories, the TeleAI-Safety benchmark conducts extensive evaluations across 14 target models. The results reveal systematic vulnerabilities and model-specific failure cases, highlighting critical trade-offs between safety and utility, and identifying potential defense patterns for future optimization. In practical scenarios, TeleAI-Safety can be flexibly adjusted with customized attack, defense, and evaluation combinations to meet specific demands. We release our complete code and evaluation results to facilitate reproducible research and establish unified safety baselines.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2512.05485" target="_blank">TeleAI-Safety: A comprehensive LLM jailbreaking benchmark towards attacks, defenses, and evaluations</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Xiuyuan Chen, Jian Zhao, Yuxiang He, Yuan Xun, Xinwei Liu, Yanshu Li, Huilin Zhou, Wei Cai, Ziyan Shi, Yuchen Yuan, Tianle Zhang, Chi Zhang, Xuelong Li</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 08 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.05485" target="_blank">https://arxiv.org/abs/2512.05485</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                While the deployment of large language models (LLMs) in high-value industries continues to expand, the systematic assessment of their safety against jailbreak and prompt-based attacks remains insufficient. Existing safety evaluation benchmarks and frameworks are often limited by an imbalanced integration of core components (attack, defense, and evaluation methods) and an isolation between flexible evaluation frameworks and standardized benchmarking capabilities. These limitations hinder reliable cross-study comparisons and create unnecessary overhead for comprehensive risk assessment. To address these gaps, we present TeleAI-Safety, a modular and reproducible framework coupled with a systematic benchmark for rigorous LLM safety evaluation. Our framework integrates a broad collection of 19 attack methods (including one self-developed method), 29 defense methods, and 19 evaluation methods (including one self-developed method). With a curated attack corpus of 342 samples spanning 12 distinct risk categories, the TeleAI-Safety benchmark conducts extensive evaluations across 14 target models. The results reveal systematic vulnerabilities and model-specific failure cases, highlighting critical trade-offs between safety and utility, and identifying potential defense patterns for future optimization. In practical scenarios, TeleAI-Safety can be flexibly adjusted with customized attack, defense, and evaluation combinations to meet specific demands. We release our complete code and evaluation results to facilitate reproducible research and establish unified safety baselines.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "Matching Ranks Over Probability Yields Truly Deep Safety Alignment", "author": "Jason Vega, Gagandeep Singh", "published": "Mon, 08 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.05518", "summary": "arXiv:2512.05518v1 Announce Type: new \nAbstract: A frustratingly easy technique known as the prefilling attack has been shown to effectively circumvent the safety alignment of frontier LLMs by simply prefilling the assistant response with an affirmative prefix before decoding. In response, recent work proposed a supervised fine-tuning (SFT) defense using data augmentation to achieve a \\enquote{deep} safety alignment, allowing the model to generate natural language refusals immediately following harmful prefills. Unfortunately, we show in this work that the \"deep\" safety alignment produced by such an approach is in fact not very deep. A generalization of the prefilling attack, which we refer to as the Rank-Assisted Prefilling (RAP) attack, can effectively extract harmful content from models fine-tuned with the data augmentation defense by selecting low-probability \"harmful\" tokens from the top 20 predicted next tokens at each step (thus ignoring high-probability \"refusal\" tokens). We argue that this vulnerability is enabled due to the \"gaming\" of the SFT objective when the target distribution entropies are low, where low fine-tuning loss is achieved by shifting large probability mass to a small number of refusal tokens while neglecting the high ranks of harmful tokens. We then propose a new perspective on achieving deep safety alignment by matching the token ranks of the target distribution, rather than their probabilities. This perspective yields a surprisingly simple fix to the data augmentation defense based on regularizing the attention placed on harmful prefill tokens, an approach we call PRefill attEntion STOpping (PRESTO). Adding PRESTO yields up to a 4.7x improvement in the mean StrongREJECT score under RAP attacks across three popular open-source LLMs, with low impact to model utility.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2512.05518" target="_blank">Matching Ranks Over Probability Yields Truly Deep Safety Alignment</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jason Vega, Gagandeep Singh</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 08 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.05518" target="_blank">https://arxiv.org/abs/2512.05518</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                A frustratingly easy technique known as the prefilling attack has been shown to effectively circumvent the safety alignment of frontier LLMs by simply prefilling the assistant response with an affirmative prefix before decoding. In response, recent work proposed a supervised fine-tuning (SFT) defense using data augmentation to achieve a \enquote{deep} safety alignment, allowing the model to generate natural language refusals immediately following harmful prefills. Unfortunately, we show in this work that the "deep" safety alignment produced by such an approach is in fact not very deep. A generalization of the prefilling attack, which we refer to as the Rank-Assisted Prefilling (RAP) attack, can effectively extract harmful content from models fine-tuned with the data augmentation defense by selecting low-probability "harmful" tokens from the top 20 predicted next tokens at each step (thus ignoring high-probability "refusal" tokens). We argue that this vulnerability is enabled due to the "gaming" of the SFT objective when the target distribution entropies are low, where low fine-tuning loss is achieved by shifting large probability mass to a small number of refusal tokens while neglecting the high ranks of harmful tokens. We then propose a new perspective on achieving deep safety alignment by matching the token ranks of the target distribution, rather than their probabilities. This perspective yields a surprisingly simple fix to the data augmentation defense based on regularizing the attention placed on harmful prefill tokens, an approach we call PRefill attEntion STOpping (PRESTO). Adding PRESTO yields up to a 4.7x improvement in the mean StrongREJECT score under RAP attacks across three popular open-source LLMs, with low impact to model utility.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Evaluating Concept Filtering Defenses against Child Sexual Abuse Material Generation by Text-to-Image Models", "author": "Ana-Maria Cretu, Klim Kireev, Amro Abdalla, Wisdom Obinna, Raphael Meier, Sarah Adel Bargal, Elissa M. Redmiles, Carmela Troncoso", "published": "Mon, 08 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.05707", "summary": "arXiv:2512.05707v1 Announce Type: new \nAbstract: We evaluate the effectiveness of child filtering to prevent the misuse of text-to-image (T2I) models to create child sexual abuse material (CSAM). First, we capture the complexity of preventing CSAM generation using a game-based security definition. Second, we show that current detection methods cannot remove all children from a dataset. Third, using an ethical proxy for CSAM (a child wearing glasses, hereafter, CWG), we show that even when only a small percentage of child images are left in the training dataset, there exist prompting strategies that generate CWG from a child-filtered T2I model using only a few more queries than when the model is trained on the unfiltered data. Fine-tuning the filtered model on child images further reduces the additional query overhead. We also show that reintroducing a concept is possible via fine-tuning even if filtering is perfect. Our results demonstrate that current filtering methods offer limited protection to closed-weight models and no protection to open-weight models, while reducing the generality of the model by hindering the generation of child-related concepts or changing their representation. We conclude by outlining challenges in conducting evaluations that establish robust evidence on the impact of AI safety mitigations for CSAM.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2512.05707" target="_blank">Evaluating Concept Filtering Defenses against Child Sexual Abuse Material Generation by Text-to-Image Models</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ana-Maria Cretu, Klim Kireev, Amro Abdalla, Wisdom Obinna, Raphael Meier, Sarah Adel Bargal, Elissa M. Redmiles, Carmela Troncoso</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 08 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.05707" target="_blank">https://arxiv.org/abs/2512.05707</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We evaluate the effectiveness of child filtering to prevent the misuse of text-to-image (T2I) models to create child sexual abuse material (CSAM). First, we capture the complexity of preventing CSAM generation using a game-based security definition. Second, we show that current detection methods cannot remove all children from a dataset. Third, using an ethical proxy for CSAM (a child wearing glasses, hereafter, CWG), we show that even when only a small percentage of child images are left in the training dataset, there exist prompting strategies that generate CWG from a child-filtered T2I model using only a few more queries than when the model is trained on the unfiltered data. Fine-tuning the filtered model on child images further reduces the additional query overhead. We also show that reintroducing a concept is possible via fine-tuning even if filtering is perfect. Our results demonstrate that current filtering methods offer limited protection to closed-weight models and no protection to open-weight models, while reducing the generality of the model by hindering the generation of child-related concepts or changing their representation. We conclude by outlining challenges in conducting evaluations that establish robust evidence on the impact of AI safety mitigations for CSAM.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "ARGUS: Defending Against Multimodal Indirect Prompt Injection via Steering Instruction-Following Behavior", "author": "Weikai Lu, Ziqian Zeng, Kehua Zhang, Haoran Li, Huiping Zhuang, Ruidong Wang, Cen Chen, Hao Peng", "published": "Mon, 08 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.05745", "summary": "arXiv:2512.05745v1 Announce Type: new \nAbstract: Multimodal Large Language Models (MLLMs) are increasingly vulnerable to multimodal Indirect Prompt Injection (IPI) attacks, which embed malicious instructions in images, videos, or audio to hijack model behavior. Existing defenses, designed primarily for text-only LLMs, are unsuitable for countering these multimodal threats, as they are easily bypassed, modality-dependent, or generalize poorly. Inspired by activation steering researches, we hypothesize that a robust, general defense independent of modality can be achieved by steering the model's behavior in the representation space. Through extensive experiments, we discover that the instruction-following behavior of MLLMs is encoded in a subspace. Steering along directions within this subspace can enforce adherence to user instructions, forming the basis of a defense. However, we also found that a naive defense direction could be coupled with a utility-degrading direction, and excessive intervention strength harms model performance. To address this, we propose ARGUS, which searches for an optimal defense direction within the safety subspace that decouples from the utility degradation direction, further combining adaptive strength steering to achieve a better safety-utility trade-off. ARGUS also introduces lightweight injection detection stage to activate the defense on-demand, and a post-filtering stage to verify defense success. Experimental results show that ARGUS can achieve robust defense against multimodal IPI while maximally preserving the MLLM's utility.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2512.05745" target="_blank">ARGUS: Defending Against Multimodal Indirect Prompt Injection via Steering Instruction-Following Behavior</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Weikai Lu, Ziqian Zeng, Kehua Zhang, Haoran Li, Huiping Zhuang, Ruidong Wang, Cen Chen, Hao Peng</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 08 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.05745" target="_blank">https://arxiv.org/abs/2512.05745</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Multimodal Large Language Models (MLLMs) are increasingly vulnerable to multimodal Indirect Prompt Injection (IPI) attacks, which embed malicious instructions in images, videos, or audio to hijack model behavior. Existing defenses, designed primarily for text-only LLMs, are unsuitable for countering these multimodal threats, as they are easily bypassed, modality-dependent, or generalize poorly. Inspired by activation steering researches, we hypothesize that a robust, general defense independent of modality can be achieved by steering the model's behavior in the representation space. Through extensive experiments, we discover that the instruction-following behavior of MLLMs is encoded in a subspace. Steering along directions within this subspace can enforce adherence to user instructions, forming the basis of a defense. However, we also found that a naive defense direction could be coupled with a utility-degrading direction, and excessive intervention strength harms model performance. To address this, we propose ARGUS, which searches for an optimal defense direction within the safety subspace that decouples from the utility degradation direction, further combining adaptive strength steering to achieve a better safety-utility trade-off. ARGUS also introduces lightweight injection detection stage to activate the defense on-demand, and a post-filtering stage to verify defense success. Experimental results show that ARGUS can achieve robust defense against multimodal IPI while maximally preserving the MLLM's utility.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "Trusted AI Agents in the Cloud", "author": "Teofil Bodea, Masanori Misono, Julian Pritzi, Patrick Sabanic, Thore Sommer, Harshavardhan Unnibhavi, David Schall, Nuno Santos, Dimitrios Stavrakakis, Pramod Bhatotia", "published": "Mon, 08 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.05951", "summary": "arXiv:2512.05951v1 Announce Type: new \nAbstract: AI agents powered by large language models are increasingly deployed as cloud services that autonomously access sensitive data, invoke external tools, and interact with other agents. However, these agents run within a complex multi-party ecosystem, where untrusted components can lead to data leakage, tampering, or unintended behavior. Existing Confidential Virtual Machines (CVMs) provide only per binary protection and offer no guarantees for cross-principal trust, accelerator-level isolation, or supervised agent behavior. We present Omega, a system that enables trusted AI agents by enforcing end-to-end isolation, establishing verifiable trust across all contributing principals, and supervising every external interaction with accountable provenance. Omega builds on Confidential VMs and Confidential GPUs to create a Trusted Agent Platform that hosts many agents within a single CVM using nested isolation. It also provides efficient multi-agent orchestration with cross-principal trust establishment via differential attestation, and a policy specification and enforcement framework that governs data access, tool usage, and inter-agent communication for data protection and regulatory compliance. Implemented on AMD SEV-SNP and NVIDIA H100, Omega fully secures agent state across CVM-GPU, and achieves high performance while enabling high-density, policy-compliant multi-agent deployments at cloud scale.", "number": 9, "labels": [{"name": "agent", "color": "#e74c3c"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2512.05951" target="_blank">Trusted AI Agents in the Cloud</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #e74c3c;">agent</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Teofil Bodea, Masanori Misono, Julian Pritzi, Patrick Sabanic, Thore Sommer, Harshavardhan Unnibhavi, David Schall, Nuno Santos, Dimitrios Stavrakakis, Pramod Bhatotia</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 08 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.05951" target="_blank">https://arxiv.org/abs/2512.05951</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                AI agents powered by large language models are increasingly deployed as cloud services that autonomously access sensitive data, invoke external tools, and interact with other agents. However, these agents run within a complex multi-party ecosystem, where untrusted components can lead to data leakage, tampering, or unintended behavior. Existing Confidential Virtual Machines (CVMs) provide only per binary protection and offer no guarantees for cross-principal trust, accelerator-level isolation, or supervised agent behavior. We present Omega, a system that enables trusted AI agents by enforcing end-to-end isolation, establishing verifiable trust across all contributing principals, and supervising every external interaction with accountable provenance. Omega builds on Confidential VMs and Confidential GPUs to create a Trusted Agent Platform that hosts many agents within a single CVM using nested isolation. It also provides efficient multi-agent orchestration with cross-principal trust establishment via differential attestation, and a policy specification and enforcement framework that governs data access, tool usage, and inter-agent communication for data protection and regulatory compliance. Implemented on AMD SEV-SNP and NVIDIA H100, Omega fully secures agent state across CVM-GPU, and achieves high performance while enabling high-density, policy-compliant multi-agent deployments at cloud scale.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "When Ads Become Profiles: Uncovering the Invisible Risk of Web Advertising at Scale with LLMs", "author": "Baiyu Chen, Benjamin Tag, Hao Xue, Daniel Angus, Flora Salim", "published": "Mon, 08 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2509.18874", "summary": "arXiv:2509.18874v2 Announce Type: cross \nAbstract: Regulatory limits on explicit targeting have not eliminated algorithmic profiling on the Web, as optimisation systems still adapt ad delivery to users' private attributes. The widespread availability of powerful zero-shot multimodal Large Language Models (LLMs) has dramatically lowered the barrier for exploiting these latent signals for adversarial inference. We investigate this emerging societal risk, specifically how adversaries can now exploit these signals to reverse-engineer private attributes from ad exposure alone. We introduce a novel pipeline that leverages LLMs as adversarial inference engines to perform natural language profiling. Applying this method to a longitudinal dataset comprising over 435,000 ad impressions collected from 891 users, we conducted a large-scale study to assess the feasibility and precision of inferring private attributes from passive online ad observations. Our results demonstrate that off-the-shelf LLMs can accurately reconstruct complex user private attributes, including party preference, employment status, and education level, consistently outperforming strong census-based priors and matching or exceeding human social perception, while operating at only a fraction of the cost (223$\\times$ lower) and time (52$\\times$ faster) required by humans. Critically, actionable profiling is feasible even within short observation windows, indicating that prolonged tracking is not a prerequisite for a successful attack. These findings provide the first empirical evidence that ad streams serve as a high-fidelity digital footprint, enabling off-platform profiling that inherently bypasses current platform safeguards, highlighting a systemic vulnerability in the ad ecosystem and the urgent need for responsible web AI governance in the generative AI era. The code is available at https://github.com/Breezelled/when-ads-become-profiles.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2509.18874" target="_blank">When Ads Become Profiles: Uncovering the Invisible Risk of Web Advertising at Scale with LLMs</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Baiyu Chen, Benjamin Tag, Hao Xue, Daniel Angus, Flora Salim</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 08 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2509.18874" target="_blank">https://arxiv.org/abs/2509.18874</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Regulatory limits on explicit targeting have not eliminated algorithmic profiling on the Web, as optimisation systems still adapt ad delivery to users' private attributes. The widespread availability of powerful zero-shot multimodal Large Language Models (LLMs) has dramatically lowered the barrier for exploiting these latent signals for adversarial inference. We investigate this emerging societal risk, specifically how adversaries can now exploit these signals to reverse-engineer private attributes from ad exposure alone. We introduce a novel pipeline that leverages LLMs as adversarial inference engines to perform natural language profiling. Applying this method to a longitudinal dataset comprising over 435,000 ad impressions collected from 891 users, we conducted a large-scale study to assess the feasibility and precision of inferring private attributes from passive online ad observations. Our results demonstrate that off-the-shelf LLMs can accurately reconstruct complex user private attributes, including party preference, employment status, and education level, consistently outperforming strong census-based priors and matching or exceeding human social perception, while operating at only a fraction of the cost (223$\times$ lower) and time (52$\times$ faster) required by humans. Critically, actionable profiling is feasible even within short observation windows, indicating that prolonged tracking is not a prerequisite for a successful attack. These findings provide the first empirical evidence that ad streams serve as a high-fidelity digital footprint, enabling off-platform profiling that inherently bypasses current platform safeguards, highlighting a systemic vulnerability in the ad ecosystem and the urgent need for responsible web AI governance in the generative AI era. The code is available at https://github.com/Breezelled/when-ads-become-profiles.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "Combined Quantum and Post-Quantum Security Performance Under Finite Keys", "author": "Aman Gupta, Ravi Singh Adhikari, Anju Rani, Xiaoyu Ai, Robert Malaney", "published": "Mon, 08 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.04429", "summary": "arXiv:2512.04429v1 Announce Type: cross \nAbstract: Recent advances in quantum-secure communication have highlighted the value of hybrid schemes that combine Quantum Key Distribution (QKD) with Post-Quantum Cryptography (PQC). Yet most existing hybrid designs omit realistic finite-key effects on QKD key rates and do not specify how to maintain security when both QKD and PQC primitives leak information through side-channels. These gaps limit the applicability of hybrid systems in practical, deployed networks. In this work, we advance a recently proposed hybrid QKD-PQC system by integrating tight finite-key security to the QKD primitive and improving the design for better scalability. This hybrid system employs an information-theoretically secure instruction sequence that determines the configurations of different primitives and thus ensures message confidentiality even when both the QKD and the PQC primitives are compromised. The novelty in our work lies in the implementation of the tightest finite-key security to date for the BBM92 protocol and the design improvements in the primitives of the hybrid system that ensure the processing time scales linearly with the size of secret instructions.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2512.04429" target="_blank">Combined Quantum and Post-Quantum Security Performance Under Finite Keys</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Aman Gupta, Ravi Singh Adhikari, Anju Rani, Xiaoyu Ai, Robert Malaney</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 08 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.04429" target="_blank">https://arxiv.org/abs/2512.04429</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Recent advances in quantum-secure communication have highlighted the value of hybrid schemes that combine Quantum Key Distribution (QKD) with Post-Quantum Cryptography (PQC). Yet most existing hybrid designs omit realistic finite-key effects on QKD key rates and do not specify how to maintain security when both QKD and PQC primitives leak information through side-channels. These gaps limit the applicability of hybrid systems in practical, deployed networks. In this work, we advance a recently proposed hybrid QKD-PQC system by integrating tight finite-key security to the QKD primitive and improving the design for better scalability. This hybrid system employs an information-theoretically secure instruction sequence that determines the configurations of different primitives and thus ensures message confidentiality even when both the QKD and the PQC primitives are compromised. The novelty in our work lies in the implementation of the tightest finite-key security to date for the BBM92 protocol and the design improvements in the primitives of the hybrid system that ensure the processing time scales linearly with the size of secret instructions.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "Edge-Only Universal Adversarial Attacks in Distributed Learning", "author": "Giulio Rossolini, Tommaso Baldi, Alessandro Biondi, Giorgio Buttazzo", "published": "Mon, 08 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2411.10500", "summary": "arXiv:2411.10500v2 Announce Type: replace \nAbstract: Distributed learning frameworks, which partition neural network models across multiple computing nodes, enhance efficiency in collaborative edge-cloud systems, but may also introduce new vulnerabilities to evasion attacks, often in the form of adversarial perturbations. In this work, we present a new threat model that explores the feasibility of generating universal adversarial perturbations (UAPs) when the attacker has access only to the edge portion of the model, consisting of its initial network layers. Unlike traditional attacks that require full model knowledge, our approach shows that adversaries can induce effective mispredictions in the unknown cloud component by manipulating key feature representations at the edge. Following the proposed threat model, we introduce both edge-only untargeted and targeted formulations of UAPs designed to control intermediate features before the split point. Our results on ImageNet demonstrate strong attack transferability to the unknown cloud part, and we compare the proposed method with classical white-box and black-box techniques, highlighting its effectiveness. Additionally, we analyze the capability of an attacker to achieve targeted adversarial effects with edge-only knowledge, revealing intriguing behaviors across multiple networks. By introducing the first adversarial attacks with edge-only knowledge in split inference, this work underscores the importance of addressing partial model access in adversarial robustness, encouraging further research in this area.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2411.10500" target="_blank">Edge-Only Universal Adversarial Attacks in Distributed Learning</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Giulio Rossolini, Tommaso Baldi, Alessandro Biondi, Giorgio Buttazzo</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 08 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2411.10500" target="_blank">https://arxiv.org/abs/2411.10500</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Distributed learning frameworks, which partition neural network models across multiple computing nodes, enhance efficiency in collaborative edge-cloud systems, but may also introduce new vulnerabilities to evasion attacks, often in the form of adversarial perturbations. In this work, we present a new threat model that explores the feasibility of generating universal adversarial perturbations (UAPs) when the attacker has access only to the edge portion of the model, consisting of its initial network layers. Unlike traditional attacks that require full model knowledge, our approach shows that adversaries can induce effective mispredictions in the unknown cloud component by manipulating key feature representations at the edge. Following the proposed threat model, we introduce both edge-only untargeted and targeted formulations of UAPs designed to control intermediate features before the split point. Our results on ImageNet demonstrate strong attack transferability to the unknown cloud part, and we compare the proposed method with classical white-box and black-box techniques, highlighting its effectiveness. Additionally, we analyze the capability of an attacker to achieve targeted adversarial effects with edge-only knowledge, revealing intriguing behaviors across multiple networks. By introducing the first adversarial attacks with edge-only knowledge in split inference, this work underscores the importance of addressing partial model access in adversarial robustness, encouraging further research in this area.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "Analyzing PDFs like Binaries: Adversarially Robust PDF Malware Analysis via Intermediate Representation and Language Model", "author": "Side Liu, Jiang Ming, Guodong Zhou, Xinyi Liu, Jianming Fu, Guojun Peng", "published": "Mon, 08 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2506.17162", "summary": "arXiv:2506.17162v2 Announce Type: replace \nAbstract: Malicious PDF files have emerged as a persistent threat and become a popular attack vector in web-based attacks. While machine learning-based PDF malware classifiers have shown promise, these classifiers are often susceptible to adversarial attacks, undermining their reliability. To address this issue, recent studies have aimed to enhance the robustness of PDF classifiers. Despite these efforts, the feature engineering underlying these studies remains outdated. Consequently, even with the application of cutting-edge machine learning techniques, these approaches fail to fundamentally resolve the issue of feature instability.\n  To tackle this, we propose a novel approach for PDF feature extraction and PDF malware detection. We introduce the PDFObj IR (PDF Object Intermediate Representation), an assembly-like language framework for PDF objects, from which we extract semantic features using a pretrained language model. Additionally, we construct an Object Reference Graph to capture structural features, drawing inspiration from program analysis. This dual approach enables us to analyze and detect PDF malware based on both semantic and structural features. Experimental results demonstrate that our proposed classifier achieves strong adversarial robustness while maintaining an exceptionally low false positive rate of only 0.07% on baseline dataset compared to state-of-the-art PDF malware classifiers.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2506.17162" target="_blank">Analyzing PDFs like Binaries: Adversarially Robust PDF Malware Analysis via Intermediate Representation and Language Model</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Side Liu, Jiang Ming, Guodong Zhou, Xinyi Liu, Jianming Fu, Guojun Peng</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 08 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2506.17162" target="_blank">https://arxiv.org/abs/2506.17162</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Malicious PDF files have emerged as a persistent threat and become a popular attack vector in web-based attacks. While machine learning-based PDF malware classifiers have shown promise, these classifiers are often susceptible to adversarial attacks, undermining their reliability. To address this issue, recent studies have aimed to enhance the robustness of PDF classifiers. Despite these efforts, the feature engineering underlying these studies remains outdated. Consequently, even with the application of cutting-edge machine learning techniques, these approaches fail to fundamentally resolve the issue of feature instability.
+  To tackle this, we propose a novel approach for PDF feature extraction and PDF malware detection. We introduce the PDFObj IR (PDF Object Intermediate Representation), an assembly-like language framework for PDF objects, from which we extract semantic features using a pretrained language model. Additionally, we construct an Object Reference Graph to capture structural features, drawing inspiration from program analysis. This dual approach enables us to analyze and detect PDF malware based on both semantic and structural features. Experimental results demonstrate that our proposed classifier achieves strong adversarial robustness while maintaining an exceptionally low false positive rate of only 0.07% on baseline dataset compared to state-of-the-art PDF malware classifiers.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Yours or Mine? Overwriting Attacks Against Neural Audio Watermarking", "author": "Lingfeng Yao, Chenpei Huang, Shengyao Wang, Junpei Xue, Hanqing Guo, Jiang Liu, Phone Lin, Tomoaki Ohtsuki, Miao Pan", "published": "Mon, 08 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2509.05835", "summary": "arXiv:2509.05835v2 Announce Type: replace \nAbstract: As generative audio models are rapidly evolving, AI-generated audios increasingly raise concerns about copyright infringement and misinformation spread. Audio watermarking, as a proactive defense, can embed secret messages into audio for copyright protection and source verification. However, current neural audio watermarking methods focus primarily on the imperceptibility and robustness of watermarking, while ignoring its vulnerability to security attacks. In this paper, we develop a simple yet powerful attack: the overwriting attack that overwrites the legitimate audio watermark with a forged one and makes the original legitimate watermark undetectable. Based on the audio watermarking information that the adversary has, we propose three categories of overwriting attacks, i.e., white-box, gray-box, and black-box attacks. We also thoroughly evaluate the proposed attacks on state-of-the-art neural audio watermarking methods. Experimental results demonstrate that the proposed overwriting attacks can effectively compromise existing watermarking schemes across various settings and achieve a nearly 100% attack success rate. The practicality and effectiveness of the proposed overwriting attacks expose security flaws in existing neural audio watermarking systems, underscoring the need to enhance security in future audio watermarking designs.", "number": 14, "labels": [{"name": "intellectual property", "color": "#27ae60"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2509.05835" target="_blank">Yours or Mine? Overwriting Attacks Against Neural Audio Watermarking</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #27ae60;">intellectual property</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Lingfeng Yao, Chenpei Huang, Shengyao Wang, Junpei Xue, Hanqing Guo, Jiang Liu, Phone Lin, Tomoaki Ohtsuki, Miao Pan</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 08 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2509.05835" target="_blank">https://arxiv.org/abs/2509.05835</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                As generative audio models are rapidly evolving, AI-generated audios increasingly raise concerns about copyright infringement and misinformation spread. Audio watermarking, as a proactive defense, can embed secret messages into audio for copyright protection and source verification. However, current neural audio watermarking methods focus primarily on the imperceptibility and robustness of watermarking, while ignoring its vulnerability to security attacks. In this paper, we develop a simple yet powerful attack: the overwriting attack that overwrites the legitimate audio watermark with a forged one and makes the original legitimate watermark undetectable. Based on the audio watermarking information that the adversary has, we propose three categories of overwriting attacks, i.e., white-box, gray-box, and black-box attacks. We also thoroughly evaluate the proposed attacks on state-of-the-art neural audio watermarking methods. Experimental results demonstrate that the proposed overwriting attacks can effectively compromise existing watermarking schemes across various settings and achieve a nearly 100% attack success rate. The practicality and effectiveness of the proposed overwriting attacks expose security flaws in existing neural audio watermarking systems, underscoring the need to enhance security in future audio watermarking designs.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Finding Phones Fast: Low-Latency and Scalable Monitoring of Cellular Communications in Sensitive Areas", "author": "Martin Kotuliak, Simon Erni, Jakub Pol\\'ak, Marc Roeschlin, Richard Baker, Ivan Martinovic, Srdjan \\v{C}apkun", "published": "Mon, 08 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2509.25430", "summary": "arXiv:2509.25430v2 Announce Type: replace \nAbstract: The widespread availability of cellular devices introduces new threat vectors that allow users or attackers to bypass security policies and physical barriers and bring unauthorized devices into sensitive areas. We identify a critical gap in this context: the absence of low-latency systems for high-quality and instantaneous monitoring of cellular transmissions. Such low-latency systems are crucial to allow for timely detection, decision, and disruption of unauthorized communication in sensitive areas. Operator-based monitoring systems, built for purposes such as people counting or tracking, lack real-time capability, require cooperation across multiple operators, and thus are hard to deploy. Operator-independent monitoring approaches proposed in the literature either lack low-latency capabilities or do not scale.\n  We propose WaveTag, the first low-latency and scalable system designed to monitor 5G and LTE connections across all operators prior to any user data transmission. WaveTag consists of several downlink sniffers and a distributed network of uplink sniffers that measure both downlink protocol information and uplink signal characteristics at multiple locations to gain a detailed spatial image of uplink signals. WaveTag then aggregates the recorded information, processes it, and provides a decision about the connection--all done prior to the complete connection establishment of a UE. To evaluate WaveTag, we deployed it in the context of geofencing, where WaveTag was able to determine whether the signals originate from inside or outside of an area within 2.3 ms of the initial base station-to-device message, therefore enabling prompt and targeted suppression of communication before any user data was transmitted. WaveTag achieved 99.66% geofencing classification accuracy. Finally, we conduct a real-world uplink measurement evaluation on a commercial 5G SA network.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2509.25430" target="_blank">Finding Phones Fast: Low-Latency and Scalable Monitoring of Cellular Communications in Sensitive Areas</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Martin Kotuliak, Simon Erni, Jakub Pol\'ak, Marc Roeschlin, Richard Baker, Ivan Martinovic, Srdjan \v{C}apkun</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 08 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2509.25430" target="_blank">https://arxiv.org/abs/2509.25430</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The widespread availability of cellular devices introduces new threat vectors that allow users or attackers to bypass security policies and physical barriers and bring unauthorized devices into sensitive areas. We identify a critical gap in this context: the absence of low-latency systems for high-quality and instantaneous monitoring of cellular transmissions. Such low-latency systems are crucial to allow for timely detection, decision, and disruption of unauthorized communication in sensitive areas. Operator-based monitoring systems, built for purposes such as people counting or tracking, lack real-time capability, require cooperation across multiple operators, and thus are hard to deploy. Operator-independent monitoring approaches proposed in the literature either lack low-latency capabilities or do not scale.
+  We propose WaveTag, the first low-latency and scalable system designed to monitor 5G and LTE connections across all operators prior to any user data transmission. WaveTag consists of several downlink sniffers and a distributed network of uplink sniffers that measure both downlink protocol information and uplink signal characteristics at multiple locations to gain a detailed spatial image of uplink signals. WaveTag then aggregates the recorded information, processes it, and provides a decision about the connection--all done prior to the complete connection establishment of a UE. To evaluate WaveTag, we deployed it in the context of geofencing, where WaveTag was able to determine whether the signals originate from inside or outside of an area within 2.3 ms of the initial base station-to-device message, therefore enabling prompt and targeted suppression of communication before any user data was transmitted. WaveTag achieved 99.66% geofencing classification accuracy. Finally, we conduct a real-world uplink measurement evaluation on a commercial 5G SA network.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "Concept-Guided Backdoor Attack on Vision Language Models", "author": "Haoyu Shen, Weimin Lyu, Haotian Xu, Tengfei Ma", "published": "Mon, 08 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.00713", "summary": "arXiv:2512.00713v2 Announce Type: replace \nAbstract: Vision-Language Models (VLMs) have achieved impressive progress in multimodal text generation, yet their rapid adoption raises increasing concerns about security vulnerabilities. Existing backdoor attacks against VLMs primarily rely on explicit pixel-level triggers or imperceptible perturbations injected into images. While effective, these approaches reduce stealthiness and remain vulnerable to image-based defenses. We introduce concept-guided backdoor attacks, a new paradigm that operates at the semantic concept level rather than on raw pixels. We propose two different attacks. The first, Concept-Thresholding Poisoning (CTP), uses explicit concepts in natural images as triggers: only samples containing the target concept are poisoned, causing the model to behave normally in all other cases but consistently inject malicious outputs whenever the concept appears. The second, CBL-Guided Unseen Backdoor (CGUB), leverages a Concept Bottleneck Model (CBM) during training to intervene on internal concept activations, while discarding the CBM branch at inference time to keep the VLM unchanged. This design enables systematic replacement of a targeted label in generated text (for example, replacing \"cat\" with \"dog\"), even when the replacement behavior never appears in the training data. Experiments across multiple VLM architectures and datasets show that both CTP and CGUB achieve high attack success rates while maintaining moderate impact on clean-task performance. These findings highlight concept-level vulnerabilities as a critical new attack surface for VLMs.", "number": 16, "labels": [{"name": "backdoor", "color": "#3498db"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2512.00713" target="_blank">Concept-Guided Backdoor Attack on Vision Language Models</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #3498db;">backdoor</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Haoyu Shen, Weimin Lyu, Haotian Xu, Tengfei Ma</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 08 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.00713" target="_blank">https://arxiv.org/abs/2512.00713</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Vision-Language Models (VLMs) have achieved impressive progress in multimodal text generation, yet their rapid adoption raises increasing concerns about security vulnerabilities. Existing backdoor attacks against VLMs primarily rely on explicit pixel-level triggers or imperceptible perturbations injected into images. While effective, these approaches reduce stealthiness and remain vulnerable to image-based defenses. We introduce concept-guided backdoor attacks, a new paradigm that operates at the semantic concept level rather than on raw pixels. We propose two different attacks. The first, Concept-Thresholding Poisoning (CTP), uses explicit concepts in natural images as triggers: only samples containing the target concept are poisoned, causing the model to behave normally in all other cases but consistently inject malicious outputs whenever the concept appears. The second, CBL-Guided Unseen Backdoor (CGUB), leverages a Concept Bottleneck Model (CBM) during training to intervene on internal concept activations, while discarding the CBM branch at inference time to keep the VLM unchanged. This design enables systematic replacement of a targeted label in generated text (for example, replacing "cat" with "dog"), even when the replacement behavior never appears in the training data. Experiments across multiple VLM architectures and datasets show that both CTP and CGUB achieve high attack success rates while maintaining moderate impact on clean-task performance. These findings highlight concept-level vulnerabilities as a critical new attack surface for VLMs.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "Towards practical secure delegated quantum computing with semi-classical light", "author": "Boris Bourdoncle, Pierre-Emmanuel Emeriau, Paul Hilaire, Shane Mansfield, Luka Music, Stephen Wein", "published": "Mon, 08 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2409.12103", "summary": "arXiv:2409.12103v3 Announce Type: replace-cross \nAbstract: Secure Delegated Quantum Computation (SDQC) protocols are a vital piece of the future quantum information processing global architecture since they allow end-users to perform their valuable computations on remote quantum servers without fear that a malicious quantum service provider or an eavesdropper might acquire some information about their data or algorithm. They also allow end-users to check that their computation has been performed as they have specified it.\n  However, existing protocols all have drawbacks that limit their usage in the real world. Most require the client to either operate a single-qubit source or perform single-qubit measurements, thus requiring them to still have some quantum technological capabilities albeit restricted, or require the server to perform operations which are hard to implement on real hardware (e.g isolate single photons from laser pulses and polarisation-preserving photon-number quantum non-demolition measurements). Others remove the need for quantum communications entirely but this comes at a cost in terms of security guarantees and memory overhead on the server's side.\n  We present an SDQC protocol which drastically reduces the technological requirements of both the client and the server while providing information-theoretic composable security. More precisely, the client only manipulates an attenuated laser pulse, while the server only handles interacting quantum emitters with a structure capable of generating spin-photon entanglement. The quantum emitter acts as both a converter from coherent laser pulses to polarisation-encoded qubits and an entanglement generator. Such devices have recently been used to demonstrate the largest entangled photonic state to date, thus hinting at the readiness of our protocol for experimental implementations.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2409.12103" target="_blank">Towards practical secure delegated quantum computing with semi-classical light</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Boris Bourdoncle, Pierre-Emmanuel Emeriau, Paul Hilaire, Shane Mansfield, Luka Music, Stephen Wein</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 08 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2409.12103" target="_blank">https://arxiv.org/abs/2409.12103</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Secure Delegated Quantum Computation (SDQC) protocols are a vital piece of the future quantum information processing global architecture since they allow end-users to perform their valuable computations on remote quantum servers without fear that a malicious quantum service provider or an eavesdropper might acquire some information about their data or algorithm. They also allow end-users to check that their computation has been performed as they have specified it.
+  However, existing protocols all have drawbacks that limit their usage in the real world. Most require the client to either operate a single-qubit source or perform single-qubit measurements, thus requiring them to still have some quantum technological capabilities albeit restricted, or require the server to perform operations which are hard to implement on real hardware (e.g isolate single photons from laser pulses and polarisation-preserving photon-number quantum non-demolition measurements). Others remove the need for quantum communications entirely but this comes at a cost in terms of security guarantees and memory overhead on the server's side.
+  We present an SDQC protocol which drastically reduces the technological requirements of both the client and the server while providing information-theoretic composable security. More precisely, the client only manipulates an attenuated laser pulse, while the server only handles interacting quantum emitters with a structure capable of generating spin-photon entanglement. The quantum emitter acts as both a converter from coherent laser pulses to polarisation-encoded qubits and an entanglement generator. Such devices have recently been used to demonstrate the largest entangled photonic state to date, thus hinting at the readiness of our protocol for experimental implementations.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "IF-GUIDE: Influence Function-Guided Detoxification of LLMs", "author": "Zachary Coalson, Juhan Bae, Nicholas Carlini, Sanghyun Hong", "published": "Mon, 08 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2506.01790", "summary": "arXiv:2506.01790v3 Announce Type: replace-cross \nAbstract: We study how training data contributes to the emergence of toxic behaviors in large language models. Most prior work on reducing model toxicity adopts reactive approaches, such as fine-tuning pre-trained (and potentially toxic) models to align them with human values. In contrast, we propose a proactive approach, IF-GUIDE, that leverages influence functions to identify and suppress harmful tokens in the training data. To this end, we first show that standard influence functions are ineffective at discovering harmful training records. We then present a novel adaptation that measures token-level attributions from training data to model toxicity, along with techniques for selecting toxic training documents and a learning objective that can be integrated into both pre-training and fine-tuning. Moreover, IF-GUIDE does not rely on human-preference data, which is typically required by existing alignment methods. In our evaluation, we demonstrate that IF-GUIDE substantially reduces both explicit and implicit toxicity-by up to 10$\\times$ compared to uncensored models, and up to 3$\\times$ compared to baseline alignment methods such as DPO and RAD-across both pre-training and fine-tuning scenarios. IF-GUIDE is computationally efficient: a billion-parameter model is not necessary for computing influence scores; a million-parameter model-with 7.5$\\times$ fewer parameters-can effectively serve as a proxy for identifying harmful data. Our code is publicly available at: https://github.com/ztcoalson/IF-Guide", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2506.01790" target="_blank">IF-GUIDE: Influence Function-Guided Detoxification of LLMs</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Zachary Coalson, Juhan Bae, Nicholas Carlini, Sanghyun Hong</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 08 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2506.01790" target="_blank">https://arxiv.org/abs/2506.01790</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study how training data contributes to the emergence of toxic behaviors in large language models. Most prior work on reducing model toxicity adopts reactive approaches, such as fine-tuning pre-trained (and potentially toxic) models to align them with human values. In contrast, we propose a proactive approach, IF-GUIDE, that leverages influence functions to identify and suppress harmful tokens in the training data. To this end, we first show that standard influence functions are ineffective at discovering harmful training records. We then present a novel adaptation that measures token-level attributions from training data to model toxicity, along with techniques for selecting toxic training documents and a learning objective that can be integrated into both pre-training and fine-tuning. Moreover, IF-GUIDE does not rely on human-preference data, which is typically required by existing alignment methods. In our evaluation, we demonstrate that IF-GUIDE substantially reduces both explicit and implicit toxicity-by up to 10$\times$ compared to uncensored models, and up to 3$\times$ compared to baseline alignment methods such as DPO and RAD-across both pre-training and fine-tuning scenarios. IF-GUIDE is computationally efficient: a billion-parameter model is not necessary for computing influence scores; a million-parameter model-with 7.5$\times$ fewer parameters-can effectively serve as a proxy for identifying harmful data. Our code is publicly available at: https://github.com/ztcoalson/IF-Guide
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Self-Supervised Learning of Graph Representations for Network Intrusion Detection", "author": "Lorenzo Guerra, Thomas Chapuis, Guillaume Duc, Pavlo Mozharovskyi, Van-Tam Nguyen", "published": "Mon, 08 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2509.16625", "summary": "arXiv:2509.16625v4 Announce Type: replace-cross \nAbstract: Detecting intrusions in network traffic is a challenging task, particularly under limited supervision and constantly evolving attack patterns. While recent works have leveraged graph neural networks for network intrusion detection, they often decouple representation learning from anomaly detection, limiting the utility of the embeddings for identifying attacks. We propose GraphIDS, a self-supervised intrusion detection model that unifies these two stages by learning local graph representations of normal communication patterns through a masked autoencoder. An inductive graph neural network embeds each flow with its local topological context to capture typical network behavior, while a Transformer-based encoder-decoder reconstructs these embeddings, implicitly learning global co-occurrence patterns via self-attention without requiring explicit positional information. During inference, flows with unusually high reconstruction errors are flagged as potential intrusions. This end-to-end framework ensures that embeddings are directly optimized for the downstream task, facilitating the recognition of malicious traffic. On diverse NetFlow benchmarks, GraphIDS achieves up to 99.98% PR-AUC and 99.61% macro F1-score, outperforming baselines by 5-25 percentage points.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2509.16625" target="_blank">Self-Supervised Learning of Graph Representations for Network Intrusion Detection</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Lorenzo Guerra, Thomas Chapuis, Guillaume Duc, Pavlo Mozharovskyi, Van-Tam Nguyen</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 08 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2509.16625" target="_blank">https://arxiv.org/abs/2509.16625</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Detecting intrusions in network traffic is a challenging task, particularly under limited supervision and constantly evolving attack patterns. While recent works have leveraged graph neural networks for network intrusion detection, they often decouple representation learning from anomaly detection, limiting the utility of the embeddings for identifying attacks. We propose GraphIDS, a self-supervised intrusion detection model that unifies these two stages by learning local graph representations of normal communication patterns through a masked autoencoder. An inductive graph neural network embeds each flow with its local topological context to capture typical network behavior, while a Transformer-based encoder-decoder reconstructs these embeddings, implicitly learning global co-occurrence patterns via self-attention without requiring explicit positional information. During inference, flows with unusually high reconstruction errors are flagged as potential intrusions. This end-to-end framework ensures that embeddings are directly optimized for the downstream task, facilitating the recognition of malicious traffic. On diverse NetFlow benchmarks, GraphIDS achieves up to 99.98% PR-AUC and 99.61% macro F1-score, outperforming baselines by 5-25 percentage points.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "Towards a Generalisable Cyber Defence Agent for Real-World Computer Networks", "author": "Tim Dudman, Martyn Bull", "published": "Mon, 08 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.09114", "summary": "arXiv:2511.09114v2 Announce Type: replace-cross \nAbstract: Recent advances in deep reinforcement learning for autonomous cyber defence have resulted in agents that can successfully defend simulated computer networks against cyber-attacks. However, many of these agents would need retraining to defend networks with differing topology or size, making them poorly suited to real-world networks where topology and size can vary over time. In this research we introduce a novel set of Topological Extensions for Reinforcement Learning Agents (TERLA) that provide generalisability for the defence of networks with differing topology and size, without the need for retraining. Our approach involves the use of heterogeneous graph neural network layers to produce a fixed-size latent embedding representing the observed network state. This representation learning stage is coupled with a reduced, fixed-size, semantically meaningful and interpretable action space. We apply TERLA to a standard deep reinforcement learning Proximal Policy Optimisation (PPO) agent model, and to reduce the sim-to-real gap, conduct our research using Cyber Autonomy Gym for Experimentation (CAGE) Challenge 4. This Cyber Operations Research Gym environment has many of the features of a real-world network, such as realistic Intrusion Detection System (IDS) events and multiple agents defending network segments of differing topology and size. TERLA agents retain the defensive performance of vanilla PPO agents whilst showing improved action efficiency. Generalisability has been demonstrated by showing that all TERLA agents have the same network-agnostic neural network architecture, and by deploying a single TERLA agent multiple times to defend network segments with differing topology and size, showing improved defensive performance and efficiency.", "number": 20, "labels": [{"name": "agent", "color": "#e74c3c"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2511.09114" target="_blank">Towards a Generalisable Cyber Defence Agent for Real-World Computer Networks</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #e74c3c;">agent</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Tim Dudman, Martyn Bull</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 08 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.09114" target="_blank">https://arxiv.org/abs/2511.09114</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Recent advances in deep reinforcement learning for autonomous cyber defence have resulted in agents that can successfully defend simulated computer networks against cyber-attacks. However, many of these agents would need retraining to defend networks with differing topology or size, making them poorly suited to real-world networks where topology and size can vary over time. In this research we introduce a novel set of Topological Extensions for Reinforcement Learning Agents (TERLA) that provide generalisability for the defence of networks with differing topology and size, without the need for retraining. Our approach involves the use of heterogeneous graph neural network layers to produce a fixed-size latent embedding representing the observed network state. This representation learning stage is coupled with a reduced, fixed-size, semantically meaningful and interpretable action space. We apply TERLA to a standard deep reinforcement learning Proximal Policy Optimisation (PPO) agent model, and to reduce the sim-to-real gap, conduct our research using Cyber Autonomy Gym for Experimentation (CAGE) Challenge 4. This Cyber Operations Research Gym environment has many of the features of a real-world network, such as realistic Intrusion Detection System (IDS) events and multiple agents defending network segments of differing topology and size. TERLA agents retain the defensive performance of vanilla PPO agents whilst showing improved action efficiency. Generalisability has been demonstrated by showing that all TERLA agents have the same network-agnostic neural network architecture, and by deploying a single TERLA agent multiple times to defend network segments with differing topology and size, showing improved defensive performance and efficiency.
+            </div>
+        </div>
+        <div class="paper" id="paper-21">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-21" data-paper-data='{"title": "Observational Auditing of Label Privacy", "author": "Iden Kalemaj, Luca Melis, Maxime Boucher, Ilya Mironov, Saeed Mahloujifar", "published": "Mon, 08 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.14084", "summary": "arXiv:2511.14084v2 Announce Type: replace-cross \nAbstract: Differential privacy (DP) auditing is essential for evaluating privacy guarantees in machine learning systems. Existing auditing methods, however, pose a significant challenge for large-scale systems since they require modifying the training dataset -- for instance, by injecting out-of-distribution canaries or removing samples from training. Such interventions on the training data pipeline are resource-intensive and involve considerable engineering overhead. We introduce a novel observational auditing framework that leverages the inherent randomness of data distributions, enabling privacy evaluation without altering the original dataset. Our approach extends privacy auditing beyond traditional membership inference to protected attributes, with labels as a special case, addressing a key gap in existing techniques. We provide theoretical foundations for our method and perform experiments on Criteo and CIFAR-10 datasets that demonstrate its effectiveness in auditing label privacy guarantees. This work opens new avenues for practical privacy auditing in large-scale production environments.", "number": 21, "labels": [{"name": "privacy", "color": "#ff69b4"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#21</span>
+                <a href="https://arxiv.org/abs/2511.14084" target="_blank">Observational Auditing of Label Privacy</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #ff69b4;">privacy</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Iden Kalemaj, Luca Melis, Maxime Boucher, Ilya Mironov, Saeed Mahloujifar</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 08 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.14084" target="_blank">https://arxiv.org/abs/2511.14084</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Differential privacy (DP) auditing is essential for evaluating privacy guarantees in machine learning systems. Existing auditing methods, however, pose a significant challenge for large-scale systems since they require modifying the training dataset -- for instance, by injecting out-of-distribution canaries or removing samples from training. Such interventions on the training data pipeline are resource-intensive and involve considerable engineering overhead. We introduce a novel observational auditing framework that leverages the inherent randomness of data distributions, enabling privacy evaluation without altering the original dataset. Our approach extends privacy auditing beyond traditional membership inference to protected attributes, with labels as a special case, addressing a key gap in existing techniques. We provide theoretical foundations for our method and perform experiments on Criteo and CIFAR-10 datasets that demonstrate its effectiveness in auditing label privacy guarantees. This work opens new avenues for practical privacy auditing in large-scale production environments.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2025-12-08 18:00:02
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>

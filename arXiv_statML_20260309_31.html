@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - stat.ML updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>stat.ML updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Mon, 09 Mar 2026 04:00:03 +0000<br>
+        <strong>論文数:</strong> 31件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Learning Optimal Distributionally Robust Individualized Treatment Rules Integrating Multi-Source Data</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Prediction-Powered Conditional Inference</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">SPPCSO: Adaptive Penalized Estimation Method for High-Dimensional Correlated Data</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">Robust support vector model based on bounded asymmetric elastic net loss for binary classification</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">Semantics-Aware Caching for Concept Learning</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">Behavior-dLDS: A decomposed linear dynamical systems model for neural activity partially constrained by behavior</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Improved Scaling Laws via Weak-to-Strong Generalization in Random Feature Ridge Regression</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Design Experiments to Compare Multi-armed Bandit Algorithms</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">Large deviation principles for convolutional Bayesian neural networks</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">Agnostic learning in (almost) optimal time via Gaussian surface area</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">Predictive Coding Graphs are a Superset of Feedforward Neural Networks</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">Gradient Flow Polarizes Softmax Outputs towards Low-Entropy Solutions</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">Synthetic Monitoring Environments for Reinforcement Learning</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Certified and accurate computation of function space norms of deep neural networks</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Bayesian Additive Distribution Regression</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">Kernel VICReg for Self-Supervised Learning in Reproducing Kernel Hilbert Space</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">Spectral/Spatial Tensor Atomic Cluster Expansion with Universal Embeddings in Cartesian Space</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">Self-Speculative Masked Diffusions</a>
+            <span class="title-label-badge" style="background-color: #9b59b6;">diffusion</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Escaping Model Collapse via Synthetic Data Verification: Near-term Improvements and Long-term Convergence</a>
+            <span class="title-label-badge" style="background-color: #e67e22;">synthetic data</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">DAISI: Data Assimilation with Inverse Sampling using Stochastic Interpolants</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-21" onchange="updateSelectedCount()">
+            <span class="title-number">21.</span>
+            <a href="#paper-21">Expert-Aided Causal Discovery of Ancestral Graphs</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-22" onchange="updateSelectedCount()">
+            <span class="title-number">22.</span>
+            <a href="#paper-22">Predictive Coding Networks and Inference Learning: Tutorial and Survey</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-23" onchange="updateSelectedCount()">
+            <span class="title-number">23.</span>
+            <a href="#paper-23">Theoretical Foundations of Conformal Prediction</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-24" onchange="updateSelectedCount()">
+            <span class="title-number">24.</span>
+            <a href="#paper-24">L0-Regularized Quadratic Surface Support Vector Machines</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-25" onchange="updateSelectedCount()">
+            <span class="title-number">25.</span>
+            <a href="#paper-25">Entropic Mirror Descent for Linear Systems: Polyak's Stepsize and Implicit Bias</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-26" onchange="updateSelectedCount()">
+            <span class="title-number">26.</span>
+            <a href="#paper-26">ContextBench: Modifying Contexts for Targeted Latent Activation</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-27" onchange="updateSelectedCount()">
+            <span class="title-number">27.</span>
+            <a href="#paper-27">Iterative Quantum Feature Maps</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-28" onchange="updateSelectedCount()">
+            <span class="title-number">28.</span>
+            <a href="#paper-28">Learning the action for long-time-step simulations of molecular dynamics</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-29" onchange="updateSelectedCount()">
+            <span class="title-number">29.</span>
+            <a href="#paper-29">Learning Centre Partitions from Summaries</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-30" onchange="updateSelectedCount()">
+            <span class="title-number">30.</span>
+            <a href="#paper-30">CADM: Cluster-customized Adaptive Distance Metric for Categorical Data Clustering</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-31" onchange="updateSelectedCount()">
+            <span class="title-number">31.</span>
+            <a href="#paper-31">Data-Driven Global Sensitivity Analysis for Engineering Design Based on Individual Conditional Expectations</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Learning Optimal Distributionally Robust Individualized Treatment Rules Integrating Multi-Source Data", "author": "Wenhai Cui, Wen Su, Xingqiu Zhao", "published": "Mon, 09 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.05568", "summary": "arXiv:2603.05568v1 Announce Type: new \nAbstract: Integrative analysis of multiple datasets for estimating optimal individualized treatment rules (ITRs) can enhance decision efficiency. A central challenge is posterior shift, wherein the conditional distribution of potential outcomes given covariates differs between source and target populations. We propose a prior information-based distributionally robust ITR (PDRO-ITR) that maximizes the worst-case policy value over a covariate-dependent distributional uncertainty set, ensuring robust performance under posterior shift. The uncertainty set is constructed as an individualized combination of source distributions, with weights combining prior source-membership probabilities and deviation terms constrained to the probability simplex to accommodate posterior shift. We derive a closed-form solution for the PDRO-ITR and develop an adaptive procedure to tune the uncertainty level. We establish risk bounds for the PDRO-ITR estimator, which guarantees robust performance under the worst case. Extensive simulations and two real-data applications demonstrate that the proposed method achieves superior performance compared to existing approaches.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2603.05568" target="_blank">Learning Optimal Distributionally Robust Individualized Treatment Rules Integrating Multi-Source Data</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Wenhai Cui, Wen Su, Xingqiu Zhao</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 09 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.05568" target="_blank">https://arxiv.org/abs/2603.05568</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Integrative analysis of multiple datasets for estimating optimal individualized treatment rules (ITRs) can enhance decision efficiency. A central challenge is posterior shift, wherein the conditional distribution of potential outcomes given covariates differs between source and target populations. We propose a prior information-based distributionally robust ITR (PDRO-ITR) that maximizes the worst-case policy value over a covariate-dependent distributional uncertainty set, ensuring robust performance under posterior shift. The uncertainty set is constructed as an individualized combination of source distributions, with weights combining prior source-membership probabilities and deviation terms constrained to the probability simplex to accommodate posterior shift. We derive a closed-form solution for the PDRO-ITR and develop an adaptive procedure to tune the uncertainty level. We establish risk bounds for the PDRO-ITR estimator, which guarantees robust performance under the worst case. Extensive simulations and two real-data applications demonstrate that the proposed method achieves superior performance compared to existing approaches.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Prediction-Powered Conditional Inference", "author": "Yang Sui, Jin Zhou, Hua Zhou, Xiaowu Dai", "published": "Mon, 09 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.05575", "summary": "arXiv:2603.05575v1 Announce Type: new \nAbstract: We study prediction-powered conditional inference in the setting where labeled data are scarce, unlabeled covariates are abundant, and a black-box machine-learning predictor is available. The goal is to perform statistical inference on conditional functionals evaluated at a fixed test point, such as conditional means, without imposing a parametric model for the conditional relationship. Our approach combines localization with prediction-based variance reduction. First, we introduce a reproducing kernel-based localization method that learns a data-adaptive weight function from covariates and reformulates the target conditional moment at the test point as a weighted unconditional moment. Second, we incorporate machine-learning predictions through a correction-based decomposition of this localized moment, yielding a prediction-powered estimator and confidence interval that reduce variance when the predictor is informative while preserving validity regardless of predictor accuracy. We establish nonasymptotic error bounds and minimax-optimal convergence rates for the resulting estimator, prove pointwise asymptotic normality with consistent variance estimation, and provide an explicit variance decomposition that characterizes how machine-learning predictions and unlabeled covariates improve statistical efficiency. Numerical experiments on simulated and real datasets demonstrate valid conditional coverage and substantially sharper confidence intervals than alternative methods.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2603.05575" target="_blank">Prediction-Powered Conditional Inference</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yang Sui, Jin Zhou, Hua Zhou, Xiaowu Dai</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 09 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.05575" target="_blank">https://arxiv.org/abs/2603.05575</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study prediction-powered conditional inference in the setting where labeled data are scarce, unlabeled covariates are abundant, and a black-box machine-learning predictor is available. The goal is to perform statistical inference on conditional functionals evaluated at a fixed test point, such as conditional means, without imposing a parametric model for the conditional relationship. Our approach combines localization with prediction-based variance reduction. First, we introduce a reproducing kernel-based localization method that learns a data-adaptive weight function from covariates and reformulates the target conditional moment at the test point as a weighted unconditional moment. Second, we incorporate machine-learning predictions through a correction-based decomposition of this localized moment, yielding a prediction-powered estimator and confidence interval that reduce variance when the predictor is informative while preserving validity regardless of predictor accuracy. We establish nonasymptotic error bounds and minimax-optimal convergence rates for the resulting estimator, prove pointwise asymptotic normality with consistent variance estimation, and provide an explicit variance decomposition that characterizes how machine-learning predictions and unlabeled covariates improve statistical efficiency. Numerical experiments on simulated and real datasets demonstrate valid conditional coverage and substantially sharper confidence intervals than alternative methods.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "SPPCSO: Adaptive Penalized Estimation Method for High-Dimensional Correlated Data", "author": "Ying Hu, Hu Yang", "published": "Mon, 09 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.06251", "summary": "arXiv:2603.06251v1 Announce Type: new \nAbstract: With the rise of high-dimensional correlated data, multicollinearity poses a significant challenge to model stability, often leading to unstable estimation and reduced predictive accuracy. This work proposes the Single-Parametric Principal Component Selection Operator (SPPCSO), an innovative penalized estimation method that integrates single-parametric principal component regression and $L_{1}$ regularization to adaptively adjust the shrinkage factor by incorporating principal component information. This approach achieves a balance between variable selection and coefficient estimation, ensuring model stability and robust estimation even in high-dimensional, high-noise environments. The primary contribution lies in addressing the instability of traditional variable selection methods when applied to high-noise, high-dimensional correlated data. Theoretically, our method exhibits selection consistency and achieves a smaller estimation error bound compared to traditional penalized estimation approaches. Extensive numerical experiments demonstrate that SPPCSO not only delivers stable and reliable estimation in high-noise settings but also accurately distinguishes signal variables from noise variables in group-effect structured data with highly correlated noise variables, effectively eliminating redundant variables and achieving more stable variable selection. Furthermore, SPPCSO successfully identifies disease-associated genes in gene expression data analysis, showcasing strong practical value. The results indicate that SPPCSO serves as an ideal tool for high-dimensional variable selection, offering an efficient and interpretable solution for modeling correlated data.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2603.06251" target="_blank">SPPCSO: Adaptive Penalized Estimation Method for High-Dimensional Correlated Data</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ying Hu, Hu Yang</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 09 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.06251" target="_blank">https://arxiv.org/abs/2603.06251</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                With the rise of high-dimensional correlated data, multicollinearity poses a significant challenge to model stability, often leading to unstable estimation and reduced predictive accuracy. This work proposes the Single-Parametric Principal Component Selection Operator (SPPCSO), an innovative penalized estimation method that integrates single-parametric principal component regression and $L_{1}$ regularization to adaptively adjust the shrinkage factor by incorporating principal component information. This approach achieves a balance between variable selection and coefficient estimation, ensuring model stability and robust estimation even in high-dimensional, high-noise environments. The primary contribution lies in addressing the instability of traditional variable selection methods when applied to high-noise, high-dimensional correlated data. Theoretically, our method exhibits selection consistency and achieves a smaller estimation error bound compared to traditional penalized estimation approaches. Extensive numerical experiments demonstrate that SPPCSO not only delivers stable and reliable estimation in high-noise settings but also accurately distinguishes signal variables from noise variables in group-effect structured data with highly correlated noise variables, effectively eliminating redundant variables and achieving more stable variable selection. Furthermore, SPPCSO successfully identifies disease-associated genes in gene expression data analysis, showcasing strong practical value. The results indicate that SPPCSO serves as an ideal tool for high-dimensional variable selection, offering an efficient and interpretable solution for modeling correlated data.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "Robust support vector model based on bounded asymmetric elastic net loss for binary classification", "author": "Haiyan Du, Hu Yang", "published": "Mon, 09 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.06257", "summary": "arXiv:2603.06257v1 Announce Type: new \nAbstract: In this paper, we propose a novel bounded asymmetric elastic net ($L_{baen}$) loss function and combine it with the support vector machine (SVM), resulting in the BAEN-SVM. The $L_{baen}$ is bounded and asymmetric and can degrade to the asymmetric elastic net hinge loss, pinball loss, and asymmetric least squares loss. BAEN-SVM not only effectively handles noise-contaminated data but also addresses the geometric irrationalities in the traditional SVM. By proving the violation tolerance upper bound (VTUB) of BAEN-SVM, we show that the model is geometrically well-defined. Furthermore, we derive that the influence function of BAEN-SVM is bounded, providing a theoretical guarantee of its robustness to noise. The Fisher consistency of the model further ensures its generalization capability. Since the \\( L_{\\text{baen}} \\) loss is non-convex, we designed a clipping dual coordinate descent-based half-quadratic algorithm to solve the non-convex optimization problem efficiently. Experimental results on artificial and benchmark datasets indicate that the proposed method outperforms classical and advanced SVMs, particularly in noisy environments.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2603.06257" target="_blank">Robust support vector model based on bounded asymmetric elastic net loss for binary classification</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Haiyan Du, Hu Yang</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 09 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.06257" target="_blank">https://arxiv.org/abs/2603.06257</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we propose a novel bounded asymmetric elastic net ($L_{baen}$) loss function and combine it with the support vector machine (SVM), resulting in the BAEN-SVM. The $L_{baen}$ is bounded and asymmetric and can degrade to the asymmetric elastic net hinge loss, pinball loss, and asymmetric least squares loss. BAEN-SVM not only effectively handles noise-contaminated data but also addresses the geometric irrationalities in the traditional SVM. By proving the violation tolerance upper bound (VTUB) of BAEN-SVM, we show that the model is geometrically well-defined. Furthermore, we derive that the influence function of BAEN-SVM is bounded, providing a theoretical guarantee of its robustness to noise. The Fisher consistency of the model further ensures its generalization capability. Since the \( L_{\text{baen}} \) loss is non-convex, we designed a clipping dual coordinate descent-based half-quadratic algorithm to solve the non-convex optimization problem efficiently. Experimental results on artificial and benchmark datasets indicate that the proposed method outperforms classical and advanced SVMs, particularly in noisy environments.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "Semantics-Aware Caching for Concept Learning", "author": "Louis Mozart Kamdem Teyou, Caglar Demir, Axel-Cyrille Ngonga Ngomo", "published": "Mon, 09 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.06506", "summary": "arXiv:2603.06506v1 Announce Type: new \nAbstract: Concept learning is a form of supervised machine learning that operates on knowledge bases in description logics. State-of-the-art concept learners often rely on an iterative search through a countably infinite concept space. In each iteration, they retrieve instances of candidate solutions to select the best concept for the next iteration. While simple learning problems might require a few dozen instance retrieval calls to find a fitting solution, complex learning problems might necessitate thousands of calls. We alleviate the resulting runtime challenge by presenting a semantics-aware caching approach. Our cache is essentially a subsumption-aware map that links concepts to a set of instances via crisp set operations. Our experiments on 5 datasets with 4 symbolic reasoners, a neuro-symbolic reasoner, and 5 popular pagination policies demonstrate that our cache can reduce the runtime of concept retrieval and concept learning by an order of magnitude while being effective for both symbolic and neuro-symbolic reasoners.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2603.06506" target="_blank">Semantics-Aware Caching for Concept Learning</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Louis Mozart Kamdem Teyou, Caglar Demir, Axel-Cyrille Ngonga Ngomo</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 09 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.06506" target="_blank">https://arxiv.org/abs/2603.06506</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Concept learning is a form of supervised machine learning that operates on knowledge bases in description logics. State-of-the-art concept learners often rely on an iterative search through a countably infinite concept space. In each iteration, they retrieve instances of candidate solutions to select the best concept for the next iteration. While simple learning problems might require a few dozen instance retrieval calls to find a fitting solution, complex learning problems might necessitate thousands of calls. We alleviate the resulting runtime challenge by presenting a semantics-aware caching approach. Our cache is essentially a subsumption-aware map that links concepts to a set of instances via crisp set operations. Our experiments on 5 datasets with 4 symbolic reasoners, a neuro-symbolic reasoner, and 5 popular pagination policies demonstrate that our cache can reduce the runtime of concept retrieval and concept learning by an order of magnitude while being effective for both symbolic and neuro-symbolic reasoners.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "Behavior-dLDS: A decomposed linear dynamical systems model for neural activity partially constrained by behavior", "author": "Eva Yezerets, En Yang, Misha B. Ahrens, Adam S. Charles", "published": "Mon, 09 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.05612", "summary": "arXiv:2603.05612v1 Announce Type: cross \nAbstract: Brain-wide recordings of large-scale networks of neurons now provide an unprecedented view into how the brain drives behavior. However, brain activity contains both information directly related to behavior as well as the potential for many internal computations. Moreover, observable behavior is executed not only by the brain, but also by the spinal cord and peripheral nervous system. Behavior is a coarse-grained product of neural activity, and we thus take the view that it can be best represented by lower-dimensional latent neural dynamics. Capturing this indirect relationship while disambiguating behavior-generating networks from internal computations running in parallel requires new modeling approaches that can embody the parallel and distributed nature of large-scale neural populations. We thus present behavior-decomposed linear dynamical systems (b-dLDS) to disentangle simultaneously recorded subsystems and identify how the latent neural subsystems relate to behavior. We demonstrate the ability of b-dLDS to decouple behavioral vs. internal computations on controlled, simulated data, showing improvements over a state-of-the-art model that uses behavior to supervise all dynamics based on behavior. We then show that b-dLDS can further scale up to tens of thousands of neurons by applying our model to large-scale recording of a zebrafish hindbrain during the complex positional homeostasis behavior, wherein b-dLDS highlights behavior-related dynamic connectivity networks.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2603.05612" target="_blank">Behavior-dLDS: A decomposed linear dynamical systems model for neural activity partially constrained by behavior</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Eva Yezerets, En Yang, Misha B. Ahrens, Adam S. Charles</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 09 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.05612" target="_blank">https://arxiv.org/abs/2603.05612</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Brain-wide recordings of large-scale networks of neurons now provide an unprecedented view into how the brain drives behavior. However, brain activity contains both information directly related to behavior as well as the potential for many internal computations. Moreover, observable behavior is executed not only by the brain, but also by the spinal cord and peripheral nervous system. Behavior is a coarse-grained product of neural activity, and we thus take the view that it can be best represented by lower-dimensional latent neural dynamics. Capturing this indirect relationship while disambiguating behavior-generating networks from internal computations running in parallel requires new modeling approaches that can embody the parallel and distributed nature of large-scale neural populations. We thus present behavior-decomposed linear dynamical systems (b-dLDS) to disentangle simultaneously recorded subsystems and identify how the latent neural subsystems relate to behavior. We demonstrate the ability of b-dLDS to decouple behavioral vs. internal computations on controlled, simulated data, showing improvements over a state-of-the-art model that uses behavior to supervise all dynamics based on behavior. We then show that b-dLDS can further scale up to tens of thousands of neurons by applying our model to large-scale recording of a zebrafish hindbrain during the complex positional homeostasis behavior, wherein b-dLDS highlights behavior-related dynamic connectivity networks.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Improved Scaling Laws via Weak-to-Strong Generalization in Random Feature Ridge Regression", "author": "Diyuan Wu, Lehan Chen, Theodor Misiakiewicz, Marco Mondelli", "published": "Mon, 09 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.05691", "summary": "arXiv:2603.05691v1 Announce Type: cross \nAbstract: It is increasingly common in machine learning to use learned models to label data and then employ such data to train more capable models. The phenomenon of weak-to-strong generalization exemplifies the advantage of this two-stage procedure: a strong student is trained on imperfect labels obtained from a weak teacher, and yet the strong student outperforms the weak teacher. In this paper, we show that the potential improvement is substantial, in the sense that it affects the scaling law followed by the test error. Specifically, we consider students and teachers trained via random feature ridge regression (RFRR). Our main technical contribution is to derive a deterministic equivalent for the excess test error of the student trained on labels obtained via the teacher. Via this deterministic equivalent, we then identify regimes in which the scaling law of the student improves upon that of the teacher, unveiling that the improvement can be achieved both in bias-dominated and variance-dominated settings. Strikingly, the student may attain the minimax optimal rate regardless of the scaling law of the teacher -- in fact, when the test error of the teacher does not even decay with the sample size.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2603.05691" target="_blank">Improved Scaling Laws via Weak-to-Strong Generalization in Random Feature Ridge Regression</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Diyuan Wu, Lehan Chen, Theodor Misiakiewicz, Marco Mondelli</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 09 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.05691" target="_blank">https://arxiv.org/abs/2603.05691</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                It is increasingly common in machine learning to use learned models to label data and then employ such data to train more capable models. The phenomenon of weak-to-strong generalization exemplifies the advantage of this two-stage procedure: a strong student is trained on imperfect labels obtained from a weak teacher, and yet the strong student outperforms the weak teacher. In this paper, we show that the potential improvement is substantial, in the sense that it affects the scaling law followed by the test error. Specifically, we consider students and teachers trained via random feature ridge regression (RFRR). Our main technical contribution is to derive a deterministic equivalent for the excess test error of the student trained on labels obtained via the teacher. Via this deterministic equivalent, we then identify regimes in which the scaling law of the student improves upon that of the teacher, unveiling that the improvement can be achieved both in bias-dominated and variance-dominated settings. Strikingly, the student may attain the minimax optimal rate regardless of the scaling law of the teacher -- in fact, when the test error of the teacher does not even decay with the sample size.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Design Experiments to Compare Multi-armed Bandit Algorithms", "author": "Huiling Meng, Ningyuan Chen, Xuefeng Gao", "published": "Mon, 09 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.05919", "summary": "arXiv:2603.05919v1 Announce Type: cross \nAbstract: Online platforms routinely compare multi-armed bandit algorithms, such as UCB and Thompson Sampling, to select the best-performing policy. Unlike standard A/B tests for static treatments, each run of a bandit algorithm over $T$ users produces only one dependent trajectory, because the algorithm's decisions depend on all past interactions. Reliable inference therefore demands many independent restarts of the algorithm, making experimentation costly and delaying deployment decisions. We propose Artificial Replay (AR) as a new experimental design for this problem. AR first runs one policy and records its trajectory. When the second policy is executed, it reuses a recorded reward whenever it selects an action the first policy already took, and queries the real environment only otherwise. We develop a new analytical framework for this design and prove three key properties of the resulting estimator: it is unbiased; it requires only $T + o(T)$ user interactions instead of $2T$ for a run of the treatment and control policies, nearly halving the experimental cost when both policies have sub-linear regret; and its variance grows sub-linearly in $T$, whereas the estimator from a na\\\"ive design has a linearly-growing variance. Numerical experiments with UCB, Thompson Sampling, and $\\epsilon$-greedy policies confirm these theoretical gains.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2603.05919" target="_blank">Design Experiments to Compare Multi-armed Bandit Algorithms</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Huiling Meng, Ningyuan Chen, Xuefeng Gao</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 09 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.05919" target="_blank">https://arxiv.org/abs/2603.05919</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Online platforms routinely compare multi-armed bandit algorithms, such as UCB and Thompson Sampling, to select the best-performing policy. Unlike standard A/B tests for static treatments, each run of a bandit algorithm over $T$ users produces only one dependent trajectory, because the algorithm's decisions depend on all past interactions. Reliable inference therefore demands many independent restarts of the algorithm, making experimentation costly and delaying deployment decisions. We propose Artificial Replay (AR) as a new experimental design for this problem. AR first runs one policy and records its trajectory. When the second policy is executed, it reuses a recorded reward whenever it selects an action the first policy already took, and queries the real environment only otherwise. We develop a new analytical framework for this design and prove three key properties of the resulting estimator: it is unbiased; it requires only $T + o(T)$ user interactions instead of $2T$ for a run of the treatment and control policies, nearly halving the experimental cost when both policies have sub-linear regret; and its variance grows sub-linearly in $T$, whereas the estimator from a na\"ive design has a linearly-growing variance. Numerical experiments with UCB, Thompson Sampling, and $\epsilon$-greedy policies confirm these theoretical gains.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "Large deviation principles for convolutional Bayesian neural networks", "author": "Federico Bassetti, Vassili De Palma, Lucia Ladelli", "published": "Mon, 09 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.06023", "summary": "arXiv:2603.06023v1 Announce Type: cross \nAbstract: While suitably scaled CNNs with Gaussian initialization are known to converge to Gaussian processes as the number of channels diverges, little is known beyond this Gaussian limit. We establish a large deviation principle (LDP) for convolutional neural networks in the infinite-channel regime.\n  We consider a broad class of multidimensional CNN architectures characterized by general receptive fields encoded through a patch-extractor function satisfying mild structural assumptions. Our main result establishes a large deviation principle (LDP) for the sequence of conditional covariance matrices under Gaussian prior distribution on the weights. We further derive an LDP for the posterior distribution obtained by conditioning on a finite number of observations. In addition, we provide a streamlined proof of the concentration of the conditional covariances and of the Gaussian equivalence of the network.\n  To the best of our knowledge, this is the first large deviation principle established for convolutional neural networks.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2603.06023" target="_blank">Large deviation principles for convolutional Bayesian neural networks</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Federico Bassetti, Vassili De Palma, Lucia Ladelli</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 09 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.06023" target="_blank">https://arxiv.org/abs/2603.06023</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                While suitably scaled CNNs with Gaussian initialization are known to converge to Gaussian processes as the number of channels diverges, little is known beyond this Gaussian limit. We establish a large deviation principle (LDP) for convolutional neural networks in the infinite-channel regime.
+  We consider a broad class of multidimensional CNN architectures characterized by general receptive fields encoded through a patch-extractor function satisfying mild structural assumptions. Our main result establishes a large deviation principle (LDP) for the sequence of conditional covariance matrices under Gaussian prior distribution on the weights. We further derive an LDP for the posterior distribution obtained by conditioning on a finite number of observations. In addition, we provide a streamlined proof of the concentration of the conditional covariances and of the Gaussian equivalence of the network.
+  To the best of our knowledge, this is the first large deviation principle established for convolutional neural networks.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "Agnostic learning in (almost) optimal time via Gaussian surface area", "author": "Lucas Pesenti, Lucas Slot, Manuel Wiedmer", "published": "Mon, 09 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.06027", "summary": "arXiv:2603.06027v1 Announce Type: cross \nAbstract: The complexity of learning a concept class under Gaussian marginals in the difficult agnostic model is closely related to its $L_1$-approximability by low-degree polynomials. For any concept class with Gaussian surface area at most $\\Gamma$, Klivans et al. (2008) show that degree $d = O(\\Gamma^2 / \\varepsilon^4)$ suffices to achieve an $\\varepsilon$-approximation. This leads to the best-known bounds on the complexity of learning a variety of concept classes. In this note, we improve their analysis by showing that degree $d = \\tilde O (\\Gamma^2 / \\varepsilon^2)$ is enough. In light of lower bounds due to Diakonikolas et al. (2021), this yields (near) optimal bounds on the complexity of agnostically learning polynomial threshold functions in the statistical query model. Our proof relies on a direct analogue of a construction of Feldman et al. (2020), who considered $L_1$-approximation on the Boolean hypercube.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2603.06027" target="_blank">Agnostic learning in (almost) optimal time via Gaussian surface area</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Lucas Pesenti, Lucas Slot, Manuel Wiedmer</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 09 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.06027" target="_blank">https://arxiv.org/abs/2603.06027</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The complexity of learning a concept class under Gaussian marginals in the difficult agnostic model is closely related to its $L_1$-approximability by low-degree polynomials. For any concept class with Gaussian surface area at most $\Gamma$, Klivans et al. (2008) show that degree $d = O(\Gamma^2 / \varepsilon^4)$ suffices to achieve an $\varepsilon$-approximation. This leads to the best-known bounds on the complexity of learning a variety of concept classes. In this note, we improve their analysis by showing that degree $d = \tilde O (\Gamma^2 / \varepsilon^2)$ is enough. In light of lower bounds due to Diakonikolas et al. (2021), this yields (near) optimal bounds on the complexity of agnostically learning polynomial threshold functions in the statistical query model. Our proof relies on a direct analogue of a construction of Feldman et al. (2020), who considered $L_1$-approximation on the Boolean hypercube.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "Predictive Coding Graphs are a Superset of Feedforward Neural Networks", "author": "Bj\\\"orn van Zwol", "published": "Mon, 09 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.06142", "summary": "arXiv:2603.06142v1 Announce Type: cross \nAbstract: Predictive coding graphs (PCGs) are a recently introduced generalization to predictive coding networks, a neuroscience-inspired probabilistic latent variable model. Here, we prove how PCGs define a mathematical superset of feedforward artificial neural networks (multilayer perceptrons). This positions PCNs more strongly within contemporary machine learning (ML), and reinforces earlier proposals to study the use of non-hierarchical neural networks for ML tasks, and more generally the notion of topology in neural networks.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2603.06142" target="_blank">Predictive Coding Graphs are a Superset of Feedforward Neural Networks</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Bj\"orn van Zwol</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 09 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.06142" target="_blank">https://arxiv.org/abs/2603.06142</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Predictive coding graphs (PCGs) are a recently introduced generalization to predictive coding networks, a neuroscience-inspired probabilistic latent variable model. Here, we prove how PCGs define a mathematical superset of feedforward artificial neural networks (multilayer perceptrons). This positions PCNs more strongly within contemporary machine learning (ML), and reinforces earlier proposals to study the use of non-hierarchical neural networks for ML tasks, and more generally the notion of topology in neural networks.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "Gradient Flow Polarizes Softmax Outputs towards Low-Entropy Solutions", "author": "Aditya Varre, Mark Rofin, Nicolas Flammarion", "published": "Mon, 09 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.06248", "summary": "arXiv:2603.06248v1 Announce Type: cross \nAbstract: Understanding the intricate non-convex training dynamics of softmax-based models is crucial for explaining the empirical success of transformers. In this article, we analyze the gradient flow dynamics of the value-softmax model, defined as ${L}(\\mathbf{V} \\sigma(\\mathbf{a}))$, where $\\mathbf{V}$ and $\\mathbf{a}$ are a learnable value matrix and attention vector, respectively. As the matrix times softmax vector parameterization constitutes the core building block of self-attention, our analysis provides direct insight into transformer's training dynamics. We reveal that gradient flow on this structure inherently drives the optimization toward solutions characterized by low-entropy outputs. We demonstrate the universality of this polarizing effect across various objectives, including logistic and square loss. Furthermore, we discuss the practical implications of these theoretical results, offering a formal mechanism for empirical phenomena such as attention sinks and massive activations.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2603.06248" target="_blank">Gradient Flow Polarizes Softmax Outputs towards Low-Entropy Solutions</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Aditya Varre, Mark Rofin, Nicolas Flammarion</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 09 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.06248" target="_blank">https://arxiv.org/abs/2603.06248</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Understanding the intricate non-convex training dynamics of softmax-based models is crucial for explaining the empirical success of transformers. In this article, we analyze the gradient flow dynamics of the value-softmax model, defined as ${L}(\mathbf{V} \sigma(\mathbf{a}))$, where $\mathbf{V}$ and $\mathbf{a}$ are a learnable value matrix and attention vector, respectively. As the matrix times softmax vector parameterization constitutes the core building block of self-attention, our analysis provides direct insight into transformer's training dynamics. We reveal that gradient flow on this structure inherently drives the optimization toward solutions characterized by low-entropy outputs. We demonstrate the universality of this polarizing effect across various objectives, including logistic and square loss. Furthermore, we discuss the practical implications of these theoretical results, offering a formal mechanism for empirical phenomena such as attention sinks and massive activations.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "Synthetic Monitoring Environments for Reinforcement Learning", "author": "Leonard Pleiss, Carolin Schmidt, Maximilian Schiffer", "published": "Mon, 09 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.06252", "summary": "arXiv:2603.06252v1 Announce Type: cross \nAbstract: Reinforcement Learning (RL) lacks benchmarks that enable precise, white-box diagnostics of agent behavior. Current environments often entangle complexity factors and lack ground-truth optimality metrics, making it difficult to isolate why algorithms fail. We introduce Synthetic Monitoring Environments (SMEs), an infinite suite of continuous control tasks. SMEs provide fully configurable task characteristics and known optimal policies. As such, SMEs allow for the exact calculation of instantaneous regret. Their rigorous geometric state space bounds allow for systematic within-distribution (WD) and out-of-distribution (OOD) evaluation. We demonstrate the framework's benefit through multidimensional ablations of PPO, TD3, and SAC, revealing how specific environmental properties - such as action or state space size, reward sparsity and complexity of the optimal policy - impact WD and OOD performance. We thereby show that SMEs offer a standardized, transparent testbed for transitioning RL evaluation from empirical benchmarking toward rigorous scientific analysis.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2603.06252" target="_blank">Synthetic Monitoring Environments for Reinforcement Learning</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Leonard Pleiss, Carolin Schmidt, Maximilian Schiffer</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 09 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.06252" target="_blank">https://arxiv.org/abs/2603.06252</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Reinforcement Learning (RL) lacks benchmarks that enable precise, white-box diagnostics of agent behavior. Current environments often entangle complexity factors and lack ground-truth optimality metrics, making it difficult to isolate why algorithms fail. We introduce Synthetic Monitoring Environments (SMEs), an infinite suite of continuous control tasks. SMEs provide fully configurable task characteristics and known optimal policies. As such, SMEs allow for the exact calculation of instantaneous regret. Their rigorous geometric state space bounds allow for systematic within-distribution (WD) and out-of-distribution (OOD) evaluation. We demonstrate the framework's benefit through multidimensional ablations of PPO, TD3, and SAC, revealing how specific environmental properties - such as action or state space size, reward sparsity and complexity of the optimal policy - impact WD and OOD performance. We thereby show that SMEs offer a standardized, transparent testbed for transitioning RL evaluation from empirical benchmarking toward rigorous scientific analysis.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Certified and accurate computation of function space norms of deep neural networks", "author": "Johannes Gr\\\"undler, Moritz Maibaum, Philipp Petersen", "published": "Mon, 09 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.06431", "summary": "arXiv:2603.06431v1 Announce Type: cross \nAbstract: Neural network methods for PDEs require reliable error control in function space norms. However, trained neural networks can typically only be probed at a finite number of point values. Without strong assumptions, point evaluations alone do not provide enough information to derive tight deterministic and guaranteed bounds on function space norms. In this work, we move beyond a purely black-box setting and exploit the neural network structure directly. We present a framework for the certified and accurate computation of integral quantities of neural networks, including Lebesgue and Sobolev norms, by combining interval arithmetic enclosures on axis-aligned boxes with adaptive marking/refinement and quadrature-based aggregation. On each box, we compute guaranteed lower and upper bounds for function values and derivatives, and propagate these local certificates to global lower and upper bounds for the target integrals. Our analysis provides a general convergence theorem for such certified adaptive quadrature procedures and instantiates it for function values, Jacobians, and Hessians, yielding certified computation of $L^p$, $W^{1,p}$, and $W^{2,p}$ norms. We further show how these ingredients lead to practical certified bounds for PINN interior residuals. Numerical experiments illustrate the accuracy and practical behavior of the proposed methods.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2603.06431" target="_blank">Certified and accurate computation of function space norms of deep neural networks</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Johannes Gr\"undler, Moritz Maibaum, Philipp Petersen</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 09 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.06431" target="_blank">https://arxiv.org/abs/2603.06431</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Neural network methods for PDEs require reliable error control in function space norms. However, trained neural networks can typically only be probed at a finite number of point values. Without strong assumptions, point evaluations alone do not provide enough information to derive tight deterministic and guaranteed bounds on function space norms. In this work, we move beyond a purely black-box setting and exploit the neural network structure directly. We present a framework for the certified and accurate computation of integral quantities of neural networks, including Lebesgue and Sobolev norms, by combining interval arithmetic enclosures on axis-aligned boxes with adaptive marking/refinement and quadrature-based aggregation. On each box, we compute guaranteed lower and upper bounds for function values and derivatives, and propagate these local certificates to global lower and upper bounds for the target integrals. Our analysis provides a general convergence theorem for such certified adaptive quadrature procedures and instantiates it for function values, Jacobians, and Hessians, yielding certified computation of $L^p$, $W^{1,p}$, and $W^{2,p}$ norms. We further show how these ingredients lead to practical certified bounds for PINN interior residuals. Numerical experiments illustrate the accuracy and practical behavior of the proposed methods.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Bayesian Additive Distribution Regression", "author": "Antonio R. Linero, Soumyabrata Bose, Jared Murray", "published": "Mon, 09 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.06462", "summary": "arXiv:2603.06462v1 Announce Type: cross \nAbstract: Distribution regression, where the goal is to predict a scalar response from a distribution-valued predictor, arises naturally in settings where observations are grouped and outcomes depend on group-level characteristics rather than on individual measurements. We introduce DistBART, a Bayesian nonparametric approach to distribution regression that models the regression function as a linear functional with the Riesz representer assigned a Bayesian additive regression trees (BART) prior. We argue that shallow decision tree ensembles encode reasonable inductive biases for tabular data, making them appropriate in settings where the functional depends primarily on low-dimensional marginals of the distributions. We show this both empirically on synthetic and real data and theoretically through an adaptive posterior concentration result. We also establish connections to kernel methods, and use this connection to motivate variants of DistBART that can learn nonlinear functionals. To enable scalability to large datasets, we develop a random-feature approximation that samples trees from the BART prior and reduces inference to sparse Bayesian linear regression, achieving computational efficiency while retaining uncertainty quantification.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2603.06462" target="_blank">Bayesian Additive Distribution Regression</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Antonio R. Linero, Soumyabrata Bose, Jared Murray</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 09 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.06462" target="_blank">https://arxiv.org/abs/2603.06462</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Distribution regression, where the goal is to predict a scalar response from a distribution-valued predictor, arises naturally in settings where observations are grouped and outcomes depend on group-level characteristics rather than on individual measurements. We introduce DistBART, a Bayesian nonparametric approach to distribution regression that models the regression function as a linear functional with the Riesz representer assigned a Bayesian additive regression trees (BART) prior. We argue that shallow decision tree ensembles encode reasonable inductive biases for tabular data, making them appropriate in settings where the functional depends primarily on low-dimensional marginals of the distributions. We show this both empirically on synthetic and real data and theoretically through an adaptive posterior concentration result. We also establish connections to kernel methods, and use this connection to motivate variants of DistBART that can learn nonlinear functionals. To enable scalability to large datasets, we develop a random-feature approximation that samples trees from the BART prior and reduces inference to sparse Bayesian linear regression, achieving computational efficiency while retaining uncertainty quantification.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "Kernel VICReg for Self-Supervised Learning in Reproducing Kernel Hilbert Space", "author": "M. Hadi Sepanj, Benyamin Ghojogh, Saed Moradi, Paul Fieguth", "published": "Mon, 09 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2509.07289", "summary": "arXiv:2509.07289v2 Announce Type: replace \nAbstract: Self-supervised learning (SSL) has emerged as a powerful paradigm for representation learning by optimizing geometric objectives, such as invariance to augmentations, variance preservation, and feature decorrelation, without requiring labels. However, most existing methods operate in Euclidean space, limiting their ability to capture nonlinear dependencies and geometric structures. In this work, we propose Kernel VICReg, a novel self-supervised learning framework that pulls the VICReg objective into a Reproducing Kernel Hilbert Space (RKHS). By kernelizing each term of the loss, variance, invariance, and covariance, we obtain a general formulation that operates on double-centered kernel matrices and Hilbert--Schmidt norms, enabling nonlinear feature learning without explicit mappings. We demonstrate that Kernel VICReg mitigates the risk of representational collapse under challenging conditions and improves performance on datasets exhibiting nonlinear structure or limited sample regimes. Empirical evaluations across MNIST, CIFAR-10, STL-10, TinyImageNet, and ImageNet100 show consistent gains over Euclidean VICReg, with particularly strong improvements on datasets where nonlinear structures are prominent. UMAP visualizations are provided only as a qualitative illustration of embedding geometry and are not used as a calibration or statistical validation. Our results suggest that kernelizing SSL objectives is a promising direction for bridging classical kernel methods with modern representation learning.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2509.07289" target="_blank">Kernel VICReg for Self-Supervised Learning in Reproducing Kernel Hilbert Space</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> M. Hadi Sepanj, Benyamin Ghojogh, Saed Moradi, Paul Fieguth</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 09 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2509.07289" target="_blank">https://arxiv.org/abs/2509.07289</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Self-supervised learning (SSL) has emerged as a powerful paradigm for representation learning by optimizing geometric objectives, such as invariance to augmentations, variance preservation, and feature decorrelation, without requiring labels. However, most existing methods operate in Euclidean space, limiting their ability to capture nonlinear dependencies and geometric structures. In this work, we propose Kernel VICReg, a novel self-supervised learning framework that pulls the VICReg objective into a Reproducing Kernel Hilbert Space (RKHS). By kernelizing each term of the loss, variance, invariance, and covariance, we obtain a general formulation that operates on double-centered kernel matrices and Hilbert--Schmidt norms, enabling nonlinear feature learning without explicit mappings. We demonstrate that Kernel VICReg mitigates the risk of representational collapse under challenging conditions and improves performance on datasets exhibiting nonlinear structure or limited sample regimes. Empirical evaluations across MNIST, CIFAR-10, STL-10, TinyImageNet, and ImageNet100 show consistent gains over Euclidean VICReg, with particularly strong improvements on datasets where nonlinear structures are prominent. UMAP visualizations are provided only as a qualitative illustration of embedding geometry and are not used as a calibration or statistical validation. Our results suggest that kernelizing SSL objectives is a promising direction for bridging classical kernel methods with modern representation learning.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "Spectral/Spatial Tensor Atomic Cluster Expansion with Universal Embeddings in Cartesian Space", "author": "Zemin Xu, Wenbo Xie, P. Hu", "published": "Mon, 09 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2509.14961", "summary": "arXiv:2509.14961v3 Announce Type: replace \nAbstract: Equivariant atomistic machine learning models have largely been built on spherical-tensor representations, where explicit angular-momentum coupling introduces substantial complexity and systematic extensions beyond energies and forces remain challenging, often requires problem-specific architectural choices. Here we introduce the Tensor Atomic Cluster Expansion (TACE), which unifies scalar and tensorial modeling in Cartesian and space by decomposing local environments into irreducible Cartesian tensors (ICT) constructing a controlled many-body hierarchy with atomic cluster expansion (ACE). In addition to performing ACE in the frequency domain, we propose an efficient Clebsch-Gordan-free alternative in the spatial domain. TACE provides universal invariant (e.g., fidelity tags and charges) and equivariant (e.g., external electric fields and non-collinear magnetic moments) embeddings and predicted tensorial observables are handled on equal footing and enabling explicit control at inference. We demonstrate the accuracy, stability, and efficiency across finite molecules and extended materials, including in-domain and out-of-domain benchmarks, spectra, Hessian, external-field responses, charged systems, and multi-fidelity/head training. We further show its robustness on nonequilibrium/reactive datasets and controlled scaling when extending to large foundation model datasets.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2509.14961" target="_blank">Spectral/Spatial Tensor Atomic Cluster Expansion with Universal Embeddings in Cartesian Space</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Zemin Xu, Wenbo Xie, P. Hu</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 09 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2509.14961" target="_blank">https://arxiv.org/abs/2509.14961</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Equivariant atomistic machine learning models have largely been built on spherical-tensor representations, where explicit angular-momentum coupling introduces substantial complexity and systematic extensions beyond energies and forces remain challenging, often requires problem-specific architectural choices. Here we introduce the Tensor Atomic Cluster Expansion (TACE), which unifies scalar and tensorial modeling in Cartesian and space by decomposing local environments into irreducible Cartesian tensors (ICT) constructing a controlled many-body hierarchy with atomic cluster expansion (ACE). In addition to performing ACE in the frequency domain, we propose an efficient Clebsch-Gordan-free alternative in the spatial domain. TACE provides universal invariant (e.g., fidelity tags and charges) and equivariant (e.g., external electric fields and non-collinear magnetic moments) embeddings and predicted tensorial observables are handled on equal footing and enabling explicit control at inference. We demonstrate the accuracy, stability, and efficiency across finite molecules and extended materials, including in-domain and out-of-domain benchmarks, spectra, Hessian, external-field responses, charged systems, and multi-fidelity/head training. We further show its robustness on nonequilibrium/reactive datasets and controlled scaling when extending to large foundation model datasets.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "Self-Speculative Masked Diffusions", "author": "Andrew Campbell, Valentin De Bortoli, Jiaxin Shi, Arnaud Doucet", "published": "Mon, 09 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2510.03929", "summary": "arXiv:2510.03929v2 Announce Type: replace \nAbstract: We present self-speculative masked diffusions, a new class of masked diffusion generative models for discrete data that require significantly fewer function evaluations to generate samples. Standard masked diffusion models predict factorized logits over currently masked positions. A number of masked positions are then sampled, however, the factorization approximation means that sampling too many positions in one go leads to poor sample quality. As a result, many simulation steps and therefore neural network function evaluations are required to generate high-quality data. We reduce the computational burden by generating non-factorized predictions over masked positions. This is achieved by modifying the final transformer attention mask from non-causal to causal, enabling draft token generation and parallel validation via a novel, model-integrated speculative sampling mechanism. This results in a non-factorized predictive distribution over masked positions in a single forward pass. We apply our method to GPT2 scale text modelling and protein sequence generation, finding that we can achieve a ~2x reduction in the required number of network forward passes relative to standard masked diffusion models.", "number": 18, "labels": [{"name": "diffusion", "color": "#9b59b6"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2510.03929" target="_blank">Self-Speculative Masked Diffusions</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #9b59b6;">diffusion</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Andrew Campbell, Valentin De Bortoli, Jiaxin Shi, Arnaud Doucet</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 09 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.03929" target="_blank">https://arxiv.org/abs/2510.03929</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We present self-speculative masked diffusions, a new class of masked diffusion generative models for discrete data that require significantly fewer function evaluations to generate samples. Standard masked diffusion models predict factorized logits over currently masked positions. A number of masked positions are then sampled, however, the factorization approximation means that sampling too many positions in one go leads to poor sample quality. As a result, many simulation steps and therefore neural network function evaluations are required to generate high-quality data. We reduce the computational burden by generating non-factorized predictions over masked positions. This is achieved by modifying the final transformer attention mask from non-causal to causal, enabling draft token generation and parallel validation via a novel, model-integrated speculative sampling mechanism. This results in a non-factorized predictive distribution over masked positions in a single forward pass. We apply our method to GPT2 scale text modelling and protein sequence generation, finding that we can achieve a ~2x reduction in the required number of network forward passes relative to standard masked diffusion models.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Escaping Model Collapse via Synthetic Data Verification: Near-term Improvements and Long-term Convergence", "author": "Bingji Yi, Qiyuan Liu, Yuwei Cheng, Haifeng Xu", "published": "Mon, 09 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2510.16657", "summary": "arXiv:2510.16657v2 Announce Type: replace \nAbstract: Synthetic data has been increasingly used to train frontier generative models. However, recent studies raise key concerns that iteratively retraining a generative model on its self-generated synthetic data may keep deteriorating model performance, a phenomenon often coined model collapse. In this paper, we investigate ways to modify the synthetic retraining process to avoid model collapse, and even possibly help reverse the trend from collapse to improvement. Our key finding is that by injecting information through an external synthetic data verifier, whether a human or a better model, synthetic retraining will not cause model collapse. Specifically, we situate our theoretical analysis in the fundamental linear regression setting, showing that verifier-guided retraining can yield near-term improvements, but ultimately drives the parameter estimate to the verifier's \"knowledge center\" in the long run. Our theory further predicts that, unless the verifier is perfectly reliable, these early gains will plateau and may even reverse. Indeed, our experiments across linear regression, Variational Autoencoders (VAEs) trained on MNIST, and fining-tuning SmolLM2-135M on the XSUM task confirm these theoretical insights.", "number": 19, "labels": [{"name": "synthetic data", "color": "#e67e22"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2510.16657" target="_blank">Escaping Model Collapse via Synthetic Data Verification: Near-term Improvements and Long-term Convergence</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #e67e22;">synthetic data</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Bingji Yi, Qiyuan Liu, Yuwei Cheng, Haifeng Xu</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 09 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.16657" target="_blank">https://arxiv.org/abs/2510.16657</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Synthetic data has been increasingly used to train frontier generative models. However, recent studies raise key concerns that iteratively retraining a generative model on its self-generated synthetic data may keep deteriorating model performance, a phenomenon often coined model collapse. In this paper, we investigate ways to modify the synthetic retraining process to avoid model collapse, and even possibly help reverse the trend from collapse to improvement. Our key finding is that by injecting information through an external synthetic data verifier, whether a human or a better model, synthetic retraining will not cause model collapse. Specifically, we situate our theoretical analysis in the fundamental linear regression setting, showing that verifier-guided retraining can yield near-term improvements, but ultimately drives the parameter estimate to the verifier's "knowledge center" in the long run. Our theory further predicts that, unless the verifier is perfectly reliable, these early gains will plateau and may even reverse. Indeed, our experiments across linear regression, Variational Autoencoders (VAEs) trained on MNIST, and fining-tuning SmolLM2-135M on the XSUM task confirm these theoretical insights.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "DAISI: Data Assimilation with Inverse Sampling using Stochastic Interpolants", "author": "Martin Andrae, Erik Larsson, So Takao, Tomas Landelius, Fredrik Lindsten", "published": "Mon, 09 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2512.00252", "summary": "arXiv:2512.00252v3 Announce Type: replace \nAbstract: Data assimilation (DA) is a cornerstone of scientific and engineering applications, combining model forecasts with sparse and noisy observations to estimate latent system states. Classical high-dimensional DA methods, such as the ensemble Kalman filter, rely on Gaussian approximations that are violated for complex dynamics or observation operators. To address this limitation, we introduce DAISI, a scalable filtering algorithm built on flow-based generative models that enables flexible probabilistic inference using data-driven priors. The core idea is to use a stationary, pre-trained generative prior that first incorporates forecast information through a novel inverse-sampling step, before assimilating observations via guidance-based conditional sampling. This allows us to leverage any forecasting model as part of the DA pipeline without having to retrain or fine-tune the generative prior at each assimilation step. Experiments on challenging nonlinear systems show that DAISI achieves accurate filtering results in regimes with sparse, noisy, and nonlinear observations where traditional methods struggle.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2512.00252" target="_blank">DAISI: Data Assimilation with Inverse Sampling using Stochastic Interpolants</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Martin Andrae, Erik Larsson, So Takao, Tomas Landelius, Fredrik Lindsten</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 09 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.00252" target="_blank">https://arxiv.org/abs/2512.00252</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Data assimilation (DA) is a cornerstone of scientific and engineering applications, combining model forecasts with sparse and noisy observations to estimate latent system states. Classical high-dimensional DA methods, such as the ensemble Kalman filter, rely on Gaussian approximations that are violated for complex dynamics or observation operators. To address this limitation, we introduce DAISI, a scalable filtering algorithm built on flow-based generative models that enables flexible probabilistic inference using data-driven priors. The core idea is to use a stationary, pre-trained generative prior that first incorporates forecast information through a novel inverse-sampling step, before assimilating observations via guidance-based conditional sampling. This allows us to leverage any forecasting model as part of the DA pipeline without having to retrain or fine-tune the generative prior at each assimilation step. Experiments on challenging nonlinear systems show that DAISI achieves accurate filtering results in regimes with sparse, noisy, and nonlinear observations where traditional methods struggle.
+            </div>
+        </div>
+        <div class="paper" id="paper-21">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-21" data-paper-data='{"title": "Expert-Aided Causal Discovery of Ancestral Graphs", "author": "Tiago da Silva, Bruna Bazaluk, Eliezer de Souza da Silva, Ant\\'onio G\\'ois, Salem Lahlou, Dominik Heider, Samuel Kaski, Diego Mesquita, Ad\\`ele Helena Ribeiro", "published": "Mon, 09 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2309.12032", "summary": "arXiv:2309.12032v4 Announce Type: replace-cross \nAbstract: Causal discovery (CD) is an important component of many scientific applications, yet most techniques produce unreliable point estimates that often contradict expert knowledge. To mitigate this, recent research has focused on ex-ante incorporation of background knowledge into the CD process, typically under an unrealistic causal sufficiency assumption. When probing experts is costly (e.g., hidden behind expensive LLM APIs), however, ex-post model refinement that maximizes query utility is preferable. Also, when independent experts provide conflicting but better-than-random feedback, a principled aggregation method is required. In this context, we introduce the first CD algorithm that enables (i) distributional inference over ancestral graphs (AGs), which represent causal systems under latent confounding, and (ii) integration of both ex-ante and uncertain ex-post expert knowledge. Briefly, our method is a diversity-seeking reinforcement learning algorithm, termed Ancestral GFlowNet (AGFN), whose policy we iteratively refine based on a Bayesian model of the noisy expert feedback. Importantly, we prove convergence to the true AG given sufficiently accurate responses. Through validation on synthetic and realistic datasets using simulated humans and LLMs, we show AGFN is competitive with or superior to strong baselines in terms of structural Hamming distance and Bayesian Information Criterion.", "number": 21, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#21</span>
+                <a href="https://arxiv.org/abs/2309.12032" target="_blank">Expert-Aided Causal Discovery of Ancestral Graphs</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Tiago da Silva, Bruna Bazaluk, Eliezer de Souza da Silva, Ant\'onio G\'ois, Salem Lahlou, Dominik Heider, Samuel Kaski, Diego Mesquita, Ad\`ele Helena Ribeiro</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 09 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2309.12032" target="_blank">https://arxiv.org/abs/2309.12032</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Causal discovery (CD) is an important component of many scientific applications, yet most techniques produce unreliable point estimates that often contradict expert knowledge. To mitigate this, recent research has focused on ex-ante incorporation of background knowledge into the CD process, typically under an unrealistic causal sufficiency assumption. When probing experts is costly (e.g., hidden behind expensive LLM APIs), however, ex-post model refinement that maximizes query utility is preferable. Also, when independent experts provide conflicting but better-than-random feedback, a principled aggregation method is required. In this context, we introduce the first CD algorithm that enables (i) distributional inference over ancestral graphs (AGs), which represent causal systems under latent confounding, and (ii) integration of both ex-ante and uncertain ex-post expert knowledge. Briefly, our method is a diversity-seeking reinforcement learning algorithm, termed Ancestral GFlowNet (AGFN), whose policy we iteratively refine based on a Bayesian model of the noisy expert feedback. Importantly, we prove convergence to the true AG given sufficiently accurate responses. Through validation on synthetic and realistic datasets using simulated humans and LLMs, we show AGFN is competitive with or superior to strong baselines in terms of structural Hamming distance and Bayesian Information Criterion.
+            </div>
+        </div>
+        <div class="paper" id="paper-22">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-22" data-paper-data='{"title": "Predictive Coding Networks and Inference Learning: Tutorial and Survey", "author": "Bj\\\"orn van Zwol, Ro Jefferson, Egon L. van den Broek", "published": "Mon, 09 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2407.04117", "summary": "arXiv:2407.04117v3 Announce Type: replace-cross \nAbstract: Recent years have witnessed a growing call for renewed emphasis on neuroscience-inspired approaches in artificial intelligence research, under the banner of NeuroAI. A prime example of this is predictive coding networks (PCNs), based on the neuroscientific framework of predictive coding. This framework views the brain as a hierarchical Bayesian inference model that minimizes prediction errors through feedback connections. Unlike traditional neural networks trained with backpropagation (BP), PCNs utilize inference learning (IL), a more biologically plausible algorithm that explains patterns of neural activity that BP cannot. Historically, IL has been more computationally intensive, but recent advancements have demonstrated that it can achieve higher efficiency than BP with sufficient parallelization. Furthermore, PCNs can be mathematically considered a superset of traditional feedforward neural networks (FNNs), significantly extending the range of trainable architectures. As inherently probabilistic (graphical) latent variable models, PCNs provide a versatile framework for both supervised learning and unsupervised (generative) modeling that goes beyond traditional artificial neural networks. This work provides a comprehensive review and detailed formal specification of PCNs, particularly situating them within the context of modern ML methods. This positions PC as a promising framework for future ML innovations.", "number": 22, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#22</span>
+                <a href="https://arxiv.org/abs/2407.04117" target="_blank">Predictive Coding Networks and Inference Learning: Tutorial and Survey</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Bj\"orn van Zwol, Ro Jefferson, Egon L. van den Broek</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 09 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2407.04117" target="_blank">https://arxiv.org/abs/2407.04117</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Recent years have witnessed a growing call for renewed emphasis on neuroscience-inspired approaches in artificial intelligence research, under the banner of NeuroAI. A prime example of this is predictive coding networks (PCNs), based on the neuroscientific framework of predictive coding. This framework views the brain as a hierarchical Bayesian inference model that minimizes prediction errors through feedback connections. Unlike traditional neural networks trained with backpropagation (BP), PCNs utilize inference learning (IL), a more biologically plausible algorithm that explains patterns of neural activity that BP cannot. Historically, IL has been more computationally intensive, but recent advancements have demonstrated that it can achieve higher efficiency than BP with sufficient parallelization. Furthermore, PCNs can be mathematically considered a superset of traditional feedforward neural networks (FNNs), significantly extending the range of trainable architectures. As inherently probabilistic (graphical) latent variable models, PCNs provide a versatile framework for both supervised learning and unsupervised (generative) modeling that goes beyond traditional artificial neural networks. This work provides a comprehensive review and detailed formal specification of PCNs, particularly situating them within the context of modern ML methods. This positions PC as a promising framework for future ML innovations.
+            </div>
+        </div>
+        <div class="paper" id="paper-23">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-23" data-paper-data='{"title": "Theoretical Foundations of Conformal Prediction", "author": "Anastasios N. Angelopoulos, Rina Foygel Barber, Stephen Bates", "published": "Mon, 09 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2411.11824", "summary": "arXiv:2411.11824v5 Announce Type: replace-cross \nAbstract: This book is about conformal prediction and related inferential techniques that build on permutation tests and exchangeability. These techniques are useful in a diverse array of tasks, including hypothesis testing and providing uncertainty quantification guarantees for machine learning systems. Much of the current interest in conformal prediction is due to its ability to integrate into complex machine learning workflows, solving the problem of forming prediction sets without any assumptions on the form of the data generating distribution. Since contemporary machine learning algorithms have generally proven difficult to analyze directly, conformal prediction's main appeal is its ability to provide formal, finite-sample guarantees when paired with such methods.\n  The goal of this book is to teach the reader about the fundamental technical arguments that arise when researching conformal prediction and related questions in distribution-free inference. Many of these proof strategies, especially the more recent ones, are scattered among research papers, making it difficult for researchers to understand where to look, which results are important, and how exactly the proofs work. We hope to bridge this gap by curating what we believe to be some of the most important results in the literature and presenting their proofs in a unified language, with illustrations, and with an eye towards pedagogy.", "number": 23, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#23</span>
+                <a href="https://arxiv.org/abs/2411.11824" target="_blank">Theoretical Foundations of Conformal Prediction</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Anastasios N. Angelopoulos, Rina Foygel Barber, Stephen Bates</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 09 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2411.11824" target="_blank">https://arxiv.org/abs/2411.11824</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This book is about conformal prediction and related inferential techniques that build on permutation tests and exchangeability. These techniques are useful in a diverse array of tasks, including hypothesis testing and providing uncertainty quantification guarantees for machine learning systems. Much of the current interest in conformal prediction is due to its ability to integrate into complex machine learning workflows, solving the problem of forming prediction sets without any assumptions on the form of the data generating distribution. Since contemporary machine learning algorithms have generally proven difficult to analyze directly, conformal prediction's main appeal is its ability to provide formal, finite-sample guarantees when paired with such methods.
+  The goal of this book is to teach the reader about the fundamental technical arguments that arise when researching conformal prediction and related questions in distribution-free inference. Many of these proof strategies, especially the more recent ones, are scattered among research papers, making it difficult for researchers to understand where to look, which results are important, and how exactly the proofs work. We hope to bridge this gap by curating what we believe to be some of the most important results in the literature and presenting their proofs in a unified language, with illustrations, and with an eye towards pedagogy.
+            </div>
+        </div>
+        <div class="paper" id="paper-24">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-24" data-paper-data='{"title": "L0-Regularized Quadratic Surface Support Vector Machines", "author": "Ahmad Mousavi, Ramin Zandvakili, Zheming Gao", "published": "Mon, 09 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2501.11268", "summary": "arXiv:2501.11268v4 Announce Type: replace-cross \nAbstract: Kernel-free quadratic surface support vector machines (QSVM) have recently gained traction due to their flexibility in modeling nonlinear decision boundaries without relying on kernel functions. However, the introduction of a full quadratic classifier significantly increases the number of model parameters, scaling quadratically with data dimensionality, which often leads to overfitting and makes interpretation difficult. To address these challenges, we propose sparse variants of the QSVM by enforcing a cardinality constraint on the model parameters. While enhancing generalization and promoting sparsity, leveraging the $\\ell_0$-norm inevitably incurs additional computational complexity. To tackle this, we develop a penalty decomposition algorithm capable of producing solutions that provably satisfy the first-order Lu-Zhang optimality conditions. We show that the subproblems arising within the algorithm either admit closed-form solutions or can be solved efficiently through dual formulations, which contributes to the method's overall effectiveness. Besides, we analyze the convergence behavior of the algorithm under both loss settings. In addition, the numerical experiments on public benchmark datasets indicate that the proposed model is competitive with commonly used SVM variants and produces sparse solutions as expected. Moreover, its strong performance on real-world credit datasets demonstrates its potential for credit scoring applications.", "number": 24, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#24</span>
+                <a href="https://arxiv.org/abs/2501.11268" target="_blank">L0-Regularized Quadratic Surface Support Vector Machines</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ahmad Mousavi, Ramin Zandvakili, Zheming Gao</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 09 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2501.11268" target="_blank">https://arxiv.org/abs/2501.11268</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Kernel-free quadratic surface support vector machines (QSVM) have recently gained traction due to their flexibility in modeling nonlinear decision boundaries without relying on kernel functions. However, the introduction of a full quadratic classifier significantly increases the number of model parameters, scaling quadratically with data dimensionality, which often leads to overfitting and makes interpretation difficult. To address these challenges, we propose sparse variants of the QSVM by enforcing a cardinality constraint on the model parameters. While enhancing generalization and promoting sparsity, leveraging the $\ell_0$-norm inevitably incurs additional computational complexity. To tackle this, we develop a penalty decomposition algorithm capable of producing solutions that provably satisfy the first-order Lu-Zhang optimality conditions. We show that the subproblems arising within the algorithm either admit closed-form solutions or can be solved efficiently through dual formulations, which contributes to the method's overall effectiveness. Besides, we analyze the convergence behavior of the algorithm under both loss settings. In addition, the numerical experiments on public benchmark datasets indicate that the proposed model is competitive with commonly used SVM variants and produces sparse solutions as expected. Moreover, its strong performance on real-world credit datasets demonstrates its potential for credit scoring applications.
+            </div>
+        </div>
+        <div class="paper" id="paper-25">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-25" data-paper-data='{"title": "Entropic Mirror Descent for Linear Systems: Polyak's Stepsize and Implicit Bias", "author": "Yura Malitsky, Alexander Posch", "published": "Mon, 09 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2505.02614", "summary": "arXiv:2505.02614v2 Announce Type: replace-cross \nAbstract: This paper focuses on applying entropic mirror descent to solve linear systems, where the main challenge for the convergence analysis stems from the unboundedness of the domain. To overcome this without imposing restrictive assumptions, we introduce a variant of Polyak-type stepsizes. Along the way, we strengthen the bound for $\\ell_1$-norm implicit bias, obtain sublinear and linear convergence results, and generalize the convergence result to arbitrary convex $L$-smooth functions. We also propose an alternative method that avoids exponentiation, resembling the original Hadamard descent, but with provable convergence.", "number": 25, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#25</span>
+                <a href="https://arxiv.org/abs/2505.02614" target="_blank">Entropic Mirror Descent for Linear Systems: Polyak's Stepsize and Implicit Bias</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yura Malitsky, Alexander Posch</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 09 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2505.02614" target="_blank">https://arxiv.org/abs/2505.02614</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This paper focuses on applying entropic mirror descent to solve linear systems, where the main challenge for the convergence analysis stems from the unboundedness of the domain. To overcome this without imposing restrictive assumptions, we introduce a variant of Polyak-type stepsizes. Along the way, we strengthen the bound for $\ell_1$-norm implicit bias, obtain sublinear and linear convergence results, and generalize the convergence result to arbitrary convex $L$-smooth functions. We also propose an alternative method that avoids exponentiation, resembling the original Hadamard descent, but with provable convergence.
+            </div>
+        </div>
+        <div class="paper" id="paper-26">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-26" data-paper-data='{"title": "ContextBench: Modifying Contexts for Targeted Latent Activation", "author": "Robert Graham, Edward Stevinson, Leo Richter, Alexander Chia, Joseph Miller, Joseph Isaac Bloom", "published": "Mon, 09 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2506.15735", "summary": "arXiv:2506.15735v2 Announce Type: replace-cross \nAbstract: Identifying inputs that trigger specific behaviours or latent features in language models could have a wide range of safety use cases. We investigate a class of methods capable of generating targeted, linguistically fluent inputs that activate specific latent features or elicit model behaviours. We formalise this approach as context modification and present ContextBench -- a benchmark with tasks assessing core method capabilities and potential safety applications. Our evaluation framework measures both elicitation strength (activation of latent features or behaviours) and linguistic fluency, highlighting how current state-of-the-art methods struggle to balance these objectives. We enhance Evolutionary Prompt Optimisation (EPO) with LLM-assistance and diffusion model inpainting, and demonstrate that these variants achieve state-of-the-art performance in balancing elicitation effectiveness and fluency.", "number": 26, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#26</span>
+                <a href="https://arxiv.org/abs/2506.15735" target="_blank">ContextBench: Modifying Contexts for Targeted Latent Activation</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Robert Graham, Edward Stevinson, Leo Richter, Alexander Chia, Joseph Miller, Joseph Isaac Bloom</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 09 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2506.15735" target="_blank">https://arxiv.org/abs/2506.15735</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Identifying inputs that trigger specific behaviours or latent features in language models could have a wide range of safety use cases. We investigate a class of methods capable of generating targeted, linguistically fluent inputs that activate specific latent features or elicit model behaviours. We formalise this approach as context modification and present ContextBench -- a benchmark with tasks assessing core method capabilities and potential safety applications. Our evaluation framework measures both elicitation strength (activation of latent features or behaviours) and linguistic fluency, highlighting how current state-of-the-art methods struggle to balance these objectives. We enhance Evolutionary Prompt Optimisation (EPO) with LLM-assistance and diffusion model inpainting, and demonstrate that these variants achieve state-of-the-art performance in balancing elicitation effectiveness and fluency.
+            </div>
+        </div>
+        <div class="paper" id="paper-27">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-27" data-paper-data='{"title": "Iterative Quantum Feature Maps", "author": "Nasa Matsumoto, Quoc Hoan Tran, Koki Chinzei, Yasuhiro Endo, Hirotaka Oshima", "published": "Mon, 09 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2506.19461", "summary": "arXiv:2506.19461v3 Announce Type: replace-cross \nAbstract: Quantum machine learning models that leverage quantum circuits as quantum feature maps (QFMs) are recognized for their enhanced expressive power in learning tasks. Such models have demonstrated rigorous end-to-end quantum speedups for specific families of classification problems. However, deploying deep QFMs on real quantum hardware remains challenging due to circuit noise and hardware constraints. Additionally, variational quantum algorithms often suffer from computational bottlenecks, particularly in accurate gradient estimation, which significantly increases quantum resource demands during training. We propose Iterative Quantum Feature Maps (IQFMs), a hybrid quantum-classical framework that constructs a deep architecture by iteratively connecting shallow QFMs with classically computed augmentation weights. By incorporating contrastive learning and a layer-wise training mechanism, the IQFMs framework effectively reduces quantum runtime and mitigates noise-induced degradation. In tasks involving noisy quantum data, numerical experiments show that the IQFMs framework outperforms quantum convolutional neural networks, without requiring the optimization of variational quantum parameters. Even for a typical classical image classification benchmark, a carefully designed IQFMs framework achieves performance comparable to that of classical neural networks. This framework presents a promising path to address current limitations and harness the full potential of quantum-enhanced machine learning.", "number": 27, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#27</span>
+                <a href="https://arxiv.org/abs/2506.19461" target="_blank">Iterative Quantum Feature Maps</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Nasa Matsumoto, Quoc Hoan Tran, Koki Chinzei, Yasuhiro Endo, Hirotaka Oshima</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 09 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2506.19461" target="_blank">https://arxiv.org/abs/2506.19461</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Quantum machine learning models that leverage quantum circuits as quantum feature maps (QFMs) are recognized for their enhanced expressive power in learning tasks. Such models have demonstrated rigorous end-to-end quantum speedups for specific families of classification problems. However, deploying deep QFMs on real quantum hardware remains challenging due to circuit noise and hardware constraints. Additionally, variational quantum algorithms often suffer from computational bottlenecks, particularly in accurate gradient estimation, which significantly increases quantum resource demands during training. We propose Iterative Quantum Feature Maps (IQFMs), a hybrid quantum-classical framework that constructs a deep architecture by iteratively connecting shallow QFMs with classically computed augmentation weights. By incorporating contrastive learning and a layer-wise training mechanism, the IQFMs framework effectively reduces quantum runtime and mitigates noise-induced degradation. In tasks involving noisy quantum data, numerical experiments show that the IQFMs framework outperforms quantum convolutional neural networks, without requiring the optimization of variational quantum parameters. Even for a typical classical image classification benchmark, a carefully designed IQFMs framework achieves performance comparable to that of classical neural networks. This framework presents a promising path to address current limitations and harness the full potential of quantum-enhanced machine learning.
+            </div>
+        </div>
+        <div class="paper" id="paper-28">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-28" data-paper-data='{"title": "Learning the action for long-time-step simulations of molecular dynamics", "author": "Filippo Bigi, Johannes Spies, Michele Ceriotti", "published": "Mon, 09 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2508.01068", "summary": "arXiv:2508.01068v2 Announce Type: replace-cross \nAbstract: The equations of classical mechanics can be used to model the time evolution of countless physical systems, from the astrophysical to the atomic scale. Accurate numerical integration requires small time steps, which limits the computational efficiency -- especially in cases such as molecular dynamics that span wildly different time scales. Using machine-learning (ML) algorithms to predict trajectories allows one to greatly extend the integration time step, at the cost of introducing artifacts such as lack of energy conservation and loss of equipartition between different degrees of freedom of a system. We propose learning data-driven structure-preserving (symplectic and time-reversible) maps to generate long time-step classical dynamics and show that this method is equivalent to learning the mechanical action of the system of interest. These models can be learned based on short reference trajectories, and be transferred across thermodynamic conditions and chemical composition. We show that an action-derived ML integrator eliminates the pathological behavior of non-structure-preserving ML predictors, and that the method can be applied iteratively, serving as a correction to computationally cheaper direct predictors.", "number": 28, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#28</span>
+                <a href="https://arxiv.org/abs/2508.01068" target="_blank">Learning the action for long-time-step simulations of molecular dynamics</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Filippo Bigi, Johannes Spies, Michele Ceriotti</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 09 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2508.01068" target="_blank">https://arxiv.org/abs/2508.01068</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The equations of classical mechanics can be used to model the time evolution of countless physical systems, from the astrophysical to the atomic scale. Accurate numerical integration requires small time steps, which limits the computational efficiency -- especially in cases such as molecular dynamics that span wildly different time scales. Using machine-learning (ML) algorithms to predict trajectories allows one to greatly extend the integration time step, at the cost of introducing artifacts such as lack of energy conservation and loss of equipartition between different degrees of freedom of a system. We propose learning data-driven structure-preserving (symplectic and time-reversible) maps to generate long time-step classical dynamics and show that this method is equivalent to learning the mechanical action of the system of interest. These models can be learned based on short reference trajectories, and be transferred across thermodynamic conditions and chemical composition. We show that an action-derived ML integrator eliminates the pathological behavior of non-structure-preserving ML predictors, and that the method can be applied iteratively, serving as a correction to computationally cheaper direct predictors.
+            </div>
+        </div>
+        <div class="paper" id="paper-29">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-29" data-paper-data='{"title": "Learning Centre Partitions from Summaries", "author": "Zinsou Max Debaly, Jean-Francois Ethier, Michael H. Neumann, F\\'elix Camirand-Lemyre", "published": "Mon, 09 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2509.16337", "summary": "arXiv:2509.16337v2 Announce Type: replace-cross \nAbstract: Multi-centre studies increasingly rely on distributed inference, where sites share only centre-level summaries. Homogeneity of parameters across centres is often violated, motivating methods that both \\emph{test} for equality and \\emph{learn} centre groupings before estimation. We develop multivariate Cochran-type tests that operate on summary statistics and embed them in a sequential, test-driven \\emph{Clusters-of-Centres (CoC)} algorithm that merges centres (or blocks) only when equality is not rejected. We derive the asymptotic $\\chi^2$-mixture distributions of the test statistics and provide plug-in estimators for implementation. To improve finite-sample integration, we introduce a multi-round bootstrap CoC that re-evaluates merges across independently resampled summary sets; under mild regularity and a separation condition, we prove a \\emph{golden-partition recovery} result: as the number of rounds grows with $n$, the true partition is recovered with probability tending to one. We also give simple numerical guidelines, including a plateau-based stopping rule, to make the multi-round procedure reproducible. Simulations and a real-data analysis of U.S.\\ airline on-time performance (2007) show accurate heterogeneity detection and partitions that change little with the choice of resampling scheme.", "number": 29, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#29</span>
+                <a href="https://arxiv.org/abs/2509.16337" target="_blank">Learning Centre Partitions from Summaries</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Zinsou Max Debaly, Jean-Francois Ethier, Michael H. Neumann, F\'elix Camirand-Lemyre</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 09 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2509.16337" target="_blank">https://arxiv.org/abs/2509.16337</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Multi-centre studies increasingly rely on distributed inference, where sites share only centre-level summaries. Homogeneity of parameters across centres is often violated, motivating methods that both \emph{test} for equality and \emph{learn} centre groupings before estimation. We develop multivariate Cochran-type tests that operate on summary statistics and embed them in a sequential, test-driven \emph{Clusters-of-Centres (CoC)} algorithm that merges centres (or blocks) only when equality is not rejected. We derive the asymptotic $\chi^2$-mixture distributions of the test statistics and provide plug-in estimators for implementation. To improve finite-sample integration, we introduce a multi-round bootstrap CoC that re-evaluates merges across independently resampled summary sets; under mild regularity and a separation condition, we prove a \emph{golden-partition recovery} result: as the number of rounds grows with $n$, the true partition is recovered with probability tending to one. We also give simple numerical guidelines, including a plateau-based stopping rule, to make the multi-round procedure reproducible. Simulations and a real-data analysis of U.S.\ airline on-time performance (2007) show accurate heterogeneity detection and partitions that change little with the choice of resampling scheme.
+            </div>
+        </div>
+        <div class="paper" id="paper-30">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-30" data-paper-data='{"title": "CADM: Cluster-customized Adaptive Distance Metric for Categorical Data Clustering", "author": "Taixi Chen, Yiu-ming Cheung, Yiqun Zhang", "published": "Mon, 09 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2511.05826", "summary": "arXiv:2511.05826v2 Announce Type: replace-cross \nAbstract: An appropriate distance metric is crucial for categorical data clustering, as the distance between categorical data cannot be directly calculated. However, the distances between attribute values usually vary in different clusters induced by their different distributions, which has not been taken into account, thus leading to unreasonable distance measurement. Therefore, we propose a cluster-customized distance metric for categorical data clustering, which can competitively update distances based on different distributions of attributes in each cluster. In addition, we extend the proposed distance metric to the mixed data that contains both numerical and categorical attributes. Experiments demonstrate the efficacy of the proposed method, i.e., achieving an average ranking of around first in fourteen datasets. The source code is available at https://anonymous.4open.science/r/CADM-47D8", "number": 30, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#30</span>
+                <a href="https://arxiv.org/abs/2511.05826" target="_blank">CADM: Cluster-customized Adaptive Distance Metric for Categorical Data Clustering</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Taixi Chen, Yiu-ming Cheung, Yiqun Zhang</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 09 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.05826" target="_blank">https://arxiv.org/abs/2511.05826</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                An appropriate distance metric is crucial for categorical data clustering, as the distance between categorical data cannot be directly calculated. However, the distances between attribute values usually vary in different clusters induced by their different distributions, which has not been taken into account, thus leading to unreasonable distance measurement. Therefore, we propose a cluster-customized distance metric for categorical data clustering, which can competitively update distances based on different distributions of attributes in each cluster. In addition, we extend the proposed distance metric to the mixed data that contains both numerical and categorical attributes. Experiments demonstrate the efficacy of the proposed method, i.e., achieving an average ranking of around first in fourteen datasets. The source code is available at https://anonymous.4open.science/r/CADM-47D8
+            </div>
+        </div>
+        <div class="paper" id="paper-31">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-31" data-paper-data='{"title": "Data-Driven Global Sensitivity Analysis for Engineering Design Based on Individual Conditional Expectations", "author": "Pramudita Satria Palar, Paul Saves, Rommel G. Regis, Koji Shimoyama, Shigeru Obayashi, Nicolas Verstaevel, Joseph Morlier", "published": "Mon, 09 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2512.11946", "summary": "arXiv:2512.11946v2 Announce Type: replace-cross \nAbstract: Explainable machine learning techniques have gained increasing attention in engineering applications, especially in aerospace design and analysis, where understanding how input variables influence data-driven models is essential. Partial Dependence Plots (PDPs) are widely used for interpreting black-box models by showing the average effect of an input variable on the prediction. However, their global sensitivity metric can be misleading when strong interactions are present, as averaging tends to obscure interaction effects. To address this limitation, we propose a global sensitivity metric based on Individual Conditional Expectation (ICE) curves. The method computes the expected feature importance across ICE curves, along with their standard deviation, to more effectively capture the influence of interactions. We provide a mathematical proof demonstrating that the PDP-based sensitivity is a lower bound of the proposed ICE-based metric under truncated orthogonal polynomial expansion. In addition, we introduce an ICE-based correlation value to quantify how interactions modify the relationship between inputs and the output. Comparative evaluations were performed on three cases: a 5-variable analytical function, a 5-variable wind-turbine fatigue problem, and a 9-variable airfoil aerodynamics case, where ICE-based sensitivity was benchmarked against PDP, SHapley Additive exPlanations (SHAP), and Sobol' indices. The results show that ICE-based feature importance provides richer insights than the traditional PDP-based approach, while visual interpretations from PDP, ICE, and SHAP complement one another by offering multiple perspectives.", "number": 31, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#31</span>
+                <a href="https://arxiv.org/abs/2512.11946" target="_blank">Data-Driven Global Sensitivity Analysis for Engineering Design Based on Individual Conditional Expectations</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Pramudita Satria Palar, Paul Saves, Rommel G. Regis, Koji Shimoyama, Shigeru Obayashi, Nicolas Verstaevel, Joseph Morlier</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 09 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.11946" target="_blank">https://arxiv.org/abs/2512.11946</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Explainable machine learning techniques have gained increasing attention in engineering applications, especially in aerospace design and analysis, where understanding how input variables influence data-driven models is essential. Partial Dependence Plots (PDPs) are widely used for interpreting black-box models by showing the average effect of an input variable on the prediction. However, their global sensitivity metric can be misleading when strong interactions are present, as averaging tends to obscure interaction effects. To address this limitation, we propose a global sensitivity metric based on Individual Conditional Expectation (ICE) curves. The method computes the expected feature importance across ICE curves, along with their standard deviation, to more effectively capture the influence of interactions. We provide a mathematical proof demonstrating that the PDP-based sensitivity is a lower bound of the proposed ICE-based metric under truncated orthogonal polynomial expansion. In addition, we introduce an ICE-based correlation value to quantify how interactions modify the relationship between inputs and the output. Comparative evaluations were performed on three cases: a 5-variable analytical function, a 5-variable wind-turbine fatigue problem, and a 9-variable airfoil aerodynamics case, where ICE-based sensitivity was benchmarked against PDP, SHapley Additive exPlanations (SHAP), and Sobol' indices. The results show that ICE-based feature importance provides richer insights than the traditional PDP-based approach, while visual interpretations from PDP, ICE, and SHAP complement one another by offering multiple perspectives.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-03-09 18:00:03
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>

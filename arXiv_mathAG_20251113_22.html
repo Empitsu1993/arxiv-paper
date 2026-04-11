@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Thu, 13 Nov 2025 05:00:40 +0000<br>
+        <strong>論文数:</strong> 22件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Inverse curve problems on del Pezzo surfaces</a>
+            <span class="title-label-badge" style="background-color: #9b59b6;">del Pezzo</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Around a class version of the Hodge index theorem for singular varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Higher Nash blow-ups and Nobile theorem</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">Brauer groups of abelian varieties over fields of finite characteristic</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">Affine Deligne-Lusztig varieties beyond the minute case</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">Logarithmic Jacobian ideals, quasi-ordinary hypersurfaces and equisingularity</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Associative Schemes and Subschemes</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">On a theorem of Keller over a base ring</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">Geometric Criteria for 6-Functor Formalisms in the Setting of Pullback Formalisms</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">Bott manifolds of Bott--Samelson type and assemblies of ordered partitions</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">Multiple Rogers-Ramanujan type identities for inert quadratic orders</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">Nilpotence of $\eta$ in \'etale motivic spectra</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">Categorification of sheaf theory</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Tracing AG Codes: Toward Meeting the Gilbert-Varshamov Bound</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Algebraic topology of $C^*$-algebras</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">The tropical galaxy of a Laman graph</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">ACC for foliated log canonical thresholds</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">Homogeneous Convex Foliations of degree 6</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Densities for Elliptic Curves over Global Function Fields</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">Singularity categories via higher McKay quivers with potential</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-21" onchange="updateSelectedCount()">
+            <span class="title-number">21.</span>
+            <a href="#paper-21">Binding groups for algebraic dynamics</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-22" onchange="updateSelectedCount()">
+            <span class="title-number">22.</span>
+            <a href="#paper-22">A Dynamical N\'eron--Ogg--Shafarevich Criterion via Orbital Arboreal Representations</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Inverse curve problems on del Pezzo surfaces", "author": "Enis Kaya, Stephen McKean, Sam Streeter, H. Uppal", "published": "Thu, 13 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.08688", "summary": "arXiv:2511.08688v1 Announce Type: new \nAbstract: We classify the number of $k$-rational lines and conic fibrations on del Pezzo surfaces over a field $k$ in terms of relatively minimal surfaces and establish rational curve analogues of the inverse Galois problem for del Pezzo surfaces. We completely solve these problems in all degrees over all global, local and finite fields and provide new solutions of the inverse Galois problem in characteristic 2. Our results generalise well-known theorems on cubic surfaces.", "number": 1, "labels": [{"name": "del Pezzo", "color": "#9b59b6"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2511.08688" target="_blank">Inverse curve problems on del Pezzo surfaces</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #9b59b6;">del Pezzo</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Enis Kaya, Stephen McKean, Sam Streeter, H. Uppal</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 13 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.08688" target="_blank">https://arxiv.org/abs/2511.08688</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We classify the number of $k$-rational lines and conic fibrations on del Pezzo surfaces over a field $k$ in terms of relatively minimal surfaces and establish rational curve analogues of the inverse Galois problem for del Pezzo surfaces. We completely solve these problems in all degrees over all global, local and finite fields and provide new solutions of the inverse Galois problem in characteristic 2. Our results generalise well-known theorems on cubic surfaces.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Around a class version of the Hodge index theorem for singular varieties", "author": "Mohammadali Aligholi, Laurentiu Maxim, Joerg Schuermann", "published": "Thu, 13 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.08780", "summary": "arXiv:2511.08780v1 Announce Type: new \nAbstract: We give an overview of recent developments around a characteristic class version of the Hodge index theorem for singular complex algebraic varieties. This was formulated by Brasselet-Schuermann-Yokura as a conjecture expressing the Goresky-MacPherson homology L-classes in terms of suitable Hodge-theoretic L-classes. Along the way, we clarify the relationship between several notions of L-classes appearing in the literature, but we also include many new cases for which the conjecture is true, e.g., all compact toric varieties, all (matroid) Schubert varieties, all Richardson and intersection varieties, all projective simply connected spherical varieties, and all compact complex algebraic surfaces and threefolds.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2511.08780" target="_blank">Around a class version of the Hodge index theorem for singular varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Mohammadali Aligholi, Laurentiu Maxim, Joerg Schuermann</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 13 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.08780" target="_blank">https://arxiv.org/abs/2511.08780</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We give an overview of recent developments around a characteristic class version of the Hodge index theorem for singular complex algebraic varieties. This was formulated by Brasselet-Schuermann-Yokura as a conjecture expressing the Goresky-MacPherson homology L-classes in terms of suitable Hodge-theoretic L-classes. Along the way, we clarify the relationship between several notions of L-classes appearing in the literature, but we also include many new cases for which the conjecture is true, e.g., all compact toric varieties, all (matroid) Schubert varieties, all Richardson and intersection varieties, all projective simply connected spherical varieties, and all compact complex algebraic surfaces and threefolds.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Higher Nash blow-ups and Nobile theorem", "author": "Shravan Saoji", "published": "Thu, 13 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.08792", "summary": "arXiv:2511.08792v1 Announce Type: new \nAbstract: We study the higher Nash blow-ups introduced by T. Yasuda and investigate the higher version of the classical Nobile's theorem. In particular, we give a characteristic free proof of the higher Nobile's theorem for the graded case. We also give a proof for the 2nd order Nash blow-ups in characteristic zero.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2511.08792" target="_blank">Higher Nash blow-ups and Nobile theorem</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Shravan Saoji</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 13 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.08792" target="_blank">https://arxiv.org/abs/2511.08792</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the higher Nash blow-ups introduced by T. Yasuda and investigate the higher version of the classical Nobile's theorem. In particular, we give a characteristic free proof of the higher Nobile's theorem for the graded case. We also give a proof for the 2nd order Nash blow-ups in characteristic zero.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "Brauer groups of abelian varieties over fields of finite characteristic", "author": "Livia Grammatica, Alexei N. Skorobogatov, Yuan Yang", "published": "Thu, 13 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.08840", "summary": "arXiv:2511.08840v1 Announce Type: new \nAbstract: We study the Brauer group of an abelian variety A over an algebraically closed field of characteristic p focusing on the p-primary torsion, the key part of which is a certain quasi-algebraic unipotent group U_A. We determine its dimension and obtain a sharp upper bound for its p-exponent. The isogeny class of U_A is classified for abelian varieties A of dimension at most 3. For principally polarised abelian varieties we compute the dimension of the p-torsion subgroup of U_A in terms of the Ekedahl--Oort type of A.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2511.08840" target="_blank">Brauer groups of abelian varieties over fields of finite characteristic</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Livia Grammatica, Alexei N. Skorobogatov, Yuan Yang</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 13 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.08840" target="_blank">https://arxiv.org/abs/2511.08840</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the Brauer group of an abelian variety A over an algebraically closed field of characteristic p focusing on the p-primary torsion, the key part of which is a certain quasi-algebraic unipotent group U_A. We determine its dimension and obtain a sharp upper bound for its p-exponent. The isogeny class of U_A is classified for abelian varieties A of dimension at most 3. For principally polarised abelian varieties we compute the dimension of the p-torsion subgroup of U_A in terms of the Ekedahl--Oort type of A.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "Affine Deligne-Lusztig varieties beyond the minute case", "author": "Felix Schremmer, Eva Viehmann", "published": "Thu, 13 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.08879", "summary": "arXiv:2511.08879v1 Announce Type: new \nAbstract: Affine Deligne-Lusztig varieties in the fully Hodge-Newton decomposable (or minute) case are the only larger class of ADLVs which could be described completely in the past. Instances of them play important roles in arithmetic geometry, from Harris-Taylor's proof of the local Langlands correspondence to applications in the Kudla program. We study generalizations for many of the equivalent conditions characterizing them to obtain in this way a larger class of ADLVs that still have a similarly good and computable description of their geometry. To generalize the minute condition itself, we introduce the notion of depth for a Shimura datum - the minute cases being those of depth bounded by 1, the cases we study being the ones of depth less than 2.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2511.08879" target="_blank">Affine Deligne-Lusztig varieties beyond the minute case</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Felix Schremmer, Eva Viehmann</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 13 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.08879" target="_blank">https://arxiv.org/abs/2511.08879</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Affine Deligne-Lusztig varieties in the fully Hodge-Newton decomposable (or minute) case are the only larger class of ADLVs which could be described completely in the past. Instances of them play important roles in arithmetic geometry, from Harris-Taylor's proof of the local Langlands correspondence to applications in the Kudla program. We study generalizations for many of the equivalent conditions characterizing them to obtain in this way a larger class of ADLVs that still have a similarly good and computable description of their geometry. To generalize the minute condition itself, we introduce the notion of depth for a Shimura datum - the minute cases being those of depth bounded by 1, the cases we study being the ones of depth less than 2.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "Logarithmic Jacobian ideals, quasi-ordinary hypersurfaces and equisingularity", "author": "Pedro D. Gonz\\'alez P\\'erez", "published": "Thu, 13 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.09126", "summary": "arXiv:2511.09126v1 Announce Type: new \nAbstract: Let $(S, 0) \\subset (\\mathbb{C}^{d+1},0)$ be an irreducible germ of hypersurface. The germ $(S,0)$ is quasi-ordinary if $(S,0)$ has a finite projection to $(\\mathbb{C}^d,0)$ which is unramified outside the coordinate hyperplanes. This implies that the normalization of $S$ is a toric singularity. One has also a monomial variety associated to $S$, which is a toric singularity with the same normalization, and with possibly higher embedding dimension. Since $(S,0)$ is quasi-ordinary, the extension of the Jacobian ideal of $S$ to the local ring of its normalization is a monomial ideal. We describe this monomial ideal by comparing it with the {\\em logarithmic Jacobian ideals} of $S$ and of its associated monomial variety and we give some applications.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2511.09126" target="_blank">Logarithmic Jacobian ideals, quasi-ordinary hypersurfaces and equisingularity</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Pedro D. Gonz\'alez P\'erez</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 13 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.09126" target="_blank">https://arxiv.org/abs/2511.09126</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $(S, 0) \subset (\mathbb{C}^{d+1},0)$ be an irreducible germ of hypersurface. The germ $(S,0)$ is quasi-ordinary if $(S,0)$ has a finite projection to $(\mathbb{C}^d,0)$ which is unramified outside the coordinate hyperplanes. This implies that the normalization of $S$ is a toric singularity. One has also a monomial variety associated to $S$, which is a toric singularity with the same normalization, and with possibly higher embedding dimension. Since $(S,0)$ is quasi-ordinary, the extension of the Jacobian ideal of $S$ to the local ring of its normalization is a monomial ideal. We describe this monomial ideal by comparing it with the {\em logarithmic Jacobian ideals} of $S$ and of its associated monomial variety and we give some applications.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Associative Schemes and Subschemes", "author": "Arvid Siqveland", "published": "Thu, 13 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.09176", "summary": "arXiv:2511.09176v1 Announce Type: new \nAbstract: In the preprint arXiv:2511.07900 we proved that there exists a localizing ring $A_M$ for $A$ an associative ring with unit, and $M=\\oplus_{i=1}^rM_i$ a direct sum of $r\\geq 1$ simple right $A$-modules. For a homomorphism of associative rings $A\\rightarrow B$ we define the contraction of a simple $B$-module to $A.$ Then we define the set of aprime right $A$-modules $\\aspec A$ to be the set of simple $A$-modules together with contractions of such. When $A$ is commutative, $\\aspec A=\\spec A,$ and we define a topology on $\\aspec A$ such that when $A$ is commutative, this is the Zariski topology. In the preprint \\cite{S251}, we proved that when we have a topology and a localizing subcategory, there exists a sheaf of associative rings $\\mathcal O_X$ on $\\aspec A,$ agreeing with the usual sheaf of rings on $\\spec A.$ In this text, we write out this construction, and we see that we can restrict the sheaf and topology to any subset $V\\subseteq\\aspec A.$ In particular, this proves that we can use complex varieties in real algebraic geometry, by restricting in accordance with $\\mathbb R\\subseteq\\mathbb C.$ Thus the theory of schemes over algebraically closed fields and its associative generalization can be applied to real (algebraic) geometry.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2511.09176" target="_blank">Associative Schemes and Subschemes</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Arvid Siqveland</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 13 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.09176" target="_blank">https://arxiv.org/abs/2511.09176</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In the preprint arXiv:2511.07900 we proved that there exists a localizing ring $A_M$ for $A$ an associative ring with unit, and $M=\oplus_{i=1}^rM_i$ a direct sum of $r\geq 1$ simple right $A$-modules. For a homomorphism of associative rings $A\rightarrow B$ we define the contraction of a simple $B$-module to $A.$ Then we define the set of aprime right $A$-modules $\aspec A$ to be the set of simple $A$-modules together with contractions of such. When $A$ is commutative, $\aspec A=\spec A,$ and we define a topology on $\aspec A$ such that when $A$ is commutative, this is the Zariski topology. In the preprint \cite{S251}, we proved that when we have a topology and a localizing subcategory, there exists a sheaf of associative rings $\mathcal O_X$ on $\aspec A,$ agreeing with the usual sheaf of rings on $\spec A.$ In this text, we write out this construction, and we see that we can restrict the sheaf and topology to any subset $V\subseteq\aspec A.$ In particular, this proves that we can use complex varieties in real algebraic geometry, by restricting in accordance with $\mathbb R\subseteq\mathbb C.$ Thus the theory of schemes over algebraically closed fields and its associative generalization can be applied to real (algebraic) geometry.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "On a theorem of Keller over a base ring", "author": "Zhihang Chen, Junwu Tu", "published": "Thu, 13 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.09264", "summary": "arXiv:2511.09264v1 Announce Type: new \nAbstract: Let $X$ be a quasi-compact separated scheme over a base field. Keller proved a theorem stating that the cyclic homology of $X$ is canonically isomorphic to the cyclic homology of the dg category ${\\sf Perf}(X)$ consisting of perfect complexes over $X$. This theorem shows the categorical nature of the cyclic homology. In this note, we generalize Keller's theorem to allow $X$ be defined over a base commutative ring.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2511.09264" target="_blank">On a theorem of Keller over a base ring</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Zhihang Chen, Junwu Tu</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 13 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.09264" target="_blank">https://arxiv.org/abs/2511.09264</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $X$ be a quasi-compact separated scheme over a base field. Keller proved a theorem stating that the cyclic homology of $X$ is canonically isomorphic to the cyclic homology of the dg category ${\sf Perf}(X)$ consisting of perfect complexes over $X$. This theorem shows the categorical nature of the cyclic homology. In this note, we generalize Keller's theorem to allow $X$ be defined over a base commutative ring.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "Geometric Criteria for 6-Functor Formalisms in the Setting of Pullback Formalisms", "author": "Roy Magen", "published": "Thu, 13 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.09371", "summary": "arXiv:2511.09371v1 Announce Type: new \nAbstract: In this article, we prove various results about six-functor formalisms and morphisms between them. In particular, we show that the stable motivic homotopy theory of algebraic stacks is the universal six-functor functor formalism in a strong sense: it is initial in some category whose objects are six-functor formalisms, and whose morphisms commute with the six operations. This strengthens previous results of this form, which only showed that stable motivic homotopy theory is a six-functor formalism, and is initial, but not that the morphisms from it commute with the six operations.\n  We also prove a similar result for the stable motivic homotopy theory of complex analytic stacks, and produce a Betti realization for stacks that commutes with Grothendieck's six operations, generalizing previous results of Ayoub for quasi-projective schemes.\n  In order to do this, we give a generalized and enhanced account of Voevodsky's geometric criterion for six-functor formalisms. Our version of Voevodsky's principle makes sense in more general geometric contexts (not only algebraic geometry), and also provides a criterion for showing that a morphism between six-functor formalisms is compatible with the six operations.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2511.09371" target="_blank">Geometric Criteria for 6-Functor Formalisms in the Setting of Pullback Formalisms</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Roy Magen</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 13 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.09371" target="_blank">https://arxiv.org/abs/2511.09371</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this article, we prove various results about six-functor formalisms and morphisms between them. In particular, we show that the stable motivic homotopy theory of algebraic stacks is the universal six-functor functor formalism in a strong sense: it is initial in some category whose objects are six-functor formalisms, and whose morphisms commute with the six operations. This strengthens previous results of this form, which only showed that stable motivic homotopy theory is a six-functor formalism, and is initial, but not that the morphisms from it commute with the six operations.
+  We also prove a similar result for the stable motivic homotopy theory of complex analytic stacks, and produce a Betti realization for stacks that commutes with Grothendieck's six operations, generalizing previous results of Ayoub for quasi-projective schemes.
+  In order to do this, we give a generalized and enhanced account of Voevodsky's geometric criterion for six-functor formalisms. Our version of Voevodsky's principle makes sense in more general geometric contexts (not only algebraic geometry), and also provides a criterion for showing that a morphism between six-functor formalisms is compatible with the six operations.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "Bott manifolds of Bott--Samelson type and assemblies of ordered partitions", "author": "Junho Jeong, Jang Soo Kim, Eunjeong Lee", "published": "Thu, 13 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.09380", "summary": "arXiv:2511.09380v1 Announce Type: new \nAbstract: A Bott manifold is a smooth projective toric variety having an iterated $\\mathbb{C} P^1$-bundle structure. A certain family of Bott manifolds is used to understand the structure of Bott--Samelson varieties (or Bott--Samelson--Demazure--Hansen varieties), which provide desingularizations of Schubert varieties. Indeed, each Bott--Samelson variety is diffeomorphic to a Bott manifold. However, not all Bott manifolds originate from Bott--Samelson varieties. Those that do are specifically referred to as Bott manifolds of Bott--Samelson type. In this paper, we provide a characterization of Bott manifolds of Bott--Samelson type by exploring their relationship with combinatorial objects called assemblies of ordered partitions. Using this relationship, we enumerate Bott manifolds of Bott--Samelson type and describe isomorphic Bott manifolds of Bott--Samelson type in terms of assemblies of ordered partitions.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2511.09380" target="_blank">Bott manifolds of Bott--Samelson type and assemblies of ordered partitions</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Junho Jeong, Jang Soo Kim, Eunjeong Lee</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 13 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.09380" target="_blank">https://arxiv.org/abs/2511.09380</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                A Bott manifold is a smooth projective toric variety having an iterated $\mathbb{C} P^1$-bundle structure. A certain family of Bott manifolds is used to understand the structure of Bott--Samelson varieties (or Bott--Samelson--Demazure--Hansen varieties), which provide desingularizations of Schubert varieties. Indeed, each Bott--Samelson variety is diffeomorphic to a Bott manifold. However, not all Bott manifolds originate from Bott--Samelson varieties. Those that do are specifically referred to as Bott manifolds of Bott--Samelson type. In this paper, we provide a characterization of Bott manifolds of Bott--Samelson type by exploring their relationship with combinatorial objects called assemblies of ordered partitions. Using this relationship, we enumerate Bott manifolds of Bott--Samelson type and describe isomorphic Bott manifolds of Bott--Samelson type in terms of assemblies of ordered partitions.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "Multiple Rogers-Ramanujan type identities for inert quadratic orders", "author": "Shane Chern, Yifeng Huang", "published": "Thu, 13 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.09452", "summary": "arXiv:2511.09452v1 Announce Type: new \nAbstract: We compute the Quot and finitized Coh zeta functions of the inert quadratic orders $\\mathbb{F}_q[[T]]+T^{m}\\mathbb{F}_{q^{2}}[[T]]$ for every $m\\geq 1$ in terms of a $2m$-fold multisum, and then show this multisum equals an $m$-fold Bressoud sum. This proves a recent conjecture of the second author, rounding up the line of exploration in the series of work by the authors and Jiang. The equality between the $2m$-fold multisum and the $m$-fold Bressoud sum is built upon generalizing the multisum by introducing a ``ghost'' parameter $a$ to its summands. We then show that such an $a$-generalization is surprisingly $a$-independent by purely $q$-theoretic techniques. Finally, we propose a refined multisum that interpolates two versions of Quot zeta functions for all three types of quadratic orders.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2511.09452" target="_blank">Multiple Rogers-Ramanujan type identities for inert quadratic orders</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Shane Chern, Yifeng Huang</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 13 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.09452" target="_blank">https://arxiv.org/abs/2511.09452</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We compute the Quot and finitized Coh zeta functions of the inert quadratic orders $\mathbb{F}_q[[T]]+T^{m}\mathbb{F}_{q^{2}}[[T]]$ for every $m\geq 1$ in terms of a $2m$-fold multisum, and then show this multisum equals an $m$-fold Bressoud sum. This proves a recent conjecture of the second author, rounding up the line of exploration in the series of work by the authors and Jiang. The equality between the $2m$-fold multisum and the $m$-fold Bressoud sum is built upon generalizing the multisum by introducing a ``ghost'' parameter $a$ to its summands. We then show that such an $a$-generalization is surprisingly $a$-independent by purely $q$-theoretic techniques. Finally, we propose a refined multisum that interpolates two versions of Quot zeta functions for all three types of quadratic orders.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "Nilpotence of $\\eta$ in \\'etale motivic spectra", "author": "Klaus Mattis, Swann Tubach", "published": "Thu, 13 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.09476", "summary": "arXiv:2511.09476v1 Announce Type: new \nAbstract: We show that every object of the stable \\'etale motivic homotopy category over any scheme is $\\eta$-complete. In some cases we show that in fact the fourth power of $\\eta$ is null, whereas the third power of $\\eta$ is always nonvanishing, similar to the situation in topology.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2511.09476" target="_blank">Nilpotence of $\eta$ in \'etale motivic spectra</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Klaus Mattis, Swann Tubach</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 13 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.09476" target="_blank">https://arxiv.org/abs/2511.09476</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We show that every object of the stable \'etale motivic homotopy category over any scheme is $\eta$-complete. In some cases we show that in fact the fourth power of $\eta$ is null, whereas the third power of $\eta$ is always nonvanishing, similar to the situation in topology.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "Categorification of sheaf theory", "author": "Germ\\'an Stefanich", "published": "Thu, 13 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.09553", "summary": "arXiv:2511.09553v1 Announce Type: new \nAbstract: We discuss a systematic procedure for categorifying presentable six-functor formalisms. Our main result produces, given the input of a representation of the $\\infty$-category of correspondences of an $\\infty$-category with finite limits $\\mathcal{C}$, a compatible sequence of representations of the $(\\infty,n)$-category of correspondences of $\\mathcal{C}$ for every $n \\geq 1$. As an application, we explain a general recipe for constructing topological field theories.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2511.09553" target="_blank">Categorification of sheaf theory</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Germ\'an Stefanich</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 13 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.09553" target="_blank">https://arxiv.org/abs/2511.09553</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We discuss a systematic procedure for categorifying presentable six-functor formalisms. Our main result produces, given the input of a representation of the $\infty$-category of correspondences of an $\infty$-category with finite limits $\mathcal{C}$, a compatible sequence of representations of the $(\infty,n)$-category of correspondences of $\mathcal{C}$ for every $n \geq 1$. As an application, we explain a general recipe for constructing topological field theories.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Tracing AG Codes: Toward Meeting the Gilbert-Varshamov Bound", "author": "Gil Cohen, Dean Doron, Noam Goldgraber, Tomer Manket", "published": "Thu, 13 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.08788", "summary": "arXiv:2511.08788v1 Announce Type: cross \nAbstract: One of the oldest problems in coding theory is to match the Gilbert-Varshamov bound with explicit binary codes. Over larger-yet still constant-sized-fields, algebraic-geometry codes are known to beat the GV bound. In this work, we leverage this phenomenon by taking traces of AG codes. Our hope is that the margin by which AG codes exceed the GV bound will withstand the parameter loss incurred by taking the trace from a constant field extension to the binary field. In contrast to concatenation, the usual alphabet-reduction method, our analysis of trace-of-AG (TAG) codes uses the AG codes' algebraic structure throughout - including in the alphabet-reduction step.\n  Our main technical contribution is a Hasse-Weil-type theorem that is well-suited for the analysis of TAG codes. The classical theorem (and its Grothendieck trace-formula extension) are inadequate in this setting. Although we do not obtain improved constructions, we show that a constant-factor strengthening of our bound would suffice. We also analyze the limitations of TAG codes under our bound and prove that, in the high-distance regime, they are inferior to code concatenation. Our Hasse-Weil-type theorem holds in far greater generality than is needed for analyzing TAG codes. In particular, we derive new estimates for exponential sums.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2511.08788" target="_blank">Tracing AG Codes: Toward Meeting the Gilbert-Varshamov Bound</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Gil Cohen, Dean Doron, Noam Goldgraber, Tomer Manket</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 13 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.08788" target="_blank">https://arxiv.org/abs/2511.08788</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                One of the oldest problems in coding theory is to match the Gilbert-Varshamov bound with explicit binary codes. Over larger-yet still constant-sized-fields, algebraic-geometry codes are known to beat the GV bound. In this work, we leverage this phenomenon by taking traces of AG codes. Our hope is that the margin by which AG codes exceed the GV bound will withstand the parameter loss incurred by taking the trace from a constant field extension to the binary field. In contrast to concatenation, the usual alphabet-reduction method, our analysis of trace-of-AG (TAG) codes uses the AG codes' algebraic structure throughout - including in the alphabet-reduction step.
+  Our main technical contribution is a Hasse-Weil-type theorem that is well-suited for the analysis of TAG codes. The classical theorem (and its Grothendieck trace-formula extension) are inadequate in this setting. Although we do not obtain improved constructions, we show that a constant-factor strengthening of our bound would suffice. We also analyze the limitations of TAG codes under our bound and prove that, in the high-distance regime, they are inferior to code concatenation. Our Hasse-Weil-type theorem holds in far greater generality than is needed for analyzing TAG codes. In particular, we derive new estimates for exponential sums.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Algebraic topology of $C^*$-algebras", "author": "Petr Ivankov", "published": "Thu, 13 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.09189", "summary": "arXiv:2511.09189v1 Announce Type: cross \nAbstract: Any $C^*$-algebra can be regarded as a generalization of locally compact Hausdorff topological space. Here we consider a generalization of fundamental group and (co)homology theory. In result one has invariants of $C^*$-algebras such that: for any commutative $C^*$-algebra $A = C_0\\left(\\mathcal X \\right)$ the invariants of $A$ coincide with the $\\mathcal X$ ones, the theory is not trivial even for algebras having a one spectrum, e.g. containing one point only.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2511.09189" target="_blank">Algebraic topology of $C^*$-algebras</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Petr Ivankov</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 13 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.09189" target="_blank">https://arxiv.org/abs/2511.09189</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Any $C^*$-algebra can be regarded as a generalization of locally compact Hausdorff topological space. Here we consider a generalization of fundamental group and (co)homology theory. In result one has invariants of $C^*$-algebras such that: for any commutative $C^*$-algebra $A = C_0\left(\mathcal X \right)$ the invariants of $A$ coincide with the $\mathcal X$ ones, the theory is not trivial even for algebras having a one spectrum, e.g. containing one point only.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "The tropical galaxy of a Laman graph", "author": "Amelia Bielby, Arushi Chauhan, Cassia Pearce, Yue Ren", "published": "Thu, 13 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.09246", "summary": "arXiv:2511.09246v1 Announce Type: cross \nAbstract: A Laman graph $G$ is a minimally rigid graph in dimension two, and its realization number is its number of distinct embeddings with fixed generic edge lengths. While conjectured to grow exponentially in the number of vertices of $G$, the best proven lower bound is merely $2$. Motivated by the fact that the realization number can be expressed as a tropical intersection product involving $\\mathrm{Trop}(G)$, the Bergman fan of the graphic matroid of $G$, and the fact that stars of $\\mathrm{Trop}(G)$ naturally lead to lower bounds thereof, we introduce the tropical galaxy of $G$ together with a galactic pairing thereon. We study structural properties of this pairing, such as under which conditions it is non-trivially subadditive, and connect it being non-zero to arboreal pairs. We also present a software package for working with tropical galaxies.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2511.09246" target="_blank">The tropical galaxy of a Laman graph</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Amelia Bielby, Arushi Chauhan, Cassia Pearce, Yue Ren</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 13 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.09246" target="_blank">https://arxiv.org/abs/2511.09246</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                A Laman graph $G$ is a minimally rigid graph in dimension two, and its realization number is its number of distinct embeddings with fixed generic edge lengths. While conjectured to grow exponentially in the number of vertices of $G$, the best proven lower bound is merely $2$. Motivated by the fact that the realization number can be expressed as a tropical intersection product involving $\mathrm{Trop}(G)$, the Bergman fan of the graphic matroid of $G$, and the fact that stars of $\mathrm{Trop}(G)$ naturally lead to lower bounds thereof, we introduce the tropical galaxy of $G$ together with a galactic pairing thereon. We study structural properties of this pairing, such as under which conditions it is non-trivially subadditive, and connect it being non-zero to arboreal pairs. We also present a software package for working with tropical galaxies.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "ACC for foliated log canonical thresholds", "author": "Yen-An Chen", "published": "Thu, 13 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2202.11346", "summary": "arXiv:2202.11346v4 Announce Type: replace \nAbstract: It is known that the set of log canonical thresholds (lcts) on any varieties with fixed dimension satisfies the ascending chain condition. Inspired by the foliated minimal model program, it is intriguing to study the foliated version of lcts and ask whether they have the similar property. We give an affirmative answer in the case of surfaces and threefolds.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2202.11346" target="_blank">ACC for foliated log canonical thresholds</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yen-An Chen</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 13 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2202.11346" target="_blank">https://arxiv.org/abs/2202.11346</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                It is known that the set of log canonical thresholds (lcts) on any varieties with fixed dimension satisfies the ascending chain condition. Inspired by the foliated minimal model program, it is intriguing to study the foliated version of lcts and ask whether they have the similar property. We give an affirmative answer in the case of surfaces and threefolds.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "Homogeneous Convex Foliations of degree 6", "author": "Carla Pracias, Maycol Falla Luza", "published": "Thu, 13 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2505.16632", "summary": "arXiv:2505.16632v2 Announce Type: replace \nAbstract: In this paper, we study homogeneous convex foliations on the complex projective plane $\\mathbb{P}^2$. A foliation is called convex if all of its leaves, except straight lines, have no inflection points, and such foliations form a Zariski closed subset in the space of degree $d$ foliations on $\\mathbb{P}^2$. Using projective duality, every foliation can be associated with a $d$-web on the dual plane via its Legendre transform, and it is known that the Legendre transform of a homogeneous convex foliation is flat. Our first main result provides a classification of homogeneous convex foliations admitting exactly three radial singularities on the line at infinity. As a second result, we complete the classification of convex homogeneous foliations of degree $6$, extending previous classifications in degrees $4$ and $5$.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2505.16632" target="_blank">Homogeneous Convex Foliations of degree 6</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Carla Pracias, Maycol Falla Luza</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 13 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2505.16632" target="_blank">https://arxiv.org/abs/2505.16632</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we study homogeneous convex foliations on the complex projective plane $\mathbb{P}^2$. A foliation is called convex if all of its leaves, except straight lines, have no inflection points, and such foliations form a Zariski closed subset in the space of degree $d$ foliations on $\mathbb{P}^2$. Using projective duality, every foliation can be associated with a $d$-web on the dual plane via its Legendre transform, and it is known that the Legendre transform of a homogeneous convex foliation is flat. Our first main result provides a classification of homogeneous convex foliations admitting exactly three radial singularities on the line at infinity. As a second result, we complete the classification of convex homogeneous foliations of degree $6$, extending previous classifications in degrees $4$ and $5$.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Densities for Elliptic Curves over Global Function Fields", "author": "Andrew Yao", "published": "Thu, 13 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2301.11437", "summary": "arXiv:2301.11437v2 Announce Type: replace-cross \nAbstract: Let $K$ be a global function field. We obtain a set of formulas for the densities of the Kodaira types and Tamagawa numbers of elliptic curves over a completion of $K$ that is independent of the field's characteristic. Furthermore, for a finite field $F$ and real numbers $s$ and $\\epsilon$ such that $s&gt;1$ and $\\epsilon&gt;0$, we prove that there exists a global function field $K$ such that the full constant field of $K$ is $F$ and the value of the zeta function of $K$ at $s$ is less than $1+\\epsilon$.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2301.11437" target="_blank">Densities for Elliptic Curves over Global Function Fields</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Andrew Yao</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 13 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2301.11437" target="_blank">https://arxiv.org/abs/2301.11437</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $K$ be a global function field. We obtain a set of formulas for the densities of the Kodaira types and Tamagawa numbers of elliptic curves over a completion of $K$ that is independent of the field's characteristic. Furthermore, for a finite field $F$ and real numbers $s$ and $\epsilon$ such that $s&gt;1$ and $\epsilon&gt;0$, we prove that there exists a global function field $K$ such that the full constant field of $K$ is $F$ and the value of the zeta function of $K$ at $s$ is less than $1+\epsilon$.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "Singularity categories via higher McKay quivers with potential", "author": "Junyang Liu", "published": "Thu, 13 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2404.01171", "summary": "arXiv:2404.01171v3 Announce Type: replace-cross \nAbstract: In 2018, Kalck and Yang showed that the singularity categories associated with $3$-dimensional Gorenstein quotient singularities are triangle equivalent (up to direct summands) to small cluster categories associated with McKay quivers with potential. We introduce higher McKay quivers with potential and generalize Kalck and Yang's theorem to arbitrary dimensions. The singularity categories we consider occur as the stable categories of categories of maximal Cohen-Macaulay modules. We refine our description of the singularity categories by showing that these categories of maximal Cohen-Macaulay modules are equivalent to Higgs categories in the sense of Wu. Moreover, we describe the singularity categories in the non-Gorenstein case.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2404.01171" target="_blank">Singularity categories via higher McKay quivers with potential</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Junyang Liu</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 13 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2404.01171" target="_blank">https://arxiv.org/abs/2404.01171</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In 2018, Kalck and Yang showed that the singularity categories associated with $3$-dimensional Gorenstein quotient singularities are triangle equivalent (up to direct summands) to small cluster categories associated with McKay quivers with potential. We introduce higher McKay quivers with potential and generalize Kalck and Yang's theorem to arbitrary dimensions. The singularity categories we consider occur as the stable categories of categories of maximal Cohen-Macaulay modules. We refine our description of the singularity categories by showing that these categories of maximal Cohen-Macaulay modules are equivalent to Higgs categories in the sense of Wu. Moreover, we describe the singularity categories in the non-Gorenstein case.
+            </div>
+        </div>
+        <div class="paper" id="paper-21">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-21" data-paper-data='{"title": "Binding groups for algebraic dynamics", "author": "Moshe Kamensky, Rahim Moosa", "published": "Thu, 13 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2405.06092", "summary": "arXiv:2405.06092v2 Announce Type: replace-cross \nAbstract: A binding group theorem is proved in the context of quantifier-free internality to the fixed field in difference-closed fields of characteristic zero. This is articulated as a statement about the birational geometry of isotrivial algebraic dynamical systems, and more generally isotrivial $\\sigma$-varieties. It asserts that if $(V,\\phi)$ is an isotrivial $\\sigma$-variety then a certain subgroup of the group of birational transformations of $V$, namely those that preserve all the relations between $(V,\\phi)$ and the trivial dynamics on the affine line, is in fact an algebraic group. Several application are given including new special cases of the Zariski Dense Orbit Conjecture and the Dixmier-Moeglin Equivalence Problem in algebraic dynamics, as well as finiteness results about the existence of nonconstant invariant rational functions on cartesian powers of $\\sigma$-varieties. These applications give algebraic-dynamical analogues of recent results in differential-algebraic geometry.", "number": 21, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#21</span>
+                <a href="https://arxiv.org/abs/2405.06092" target="_blank">Binding groups for algebraic dynamics</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Moshe Kamensky, Rahim Moosa</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 13 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2405.06092" target="_blank">https://arxiv.org/abs/2405.06092</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                A binding group theorem is proved in the context of quantifier-free internality to the fixed field in difference-closed fields of characteristic zero. This is articulated as a statement about the birational geometry of isotrivial algebraic dynamical systems, and more generally isotrivial $\sigma$-varieties. It asserts that if $(V,\phi)$ is an isotrivial $\sigma$-variety then a certain subgroup of the group of birational transformations of $V$, namely those that preserve all the relations between $(V,\phi)$ and the trivial dynamics on the affine line, is in fact an algebraic group. Several application are given including new special cases of the Zariski Dense Orbit Conjecture and the Dixmier-Moeglin Equivalence Problem in algebraic dynamics, as well as finiteness results about the existence of nonconstant invariant rational functions on cartesian powers of $\sigma$-varieties. These applications give algebraic-dynamical analogues of recent results in differential-algebraic geometry.
+            </div>
+        </div>
+        <div class="paper" id="paper-22">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-22" data-paper-data='{"title": "A Dynamical N\\'eron--Ogg--Shafarevich Criterion via Orbital Arboreal Representations", "author": "J. Rogelio P\\'erez-Buend\\'ia", "published": "Thu, 13 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2510.23097", "summary": "arXiv:2510.23097v2 Announce Type: replace-cross \nAbstract: Let $K$ be a non-archimedean local field and $\\varphi:\\mathbb{P}^1\\to\\mathbb{P}^1$ a rational endomorphism of degree $d\\ge2$ defined over $K$. In the tame case ($p \\nmid d$) we give a concise local criterion for strict good reduction on the natural residual 'etale locus: there exists a nonempty open $U_k\\subset\\mathbb{P}^1_k\\setminus \\mathrm{PC}(\\tilde\\varphi)$ such that for every $x\\in\\mathbb{P}^1(\\mathcal{O}_K)$ with $\\bar x\\in U_k$ the reduced level-$1$ fiber has degree $d$ and is 'etale; equivalently, the fiber polynomial has unit leading coefficient and unit discriminant. In particular, all backward preimage extensions $K(X_n(x))/K$ are unramified for all $n\\ge1$. This work provides an orbital refinement of the pointwise criterion of Benedetto, framing it in terms of a canonical, orbit-invariant Galois object. We provide complete proofs and explicit examples over $\\mathbb{Q}_p$.", "number": 22, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#22</span>
+                <a href="https://arxiv.org/abs/2510.23097" target="_blank">A Dynamical N\'eron--Ogg--Shafarevich Criterion via Orbital Arboreal Representations</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> J. Rogelio P\'erez-Buend\'ia</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 13 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.23097" target="_blank">https://arxiv.org/abs/2510.23097</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $K$ be a non-archimedean local field and $\varphi:\mathbb{P}^1\to\mathbb{P}^1$ a rational endomorphism of degree $d\ge2$ defined over $K$. In the tame case ($p \nmid d$) we give a concise local criterion for strict good reduction on the natural residual 'etale locus: there exists a nonempty open $U_k\subset\mathbb{P}^1_k\setminus \mathrm{PC}(\tilde\varphi)$ such that for every $x\in\mathbb{P}^1(\mathcal{O}_K)$ with $\bar x\in U_k$ the reduced level-$1$ fiber has degree $d$ and is 'etale; equivalently, the fiber polynomial has unit leading coefficient and unit discriminant. In particular, all backward preimage extensions $K(X_n(x))/K$ are unramified for all $n\ge1$. This work provides an orbital refinement of the pointwise criterion of Benedetto, framing it in terms of a canonical, orbit-invariant Galois object. We provide complete proofs and explicit examples over $\mathbb{Q}_p$.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2025-11-13 18:00:02
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>

@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Mon, 26 Jan 2026 05:00:15 +0000<br>
+        <strong>論文数:</strong> 26件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Chow rings of moduli spaces of genus 0 curves with collisions</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Landau-Ginzburg models for Fano threefolds of Picard rank one and exceptional collections</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Computing Picard Schemes</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">Hodge Theory of $p$-adic analytic varieties: a survey</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">Components of the nested Hilbert scheme of few points</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">Twisted Derived Equivalences Between Abelian Varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">A Constructive Cayley Representation of Orthogonal Matrices and Applications to Optimization</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Quasi-projective nilmanifolds</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">$p$-adic Periods and Selmer Scheme Images</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">Algebraic Geometry for Spin-Adapted Coupled Cluster Theory</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">Derived equivalences for complexes with support</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">Partial Hasse invariants for genus zero curves in Hilbert modular varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">Atkin polynomials for families of abelian varieties with real multiplication</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Pure subrings of Du Bois singularities are Du Bois singularities</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">On P^1-stabilization in unstable motivic homotopy theory</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">Ekedahl-Oort types of stable curves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">An unusual family of supersingular curves of genus five in characteristic two</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">The first higher Chow groups of $\mathcal{M}_{1,n}$ for $n\leq 4$</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Graded Betti numbers of the Jacobian algebra and total Tjurina numbers of plane curves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">Volume polynomials</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-21" onchange="updateSelectedCount()">
+            <span class="title-number">21.</span>
+            <a href="#paper-21">Logarithmic geometry and Infinitesimal Hodge Theory</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-22" onchange="updateSelectedCount()">
+            <span class="title-number">22.</span>
+            <a href="#paper-22">Formal principle for line bundles on neighborhoods of an analytic subset of a compact K\"ahler manifold</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-23" onchange="updateSelectedCount()">
+            <span class="title-number">23.</span>
+            <a href="#paper-23">Oka and Alexander polynomials of symplectic curves and divisibility relations</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-24" onchange="updateSelectedCount()">
+            <span class="title-number">24.</span>
+            <a href="#paper-24">Closed real plane curves of hyperelliptic solutions of focusing gauged modified KdV equation of genus $g$</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-25" onchange="updateSelectedCount()">
+            <span class="title-number">25.</span>
+            <a href="#paper-25">Geometric Categories for Continuous Gauging</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-26" onchange="updateSelectedCount()">
+            <span class="title-number">26.</span>
+            <a href="#paper-26">Structure of ind-pro completions of Noetherian rings</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Chow rings of moduli spaces of genus 0 curves with collisions", "author": "William C. Newman", "published": "Mon, 26 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.16415", "summary": "arXiv:2601.16415v1 Announce Type: new \nAbstract: Introduced in [BB], simplicially stable spaces are alternative compactifications of $\\mathcal{M}_{g,n}$ generalizing Hassett's moduli spaces of weighted stable curves. We give presentations of the Chow rings of these spaces in genus $0$ using techniques developed by the author in [New25]. When considering the special case of $\\overline{\\mathcal{M}}_{0,n}$, this gives a new proof of Keel's presentation of $\\operatorname{CH}(\\overline{\\mathcal{M}}_{0,n})$.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2601.16415" target="_blank">Chow rings of moduli spaces of genus 0 curves with collisions</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> William C. Newman</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 26 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.16415" target="_blank">https://arxiv.org/abs/2601.16415</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Introduced in [BB], simplicially stable spaces are alternative compactifications of $\mathcal{M}_{g,n}$ generalizing Hassett's moduli spaces of weighted stable curves. We give presentations of the Chow rings of these spaces in genus $0$ using techniques developed by the author in [New25]. When considering the special case of $\overline{\mathcal{M}}_{0,n}$, this gives a new proof of Keel's presentation of $\operatorname{CH}(\overline{\mathcal{M}}_{0,n})$.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Landau-Ginzburg models for Fano threefolds of Picard rank one and exceptional collections", "author": "Victor Przyjalkowski", "published": "Mon, 26 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.16497", "summary": "arXiv:2601.16497v1 Announce Type: new \nAbstract: We study fibers with isolated singularities of Landau-Ginzburg models for Fano threefolds of Picard rank one. We compare the data we get with maximal known lengths of exceptional collections in derived categories of coherent sheaves on the Fano threefolds, verify some predictions of Homological Mirror Symmetry, and present some expectations about exceptional collections for Fano threefolds.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2601.16497" target="_blank">Landau-Ginzburg models for Fano threefolds of Picard rank one and exceptional collections</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Victor Przyjalkowski</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 26 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.16497" target="_blank">https://arxiv.org/abs/2601.16497</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study fibers with isolated singularities of Landau-Ginzburg models for Fano threefolds of Picard rank one. We compare the data we get with maximal known lengths of exceptional collections in derived categories of coherent sheaves on the Fano threefolds, verify some predictions of Homological Mirror Symmetry, and present some expectations about exceptional collections for Fano threefolds.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Computing Picard Schemes", "author": "Hyuk Jun Kweon, Madhavan Venkatesh", "published": "Mon, 26 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.16505", "summary": "arXiv:2601.16505v1 Announce Type: new \nAbstract: We present an algorithm to compute the torsion component $\\mathrm{Pic}^\\tau X$ of the Picard scheme of a smooth projective variety $X$ over a field $k$. Specifically, we describe $\\mathrm{Pic}^\\tau X$ as a closed subscheme of a projective space defined by explicit homogeneous polynomials. Furthermore, we compute the group scheme structure on $\\mathrm{Pic}^\\tau X$. As applications, we provide algorithms to compute various homological invariants. Among these, we compute the abelianization of the geometric \\'etale fundamental group $\\pi^{\\mathrm{{e}t}}_1(X_{\\bar{k}}, x)^{\\mathrm{ab}}$. Moreover, we determine the Galois module structure of the first \\'etale cohomology groups $H^1_{\\mathrm{{e}t}}(X_{\\bar{k}}, \\mathbb{Z}/n\\mathbb{Z})$ without requiring $n$ to be prime to the characteristic of $k$.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2601.16505" target="_blank">Computing Picard Schemes</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Hyuk Jun Kweon, Madhavan Venkatesh</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 26 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.16505" target="_blank">https://arxiv.org/abs/2601.16505</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We present an algorithm to compute the torsion component $\mathrm{Pic}^\tau X$ of the Picard scheme of a smooth projective variety $X$ over a field $k$. Specifically, we describe $\mathrm{Pic}^\tau X$ as a closed subscheme of a projective space defined by explicit homogeneous polynomials. Furthermore, we compute the group scheme structure on $\mathrm{Pic}^\tau X$. As applications, we provide algorithms to compute various homological invariants. Among these, we compute the abelianization of the geometric \'etale fundamental group $\pi^{\mathrm{{e}t}}_1(X_{\bar{k}}, x)^{\mathrm{ab}}$. Moreover, we determine the Galois module structure of the first \'etale cohomology groups $H^1_{\mathrm{{e}t}}(X_{\bar{k}}, \mathbb{Z}/n\mathbb{Z})$ without requiring $n$ to be prime to the characteristic of $k$.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "Hodge Theory of $p$-adic analytic varieties: a survey", "author": "Pierre Colmez, Wies{\\l}awa Nizio{\\l}", "published": "Mon, 26 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.16557", "summary": "arXiv:2601.16557v1 Announce Type: new \nAbstract: Hodge Theory of $p$-adic analytic varieties was initiated by Tate in his 1967 paper on $p$-divisible groups, where he conjectured the existence of a Hodge-like decomposition for the $p$-adic \\'etale cohomology of proper analytic varieties. Tate's conjecture was refined by Fontaine who gave the theory its definite shape. A lot of work has been done for algebraic varieties and a number of proofs of Fontaine's conjectures have been obtained between years 1985 and 2011. But the study of Hodge Theory of $p$-adic analytic varieties started really only in 2011 with Scholze's proof of Tate's conjecture using perfectoid methods. Methods that opened the way to an avalanche of results.\n  In this paper, we survey our results and conjectures (comparison theorems and their geometrization, dualities, etc.), focusing on the case of nonproper analytic varieties, where a number of new phenomena occur. We also describe the new objects that appeared along the way.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2601.16557" target="_blank">Hodge Theory of $p$-adic analytic varieties: a survey</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Pierre Colmez, Wies{\l}awa Nizio{\l}</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 26 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.16557" target="_blank">https://arxiv.org/abs/2601.16557</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Hodge Theory of $p$-adic analytic varieties was initiated by Tate in his 1967 paper on $p$-divisible groups, where he conjectured the existence of a Hodge-like decomposition for the $p$-adic \'etale cohomology of proper analytic varieties. Tate's conjecture was refined by Fontaine who gave the theory its definite shape. A lot of work has been done for algebraic varieties and a number of proofs of Fontaine's conjectures have been obtained between years 1985 and 2011. But the study of Hodge Theory of $p$-adic analytic varieties started really only in 2011 with Scholze's proof of Tate's conjecture using perfectoid methods. Methods that opened the way to an avalanche of results.
+  In this paper, we survey our results and conjectures (comparison theorems and their geometrization, dualities, etc.), focusing on the case of nonproper analytic varieties, where a number of new phenomena occur. We also describe the new objects that appeared along the way.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "Components of the nested Hilbert scheme of few points", "author": "Michele Graffeo, Paolo Lella", "published": "Mon, 26 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.16765", "summary": "arXiv:2601.16765v1 Announce Type: new \nAbstract: We study the existence and the schematic structure of elementary components of the nested Hilbert scheme on a smooth quasi-projective variety. Precisely, we find a new lower bound for the existence of non-smoothable nestings of fat points on a smooth $n$-fold, for $n\\geqslant 4$. Moreover, we implement a systematic method to build generically non-reduced elementary components. We also investigate the problem of irreducibility of the Hilbert scheme of points on a singular hypersurface of $\\mathbb A^3$. Explicitly, we show that the Hilbert scheme of points on a hypersurface of $\\mathbb{A}^3$ having a singularity of multiplicity at least 5 admits elementary components.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2601.16765" target="_blank">Components of the nested Hilbert scheme of few points</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Michele Graffeo, Paolo Lella</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 26 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.16765" target="_blank">https://arxiv.org/abs/2601.16765</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the existence and the schematic structure of elementary components of the nested Hilbert scheme on a smooth quasi-projective variety. Precisely, we find a new lower bound for the existence of non-smoothable nestings of fat points on a smooth $n$-fold, for $n\geqslant 4$. Moreover, we implement a systematic method to build generically non-reduced elementary components. We also investigate the problem of irreducibility of the Hilbert scheme of points on a singular hypersurface of $\mathbb A^3$. Explicitly, we show that the Hilbert scheme of points on a hypersurface of $\mathbb{A}^3$ having a singularity of multiplicity at least 5 admits elementary components.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "Twisted Derived Equivalences Between Abelian Varieties", "author": "Tyler Lane", "published": "Mon, 26 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.16871", "summary": "arXiv:2601.16871v1 Announce Type: new \nAbstract: We generalize a result of Popa-Schnell and show that the isogeny class of the Picard variety is twisted derived invariant. Using this, we prove that any twisted Fourier-Mukai partner of an abelian variety is an abelian variety. We then provide a necessary and sufficient isogeny-based condition for two abelian varieties to be twisted derived equivalent.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2601.16871" target="_blank">Twisted Derived Equivalences Between Abelian Varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Tyler Lane</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 26 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.16871" target="_blank">https://arxiv.org/abs/2601.16871</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We generalize a result of Popa-Schnell and show that the isogeny class of the Picard variety is twisted derived invariant. Using this, we prove that any twisted Fourier-Mukai partner of an abelian variety is an abelian variety. We then provide a necessary and sufficient isogeny-based condition for two abelian varieties to be twisted derived equivalent.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "A Constructive Cayley Representation of Orthogonal Matrices and Applications to Optimization", "author": "Iwo Biborski", "published": "Mon, 26 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.16271", "summary": "arXiv:2601.16271v1 Announce Type: cross \nAbstract: It is known that every real orthogonal matrix can be brought into the domain of the Cayley transform by multiplication with a suitable diagonal signature matrix. In this paper we provide a constructive and numerically efficient algorithm that, given a real orthogonal matrix $U$, computes a diagonal matrix $D$ with entries in $\\{\\pm1\\}$ such that the Cayley transform of $DU$ is well defined. This yields a representation of $U$ in the form \\[ U = D(I-S)(I+S)^{-1}, \\] where $S$ is a skew-symmetric matrix. The proposed algorithm requires $O(n^{3})$ arithmetic operations and produces an explicit quantitative bound on the associated skew-symmetric generator. As an application, we show how this construction can be used to control singularities in Cayley-transform-based optimization methods on the orthogonal group.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2601.16271" target="_blank">A Constructive Cayley Representation of Orthogonal Matrices and Applications to Optimization</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Iwo Biborski</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 26 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.16271" target="_blank">https://arxiv.org/abs/2601.16271</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                It is known that every real orthogonal matrix can be brought into the domain of the Cayley transform by multiplication with a suitable diagonal signature matrix. In this paper we provide a constructive and numerically efficient algorithm that, given a real orthogonal matrix $U$, computes a diagonal matrix $D$ with entries in $\{\pm1\}$ such that the Cayley transform of $DU$ is well defined. This yields a representation of $U$ in the form \[ U = D(I-S)(I+S)^{-1}, \] where $S$ is a skew-symmetric matrix. The proposed algorithm requires $O(n^{3})$ arithmetic operations and produces an explicit quantitative bound on the associated skew-symmetric generator. As an application, we show how this construction can be used to control singularities in Cayley-transform-based optimization methods on the orthogonal group.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Quasi-projective nilmanifolds", "author": "Taito Shimoji", "published": "Mon, 26 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.16433", "summary": "arXiv:2601.16433v1 Announce Type: cross \nAbstract: Let $M=V\\setminus D$ be a smooth quasi-projective variety for some smooth projective variety $V$ and a divisor $D$ with normal crossings. Assume that $M$ is diffeomorphic to a non-compact nilmanifold $\\Gamma\\backslash N\\times\\mathbb{R}^m$. We show that $M$ is diffeomorphic to a trivial bundle $T^n\\times \\mathbb{R}^m$ over a torus $T^n$ if the first cohomology $H^1(V)$ of $V$ vanishes. Moreover, in general, we show that $M$ is diffeomorphic to a trivial bundle $T^{b_1(M)}\\times \\mathbb{R}^m$ over a $b_1(M)$-dimensional torus $T^{b_1(M)}$, or a trivial bundle $E\\times \\mathbb{R}^m$ such that $E$ is a torus bundle $E\\rightarrow T^{b_1(M)}$ over a torus $T^{b_1(M)}$. Conversely, we consider whether non-compact nilmanifolds are diffeomorphic to a smooth quasi-projective variety. We determine the Lie groups of dimension up to $8$ such that corresponding non-compact nilmanifolds may be diffeomorphic to smooth quasi-projective varieties.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2601.16433" target="_blank">Quasi-projective nilmanifolds</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Taito Shimoji</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 26 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.16433" target="_blank">https://arxiv.org/abs/2601.16433</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $M=V\setminus D$ be a smooth quasi-projective variety for some smooth projective variety $V$ and a divisor $D$ with normal crossings. Assume that $M$ is diffeomorphic to a non-compact nilmanifold $\Gamma\backslash N\times\mathbb{R}^m$. We show that $M$ is diffeomorphic to a trivial bundle $T^n\times \mathbb{R}^m$ over a torus $T^n$ if the first cohomology $H^1(V)$ of $V$ vanishes. Moreover, in general, we show that $M$ is diffeomorphic to a trivial bundle $T^{b_1(M)}\times \mathbb{R}^m$ over a $b_1(M)$-dimensional torus $T^{b_1(M)}$, or a trivial bundle $E\times \mathbb{R}^m$ such that $E$ is a torus bundle $E\rightarrow T^{b_1(M)}$ over a torus $T^{b_1(M)}$. Conversely, we consider whether non-compact nilmanifolds are diffeomorphic to a smooth quasi-projective variety. We determine the Lie groups of dimension up to $8$ such that corresponding non-compact nilmanifolds may be diffeomorphic to smooth quasi-projective varieties.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "$p$-adic Periods and Selmer Scheme Images", "author": "David Corwin, Ishai Dan-Cohen", "published": "Mon, 26 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.16591", "summary": "arXiv:2601.16591v1 Announce Type: cross \nAbstract: The Chabauty--Kim method was developed with the aim of approaching effective Faltings', the problem of explicitly determining the finite set of rational points on a hyperbolic curve. This method has seen success with the more particular Quadratic Chabauty method, but this method still applies only to certain curves. Previous applications of Chabauty--Kim beyond the quadratic level, as pursued by the authors, by S. Wewers, and by others, use mixed Tate motives and the $p$-adic period map of Chatzistamatiou-\\\"Unver to approach the particular hyperbolic curve $\\mathbb{P}^1\\setminus\\{0,1,\\infty\\}$.\n  The main purpose of this article is to lay foundations for extending the above approach to more general hyperbolic curves, in particular by defining an analogous $p$-adic period map for more general categories of motives and their non-conjectural cousins such as systems of realizations and $p$-adic Galois representations. We use this to describe a general setup for non-abelian Chabauty for an arbitrary hyperbolic curve.\n  Our period map also connects the study of $p$-adic iterated integrals with Goncharov's theory of motivic iterated integrals, and allows us to investigate Goncharov's conjectures from a $p$-adic point of view. In particular, it suggests the possibility of evaluating syntomic regulators by writing elements of $K$-theory in terms of motivic iterated integrals. Lastly, it forms the basis for a certain generalization of the $p$-adic period conjecture of Yamashita for mixed Tate motives well-suited to applications in Chabauty--Kim theory.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2601.16591" target="_blank">$p$-adic Periods and Selmer Scheme Images</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> David Corwin, Ishai Dan-Cohen</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 26 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.16591" target="_blank">https://arxiv.org/abs/2601.16591</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The Chabauty--Kim method was developed with the aim of approaching effective Faltings', the problem of explicitly determining the finite set of rational points on a hyperbolic curve. This method has seen success with the more particular Quadratic Chabauty method, but this method still applies only to certain curves. Previous applications of Chabauty--Kim beyond the quadratic level, as pursued by the authors, by S. Wewers, and by others, use mixed Tate motives and the $p$-adic period map of Chatzistamatiou-\"Unver to approach the particular hyperbolic curve $\mathbb{P}^1\setminus\{0,1,\infty\}$.
+  The main purpose of this article is to lay foundations for extending the above approach to more general hyperbolic curves, in particular by defining an analogous $p$-adic period map for more general categories of motives and their non-conjectural cousins such as systems of realizations and $p$-adic Galois representations. We use this to describe a general setup for non-abelian Chabauty for an arbitrary hyperbolic curve.
+  Our period map also connects the study of $p$-adic iterated integrals with Goncharov's theory of motivic iterated integrals, and allows us to investigate Goncharov's conjectures from a $p$-adic point of view. In particular, it suggests the possibility of evaluating syntomic regulators by writing elements of $K$-theory in terms of motivic iterated integrals. Lastly, it forms the basis for a certain generalization of the $p$-adic period conjecture of Yamashita for mixed Tate motives well-suited to applications in Chabauty--Kim theory.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "Algebraic Geometry for Spin-Adapted Coupled Cluster Theory", "author": "Fabian M. Faulstich, Svala Sverrisd\\'ottir", "published": "Mon, 26 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.16646", "summary": "arXiv:2601.16646v1 Announce Type: cross \nAbstract: We develop and numerically analyze an algebraic-geometric framework for spin-adapted coupled-cluster (CC) theory. Since the electronic Hamiltonian is SU(2)-invariant, physically relevant quantum states lie in the spin singlet sector. We give an explicit description of the SU(2)-invariant (spin singlet) many-body space by identifying it with an Artinian commutative ring, called the excitation ring, whose dimension is governed by a Narayana number. We define spin-adapted truncation varieties via embeddings of graded subspaces of this ring, and we identify the CCS truncation variety with the Veronese square of the Grassmannian. Compared to the spin-generalized formulation, this approach yields a substantial reduction in dimension and degree, with direct computational consequences. In particular, the CC degree of the truncation variety -- governing the number of homotopy paths required to compute all CC solutions -- is reduced by orders of magnitude. We present scaling studies demonstrating asymptotic improvements and we exploit this reduction to compute the full solution landscape of spin-adapted CC equations for water and lithium hydride.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2601.16646" target="_blank">Algebraic Geometry for Spin-Adapted Coupled Cluster Theory</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Fabian M. Faulstich, Svala Sverrisd\'ottir</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 26 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.16646" target="_blank">https://arxiv.org/abs/2601.16646</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We develop and numerically analyze an algebraic-geometric framework for spin-adapted coupled-cluster (CC) theory. Since the electronic Hamiltonian is SU(2)-invariant, physically relevant quantum states lie in the spin singlet sector. We give an explicit description of the SU(2)-invariant (spin singlet) many-body space by identifying it with an Artinian commutative ring, called the excitation ring, whose dimension is governed by a Narayana number. We define spin-adapted truncation varieties via embeddings of graded subspaces of this ring, and we identify the CCS truncation variety with the Veronese square of the Grassmannian. Compared to the spin-generalized formulation, this approach yields a substantial reduction in dimension and degree, with direct computational consequences. In particular, the CC degree of the truncation variety -- governing the number of homotopy paths required to compute all CC solutions -- is reduced by orders of magnitude. We present scaling studies demonstrating asymptotic improvements and we exploit this reduction to compute the full solution landscape of spin-adapted CC equations for water and lithium hydride.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "Derived equivalences for complexes with support", "author": "K. Ganapathy, Sarang Sane", "published": "Mon, 26 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.16729", "summary": "arXiv:2601.16729v1 Announce Type: cross \nAbstract: For a Serre subcategory $\\mathscr L$ and a resolving subcategory $\\mathscr A$ of an abelian category, we show that the derived equivalence $D^b(\\overline{\\mathscr A} \\cap \\mathscr L) \\simeq D^b_{\\mathscr L}(\\mathscr A)$ holds under certain conditions. We apply this to obtain derived equivalences in the contexts of chain complexes of graded modules or coherent sheaves, with finite $\\mathscr A$-dimension, supported on closed sets having eventually finite $\\mathscr A$-dimension.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2601.16729" target="_blank">Derived equivalences for complexes with support</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> K. Ganapathy, Sarang Sane</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 26 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.16729" target="_blank">https://arxiv.org/abs/2601.16729</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                For a Serre subcategory $\mathscr L$ and a resolving subcategory $\mathscr A$ of an abelian category, we show that the derived equivalence $D^b(\overline{\mathscr A} \cap \mathscr L) \simeq D^b_{\mathscr L}(\mathscr A)$ holds under certain conditions. We apply this to obtain derived equivalences in the contexts of chain complexes of graded modules or coherent sheaves, with finite $\mathscr A$-dimension, supported on closed sets having eventually finite $\mathscr A$-dimension.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "Partial Hasse invariants for genus zero curves in Hilbert modular varieties", "author": "Gabriele Bogo, Yingkun Li", "published": "Mon, 26 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.16929", "summary": "arXiv:2601.16929v1 Announce Type: cross \nAbstract: We construct characteristic-zero lifts of partial Hasse invariants for genus zero non-compact curves in Hilbert modular varieties. The construction is based on recent results on the associated Picard-Fuchs differential equations. As an application, we relate the size of the non-ordinary locus of the modulo $p$ reduction of these curves to the dimension of spaces of (twisted) modular forms. We compute it explicitly for several Teichm\\\"uller curves, obtaining Deuring-like formulae. Moreover, we study the modulo $p$ reduction of (twisted) modular forms on not necessarily arithmetic genus-zero Fuchsian groups with modular embedding.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2601.16929" target="_blank">Partial Hasse invariants for genus zero curves in Hilbert modular varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Gabriele Bogo, Yingkun Li</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 26 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.16929" target="_blank">https://arxiv.org/abs/2601.16929</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We construct characteristic-zero lifts of partial Hasse invariants for genus zero non-compact curves in Hilbert modular varieties. The construction is based on recent results on the associated Picard-Fuchs differential equations. As an application, we relate the size of the non-ordinary locus of the modulo $p$ reduction of these curves to the dimension of spaces of (twisted) modular forms. We compute it explicitly for several Teichm\"uller curves, obtaining Deuring-like formulae. Moreover, we study the modulo $p$ reduction of (twisted) modular forms on not necessarily arithmetic genus-zero Fuchsian groups with modular embedding.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "Atkin polynomials for families of abelian varieties with real multiplication", "author": "Gabriele Bogo, Yingkun Li", "published": "Mon, 26 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.16944", "summary": "arXiv:2601.16944v1 Announce Type: cross \nAbstract: Generalizing the work of Atkin and Kaneko-Zagier in the elliptic case, we describe the non-ordinary locus of a genus-zero non-compact curve $Y$ in a Hilbert modular variety in terms of the zeros of generalized Atkin's orthogonal polynomials. The argument relies on the recent construction of lifts of partial Hasse invariants for $Y$. We further describe these orthogonal polynomials as denominators of Pad\\'e approximants to the logarithmic derivatives of solutions of the Picard-Fuchs differential equations associated with $Y$. This provides a new link between Pad\\'e approximation and the geometry of the non-ordinary locus, extending a classical observation of Igusa for the Legendre family and applying, in particular, to situations where the Picard-Fuchs equations do not admit modular solutions. As applications, we determine the three-term recurrence relations for Atkin polynomials attached to triangle curves via hypergeometric identities, and compute the supersingular locus of a double cover of the Teichm\\\"uller curve $W_{17}$. In the latter case, we conjecture that the associated supersingular polynomial is self-reciprocal, implying that supersingular points occur in pairs.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2601.16944" target="_blank">Atkin polynomials for families of abelian varieties with real multiplication</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Gabriele Bogo, Yingkun Li</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 26 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.16944" target="_blank">https://arxiv.org/abs/2601.16944</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Generalizing the work of Atkin and Kaneko-Zagier in the elliptic case, we describe the non-ordinary locus of a genus-zero non-compact curve $Y$ in a Hilbert modular variety in terms of the zeros of generalized Atkin's orthogonal polynomials. The argument relies on the recent construction of lifts of partial Hasse invariants for $Y$. We further describe these orthogonal polynomials as denominators of Pad\'e approximants to the logarithmic derivatives of solutions of the Picard-Fuchs differential equations associated with $Y$. This provides a new link between Pad\'e approximation and the geometry of the non-ordinary locus, extending a classical observation of Igusa for the Legendre family and applying, in particular, to situations where the Picard-Fuchs equations do not admit modular solutions. As applications, we determine the three-term recurrence relations for Atkin polynomials attached to triangle curves via hypergeometric identities, and compute the supersingular locus of a double cover of the Teichm\"uller curve $W_{17}$. In the latter case, we conjecture that the associated supersingular polynomial is self-reciprocal, implying that supersingular points occur in pairs.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Pure subrings of Du Bois singularities are Du Bois singularities", "author": "Charles Godfrey, Takumi Murayama", "published": "Mon, 26 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2208.14429", "summary": "arXiv:2208.14429v4 Announce Type: replace \nAbstract: Let $R \\to S$ be a cyclically pure map of Noetherian $\\mathbb{Q}$-algebras. In this paper, we show that if $S$ has Du Bois singularities, then $R$ has Du Bois singularities. Our result is new even when $R \\to S$ is faithfully flat. Our proof also yields interesting results in prime characteristic and in mixed characteristic. As a consequence, we show that if $R \\to S$ is a cyclically pure map of rings essentially of finite type over the complex numbers $\\mathbb{C}$, $S$ has log canonical type singularities, and $K_R$ is Cartier, then $R$ has log canonical singularities. Along the way, we prove a version of the key injectivity theorem of Kov\\'acs and Schwede for Noetherian schemes of equal characteristic zero that have isolated non-Du Bois points. Throughout the paper, we use the characterization of the complex $\\underline{\\Omega}^0_X$ and of Du Bois singularities in terms of sheafification with respect to Grothendieck topologies.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2208.14429" target="_blank">Pure subrings of Du Bois singularities are Du Bois singularities</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Charles Godfrey, Takumi Murayama</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 26 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2208.14429" target="_blank">https://arxiv.org/abs/2208.14429</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $R \to S$ be a cyclically pure map of Noetherian $\mathbb{Q}$-algebras. In this paper, we show that if $S$ has Du Bois singularities, then $R$ has Du Bois singularities. Our result is new even when $R \to S$ is faithfully flat. Our proof also yields interesting results in prime characteristic and in mixed characteristic. As a consequence, we show that if $R \to S$ is a cyclically pure map of rings essentially of finite type over the complex numbers $\mathbb{C}$, $S$ has log canonical type singularities, and $K_R$ is Cartier, then $R$ has log canonical singularities. Along the way, we prove a version of the key injectivity theorem of Kov\'acs and Schwede for Noetherian schemes of equal characteristic zero that have isolated non-Du Bois points. Throughout the paper, we use the characterization of the complex $\underline{\Omega}^0_X$ and of Du Bois singularities in terms of sheafification with respect to Grothendieck topologies.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "On P^1-stabilization in unstable motivic homotopy theory", "author": "Aravind Asok, Tom Bachmann, Michael J. Hopkins", "published": "Mon, 26 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2306.04631", "summary": "arXiv:2306.04631v3 Announce Type: replace \nAbstract: We analyze stabilization with respect to ${\\mathbb P}^1$ in the Morel--Voevodsky unstable motivic homotopy theory. We introduce a refined notion of cellularity (a.k.a., biconnectivity) in various motivic homotopy categories taking into account both the simplicial and Tate circles. Under suitable cellularity hypotheses, we refine the Whitehead theorem by showing that a map of nilpotent motivic spaces can be seen to be an equivalence if it so after taking (Voevodsky) motives. We then establish a version of the Freudenthal suspension theorem for ${\\mathbb P}^1$-suspension, again under suitable cellularity hypotheses. As applications, we resolve Murthy's conjecture on splitting of corank $1$ vector bundles on smooth affine algebras over algebraically closed fields having characteristic $0$ and compute new unstable motivic homotopy of motivic spheres.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2306.04631" target="_blank">On P^1-stabilization in unstable motivic homotopy theory</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Aravind Asok, Tom Bachmann, Michael J. Hopkins</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 26 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2306.04631" target="_blank">https://arxiv.org/abs/2306.04631</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We analyze stabilization with respect to ${\mathbb P}^1$ in the Morel--Voevodsky unstable motivic homotopy theory. We introduce a refined notion of cellularity (a.k.a., biconnectivity) in various motivic homotopy categories taking into account both the simplicial and Tate circles. Under suitable cellularity hypotheses, we refine the Whitehead theorem by showing that a map of nilpotent motivic spaces can be seen to be an equivalence if it so after taking (Voevodsky) motives. We then establish a version of the Freudenthal suspension theorem for ${\mathbb P}^1$-suspension, again under suitable cellularity hypotheses. As applications, we resolve Murthy's conjecture on splitting of corank $1$ vector bundles on smooth affine algebras over algebraically closed fields having characteristic $0$ and compute new unstable motivic homotopy of motivic spheres.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "Ekedahl-Oort types of stable curves", "author": "Du\\v{s}an Dragutinovi\\'c", "published": "Mon, 26 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2307.13445", "summary": "arXiv:2307.13445v3 Announce Type: replace \nAbstract: We extend Moonen's definition of Ekedahl-Oort types of smooth curves in terms of Hasse-Witt triples to all stable curves and show that it matches Ekedahl and van der Geer's definition of Ekedahl-Oort types of their generalized Jacobians as semi-abelian varieties. Using this intrinsic insight, we can compute the dimensions of certain Ekedahl-Oort loci of curves and generalize some previously known results about the dimensions of the $p$-rank and $a$-number loci of curves.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2307.13445" target="_blank">Ekedahl-Oort types of stable curves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Du\v{s}an Dragutinovi\'c</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 26 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2307.13445" target="_blank">https://arxiv.org/abs/2307.13445</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We extend Moonen's definition of Ekedahl-Oort types of smooth curves in terms of Hasse-Witt triples to all stable curves and show that it matches Ekedahl and van der Geer's definition of Ekedahl-Oort types of their generalized Jacobians as semi-abelian varieties. Using this intrinsic insight, we can compute the dimensions of certain Ekedahl-Oort loci of curves and generalize some previously known results about the dimensions of the $p$-rank and $a$-number loci of curves.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "An unusual family of supersingular curves of genus five in characteristic two", "author": "Du\\v{s}an Dragutinovi\\'c", "published": "Mon, 26 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2507.03519", "summary": "arXiv:2507.03519v2 Announce Type: replace \nAbstract: We construct a family of smooth supersingular curves of genus $5$ in characteristic $2$ with several notable features: its dimension matches the expected dimension of any component of the supersingular locus in genus $5$, its members are non-hyperelliptic curves with non-trivial automorphism groups, and each curve in the family admits a double cover structure over both an elliptic curve and a genus-$2$ curve. We also provide an explicit parametrization of this family.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2507.03519" target="_blank">An unusual family of supersingular curves of genus five in characteristic two</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Du\v{s}an Dragutinovi\'c</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 26 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2507.03519" target="_blank">https://arxiv.org/abs/2507.03519</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We construct a family of smooth supersingular curves of genus $5$ in characteristic $2$ with several notable features: its dimension matches the expected dimension of any component of the supersingular locus in genus $5$, its members are non-hyperelliptic curves with non-trivial automorphism groups, and each curve in the family admits a double cover structure over both an elliptic curve and a genus-$2$ curve. We also provide an explicit parametrization of this family.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "The first higher Chow groups of $\\mathcal{M}_{1,n}$ for $n\\leq 4$", "author": "William C. Newman", "published": "Mon, 26 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2508.20264", "summary": "arXiv:2508.20264v2 Announce Type: replace \nAbstract: For $n\\leq 4$, we compute the indecomposible higher Chow groups $\\overline{\\operatorname{CH}}(\\mathcal{M}_{1,n},1)$ with integer coefficients. As an application, we give new proofs of presentations of the integral Chow rings $\\operatorname{CH}(\\overline{\\mathcal{M}}_{1,n})$ for $n\\leq 4$ and determine formulas for the classes of boundary strata in these rings.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2508.20264" target="_blank">The first higher Chow groups of $\mathcal{M}_{1,n}$ for $n\leq 4$</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> William C. Newman</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 26 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2508.20264" target="_blank">https://arxiv.org/abs/2508.20264</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                For $n\leq 4$, we compute the indecomposible higher Chow groups $\overline{\operatorname{CH}}(\mathcal{M}_{1,n},1)$ with integer coefficients. As an application, we give new proofs of presentations of the integral Chow rings $\operatorname{CH}(\overline{\mathcal{M}}_{1,n})$ for $n\leq 4$ and determine formulas for the classes of boundary strata in these rings.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Graded Betti numbers of the Jacobian algebra and total Tjurina numbers of plane curves", "author": "Alexandru Dimca, Gabriel Sticlaru", "published": "Mon, 26 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.08583", "summary": "arXiv:2601.08583v3 Announce Type: replace \nAbstract: In this paper we compute an explicit closed formula for the total Tjurina number $\\tau(C)$ of a reduced projective plane curve $C$ in terms of the graded Betti numbers of the corresponding Jacobian algebra. This formula allows a completely new view point on the classical upper bounds for the total Tjurina number $\\tau(C)$ of a plane curve $C$ given by A. du Plessis and C. T. C. Wall. This approach yields in particular a new necessary condition for a set of positive integers to be the graded Betti numbers of the Jacobian algebra of a reduced plane curve.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2601.08583" target="_blank">Graded Betti numbers of the Jacobian algebra and total Tjurina numbers of plane curves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Alexandru Dimca, Gabriel Sticlaru</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 26 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.08583" target="_blank">https://arxiv.org/abs/2601.08583</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper we compute an explicit closed formula for the total Tjurina number $\tau(C)$ of a reduced projective plane curve $C$ in terms of the graded Betti numbers of the corresponding Jacobian algebra. This formula allows a completely new view point on the classical upper bounds for the total Tjurina number $\tau(C)$ of a plane curve $C$ given by A. du Plessis and C. T. C. Wall. This approach yields in particular a new necessary condition for a set of positive integers to be the graded Betti numbers of the Jacobian algebra of a reduced plane curve.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "Volume polynomials", "author": "June Huh", "published": "Mon, 26 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.13249", "summary": "arXiv:2601.13249v2 Announce Type: replace \nAbstract: Volume polynomials form a distinguished class of log-concave polynomials with remarkable analytic and combinatorial properties. I will survey realization problems related to them, review fundamental inequalities they satisfy, and discuss applications to the combinatorics of algebraic matroids. These notes are based on lectures given at the 2025 Summer Research Institute in Algebraic Geometry at Colorado State University.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2601.13249" target="_blank">Volume polynomials</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> June Huh</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 26 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.13249" target="_blank">https://arxiv.org/abs/2601.13249</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Volume polynomials form a distinguished class of log-concave polynomials with remarkable analytic and combinatorial properties. I will survey realization problems related to them, review fundamental inequalities they satisfy, and discuss applications to the combinatorics of algebraic matroids. These notes are based on lectures given at the 2025 Summer Research Institute in Algebraic Geometry at Colorado State University.
+            </div>
+        </div>
+        <div class="paper" id="paper-21">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-21" data-paper-data='{"title": "Logarithmic geometry and Infinitesimal Hodge Theory", "author": "Mounir Nisse", "published": "Mon, 26 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.13568", "summary": "arXiv:2601.13568v3 Announce Type: replace \nAbstract: This paper develops a systematic approach to infinitesimal variations of Hodge structure for singular and equisingular families by means of logarithmic geometry and residue theory. The central idea is that logarithmic vector fields encode precisely those deformation directions that preserve singularities and act trivially on Hodge structures, while the effective variation is entirely governed by residue calculus. This viewpoint provides a conceptual reinterpretation of classical results of Griffiths, Green, and Voisin, and extends them to settings involving singular varieties and equisingular deformations. The resulting framework yields a geometric explanation for the appearance of Jacobian rings in infinitesimal Hodge theory and clarifies the structure of deformation spaces underlying Severi varieties and related moduli problems.", "number": 21, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#21</span>
+                <a href="https://arxiv.org/abs/2601.13568" target="_blank">Logarithmic geometry and Infinitesimal Hodge Theory</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Mounir Nisse</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 26 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.13568" target="_blank">https://arxiv.org/abs/2601.13568</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This paper develops a systematic approach to infinitesimal variations of Hodge structure for singular and equisingular families by means of logarithmic geometry and residue theory. The central idea is that logarithmic vector fields encode precisely those deformation directions that preserve singularities and act trivially on Hodge structures, while the effective variation is entirely governed by residue calculus. This viewpoint provides a conceptual reinterpretation of classical results of Griffiths, Green, and Voisin, and extends them to settings involving singular varieties and equisingular deformations. The resulting framework yields a geometric explanation for the appearance of Jacobian rings in infinitesimal Hodge theory and clarifies the structure of deformation spaces underlying Severi varieties and related moduli problems.
+            </div>
+        </div>
+        <div class="paper" id="paper-22">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-22" data-paper-data='{"title": "Formal principle for line bundles on neighborhoods of an analytic subset of a compact K\\\"ahler manifold", "author": "Takayuki Koike", "published": "Mon, 26 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2409.20367", "summary": "arXiv:2409.20367v3 Announce Type: replace-cross \nAbstract: We investigate the formal principle for holomorphic line bundles on neighborhoods of an analytic subset of a complex manifold mainly in the case where it can be realized as an open subset of a compact K\\\"ahler manifold. Our approach identifies the obstruction as a global analytic class supported on a neighborhood of $Y$, and relates its vanishing to the solvability of a $\\partial\\overline{\\partial}$-problem on neighborhoods of $Y$. As a consequence we obtain cohomological criteria ensuring the formal principle. We also construct a holomorphic family of compact K\\\"ahler surfaces containing a curve with topologically trivial normal bundle in which the formal principle holds for almost every fiber but fails for uncountably many fibers, exhibiting an instability phenomenon in families.", "number": 22, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#22</span>
+                <a href="https://arxiv.org/abs/2409.20367" target="_blank">Formal principle for line bundles on neighborhoods of an analytic subset of a compact K\"ahler manifold</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Takayuki Koike</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 26 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2409.20367" target="_blank">https://arxiv.org/abs/2409.20367</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We investigate the formal principle for holomorphic line bundles on neighborhoods of an analytic subset of a complex manifold mainly in the case where it can be realized as an open subset of a compact K\"ahler manifold. Our approach identifies the obstruction as a global analytic class supported on a neighborhood of $Y$, and relates its vanishing to the solvability of a $\partial\overline{\partial}$-problem on neighborhoods of $Y$. As a consequence we obtain cohomological criteria ensuring the formal principle. We also construct a holomorphic family of compact K\"ahler surfaces containing a curve with topologically trivial normal bundle in which the formal principle holds for almost every fiber but fails for uncountably many fibers, exhibiting an instability phenomenon in families.
+            </div>
+        </div>
+        <div class="paper" id="paper-23">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-23" data-paper-data='{"title": "Oka and Alexander polynomials of symplectic curves and divisibility relations", "author": "Hanine Awada, Marco Golla", "published": "Mon, 26 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2412.15792", "summary": "arXiv:2412.15792v2 Announce Type: replace-cross \nAbstract: We prove Libgober's divisibility relations for Oka and Alexander polynomials of symplectic curves in the complex projective plane. Along the way, we give new proofs of the divisibility relations for the Alexander polynomials of complex algebraic curves with respect to a generic line at infinity.", "number": 23, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#23</span>
+                <a href="https://arxiv.org/abs/2412.15792" target="_blank">Oka and Alexander polynomials of symplectic curves and divisibility relations</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Hanine Awada, Marco Golla</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 26 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2412.15792" target="_blank">https://arxiv.org/abs/2412.15792</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove Libgober's divisibility relations for Oka and Alexander polynomials of symplectic curves in the complex projective plane. Along the way, we give new proofs of the divisibility relations for the Alexander polynomials of complex algebraic curves with respect to a generic line at infinity.
+            </div>
+        </div>
+        <div class="paper" id="paper-24">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-24" data-paper-data='{"title": "Closed real plane curves of hyperelliptic solutions of focusing gauged modified KdV equation of genus $g$", "author": "Shigeki Matsutani", "published": "Mon, 26 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2504.18285", "summary": "arXiv:2504.18285v4 Announce Type: replace-cross \nAbstract: The real part of the focusing modified Korteweg-de Vries (MKdV) equation defined over the complex field $\\mathbb{C}$ is reduced to the focusing gauged MKdV (FGMKdV) equation. In this paper, we construct the real hyperelliptic solutions of FGMKdV equation in terms of data of the hyperelliptic curves of genus $g$ and demonstrate the closed hyperelliptic plane curves of genus $g=5$ whose curvature obeys the FGMKdV equation by extending the previous results of genus three (Matsutani, {\\it{J. Geom. Phys}} {\\bf{215}} (2025) 105540). These are a generalization of Euler's elasticae.", "number": 24, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#24</span>
+                <a href="https://arxiv.org/abs/2504.18285" target="_blank">Closed real plane curves of hyperelliptic solutions of focusing gauged modified KdV equation of genus $g$</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Shigeki Matsutani</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 26 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2504.18285" target="_blank">https://arxiv.org/abs/2504.18285</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The real part of the focusing modified Korteweg-de Vries (MKdV) equation defined over the complex field $\mathbb{C}$ is reduced to the focusing gauged MKdV (FGMKdV) equation. In this paper, we construct the real hyperelliptic solutions of FGMKdV equation in terms of data of the hyperelliptic curves of genus $g$ and demonstrate the closed hyperelliptic plane curves of genus $g=5$ whose curvature obeys the FGMKdV equation by extending the previous results of genus three (Matsutani, {\it{J. Geom. Phys}} {\bf{215}} (2025) 105540). These are a generalization of Euler's elasticae.
+            </div>
+        </div>
+        <div class="paper" id="paper-25">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-25" data-paper-data='{"title": "Geometric Categories for Continuous Gauging", "author": "Devon Stockall, Matthew Yu", "published": "Mon, 26 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.08254", "summary": "arXiv:2511.08254v3 Announce Type: replace-cross \nAbstract: We develop a unified categorical framework for gauging both continuous and finite symmetries in arbitrary spacetime dimensions. Our construction applies to geometric categories i.e. categories internal to stacks. This generalizes the familiar setting of fusion categories, which describe finite group symmetries, to the case of Lie group symmetries. Within this framework, we obtain a functorial Symmetry Topological Field Theory together with its natural boundaries, allowing us to compute associated endomorphism categories and Drinfeld centers in a uniform way. For a given symmetry group $G$, our framework recovers the electric and magnetic higher-form symmetries expected in $G$-gauge theory. Moreover, it naturally encodes electric breaking symmetry in the presence of charged matter, reproducing known physical phenomena in a categorical setting.", "number": 25, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#25</span>
+                <a href="https://arxiv.org/abs/2511.08254" target="_blank">Geometric Categories for Continuous Gauging</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Devon Stockall, Matthew Yu</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 26 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.08254" target="_blank">https://arxiv.org/abs/2511.08254</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We develop a unified categorical framework for gauging both continuous and finite symmetries in arbitrary spacetime dimensions. Our construction applies to geometric categories i.e. categories internal to stacks. This generalizes the familiar setting of fusion categories, which describe finite group symmetries, to the case of Lie group symmetries. Within this framework, we obtain a functorial Symmetry Topological Field Theory together with its natural boundaries, allowing us to compute associated endomorphism categories and Drinfeld centers in a uniform way. For a given symmetry group $G$, our framework recovers the electric and magnetic higher-form symmetries expected in $G$-gauge theory. Moreover, it naturally encodes electric breaking symmetry in the presence of charged matter, reproducing known physical phenomena in a categorical setting.
+            </div>
+        </div>
+        <div class="paper" id="paper-26">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-26" data-paper-data='{"title": "Structure of ind-pro completions of Noetherian rings", "author": "Dmitry Badulin", "published": "Mon, 26 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.12016", "summary": "arXiv:2601.12016v2 Announce Type: replace-cross \nAbstract: We prove some results on the structure of ind-pro completions of Noetherian rings along flags of prime ideals. In particular, we compute the Krull dimension and deduce the criterion on semilocality in the case of essentially of finite type algebras over a field. We also show that ind-pro completion inherits properties of the base ring such as normality, regularity, local equidimensionality, etc.", "number": 26, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#26</span>
+                <a href="https://arxiv.org/abs/2601.12016" target="_blank">Structure of ind-pro completions of Noetherian rings</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Dmitry Badulin</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 26 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.12016" target="_blank">https://arxiv.org/abs/2601.12016</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove some results on the structure of ind-pro completions of Noetherian rings along flags of prime ideals. In particular, we compute the Krull dimension and deduce the criterion on semilocality in the case of essentially of finite type algebras over a field. We also show that ind-pro completion inherits properties of the base ring such as normality, regularity, local equidimensionality, etc.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-01-26 18:00:02
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>

@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Wed, 18 Mar 2026 04:01:04 +0000<br>
+        <strong>論文数:</strong> 18件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Eigenforms and graphs of Hecke operators with wild ramification</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Lawson homology groups of Chow varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Algebraicity of supermoduli of curves via Artin's criteria</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">A Quadratically Enriched Count Of Lines In Smooth Del Pezzo Surfaces Of Degree 2 And 4</a>
+            <span class="title-label-badge" style="background-color: #9b59b6;">del Pezzo</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">Realizations of 1-motives over a scheme of characteristic 0</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">The cohomology of Hyperquot schemes on curves via shifted Yangians in type A</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Fourier transform of irregular connections on $\mathbb P^1$ and classification of Argyres-Douglas theories</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Computing the connected components of real algebraic curves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">Relating Hodge Atoms, Spectral Triples, and BPS Flows</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">On wall-crossing invariance of certain sums of Welschinger numbers</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">Local structure of the overconvergent de Rham-Witt complex</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">The real Mordell-Weil group of rational elliptic surfaces and real lines on del Pezzo surfaces of degree $K^2=1$</a>
+            <span class="title-label-badge" style="background-color: #9b59b6;">del Pezzo</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">Derived autoequivalences of length 2 flops via GIT</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Envelopes and evolutes</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">A note on quasi-perfect morphisms</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">Non-abelian Rees construction and pure motives</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">On the separation \L ojasiewicz exponents of real analytic sets in the real plane</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">Higher a-numbers in $\mathbf{Z}_p$-towers via Counting Lattice Points</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Eigenforms and graphs of Hecke operators with wild ramification", "author": "Rudrendra Kashyap, Vladyslav Zveryk", "published": "Wed, 18 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.15931", "summary": "arXiv:2603.15931v1 Announce Type: new \nAbstract: Hecke operators on moduli of bundles over a global function field become substantially more complicated in the presence of ramification. We show that far enough in the Harder-Narasimhan cone of $\\mathrm{Bun}_G$, this extra complexity has a simple structure, which allows to reduce the main study to the unramified case. Using the theory of graphs of Hecke operators, we transform this statement into a combinatorial condition. Utilizing the combinatorial language, we obtain tight bounds, and for generic eigenvalues exact formulas for the dimensions of Hecke eigenspaces with arbitrary ramification for $\\mathrm{Bun}_{\\mathrm{PGL}_2}$. Moreover, our methods allow to construct eigenforms explicitly.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2603.15931" target="_blank">Eigenforms and graphs of Hecke operators with wild ramification</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Rudrendra Kashyap, Vladyslav Zveryk</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.15931" target="_blank">https://arxiv.org/abs/2603.15931</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Hecke operators on moduli of bundles over a global function field become substantially more complicated in the presence of ramification. We show that far enough in the Harder-Narasimhan cone of $\mathrm{Bun}_G$, this extra complexity has a simple structure, which allows to reduce the main study to the unramified case. Using the theory of graphs of Hecke operators, we transform this statement into a combinatorial condition. Utilizing the combinatorial language, we obtain tight bounds, and for generic eigenvalues exact formulas for the dimensions of Hecke eigenspaces with arbitrary ramification for $\mathrm{Bun}_{\mathrm{PGL}_2}$. Moreover, our methods allow to construct eigenforms explicitly.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Lawson homology groups of Chow varieties", "author": "Youming Chen, Wenchuan Hu", "published": "Wed, 18 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.16252", "summary": "arXiv:2603.16252v1 Announce Type: new \nAbstract: Let $C_{p,d}(\\mathbb{P}^n)$ denote the Chow variety of effective algebraic $p$-cycles of degree $d$ in complex projective space $\\mathbb{P}^n$. In this paper, we compute the rational Lawson homology groups $L_qH_k(C_{p,d}(\\mathbb{P}^n))_\\mathbb{Q}$ for $0 \\leq 2q\\leq k \\leq 2d$. Additionally, we prove that the rational Lawson homology groups of a natural completion of the Chow monoid of algebraic $p$-cycles in projective spaces are isomorphic to the corresponding rational singular homology groups. We also establish the stability of Lawson homology groups of Chow varieties under natural embeddings and algebraic suspension maps within a specified range.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2603.16252" target="_blank">Lawson homology groups of Chow varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Youming Chen, Wenchuan Hu</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.16252" target="_blank">https://arxiv.org/abs/2603.16252</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $C_{p,d}(\mathbb{P}^n)$ denote the Chow variety of effective algebraic $p$-cycles of degree $d$ in complex projective space $\mathbb{P}^n$. In this paper, we compute the rational Lawson homology groups $L_qH_k(C_{p,d}(\mathbb{P}^n))_\mathbb{Q}$ for $0 \leq 2q\leq k \leq 2d$. Additionally, we prove that the rational Lawson homology groups of a natural completion of the Chow monoid of algebraic $p$-cycles in projective spaces are isomorphic to the corresponding rational singular homology groups. We also establish the stability of Lawson homology groups of Chow varieties under natural embeddings and algebraic suspension maps within a specified range.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Algebraicity of supermoduli of curves via Artin's criteria", "author": "Nadia Ott", "published": "Wed, 18 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.16254", "summary": "arXiv:2603.16254v1 Announce Type: new \nAbstract: We apply the supergeometric analogue of Artin's algebraicity criteria to prove algebraicity for four moduli problems in supergeometry: supercurves, super Riemann surfaces, stable supercurves, and stable super Riemann surfaces. The algebraicity of the moduli of (stable) super Riemann surfaces is known but we give a new proof by verifying the super Artin conditions. The algebraicity of the moduli of (stable) supercurves is new.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2603.16254" target="_blank">Algebraicity of supermoduli of curves via Artin's criteria</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Nadia Ott</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.16254" target="_blank">https://arxiv.org/abs/2603.16254</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We apply the supergeometric analogue of Artin's algebraicity criteria to prove algebraicity for four moduli problems in supergeometry: supercurves, super Riemann surfaces, stable supercurves, and stable super Riemann surfaces. The algebraicity of the moduli of (stable) super Riemann surfaces is known but we give a new proof by verifying the super Artin conditions. The algebraicity of the moduli of (stable) supercurves is new.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "A Quadratically Enriched Count Of Lines In Smooth Del Pezzo Surfaces Of Degree 2 And 4", "author": "Victor Chachay (IMB)", "published": "Wed, 18 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.16315", "summary": "arXiv:2603.16315v1 Announce Type: new \nAbstract: We give a computation of some Euler classes in Chow-Witt groups associated to the count of lines of smooth del Pezzo surfaces of degree 2 and 4. The description of Chow-Witt groups of projective bundles over Grassmannians for vector bundles that are not relatively orientable is the main part of the article. We show that the quadratic count is not enriched as the Chow-Witt group is isomorphic to the Chow group. In this setting, we give an expression of the classes of even rank in the Chow-Witt group as multiples of the hyperbolic element h. A direct application of this construction is the count for the del Pezzo surfaces.", "number": 4, "labels": [{"name": "del Pezzo", "color": "#9b59b6"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2603.16315" target="_blank">A Quadratically Enriched Count Of Lines In Smooth Del Pezzo Surfaces Of Degree 2 And 4</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #9b59b6;">del Pezzo</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Victor Chachay (IMB)</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.16315" target="_blank">https://arxiv.org/abs/2603.16315</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We give a computation of some Euler classes in Chow-Witt groups associated to the count of lines of smooth del Pezzo surfaces of degree 2 and 4. The description of Chow-Witt groups of projective bundles over Grassmannians for vector bundles that are not relatively orientable is the main part of the article. We show that the quadratic count is not enriched as the Chow-Witt group is isomorphic to the Chow group. In this setting, we give an expression of the classes of even rank in the Chow-Witt group as multiples of the hyperbolic element h. A direct application of this construction is the count for the del Pezzo surfaces.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "Realizations of 1-motives over a scheme of characteristic 0", "author": "Cristiana Bertolin", "published": "Wed, 18 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.16545", "summary": "arXiv:2603.16545v1 Announce Type: new \nAbstract: Let S be a connected and smooth scheme of finite type over the complex numbers. We construct functorially the Hodge realization of a 1-motive over S as a torsion-free, polarizable and admissible variation of mixed Hodge structures of type (0,0),(-1,0),(0,-1),(-1,-1). We prove that this construction yields an equivalence between the category of 1-motives over S and the category of such variations of mixed Hodge structures, thereby extending Deligne's equivalence over the complex numbers to the relative case and providing a positive answer to a question of Andr\\'e concerning the geometric origin of admissible variations of mixed Hodge structures of the above type. We also describe the l-adic and de Rham realizations of 1-motives and show that these realizations fit naturally into Deligne's framework of smooth mixed realizations.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2603.16545" target="_blank">Realizations of 1-motives over a scheme of characteristic 0</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Cristiana Bertolin</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.16545" target="_blank">https://arxiv.org/abs/2603.16545</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let S be a connected and smooth scheme of finite type over the complex numbers. We construct functorially the Hodge realization of a 1-motive over S as a torsion-free, polarizable and admissible variation of mixed Hodge structures of type (0,0),(-1,0),(0,-1),(-1,-1). We prove that this construction yields an equivalence between the category of 1-motives over S and the category of such variations of mixed Hodge structures, thereby extending Deligne's equivalence over the complex numbers to the relative case and providing a positive answer to a question of Andr\'e concerning the geometric origin of admissible variations of mixed Hodge structures of the above type. We also describe the l-adic and de Rham realizations of 1-motives and show that these realizations fit naturally into Deligne's framework of smooth mixed realizations.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "The cohomology of Hyperquot schemes on curves via shifted Yangians in type A", "author": "Archi Kaushik", "published": "Wed, 18 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.16691", "summary": "arXiv:2603.16691v1 Announce Type: new \nAbstract: Let $V$ be a vector bundle of rank $r$ on a smooth projective complex curve $C$. The Hyperquot scheme $\\text{F}^{n}\\text{Quot}\\,(V)$ is the moduli space of length $n$ flags of rank $r$ sub-sheaves of $V$. This article has two main results: First, we show that a certain shifted Yangian of $\\mathfrak{sl}_{n+1}$ acts on $H^{*}\\left(\\text{F}^{n}\\text{Quot}\\,(V)\\right)$ by correspondences. Then, we define a family of $rn$ commuting Yangian operators which yields a natural basis for $H^{*}\\left(\\text{F}^{n}\\text{Quot}\\,(V)\\right)$. This generalises the work arXiv:2307.13671 of Marian and Negut, who proved the above results in the case $n=1$. The new feature, which makes this generalisation possible, is the use of so called skew-nested Quot schemes. The rank $1$ versions of these spaces, skew-nested Hilbert schemes, have been recently introduced by Sergej Monavari in the context of refined DT theory of local curves arXiv:2506.14359. In the present article, skew-nested Quot schemes appear as correspondences associated with iterated commutators of Yangian elements.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2603.16691" target="_blank">The cohomology of Hyperquot schemes on curves via shifted Yangians in type A</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Archi Kaushik</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.16691" target="_blank">https://arxiv.org/abs/2603.16691</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $V$ be a vector bundle of rank $r$ on a smooth projective complex curve $C$. The Hyperquot scheme $\text{F}^{n}\text{Quot}\,(V)$ is the moduli space of length $n$ flags of rank $r$ sub-sheaves of $V$. This article has two main results: First, we show that a certain shifted Yangian of $\mathfrak{sl}_{n+1}$ acts on $H^{*}\left(\text{F}^{n}\text{Quot}\,(V)\right)$ by correspondences. Then, we define a family of $rn$ commuting Yangian operators which yields a natural basis for $H^{*}\left(\text{F}^{n}\text{Quot}\,(V)\right)$. This generalises the work arXiv:2307.13671 of Marian and Negut, who proved the above results in the case $n=1$. The new feature, which makes this generalisation possible, is the use of so called skew-nested Quot schemes. The rank $1$ versions of these spaces, skew-nested Hilbert schemes, have been recently introduced by Sergej Monavari in the context of refined DT theory of local curves arXiv:2506.14359. In the present article, skew-nested Quot schemes appear as correspondences associated with iterated commutators of Yangian elements.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Fourier transform of irregular connections on $\\mathbb P^1$ and classification of Argyres-Douglas theories", "author": "Jean Dou\\c{c}ot", "published": "Wed, 18 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.15942", "summary": "arXiv:2603.15942v1 Announce Type: cross \nAbstract: We give a mathematical interpretation of the dualities between type $A$ Argyres-Douglas theories recently obtained by Beem, Martone, Sacchi, Singh and Stedman, building on work of Xie. Using the fact that, via the wild nonabelian Hodge correspondence, the data defining such a theory amount to singularity data for irregular connections on $\\mathbb P^1$ of a specific form, we show that these dualities can all be realized as compositions of two types of more basic operations acting on such irregular connections: the Fourier transform and a M\\\"obius transformation exchanging zero and infinity. The proof relies on the stationary phase formula giving explicit expressions for the singularity data of the Fourier transform. We also clarify the relation between the quivers describing the 3d mirrors of type $A$ Argyres-Douglas theories and the nonabelian Hodge diagrams defined in work of Boalch-Yamakawa and of the author: the 3d mirror corresponds to the unique nonabelian Hodge diagram with no negative edges/loops among those of singularity data in the corresponding orbit under basic operations.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2603.15942" target="_blank">Fourier transform of irregular connections on $\mathbb P^1$ and classification of Argyres-Douglas theories</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jean Dou\c{c}ot</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.15942" target="_blank">https://arxiv.org/abs/2603.15942</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We give a mathematical interpretation of the dualities between type $A$ Argyres-Douglas theories recently obtained by Beem, Martone, Sacchi, Singh and Stedman, building on work of Xie. Using the fact that, via the wild nonabelian Hodge correspondence, the data defining such a theory amount to singularity data for irregular connections on $\mathbb P^1$ of a specific form, we show that these dualities can all be realized as compositions of two types of more basic operations acting on such irregular connections: the Fourier transform and a M\"obius transformation exchanging zero and infinity. The proof relies on the stationary phase formula giving explicit expressions for the singularity data of the Fourier transform. We also clarify the relation between the quivers describing the 3d mirrors of type $A$ Argyres-Douglas theories and the nonabelian Hodge diagrams defined in work of Boalch-Yamakawa and of the author: the 3d mirror corresponds to the unique nonabelian Hodge diagram with no negative edges/loops among those of singularity data in the corresponding orbit under basic operations.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Computing the connected components of real algebraic curves", "author": "Elisabetta Rocchi (PolSys), Mohab Safey El Din (PolSys)", "published": "Wed, 18 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.16283", "summary": "arXiv:2603.16283v1 Announce Type: cross \nAbstract: Connected components of real algebraic sets are semi-algebraic, i.e. they are described by a boolean formula whose atoms are polynomial constraints with real coefficients. Computing such descriptions finds topical applications in optical system design and robotics. In this paper, we design a new algorithm for computing such semi-algebraic descriptions for real algebraic curves. Notably, its complexity is less than the best known one for computing a graph which is isotopic to the real space curve under study.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2603.16283" target="_blank">Computing the connected components of real algebraic curves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Elisabetta Rocchi (PolSys), Mohab Safey El Din (PolSys)</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.16283" target="_blank">https://arxiv.org/abs/2603.16283</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Connected components of real algebraic sets are semi-algebraic, i.e. they are described by a boolean formula whose atoms are polynomial constraints with real coefficients. Computing such descriptions finds topical applications in optical system design and robotics. In this paper, we design a new algorithm for computing such semi-algebraic descriptions for real algebraic curves. Notably, its complexity is less than the best known one for computing a graph which is isotopic to the real space curve under study.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "Relating Hodge Atoms, Spectral Triples, and BPS Flows", "author": "Mark Raugas", "published": "Wed, 18 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.16639", "summary": "arXiv:2603.16639v1 Announce Type: cross \nAbstract: We compare algebraic and analytic pictures relevant to the study of birational invariants. Motivated by recent advances in the development of non-commutative Hodge structures, we examine their implication for quiver gauge field theory on the cubic fourfold. By interpreting the semiorthogonal property as a dynamical selection rule, we conjecture that the K3 Hodge atom of the cubic fourfold represents a protected quantum phase whose spectra remain invariant under non-perturbative tunneling processes.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2603.16639" target="_blank">Relating Hodge Atoms, Spectral Triples, and BPS Flows</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Mark Raugas</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.16639" target="_blank">https://arxiv.org/abs/2603.16639</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We compare algebraic and analytic pictures relevant to the study of birational invariants. Motivated by recent advances in the development of non-commutative Hodge structures, we examine their implication for quiver gauge field theory on the cubic fourfold. By interpreting the semiorthogonal property as a dynamical selection rule, we conjecture that the K3 Hodge atom of the cubic fourfold represents a protected quantum phase whose spectra remain invariant under non-perturbative tunneling processes.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "On wall-crossing invariance of certain sums of Welschinger numbers", "author": "Sergey Finashin, Viatcheslav Kharlamov", "published": "Wed, 18 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2203.10503", "summary": "arXiv:2203.10503v2 Announce Type: replace \nAbstract: We continue our quest for real enumerative invariants not sensitive to changing the real structure and extend the construction we uncovered previously for counting curves of anti-canonical degree $\\leqslant 2$ on del Pezzo surfaces with $K^2=1$ to curves of any anti-canonical degree and on any del Pezzo surfaces of degree $K^2\\leqslant 3$.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2203.10503" target="_blank">On wall-crossing invariance of certain sums of Welschinger numbers</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sergey Finashin, Viatcheslav Kharlamov</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2203.10503" target="_blank">https://arxiv.org/abs/2203.10503</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We continue our quest for real enumerative invariants not sensitive to changing the real structure and extend the construction we uncovered previously for counting curves of anti-canonical degree $\leqslant 2$ on del Pezzo surfaces with $K^2=1$ to curves of any anti-canonical degree and on any del Pezzo surfaces of degree $K^2\leqslant 3$.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "Local structure of the overconvergent de Rham-Witt complex", "author": "Rub\\'en Mu\\~noz--Bertrand", "published": "Wed, 18 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2311.15449", "summary": "arXiv:2311.15449v2 Announce Type: replace \nAbstract: We give a general description of the structure of the relative de Rham-Witt complex on a polynomial ring, seen as an algebra over its integral part. After giving a control of the overconvergence of Lazard's morphism, we similarly give the structure of the overconvergent complex, locally on a smooth algebraic variety over a perfect field of positive characteristic.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2311.15449" target="_blank">Local structure of the overconvergent de Rham-Witt complex</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Rub\'en Mu\~noz--Bertrand</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2311.15449" target="_blank">https://arxiv.org/abs/2311.15449</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We give a general description of the structure of the relative de Rham-Witt complex on a polynomial ring, seen as an algebra over its integral part. After giving a control of the overconvergence of Lazard's morphism, we similarly give the structure of the overconvergent complex, locally on a smooth algebraic variety over a perfect field of positive characteristic.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "The real Mordell-Weil group of rational elliptic surfaces and real lines on del Pezzo surfaces of degree $K^2=1$", "author": "Sergey Finashin, Viatcheslav Kharlamov", "published": "Wed, 18 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2409.01202", "summary": "arXiv:2409.01202v3 Announce Type: replace \nAbstract: We undertake a study of topological properties of the real Mordell-Weil group $\\operatorname{MW}_{\\mathbb R}$ of real rational elliptic surfaces $X$ which we accompany by a related study of real lines on $X$ and on the \"subordinate\" del Pezzo surfaces $Y$ of degree 1. We give an explicit description of isotopy types of real lines on $Y_{\\mathbb R}$ and an explicit presentation of $\\operatorname{MW}_{\\mathbb R}$ in the mapping class group $\\operatorname{Mod}(X_{\\mathbb R})$. Combining these results we establish an explicit formula for the action of $\\operatorname{MW}_{\\mathbb R}$ in $H_1(X_{\\mathbb R})$.", "number": 12, "labels": [{"name": "del Pezzo", "color": "#9b59b6"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2409.01202" target="_blank">The real Mordell-Weil group of rational elliptic surfaces and real lines on del Pezzo surfaces of degree $K^2=1$</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #9b59b6;">del Pezzo</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sergey Finashin, Viatcheslav Kharlamov</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2409.01202" target="_blank">https://arxiv.org/abs/2409.01202</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We undertake a study of topological properties of the real Mordell-Weil group $\operatorname{MW}_{\mathbb R}$ of real rational elliptic surfaces $X$ which we accompany by a related study of real lines on $X$ and on the "subordinate" del Pezzo surfaces $Y$ of degree 1. We give an explicit description of isotopy types of real lines on $Y_{\mathbb R}$ and an explicit presentation of $\operatorname{MW}_{\mathbb R}$ in the mapping class group $\operatorname{Mod}(X_{\mathbb R})$. Combining these results we establish an explicit formula for the action of $\operatorname{MW}_{\mathbb R}$ in $H_1(X_{\mathbb R})$.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "Derived autoequivalences of length 2 flops via GIT", "author": "Aporva Varshney", "published": "Wed, 18 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2508.05285", "summary": "arXiv:2508.05285v2 Announce Type: replace \nAbstract: We obtain the derived autoequivalences of a flopping rational curve of length 2 using GIT and the theory of windows applied to the universal length 2 flop. We show that the stringy K\\\"ahler moduli space (SKMS) associated to the GIT problem, as constructed by Halpern-Leistner--Sam, matches the description of the space obtained for length 2 threefolds by Hirano--Wemyss as a quotient of a Bridgeland stability manifold. Furthermore, we show that its fundamental group acts via contraction algebra and fibre algebra twists, hence recovering the monodromy action described by Donovan--Wemyss. In particular, this shows that the two approaches to building the SKMS agree in this setting.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2508.05285" target="_blank">Derived autoequivalences of length 2 flops via GIT</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Aporva Varshney</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2508.05285" target="_blank">https://arxiv.org/abs/2508.05285</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We obtain the derived autoequivalences of a flopping rational curve of length 2 using GIT and the theory of windows applied to the universal length 2 flop. We show that the stringy K\"ahler moduli space (SKMS) associated to the GIT problem, as constructed by Halpern-Leistner--Sam, matches the description of the space obtained for length 2 threefolds by Hirano--Wemyss as a quotient of a Bridgeland stability manifold. Furthermore, we show that its fundamental group acts via contraction algebra and fibre algebra twists, hence recovering the monodromy action described by Donovan--Wemyss. In particular, this shows that the two approaches to building the SKMS agree in this setting.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Envelopes and evolutes", "author": "Ragni Piene", "published": "Wed, 18 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2508.08145", "summary": "arXiv:2508.08145v2 Announce Type: replace \nAbstract: The study of evolutes of plane curves goes back at least to Huygens, and was continued and extended to space curves by Monge, Darboux, and others. Salmon studied projective curves and surfaces and their evolutes and gave many enumerative formulas for their degrees and number of singularities.\n  We define envelopes of families of linear spaces in projective space. In order to define evolutes we impose a notion of perpendicularity, which allows us to consider the normal spaces to a projective variety. The evolute of a projective hypersurface is the envelope of the family of normal lines. For a variety of dimension $r$ in $n$-space, the evolute is defined as the $(n-r)$th iterated cuspidal locus of the map from the total space of the normal spaces to projective space. Thus the envelope can be interpreted as a $(n-r)$th order Thom-Boardman singularity. Further higher order Thom-Boardman singularities correspond, for a curve in the plane or in 3-space, to classical objects like the vertices of the curve; for a surface in 3-space, they give the cuspidal curve - and its cusps - on the evolute. Using known formulas for Thom polynomials we are able to verify and generalize many of Salmon's formulas and find new ones.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2508.08145" target="_blank">Envelopes and evolutes</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ragni Piene</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2508.08145" target="_blank">https://arxiv.org/abs/2508.08145</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The study of evolutes of plane curves goes back at least to Huygens, and was continued and extended to space curves by Monge, Darboux, and others. Salmon studied projective curves and surfaces and their evolutes and gave many enumerative formulas for their degrees and number of singularities.
+  We define envelopes of families of linear spaces in projective space. In order to define evolutes we impose a notion of perpendicularity, which allows us to consider the normal spaces to a projective variety. The evolute of a projective hypersurface is the envelope of the family of normal lines. For a variety of dimension $r$ in $n$-space, the evolute is defined as the $(n-r)$th iterated cuspidal locus of the map from the total space of the normal spaces to projective space. Thus the envelope can be interpreted as a $(n-r)$th order Thom-Boardman singularity. Further higher order Thom-Boardman singularities correspond, for a curve in the plane or in 3-space, to classical objects like the vertices of the curve; for a surface in 3-space, they give the cuspidal curve - and its cusps - on the evolute. Using known formulas for Thom polynomials we are able to verify and generalize many of Salmon's formulas and find new ones.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "A note on quasi-perfect morphisms", "author": "Timothy De Deyn, Pat Lank, Kabeer Manali Rahul", "published": "Wed, 18 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2508.10845", "summary": "arXiv:2508.10845v3 Announce Type: replace \nAbstract: This note is concerned with quasi-perfect morphisms between Noetherian algebraic spaces. In particular, we study the local behavior of quasi-perfect proper morphisms. We show that quasi-perfectness of a proper morphism can be detected at the \\'{e}tale local rings of points of the target, as well as their completions and (strict) Henselizations. As a corollary, we obtain that the locus of points where a proper morphism is quasi-perfect is Zariski open.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2508.10845" target="_blank">A note on quasi-perfect morphisms</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Timothy De Deyn, Pat Lank, Kabeer Manali Rahul</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2508.10845" target="_blank">https://arxiv.org/abs/2508.10845</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This note is concerned with quasi-perfect morphisms between Noetherian algebraic spaces. In particular, we study the local behavior of quasi-perfect proper morphisms. We show that quasi-perfectness of a proper morphism can be detected at the \'{e}tale local rings of points of the target, as well as their completions and (strict) Henselizations. As a corollary, we obtain that the locus of points where a proper morphism is quasi-perfect is Zariski open.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "Non-abelian Rees construction and pure motives", "author": "Yves Andr\\'e", "published": "Wed, 18 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2601.21052", "summary": "arXiv:2601.21052v2 Announce Type: replace \nAbstract: The classical Rees construction (of common use in commutative algebra and Hodge theory) interpolates between filtrations, viewed as ${\\mathbb G}_m$-equivariant vector bundles on the affine line, and their associated gradings. Various non-abelian versions have been proposed, where the multiplicative group ${\\mathbb G}_m$ is replaced by an arbitrary reductive group. Building on a construction due to P. O'Sullivan, we present a Galois correspondence between quasi-homogeneous spaces and certain monoidal categories, and apply it to monoidal categories of motives with concrete applications to algebraic cycles. In particular, we give a new proof and generalization of the Clozel-Deligne theorem about numerical equivalence on abelian varieties over finite fields.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2601.21052" target="_blank">Non-abelian Rees construction and pure motives</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yves Andr\'e</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.21052" target="_blank">https://arxiv.org/abs/2601.21052</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The classical Rees construction (of common use in commutative algebra and Hodge theory) interpolates between filtrations, viewed as ${\mathbb G}_m$-equivariant vector bundles on the affine line, and their associated gradings. Various non-abelian versions have been proposed, where the multiplicative group ${\mathbb G}_m$ is replaced by an arbitrary reductive group. Building on a construction due to P. O'Sullivan, we present a Galois correspondence between quasi-homogeneous spaces and certain monoidal categories, and apply it to monoidal categories of motives with concrete applications to algebraic cycles. In particular, we give a new proof and generalization of the Clozel-Deligne theorem about numerical equivalence on abelian varieties over finite fields.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "On the separation \\L ojasiewicz exponents of real analytic sets in the real plane", "author": "Phi Dung Hoang, Hong Duc Nguyen", "published": "Wed, 18 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.15532", "summary": "arXiv:2603.15532v2 Announce Type: replace \nAbstract: The main aim of the paper is to give a formula for computing the separation \\L ojasiewicz exponents for two real analytic set germs via the Newton--Puiseux expansions of their defining functions. Moreover, we present an effective exponent for the case of two real algebraic sets in terms of their degrees.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2603.15532" target="_blank">On the separation \L ojasiewicz exponents of real analytic sets in the real plane</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Phi Dung Hoang, Hong Duc Nguyen</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.15532" target="_blank">https://arxiv.org/abs/2603.15532</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The main aim of the paper is to give a formula for computing the separation \L ojasiewicz exponents for two real analytic set germs via the Newton--Puiseux expansions of their defining functions. Moreover, we present an effective exponent for the case of two real algebraic sets in terms of their degrees.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "Higher a-numbers in $\\mathbf{Z}_p$-towers via Counting Lattice Points", "author": "Jeremy Booher, Jack Hsieh, Rakesh Rivera, Vincent Tran, James Upton, Carol Wu", "published": "Wed, 18 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2407.13969", "summary": "arXiv:2407.13969v3 Announce Type: replace-cross \nAbstract: Booher, Cais, Kramer-Miller and Upton study a class of $\\mathbf{Z}_p$-tower of curves in characteristic $p$ with ramification controlled by an integer $d$. In the special case that $d$ divides $p-1$, they prove a formula for the higher $a$-numbers of these curves involving the number of lattice points in a complicated region of the plane. Booher and Cais had previously conjectured that for $n$ sufficiently large the higher $a$-numbers of the $n$th curve are given by formulae of the form $\\alpha(n) p^{2n} + \\beta(n) p^n + \\lambda_r(n) n + \\nu(n) $, where $\\alpha,\\beta,\\nu,\\lambda_r$ are periodic functions of $n$. This is an example of a new kind of Iwasawa theory. We establish this conjecture by carefully studying these lattice points.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2407.13969" target="_blank">Higher a-numbers in $\mathbf{Z}_p$-towers via Counting Lattice Points</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jeremy Booher, Jack Hsieh, Rakesh Rivera, Vincent Tran, James Upton, Carol Wu</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2407.13969" target="_blank">https://arxiv.org/abs/2407.13969</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Booher, Cais, Kramer-Miller and Upton study a class of $\mathbf{Z}_p$-tower of curves in characteristic $p$ with ramification controlled by an integer $d$. In the special case that $d$ divides $p-1$, they prove a formula for the higher $a$-numbers of these curves involving the number of lattice points in a complicated region of the plane. Booher and Cais had previously conjectured that for $n$ sufficiently large the higher $a$-numbers of the $n$th curve are given by formulae of the form $\alpha(n) p^{2n} + \beta(n) p^n + \lambda_r(n) n + \nu(n) $, where $\alpha,\beta,\nu,\lambda_r$ are periodic functions of $n$. This is an example of a new kind of Iwasawa theory. We establish this conjecture by carefully studying these lattice points.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-03-18 18:00:03
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>

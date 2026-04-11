@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Mon, 19 Jan 2026 05:00:43 +0000<br>
+        <strong>論文数:</strong> 24件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Maximal cross-ratio degree for 8 points in $\mathbb{P}^1$</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">On the rational points in conics of a cubic surfac</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Interpolation matrices and jumping lines of logarithmic bundles</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">Positive Genus Pairs from Amplituhedra</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">The resultant divisor is negative</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">The rank-nullity ring of a matroid</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Theta operators on Hodge type Shimura varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">A de Rham weight part of Serre's conjecture and generalized mod $p$ BGG decompositions</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">Nash uniformization of chessboard sets by Nash manifolds with corners</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">Fundamentals of Broken Line Convex Geometry</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">A non-abelian version of Deligne's Fixed Part Theorem</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">Proof of the geometric Langlands conjecture V: the multiplicity one theorem</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">An explicit derived McKay correspondence for some complex reflection groups of rank two</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Sparse systems and algorithmic equidimensional decomposition</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Effective bounds for polynomial systems defined over the rationals</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">Unboundedness for motivic invariants of birational automorphisms</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">Variations on cohomology rings and zero schemes</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">On quasi-Albanese morphisms for log canonical Calabi-Yau pairs</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Defect of projective hypersurfaces with isolated singularities</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">Scheme-theoretic coisotropic reduction</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-21" onchange="updateSelectedCount()">
+            <span class="title-number">21.</span>
+            <a href="#paper-21">Theta operators and a generic entailment for $GSp_4$</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-22" onchange="updateSelectedCount()">
+            <span class="title-number">22.</span>
+            <a href="#paper-22">Partitioning Theorems for Sets of Semi-Pfaffian Sets, with Applications</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-23" onchange="updateSelectedCount()">
+            <span class="title-number">23.</span>
+            <a href="#paper-23">Perfectoid $C_i$ transfer</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-24" onchange="updateSelectedCount()">
+            <span class="title-number">24.</span>
+            <a href="#paper-24">Deformation quantisation of exact shifted symplectic structures, with an application to vanishing cycles</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Maximal cross-ratio degree for 8 points in $\\mathbb{P}^1$", "author": "Arjun Maniyar", "published": "Mon, 19 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.10888", "summary": "arXiv:2601.10888v1 Announce Type: new \nAbstract: The cross-ratio degree problem asks for the number of configurations of $n$ points in $\\mathbb{P}^1$ that satisfy $n-3$ specified cross-ratio conditions. It is known that the maximal cross-ratio degree for 8 points is at least 4. In this paper, we will see that the maximal cross-ratio degree for 8 points in $\\mathbb{P}^1$ is equal to 4.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2601.10888" target="_blank">Maximal cross-ratio degree for 8 points in $\mathbb{P}^1$</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Arjun Maniyar</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 19 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.10888" target="_blank">https://arxiv.org/abs/2601.10888</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The cross-ratio degree problem asks for the number of configurations of $n$ points in $\mathbb{P}^1$ that satisfy $n-3$ specified cross-ratio conditions. It is known that the maximal cross-ratio degree for 8 points is at least 4. In this paper, we will see that the maximal cross-ratio degree for 8 points in $\mathbb{P}^1$ is equal to 4.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "On the rational points in conics of a cubic surfac", "author": "Chunhui Liu", "published": "Mon, 19 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.10895", "summary": "arXiv:2601.10895v1 Announce Type: new \nAbstract: In this paper, we give a uniform upper bound on the rational points of bounded height provided by conics in a cubic surface. For this target, we give a generalized version of the global determinant method of Salberger by Arakelov geometry.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2601.10895" target="_blank">On the rational points in conics of a cubic surfac</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Chunhui Liu</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 19 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.10895" target="_blank">https://arxiv.org/abs/2601.10895</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we give a uniform upper bound on the rational points of bounded height provided by conics in a cubic surface. For this target, we give a generalized version of the global determinant method of Salberger by Arakelov geometry.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Interpolation matrices and jumping lines of logarithmic bundles", "author": "Elena Guardo, Graham Keiper, Grzegorz Malara", "published": "Mon, 19 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.11114", "summary": "arXiv:2601.11114v1 Announce Type: new \nAbstract: We study jumping lines loci of logarithmic bundles associated with finite sets of points in the projective plane. Using the interpolation matrix introduced in [DMTG25], we describe these loci as the zero sets of explicit determinants depending on parameters $(d,m)$ determined by the number of points. We show that for points in general position the determinant defines an irreducible curve of the expected degree, while for special configurations it acquires fixed components related to the combinatorics of the arrangement. The approach provides a new geometric interpretation of the classical jumping lines of Dolgachev--Kapranov and Barth, and connects them to the framework of unexpected curves and hypersurfaces.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2601.11114" target="_blank">Interpolation matrices and jumping lines of logarithmic bundles</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Elena Guardo, Graham Keiper, Grzegorz Malara</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 19 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.11114" target="_blank">https://arxiv.org/abs/2601.11114</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study jumping lines loci of logarithmic bundles associated with finite sets of points in the projective plane. Using the interpolation matrix introduced in [DMTG25], we describe these loci as the zero sets of explicit determinants depending on parameters $(d,m)$ determined by the number of points. We show that for points in general position the determinant defines an irreducible curve of the expected degree, while for special configurations it acquires fixed components related to the combinatorics of the arrangement. The approach provides a new geometric interpretation of the classical jumping lines of Dolgachev--Kapranov and Barth, and connects them to the framework of unexpected curves and hypersurfaces.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "Positive Genus Pairs from Amplituhedra", "author": "Joris Koefler, Dmitrii Pavlov, Rainer Sinn", "published": "Mon, 19 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.11142", "summary": "arXiv:2601.11142v1 Announce Type: new \nAbstract: A main conjecture in the field of Positive Geometry states that amplituhedra are positive geometries. It is motivated by examples showing that the canonical forms of certain amplituhedra compute scattering amplitudes in particle physics. In recent work, Brown and Dupont introduced a new framework, based on mixed Hodge theory, connecting canonical forms and de Rham cohomology. In this paper, we show that this framework is consistent with the known results for amplituhedra but does not apply beyond those families. We provide an explicit example showing that the central assumption of the Brown-Dupont framework (namely to have a pair of genus zero) is not a necessary condition to be a positive geometry in the original sense of Arkani-Hamed, Bai, and Lam. This underscores the fact that our results do not immediately disqualify the amplituhedron from being a positive geometry.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2601.11142" target="_blank">Positive Genus Pairs from Amplituhedra</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Joris Koefler, Dmitrii Pavlov, Rainer Sinn</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 19 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.11142" target="_blank">https://arxiv.org/abs/2601.11142</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                A main conjecture in the field of Positive Geometry states that amplituhedra are positive geometries. It is motivated by examples showing that the canonical forms of certain amplituhedra compute scattering amplitudes in particle physics. In recent work, Brown and Dupont introduced a new framework, based on mixed Hodge theory, connecting canonical forms and de Rham cohomology. In this paper, we show that this framework is consistent with the known results for amplituhedra but does not apply beyond those families. We provide an explicit example showing that the central assumption of the Brown-Dupont framework (namely to have a pair of genus zero) is not a necessary condition to be a positive geometry in the original sense of Arkani-Hamed, Bai, and Lam. This underscores the fact that our results do not immediately disqualify the amplituhedron from being a positive geometry.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "The resultant divisor is negative", "author": "Olivier Benoist", "published": "Mon, 19 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.11474", "summary": "arXiv:2601.11474v1 Announce Type: new \nAbstract: Fix two integers $1\\leq d&lt;e$. We study the birational geometry of a parameter space for pairs of homogeneous polynomials of degrees $d$ and $e$ in two variables (in which the higher degree polynomial is well defined only up to a multiple of the lower degree polynomial). We show that one can run the MMP on this space, and that it eventually contracts the resultant divisor.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2601.11474" target="_blank">The resultant divisor is negative</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Olivier Benoist</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 19 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.11474" target="_blank">https://arxiv.org/abs/2601.11474</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Fix two integers $1\leq d&lt;e$. We study the birational geometry of a parameter space for pairs of homogeneous polynomials of degrees $d$ and $e$ in two variables (in which the higher degree polynomial is well defined only up to a multiple of the lower degree polynomial). We show that one can run the MMP on this space, and that it eventually contracts the resultant divisor.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "The rank-nullity ring of a matroid", "author": "Tara Fife, Eline Mannino, Felipe Rinc\\'on", "published": "Mon, 19 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.11246", "summary": "arXiv:2601.11246v1 Announce Type: cross \nAbstract: We introduce the rank-nullity ring of a matroid $M$, which is a subring of the Chow ring of the permutahedral toric variety. This subring contains the tautological Chern classes of $M$, a fact we deduce from a highly symmetric formula for these classes. When the matroid $M$ is a uniform matroid, the rank-nullity ring coincides with the subring of $S_n$-invariants of the Chow ring of the permutahedral toric variety. In this case, we compute its Hilbert function explicitly and provide a Gr\\\"obner basis for the ideal of relations among its generators.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2601.11246" target="_blank">The rank-nullity ring of a matroid</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Tara Fife, Eline Mannino, Felipe Rinc\'on</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 19 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.11246" target="_blank">https://arxiv.org/abs/2601.11246</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We introduce the rank-nullity ring of a matroid $M$, which is a subring of the Chow ring of the permutahedral toric variety. This subring contains the tautological Chern classes of $M$, a fact we deduce from a highly symmetric formula for these classes. When the matroid $M$ is a uniform matroid, the rank-nullity ring coincides with the subring of $S_n$-invariants of the Chow ring of the permutahedral toric variety. In this case, we compute its Hilbert function explicitly and provide a Gr\"obner basis for the ideal of relations among its generators.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Theta operators on Hodge type Shimura varieties", "author": "Martin Ortiz", "published": "Mon, 19 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.11260", "summary": "arXiv:2601.11260v1 Announce Type: cross \nAbstract: We construct a new family of mod $p$ weight shifting differential operators on Hodge type Shimura varieties at hyperspecial level. First we construct basic theta operators, labelled by positive roots, that generalize Katz's theta operator for modular forms. Secondly we construct theta linkage maps, these are operators between automorphic vector bundles with linked weights, which can be thought of as generalizations of the classical theta cycle of Tate--Jochnowitz. In particular, there exist such maps within the $p$-restricted region, whose weight shifts are directly related to the conjectures of Herzig on the weight part of Serre's conjecture. We explain the relation between the two operators, and we prove some properties about them, e.g., the injectivity of some of them in a generic locus of the $p$-restricted region. As an application, we produce an example of a generic entailment of Serre weights for the groups $GL_{4,\\mathbb{Q}_p}$ and $U(4)_{\\mathbb{Q}_p}$, by combining the method of arxiv:2410.09602 with our stronger results about theta operators.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2601.11260" target="_blank">Theta operators on Hodge type Shimura varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Martin Ortiz</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 19 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.11260" target="_blank">https://arxiv.org/abs/2601.11260</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We construct a new family of mod $p$ weight shifting differential operators on Hodge type Shimura varieties at hyperspecial level. First we construct basic theta operators, labelled by positive roots, that generalize Katz's theta operator for modular forms. Secondly we construct theta linkage maps, these are operators between automorphic vector bundles with linked weights, which can be thought of as generalizations of the classical theta cycle of Tate--Jochnowitz. In particular, there exist such maps within the $p$-restricted region, whose weight shifts are directly related to the conjectures of Herzig on the weight part of Serre's conjecture. We explain the relation between the two operators, and we prove some properties about them, e.g., the injectivity of some of them in a generic locus of the $p$-restricted region. As an application, we produce an example of a generic entailment of Serre weights for the groups $GL_{4,\mathbb{Q}_p}$ and $U(4)_{\mathbb{Q}_p}$, by combining the method of arxiv:2410.09602 with our stronger results about theta operators.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "A de Rham weight part of Serre's conjecture and generalized mod $p$ BGG decompositions", "author": "Martin Ortiz", "published": "Mon, 19 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.11271", "summary": "arXiv:2601.11271v1 Announce Type: cross \nAbstract: We propose the use of de Rham cohomology of special fibers of Shimura varieties to formulate a geometric version of\n  the weight part of Serre's conjecture. We conjecture that this formulation is equivalent to the one using Serre weights and the \\'etale cohomology of Shimura varieties.\n  We prove this equivalence for generic weights and generic non-Eisenstein eigensystems for a compact $U(2,1)$ Shimura variety such that $G_{\\mathbb{Q}_p}=GL_3$. We do this by proving\n  a generic concentration in middle degree of mod $p$ de Rham cohomology with coefficients.\n  In turn, we prove this generic concentration by constructing generalized mod $p$ BGG decompositions for de Rham cohomology. After applying the results\n  from our companion paper, this reduces to computing some BGG-like resolutions\n  in a certain mod $p$ version of category $\\mathcal{O}$, which is the main content\n  of the article.\n  In the $GSp_4$ case we also compute some explicit BGG decompositions, and assuming the generic concentration in middle degree of de Rham cohomology\n  we obtain an improvement on the main result of arxiv:2410.09602.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2601.11271" target="_blank">A de Rham weight part of Serre's conjecture and generalized mod $p$ BGG decompositions</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Martin Ortiz</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 19 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.11271" target="_blank">https://arxiv.org/abs/2601.11271</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We propose the use of de Rham cohomology of special fibers of Shimura varieties to formulate a geometric version of
+  the weight part of Serre's conjecture. We conjecture that this formulation is equivalent to the one using Serre weights and the \'etale cohomology of Shimura varieties.
+  We prove this equivalence for generic weights and generic non-Eisenstein eigensystems for a compact $U(2,1)$ Shimura variety such that $G_{\mathbb{Q}_p}=GL_3$. We do this by proving
+  a generic concentration in middle degree of mod $p$ de Rham cohomology with coefficients.
+  In turn, we prove this generic concentration by constructing generalized mod $p$ BGG decompositions for de Rham cohomology. After applying the results
+  from our companion paper, this reduces to computing some BGG-like resolutions
+  in a certain mod $p$ version of category $\mathcal{O}$, which is the main content
+  of the article.
+  In the $GSp_4$ case we also compute some explicit BGG decompositions, and assuming the generic concentration in middle degree of de Rham cohomology
+  we obtain an improvement on the main result of arxiv:2410.09602.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "Nash uniformization of chessboard sets by Nash manifolds with corners", "author": "Antonio Carbone, Jos\\'e F. Fernando", "published": "Mon, 19 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2306.08093", "summary": "arXiv:2306.08093v5 Announce Type: replace \nAbstract: Bierstone and Parusi\\'nski studied the desingularization of $d$-dimensional closed subanalytic sets and in particular of $d$-dimensional closed semialgebraic sets. Their main tools are Hironaka's desingularization of real algebraic sets (to `uniform' the Zariski closure of the closed semialgebraic set) and Hironaka's embedded desingularization of real algebraic subsets of non-singular real algebraic sets (to uniform afterwards the Zariski closure of the boundary of the uniformed closed semialgebraic set).\n  The obtained models in the desingularization process, that we call in the following closed chessboard sets, are the closures of (finite) unions of connected components of the complements of normal-crossings divisors of non-singular real algebraic sets. The local models for $d$-dimensional chessboard sets are unions of (standard) closed orthants of ${\\mathbb R}^d$, that is, $\\bigcup_{(\\varepsilon_1,\\ldots,\\varepsilon_d)\\in{\\mathfrak F}}\\{\\varepsilon_1{\\tt x}_1\\geq0,\\ldots,\\varepsilon_d{\\tt x}_d\\geq0\\}\\subset{\\mathbb R}^d$ for some set ${\\mathfrak F}\\subset\\{-1,1\\}^d$.\n  We study the Nash uniformization of $d$-dimensional closed chessboard sets ${\\mathcal S}$ using Nash manifolds with corners ${\\mathcal Q}$ with the same number of connected components as ${\\mathcal S}$ (or equivalently the same number of irreducible components). Nash manifolds with corners are closed chessboard set whose local models are either ${\\mathbb R}^d$ or semialgebraic sets of the type $\\{{\\tt x}_1\\geq0,\\ldots,{\\tt x}_k\\geq0\\}$ for some $1\\leq k\\leq d$. More generally, a chessboard set is a semialgebraic set in between a finite union of connected components of the complement of a normal-crossings divisor of non-singular real algebraic set and its closure. We also provide a Nash uniformization result for general chessboard sets ${\\mathcal S}$.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2306.08093" target="_blank">Nash uniformization of chessboard sets by Nash manifolds with corners</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Antonio Carbone, Jos\'e F. Fernando</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 19 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2306.08093" target="_blank">https://arxiv.org/abs/2306.08093</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Bierstone and Parusi\'nski studied the desingularization of $d$-dimensional closed subanalytic sets and in particular of $d$-dimensional closed semialgebraic sets. Their main tools are Hironaka's desingularization of real algebraic sets (to `uniform' the Zariski closure of the closed semialgebraic set) and Hironaka's embedded desingularization of real algebraic subsets of non-singular real algebraic sets (to uniform afterwards the Zariski closure of the boundary of the uniformed closed semialgebraic set).
+  The obtained models in the desingularization process, that we call in the following closed chessboard sets, are the closures of (finite) unions of connected components of the complements of normal-crossings divisors of non-singular real algebraic sets. The local models for $d$-dimensional chessboard sets are unions of (standard) closed orthants of ${\mathbb R}^d$, that is, $\bigcup_{(\varepsilon_1,\ldots,\varepsilon_d)\in{\mathfrak F}}\{\varepsilon_1{\tt x}_1\geq0,\ldots,\varepsilon_d{\tt x}_d\geq0\}\subset{\mathbb R}^d$ for some set ${\mathfrak F}\subset\{-1,1\}^d$.
+  We study the Nash uniformization of $d$-dimensional closed chessboard sets ${\mathcal S}$ using Nash manifolds with corners ${\mathcal Q}$ with the same number of connected components as ${\mathcal S}$ (or equivalently the same number of irreducible components). Nash manifolds with corners are closed chessboard set whose local models are either ${\mathbb R}^d$ or semialgebraic sets of the type $\{{\tt x}_1\geq0,\ldots,{\tt x}_k\geq0\}$ for some $1\leq k\leq d$. More generally, a chessboard set is a semialgebraic set in between a finite union of connected components of the complement of a normal-crossings divisor of non-singular real algebraic set and its closure. We also provide a Nash uniformization result for general chessboard sets ${\mathcal S}$.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "Fundamentals of Broken Line Convex Geometry", "author": "Juan Bosco Fr\\'ias-Medina, Timothy Magee", "published": "Mon, 19 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2407.02427", "summary": "arXiv:2407.02427v2 Announce Type: replace \nAbstract: We develop the fundamentals of a new theory of convex geometry -- which we call \"broken line convex geometry\". This is a theory of convexity where the ambient space is the rational tropicalization of a cluster variety, as opposed to an ambient vector space. In this theory, line segments are replaced by broken line segments, and we adopt the notion of convexity in [CMN21]. We state and prove broken line convex geometry versions of many standard results from usual convex geometry.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2407.02427" target="_blank">Fundamentals of Broken Line Convex Geometry</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Juan Bosco Fr\'ias-Medina, Timothy Magee</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 19 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2407.02427" target="_blank">https://arxiv.org/abs/2407.02427</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We develop the fundamentals of a new theory of convex geometry -- which we call "broken line convex geometry". This is a theory of convexity where the ambient space is the rational tropicalization of a cluster variety, as opposed to an ambient vector space. In this theory, line segments are replaced by broken line segments, and we adopt the notion of convexity in [CMN21]. We state and prove broken line convex geometry versions of many standard results from usual convex geometry.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "A non-abelian version of Deligne's Fixed Part Theorem", "author": "H\\'el\\`ene Esnault, Moritz Kerz", "published": "Mon, 19 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2408.13910", "summary": "arXiv:2408.13910v5 Announce Type: replace \nAbstract: We formulate and prove a non-abelian analog of Deligne's Fixed Part theorem on Hodge classes, revisiting previous work of Jost--Zuo, Katzarkov--Pantev and Landesman--Litt. To this aim we study algebraically isomonodromic extensions of local systems and we relate them to variations of Hodge structures, for example we show that the Mumford-Tate group at a generic point stays constant in an algebraically isomonodromic extension of a variation of Hodge structure. v2: a few typos ironed and Thm 1.1 5) completed. v3: there was a Schlamassel leading to a mix-up of files. Apologies. Else identical version (one minor change). v5 final version. Appears in Alg. Geom.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2408.13910" target="_blank">A non-abelian version of Deligne's Fixed Part Theorem</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> H\'el\`ene Esnault, Moritz Kerz</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 19 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2408.13910" target="_blank">https://arxiv.org/abs/2408.13910</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We formulate and prove a non-abelian analog of Deligne's Fixed Part theorem on Hodge classes, revisiting previous work of Jost--Zuo, Katzarkov--Pantev and Landesman--Litt. To this aim we study algebraically isomonodromic extensions of local systems and we relate them to variations of Hodge structures, for example we show that the Mumford-Tate group at a generic point stays constant in an algebraically isomonodromic extension of a variation of Hodge structure. v2: a few typos ironed and Thm 1.1 5) completed. v3: there was a Schlamassel leading to a mix-up of files. Apologies. Else identical version (one minor change). v5 final version. Appears in Alg. Geom.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "Proof of the geometric Langlands conjecture V: the multiplicity one theorem", "author": "Dennis Gaitsgory, Sam Raskin", "published": "Mon, 19 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2409.09856", "summary": "arXiv:2409.09856v3 Announce Type: replace \nAbstract: This is the final paper in the series of five, in which we prove the geometric Langlands conjecture (GLC). We conclude the proof of GLC by showing that there exists a unique (up to tensoring up by a vector space) Hecke eigensheaf corresponding to an irreducible local system (hence, the title of the paper). We achieve this by analyzing the geometry of the stack of local systems.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2409.09856" target="_blank">Proof of the geometric Langlands conjecture V: the multiplicity one theorem</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Dennis Gaitsgory, Sam Raskin</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 19 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2409.09856" target="_blank">https://arxiv.org/abs/2409.09856</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This is the final paper in the series of five, in which we prove the geometric Langlands conjecture (GLC). We conclude the proof of GLC by showing that there exists a unique (up to tensoring up by a vector space) Hecke eigensheaf corresponding to an irreducible local system (hence, the title of the paper). We achieve this by analyzing the geometry of the stack of local systems.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "An explicit derived McKay correspondence for some complex reflection groups of rank two", "author": "Anirban Bhaduri, Yael Davidov, Eleonore Faber, Katrina Honigs, Peter McDonald, C. Eric Overton-Walker, Dylan Spence", "published": "Mon, 19 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2412.17937", "summary": "arXiv:2412.17937v2 Announce Type: replace \nAbstract: In this paper, we explore the derived McKay correspondence for several reflection groups, namely reflection groups of rank two generated by reflections of order two. We prove that for each of the reflection groups $G=G(2m,m,2)$, $G_{12}$, $G_{13}$, or $G_{22}$, there is a semiorthogonal decomposition of the following form, where $B_1,\\ldots,B_r$ are the normalizations of the irreducible components of the branch divisor $\\mathbb{C}^2\\to \\mathbb{C}^2/G$ and $E_1,\\ldots,E_n$ are exceptional objects: $$D^G(\\mathbb{C}^2)\\cong \\langle E_1,\\ldots,E_n,D(B_1),\\ldots, D(B_r), D(\\mathbb{C}^2/G)\\rangle.$$ We verify that the pieces of this decomposition correspond to the irreducible representations of $G$, verifying the Orbifold Semiorthogonal Decomposition Conjecture of Polishchuk and Van den Bergh. Due to work of Potter on the group $G(m,m,2)$, this conjecture is now proven for all finite groups $G\\leq \\mathrm{GL}(2,\\mathbb{C})$ that are generated by order $2$ reflections. Each of these groups contains, as a subgroup of index $2$, a distinct finite group $H\\leq \\mathrm{SL}(2,\\mathbb{C})$. A key part of our work is an explicit computation of the action of $G/H$ on the $H$-Hilbert scheme $\\textrm{$H$-Hilb}(\\mathbb{C}^2)$.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2412.17937" target="_blank">An explicit derived McKay correspondence for some complex reflection groups of rank two</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Anirban Bhaduri, Yael Davidov, Eleonore Faber, Katrina Honigs, Peter McDonald, C. Eric Overton-Walker, Dylan Spence</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 19 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2412.17937" target="_blank">https://arxiv.org/abs/2412.17937</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we explore the derived McKay correspondence for several reflection groups, namely reflection groups of rank two generated by reflections of order two. We prove that for each of the reflection groups $G=G(2m,m,2)$, $G_{12}$, $G_{13}$, or $G_{22}$, there is a semiorthogonal decomposition of the following form, where $B_1,\ldots,B_r$ are the normalizations of the irreducible components of the branch divisor $\mathbb{C}^2\to \mathbb{C}^2/G$ and $E_1,\ldots,E_n$ are exceptional objects: $$D^G(\mathbb{C}^2)\cong \langle E_1,\ldots,E_n,D(B_1),\ldots, D(B_r), D(\mathbb{C}^2/G)\rangle.$$ We verify that the pieces of this decomposition correspond to the irreducible representations of $G$, verifying the Orbifold Semiorthogonal Decomposition Conjecture of Polishchuk and Van den Bergh. Due to work of Potter on the group $G(m,m,2)$, this conjecture is now proven for all finite groups $G\leq \mathrm{GL}(2,\mathbb{C})$ that are generated by order $2$ reflections. Each of these groups contains, as a subgroup of index $2$, a distinct finite group $H\leq \mathrm{SL}(2,\mathbb{C})$. A key part of our work is an explicit computation of the action of $G/H$ on the $H$-Hilbert scheme $\textrm{$H$-Hilb}(\mathbb{C}^2)$.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Sparse systems and algorithmic equidimensional decomposition", "author": "Maria Isabel Herrero, Gabriela Jeronimo, Juan Sabia", "published": "Mon, 19 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2505.08097", "summary": "arXiv:2505.08097v2 Announce Type: replace \nAbstract: We present a new probabilistic algorithm that characterizes the equidimensional components of the affine algebraic variety defined by an arbitrary sparse polynomial system with prescribed supports. For each equidimensional component, the algorithm computes a witness set, namely a finite set obtained by intersecting the component with a generic linear variety of complementary dimension. The complexity of the algorithm is polynomial in combinatorial invariants associated to the supports of the polynomials involved.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2505.08097" target="_blank">Sparse systems and algorithmic equidimensional decomposition</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Maria Isabel Herrero, Gabriela Jeronimo, Juan Sabia</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 19 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2505.08097" target="_blank">https://arxiv.org/abs/2505.08097</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We present a new probabilistic algorithm that characterizes the equidimensional components of the affine algebraic variety defined by an arbitrary sparse polynomial system with prescribed supports. For each equidimensional component, the algorithm computes a witness set, namely a finite set obtained by intersecting the component with a generic linear variety of complementary dimension. The complexity of the algorithm is polynomial in combinatorial invariants associated to the supports of the polynomials involved.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Effective bounds for polynomial systems defined over the rationals", "author": "Teresa Krick", "published": "Mon, 19 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2506.18144", "summary": "arXiv:2506.18144v2 Announce Type: replace \nAbstract: This survey paper was primarily written as as the support for a course pesented at the JNCF2025: it aims to present some material that illustrates the kind of estimates one can obtain in effective algebraic geometry, for affine polynomial equation systems defined over the rational numbers Q, and focuses on the case of finite varieties.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2506.18144" target="_blank">Effective bounds for polynomial systems defined over the rationals</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Teresa Krick</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 19 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2506.18144" target="_blank">https://arxiv.org/abs/2506.18144</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This survey paper was primarily written as as the support for a course pesented at the JNCF2025: it aims to present some material that illustrates the kind of estimates one can obtain in effective algebraic geometry, for affine polynomial equation systems defined over the rational numbers Q, and focuses on the case of finite varieties.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "Unboundedness for motivic invariants of birational automorphisms", "author": "Hsueh-Yung Lin, Evgeny Shinder", "published": "Mon, 19 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2510.00290", "summary": "arXiv:2510.00290v2 Announce Type: replace \nAbstract: We introduce horizontal and vertical motivic invariants of birational maps between rational dominant maps and study their basic properties. As a first application, we show that the (usual) motivic invariants vanish for birational automorphisms of threefolds over algebraically closed fields of characteristic zero. On the other hand, we prove that the motivic invariants of the birational automorphism group of many types of varieties, including projective spaces of dimension at least four over a field of characteristic zero, do not form a bounded family, even after extending scalars to the algebraic closure of the field. For such varieties, we further show that their birational automorphism groups are not generated by maps preserving a conic bundle or a rational surface fibration structure, and their abelianizations do not stabilize.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2510.00290" target="_blank">Unboundedness for motivic invariants of birational automorphisms</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Hsueh-Yung Lin, Evgeny Shinder</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 19 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.00290" target="_blank">https://arxiv.org/abs/2510.00290</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We introduce horizontal and vertical motivic invariants of birational maps between rational dominant maps and study their basic properties. As a first application, we show that the (usual) motivic invariants vanish for birational automorphisms of threefolds over algebraically closed fields of characteristic zero. On the other hand, we prove that the motivic invariants of the birational automorphism group of many types of varieties, including projective spaces of dimension at least four over a field of characteristic zero, do not form a bounded family, even after extending scalars to the algebraic closure of the field. For such varieties, we further show that their birational automorphism groups are not generated by maps preserving a conic bundle or a rational surface fibration structure, and their abelianizations do not stabilize.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "Variations on cohomology rings and zero schemes", "author": "Kamil Rychlewicz", "published": "Mon, 19 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2510.17493", "summary": "arXiv:2510.17493v2 Announce Type: replace \nAbstract: We extend the theorem of Hausel and the author from arXiv:2212.11836 that relates equivariant cohomology rings and algebras of functions on zero schemes. This paper combines three separate results. We prove that for a reductive group G acting on a smooth projective variety one can see the equivariant cohomology ring as the ring of functions on the zero scheme over the Kostant section, provided that some transversality condition is satisfied. In particular, we show that the conclusion holds for spherical varieties. We then show a version for singular varieties, e.g. discriminant varieties, where in general we only recover a part of equivariant cohomology ring, generated by Chern classes. We also show that an analogous result, connecting equivariant K-theory to the ring of functions on the fixed-point scheme, holds for GKM spaces.\n  This is a concise version of some results from the PhD thesis arXiv:2407.14659, which contains a broader introduction to the topic.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2510.17493" target="_blank">Variations on cohomology rings and zero schemes</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Kamil Rychlewicz</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 19 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.17493" target="_blank">https://arxiv.org/abs/2510.17493</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We extend the theorem of Hausel and the author from arXiv:2212.11836 that relates equivariant cohomology rings and algebras of functions on zero schemes. This paper combines three separate results. We prove that for a reductive group G acting on a smooth projective variety one can see the equivariant cohomology ring as the ring of functions on the zero scheme over the Kostant section, provided that some transversality condition is satisfied. In particular, we show that the conclusion holds for spherical varieties. We then show a version for singular varieties, e.g. discriminant varieties, where in general we only recover a part of equivariant cohomology ring, generated by Chern classes. We also show that an analogous result, connecting equivariant K-theory to the ring of functions on the fixed-point scheme, holds for GKM spaces.
+  This is a concise version of some results from the PhD thesis arXiv:2407.14659, which contains a broader introduction to the topic.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "On quasi-Albanese morphisms for log canonical Calabi-Yau pairs", "author": "Yiming Zhu", "published": "Mon, 19 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.14580", "summary": "arXiv:2511.14580v2 Announce Type: replace \nAbstract: In this note, we study quasi-Albanese morphisms for log canonical Calabi-Yau pairs and obtain several structural results. As an application, we prove a characterization of toric pairs.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2511.14580" target="_blank">On quasi-Albanese morphisms for log canonical Calabi-Yau pairs</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yiming Zhu</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 19 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.14580" target="_blank">https://arxiv.org/abs/2511.14580</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this note, we study quasi-Albanese morphisms for log canonical Calabi-Yau pairs and obtain several structural results. As an application, we prove a characterization of toric pairs.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Defect of projective hypersurfaces with isolated singularities", "author": "Seung-Jo Jung, Morihiko Saito", "published": "Mon, 19 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.23522", "summary": "arXiv:2512.23522v2 Announce Type: replace \nAbstract: Let $X$ be a hypersurface with isolated singularities defined by $f$ in ${\\bf P^{n+1}}$ with $n&gt;1$. The difference ${\\rm def}(X):=h^{n+1}(X)-h^{n-1}(X)$ is called the defect of $X$ (for self-duality of the cohomology of $X$). It is known that its vanishing is closely related to ${\\bf Q}$-factoriality of $X$ in the rational singularity case with $n=3$. This number coincides with the dimension of the cokernel of the inclusion $H^{n-1}(X)\\to{\\rm IH}^{n-1}(X)$, the rank of the morphism from the vanishing cohomologies of $X$ to $H^{n+1}(X)$ for a one-parameter smoothing of $X$ with total space smooth, and also with the dimension of the unipotent monodromy part of the Milnor fiber cohomology of $f$ with degree $n$. In the case $X$ has only weighted homogeneous isolated singularities, the defect ${\\rm def}(X)$ is then given by the $E_2$-term of the spectral sequence of the double complex with differentials ${\\rm d}f\\wedge$ and $\\rm d$ by the $E_2$-degeneration of the pole order spectral sequence. It can be calculated explicitly using a computer even for analogues of the Hirzebruch quintic threefold with more than one hundred ordinary double points found by B.\\ van Geemen and J.\\ Werner in a compatible way with their computation. We give also an example with ${\\rm def}(X)&gt;0$ and $|{\\rm Sing}\\,X|=1$ where $n=3$.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2512.23522" target="_blank">Defect of projective hypersurfaces with isolated singularities</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Seung-Jo Jung, Morihiko Saito</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 19 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.23522" target="_blank">https://arxiv.org/abs/2512.23522</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $X$ be a hypersurface with isolated singularities defined by $f$ in ${\bf P^{n+1}}$ with $n&gt;1$. The difference ${\rm def}(X):=h^{n+1}(X)-h^{n-1}(X)$ is called the defect of $X$ (for self-duality of the cohomology of $X$). It is known that its vanishing is closely related to ${\bf Q}$-factoriality of $X$ in the rational singularity case with $n=3$. This number coincides with the dimension of the cokernel of the inclusion $H^{n-1}(X)\to{\rm IH}^{n-1}(X)$, the rank of the morphism from the vanishing cohomologies of $X$ to $H^{n+1}(X)$ for a one-parameter smoothing of $X$ with total space smooth, and also with the dimension of the unipotent monodromy part of the Milnor fiber cohomology of $f$ with degree $n$. In the case $X$ has only weighted homogeneous isolated singularities, the defect ${\rm def}(X)$ is then given by the $E_2$-term of the spectral sequence of the double complex with differentials ${\rm d}f\wedge$ and $\rm d$ by the $E_2$-degeneration of the pole order spectral sequence. It can be calculated explicitly using a computer even for analogues of the Hirzebruch quintic threefold with more than one hundred ordinary double points found by B.\ van Geemen and J.\ Werner in a compatible way with their computation. We give also an example with ${\rm def}(X)&gt;0$ and $|{\rm Sing}\,X|=1$ where $n=3$.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "Scheme-theoretic coisotropic reduction", "author": "Peter Crooks, Maxence Mayrand", "published": "Mon, 19 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2408.11932", "summary": "arXiv:2408.11932v2 Announce Type: replace-cross \nAbstract: We develop an affine scheme-theoretic version of Hamiltonian reduction by symplectic groupoids. It works over $\\Bbbk=\\mathbb{R}$ or $\\Bbbk=\\mathbb{C}$, and is formulated for an affine symplectic groupoid $\\mathcal{G}\\rightrightarrows X$, an affine Hamiltonian $\\mathcal{G}$-scheme $\\mu:M\\longrightarrow X$, a coisotropic subvariety $S\\subseteq X$, and a stabilizer subgroupoid $\\mathcal{H}\\rightrightarrows S$. Our first main result is that the Poisson bracket on $\\Bbbk[M]$ induces a Poisson bracket on the subquotient $\\Bbbk[\\mu^{-1}(S)]^{\\mathcal{H}}$. The Poisson scheme $\\mathrm{Spec}(\\Bbbk[\\mu^{-1}(S)]^{\\mathcal{H}})$ is then declared to be a Hamiltonian reduction of $M$. Other main results include sufficient conditions for $\\mathrm{Spec}(\\Bbbk[\\mu^{-1}(S)]^{\\mathcal{H}})$ to inherit a residual Hamiltonian scheme structure.\n  Our main results are best viewed as affine scheme-theoretic counterparts to an earlier paper, where we simultaneously generalize several Hamiltonian reduction processes. In this way, the present work yields scheme-theoretic analogues of Marsden-Ratiu reduction, Mikami-Weinstein reduction, \\'{S}niatycki-Weinstein reduction, and symplectic reduction along general coisotropic submanifolds. The initial impetus for this work was its utility in formulating and proving generalizations of the Moore-Tachikawa conjecture.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2408.11932" target="_blank">Scheme-theoretic coisotropic reduction</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Peter Crooks, Maxence Mayrand</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 19 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2408.11932" target="_blank">https://arxiv.org/abs/2408.11932</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We develop an affine scheme-theoretic version of Hamiltonian reduction by symplectic groupoids. It works over $\Bbbk=\mathbb{R}$ or $\Bbbk=\mathbb{C}$, and is formulated for an affine symplectic groupoid $\mathcal{G}\rightrightarrows X$, an affine Hamiltonian $\mathcal{G}$-scheme $\mu:M\longrightarrow X$, a coisotropic subvariety $S\subseteq X$, and a stabilizer subgroupoid $\mathcal{H}\rightrightarrows S$. Our first main result is that the Poisson bracket on $\Bbbk[M]$ induces a Poisson bracket on the subquotient $\Bbbk[\mu^{-1}(S)]^{\mathcal{H}}$. The Poisson scheme $\mathrm{Spec}(\Bbbk[\mu^{-1}(S)]^{\mathcal{H}})$ is then declared to be a Hamiltonian reduction of $M$. Other main results include sufficient conditions for $\mathrm{Spec}(\Bbbk[\mu^{-1}(S)]^{\mathcal{H}})$ to inherit a residual Hamiltonian scheme structure.
+  Our main results are best viewed as affine scheme-theoretic counterparts to an earlier paper, where we simultaneously generalize several Hamiltonian reduction processes. In this way, the present work yields scheme-theoretic analogues of Marsden-Ratiu reduction, Mikami-Weinstein reduction, \'{S}niatycki-Weinstein reduction, and symplectic reduction along general coisotropic submanifolds. The initial impetus for this work was its utility in formulating and proving generalizations of the Moore-Tachikawa conjecture.
+            </div>
+        </div>
+        <div class="paper" id="paper-21">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-21" data-paper-data='{"title": "Theta operators and a generic entailment for $GSp_4$", "author": "Martin Ortiz", "published": "Mon, 19 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2410.09602", "summary": "arXiv:2410.09602v2 Announce Type: replace-cross \nAbstract: We construct a new family of mod $p$ weight shifting differential operators on the Siegel threefold. In particular, we construct one operator which generalizes the classical theta cycle, whose weight shift allows for maps between $p$-restricted weights, and which is generically injective on global sections. As an application we produce a generic entailment of Serre weights, i.e. any Hecke eigenform which is modular for a generic Serre weight in the lowest alcove is also modular for a Serre weight in one of the upper alcoves. The entailed Serre weight corresponds to a shadow weight of the lowest alcove Serre weight,\n  in Herzig's conjectural description of $W(\\overline{\\rho})$.", "number": 21, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#21</span>
+                <a href="https://arxiv.org/abs/2410.09602" target="_blank">Theta operators and a generic entailment for $GSp_4$</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Martin Ortiz</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 19 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2410.09602" target="_blank">https://arxiv.org/abs/2410.09602</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We construct a new family of mod $p$ weight shifting differential operators on the Siegel threefold. In particular, we construct one operator which generalizes the classical theta cycle, whose weight shift allows for maps between $p$-restricted weights, and which is generically injective on global sections. As an application we produce a generic entailment of Serre weights, i.e. any Hecke eigenform which is modular for a generic Serre weight in the lowest alcove is also modular for a Serre weight in one of the upper alcoves. The entailed Serre weight corresponds to a shadow weight of the lowest alcove Serre weight,
+  in Herzig's conjectural description of $W(\overline{\rho})$.
+            </div>
+        </div>
+        <div class="paper" id="paper-22">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-22" data-paper-data='{"title": "Partitioning Theorems for Sets of Semi-Pfaffian Sets, with Applications", "author": "Martin Lotz, Abhiram Natarajan, Nicolai Vorobjov", "published": "Mon, 19 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2412.02961", "summary": "arXiv:2412.02961v3 Announce Type: replace-cross \nAbstract: We generalize the seminal polynomial partitioning theorems of Guth and Katz to a set of semi-Pfaffian sets. Specifically, given a set $\\Gamma \\subseteq \\mathbb{R}^n$ of $k$-dimensional semi-Pfaffian sets, where each $\\gamma \\in \\Gamma$ is defined by a fixed number of Pfaffian functions, and each Pfaffian function is in turn defined with respect to a Pfaffian chain $\\vec{q}$ of length $r$, for any $D \\ge 1$, we prove the existence of a polynomial $P \\in \\mathbb{R}[X_1, \\ldots, X_n]$ of degree at most $D$ such that each connected component of $\\mathbb{R}^n \\setminus Z(P)$ intersects at most $\\sim \\frac{|\\Gamma|}{D^{n - k - r}}$ elements of $\\Gamma$. Also, under some mild conditions on $\\vec{q}$, for any $D \\ge 1$, we prove the existence of a Pfaffian function $P'$ of degree at most $D$ defined with respect to $\\vec{q}$, such that each connected component of $\\mathbb{R}^n \\setminus Z(P')$ intersects at most $\\sim \\frac{|\\Gamma|}{D^{n-k}}$ elements of $\\Gamma$. To do so, given a $k$-dimensional semi-Pfaffian set $\\mathcal{X} \\subseteq \\mathbb{R}^n$, and a polynomial $P \\in \\mathbb{R}[X_1, \\ldots, X_n]$ of degree at most $D$, we establish a uniform bound on the number of connected components of $\\mathbb{R}^n \\setminus Z(P)$ that $\\mathcal{X}$ intersects; that is, we prove that the number of connected components of $(\\mathbb{R}^n \\setminus Z(P)) \\cap \\mathcal{X}$ is at most $\\sim D^{k+r}$. Finally as applications, we derive Pfaffian versions of Szemer\\'edi-Trotter type theorems, and also prove bounds on the number of joints between Pfaffian curves.", "number": 22, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#22</span>
+                <a href="https://arxiv.org/abs/2412.02961" target="_blank">Partitioning Theorems for Sets of Semi-Pfaffian Sets, with Applications</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Martin Lotz, Abhiram Natarajan, Nicolai Vorobjov</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 19 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2412.02961" target="_blank">https://arxiv.org/abs/2412.02961</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We generalize the seminal polynomial partitioning theorems of Guth and Katz to a set of semi-Pfaffian sets. Specifically, given a set $\Gamma \subseteq \mathbb{R}^n$ of $k$-dimensional semi-Pfaffian sets, where each $\gamma \in \Gamma$ is defined by a fixed number of Pfaffian functions, and each Pfaffian function is in turn defined with respect to a Pfaffian chain $\vec{q}$ of length $r$, for any $D \ge 1$, we prove the existence of a polynomial $P \in \mathbb{R}[X_1, \ldots, X_n]$ of degree at most $D$ such that each connected component of $\mathbb{R}^n \setminus Z(P)$ intersects at most $\sim \frac{|\Gamma|}{D^{n - k - r}}$ elements of $\Gamma$. Also, under some mild conditions on $\vec{q}$, for any $D \ge 1$, we prove the existence of a Pfaffian function $P'$ of degree at most $D$ defined with respect to $\vec{q}$, such that each connected component of $\mathbb{R}^n \setminus Z(P')$ intersects at most $\sim \frac{|\Gamma|}{D^{n-k}}$ elements of $\Gamma$. To do so, given a $k$-dimensional semi-Pfaffian set $\mathcal{X} \subseteq \mathbb{R}^n$, and a polynomial $P \in \mathbb{R}[X_1, \ldots, X_n]$ of degree at most $D$, we establish a uniform bound on the number of connected components of $\mathbb{R}^n \setminus Z(P)$ that $\mathcal{X}$ intersects; that is, we prove that the number of connected components of $(\mathbb{R}^n \setminus Z(P)) \cap \mathcal{X}$ is at most $\sim D^{k+r}$. Finally as applications, we derive Pfaffian versions of Szemer\'edi-Trotter type theorems, and also prove bounds on the number of joints between Pfaffian curves.
+            </div>
+        </div>
+        <div class="paper" id="paper-23">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-23" data-paper-data='{"title": "Perfectoid $C_i$ transfer", "author": "Konstantinos Kartas", "published": "Mon, 19 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2504.14719", "summary": "arXiv:2504.14719v4 Announce Type: replace-cross \nAbstract: We prove a perfectoid analogue of the Ax-Kochen theorem on zeros of $p$-adic forms: Given $d\\in \\mathbb{N}$, there is a finite totally ramified extension $E/\\mathbb{Q}_p$ such that every untilt of $\\mathbb{F}_p(\\!(t^{1/p^{\\infty}})\\!)$ containing $E$ is $C_2(d)$. We also prove a similar result for the existence of rational points in rationally connected varieties over perfectoid field extensions of $\\mathbb{Q}_p^{ur}$.", "number": 23, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#23</span>
+                <a href="https://arxiv.org/abs/2504.14719" target="_blank">Perfectoid $C_i$ transfer</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Konstantinos Kartas</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 19 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2504.14719" target="_blank">https://arxiv.org/abs/2504.14719</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove a perfectoid analogue of the Ax-Kochen theorem on zeros of $p$-adic forms: Given $d\in \mathbb{N}$, there is a finite totally ramified extension $E/\mathbb{Q}_p$ such that every untilt of $\mathbb{F}_p(\!(t^{1/p^{\infty}})\!)$ containing $E$ is $C_2(d)$. We also prove a similar result for the existence of rational points in rationally connected varieties over perfectoid field extensions of $\mathbb{Q}_p^{ur}$.
+            </div>
+        </div>
+        <div class="paper" id="paper-24">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-24" data-paper-data='{"title": "Deformation quantisation of exact shifted symplectic structures, with an application to vanishing cycles", "author": "J. P. Pridham", "published": "Mon, 19 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.07602", "summary": "arXiv:2511.07602v2 Announce Type: replace-cross \nAbstract: We extend the author's and CPTVV's correspondence between shifted symplectic and Poisson structures to establish a correspondence between exact shifted symplectic structures and non-degenerate shifted Poisson structures with formal derivation, a concept generalising constructions by De Wilde and Lecomte. Our formulation is sufficiently general to encompass derived algebraic, analytic and $\\mathcal{C}^{\\infty}$ stacks, as well as Lagrangians and non-commutative generalisations. We also show that non-degenerate shifted Poisson structures with formal derivation carry unique self-dual deformation quantisations in any setting where the latter can be formulated.\n  One application is that for (not necessarily exact) $0$-shifted symplectic structures in analytic and $\\mathcal{C}^{\\infty}$ settings, it follows that the author's earlier parametrisations of quantisations are in fact independent of any choice of associator, and generalise Fedosov's parametrisation of quantisations for classical manifolds.\n  Our main application is to complex $(-1)$-shifted symplectic structures, showing that our unique quantisation of the canonical exact structure, a sheaf of twisted $BD_0$-algebras with derivation, gives rise to BBDJS's perverse sheaf of vanishing cycles, equipped with its monodromy operator.", "number": 24, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#24</span>
+                <a href="https://arxiv.org/abs/2511.07602" target="_blank">Deformation quantisation of exact shifted symplectic structures, with an application to vanishing cycles</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> J. P. Pridham</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 19 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.07602" target="_blank">https://arxiv.org/abs/2511.07602</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We extend the author's and CPTVV's correspondence between shifted symplectic and Poisson structures to establish a correspondence between exact shifted symplectic structures and non-degenerate shifted Poisson structures with formal derivation, a concept generalising constructions by De Wilde and Lecomte. Our formulation is sufficiently general to encompass derived algebraic, analytic and $\mathcal{C}^{\infty}$ stacks, as well as Lagrangians and non-commutative generalisations. We also show that non-degenerate shifted Poisson structures with formal derivation carry unique self-dual deformation quantisations in any setting where the latter can be formulated.
+  One application is that for (not necessarily exact) $0$-shifted symplectic structures in analytic and $\mathcal{C}^{\infty}$ settings, it follows that the author's earlier parametrisations of quantisations are in fact independent of any choice of associator, and generalise Fedosov's parametrisation of quantisations for classical manifolds.
+  Our main application is to complex $(-1)$-shifted symplectic structures, showing that our unique quantisation of the canonical exact structure, a sheaf of twisted $BD_0$-algebras with derivation, gives rise to BBDJS's perverse sheaf of vanishing cycles, equipped with its monodromy operator.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-01-19 18:00:03
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>

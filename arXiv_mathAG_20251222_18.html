@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Mon, 22 Dec 2025 05:00:20 +0000<br>
+        <strong>論文数:</strong> 18件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Bloch-Suslin Complex and Strong $\mathbb{A}^{1}-$invariance</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Endomorphisms of singular del Pezzo surfaces</a>
+            <span class="title-label-badge" style="background-color: #9b59b6;">del Pezzo</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Extending Chevalley's Theorem: A Topological Characterization of Constructibility and its Generalization Beyond Noetherian Spaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">Harmonic band theory: rigidity of non-zero degree harmonic maps from 2-torus to complex projective space</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">Around Segal conjecture in p-adic geometry</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">On orientably-regular maps of Euler characteristic $-2p^2$</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Cellular free resolutions for normalizations of toric ideals</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Adiabatic Limit and Deformations of Complex Structures</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">Hyperbolicity in presence of a large local system</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">Varieties of prime tropical ideals and the dimension of the coordinate semiring</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">Ciliberto-Di Gennaro conjecture for sextic hypersurfaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">Nef cones of Hilbert schemes of points on some K3 surfaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">A dodecic surface with 320 cusps</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Action de groupe sur la compactification hybride</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Chern character of Schur bundles</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">Non-semisimple Crane-Yetter theory varying over the character stack</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">Polarization and Gorenstein liaison</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">Tykhyy's Conjecture on finite mapping class group orbits</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Bloch-Suslin Complex and Strong $\\mathbb{A}^{1}-$invariance", "author": "Saheb Mohapatra", "published": "Mon, 22 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.17118", "summary": "arXiv:2512.17118v1 Announce Type: new \nAbstract: We prove that there is no extension of the abelian groups appearing in the Bloch-Suslin complex to strongly $\\mathbb{A}^{1}-$invariant sheaves on $Sm_{k}$ (char($k$)=0) that also extend the canonical symbol maps from the respective $\\mathbb{G}_{m}^{\\wedge n}$ (i.e., from $\\mathbb{G}_{m}$ and $\\mathbb{G}_{m}^{\\wedge2}$).", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2512.17118" target="_blank">Bloch-Suslin Complex and Strong $\mathbb{A}^{1}-$invariance</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Saheb Mohapatra</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 22 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.17118" target="_blank">https://arxiv.org/abs/2512.17118</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove that there is no extension of the abelian groups appearing in the Bloch-Suslin complex to strongly $\mathbb{A}^{1}-$invariant sheaves on $Sm_{k}$ (char($k$)=0) that also extend the canonical symbol maps from the respective $\mathbb{G}_{m}^{\wedge n}$ (i.e., from $\mathbb{G}_{m}$ and $\mathbb{G}_{m}^{\wedge2}$).
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Endomorphisms of singular del Pezzo surfaces", "author": "Burt Totaro", "published": "Mon, 22 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.17345", "summary": "arXiv:2512.17345v1 Announce Type: new \nAbstract: A natural problem of algebraic dynamics is to classify the complex projective varieties that admit an endomorphism of degree greater than 1. Joshi solved the problem for all canonical del Pezzo surfaces with Picard number 1 except one, a surface with a du Val singularity of type $E_8$. The method of Bott vanishing does not resolve this case.\n  We show here that the $E_8$ surface has no endomorphism of degree greater than 1. For the proof, we extend the method of Amerik-Rovinsky-Van de Ven, involving Chern number inequalities, from varieties to Deligne-Mumford stacks. This approach should be useful for other hard cases in the classification of varieties with endomorphisms.", "number": 2, "labels": [{"name": "del Pezzo", "color": "#9b59b6"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2512.17345" target="_blank">Endomorphisms of singular del Pezzo surfaces</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #9b59b6;">del Pezzo</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Burt Totaro</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 22 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.17345" target="_blank">https://arxiv.org/abs/2512.17345</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                A natural problem of algebraic dynamics is to classify the complex projective varieties that admit an endomorphism of degree greater than 1. Joshi solved the problem for all canonical del Pezzo surfaces with Picard number 1 except one, a surface with a du Val singularity of type $E_8$. The method of Bott vanishing does not resolve this case.
+  We show here that the $E_8$ surface has no endomorphism of degree greater than 1. For the proof, we extend the method of Amerik-Rovinsky-Van de Ven, involving Chern number inequalities, from varieties to Deligne-Mumford stacks. This approach should be useful for other hard cases in the classification of varieties with endomorphisms.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Extending Chevalley's Theorem: A Topological Characterization of Constructibility and its Generalization Beyond Noetherian Spaces", "author": "Jiawei Sheng", "published": "Mon, 22 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.17481", "summary": "arXiv:2512.17481v1 Announce Type: new \nAbstract: We introduce the notion of a \\textit{good map} between topological spaces: a continuous map $f:X\\to Y$ is good if for every non-empty irreducible locally closed subset $U\\subseteq X$, there exists a non-empty open subset $W\\subseteq Y$ such that $W\\cap f(U)=W\\cap\\overline{f(U)}\\neq\\varnothing$. In Noetherian spaces, this condition is equivalent to preserving constructible subsets (Theorem 2.3), giving a topological characterization of Chevalley's theorem. Without the Noetherian assumption, the good property continues to make sense and serves as a reasonable generalization. We establish basic properties of good maps and introduce a weaker variant, \\textit{weak good maps}. In algebraic geometry, affine space projections $\\mathbb{A}_{S}^{n}\\to S$ are good for any base scheme $S$ (Theorem 4.1). From this we obtain:\n  $\\bullet$ A generalization of Chevalley's theorem for morphisms of finite type with Noetherian underlying topological spaces (Theorem 4.2);\n  $\\bullet$ The fact that every morphism locally of finite type is weak good (Proposition 4.4), yielding an elementary proof of Jacobson ascent (Corollary 4.5).\n  The good property is stable under formal completion, suggesting extensions to other non-Hausdorff geometries.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2512.17481" target="_blank">Extending Chevalley's Theorem: A Topological Characterization of Constructibility and its Generalization Beyond Noetherian Spaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jiawei Sheng</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 22 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.17481" target="_blank">https://arxiv.org/abs/2512.17481</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We introduce the notion of a \textit{good map} between topological spaces: a continuous map $f:X\to Y$ is good if for every non-empty irreducible locally closed subset $U\subseteq X$, there exists a non-empty open subset $W\subseteq Y$ such that $W\cap f(U)=W\cap\overline{f(U)}\neq\varnothing$. In Noetherian spaces, this condition is equivalent to preserving constructible subsets (Theorem 2.3), giving a topological characterization of Chevalley's theorem. Without the Noetherian assumption, the good property continues to make sense and serves as a reasonable generalization. We establish basic properties of good maps and introduce a weaker variant, \textit{weak good maps}. In algebraic geometry, affine space projections $\mathbb{A}_{S}^{n}\to S$ are good for any base scheme $S$ (Theorem 4.1). From this we obtain:
+  $\bullet$ A generalization of Chevalley's theorem for morphisms of finite type with Noetherian underlying topological spaces (Theorem 4.2);
+  $\bullet$ The fact that every morphism locally of finite type is weak good (Proposition 4.4), yielding an elementary proof of Jacobson ascent (Corollary 4.5).
+  The good property is stable under formal completion, suggesting extensions to other non-Hausdorff geometries.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "Harmonic band theory: rigidity of non-zero degree harmonic maps from 2-torus to complex projective space", "author": "Yoshinori Hashimoto, Bruno Mera, Tomoki Ozawa", "published": "Mon, 22 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.17150", "summary": "arXiv:2512.17150v1 Announce Type: cross \nAbstract: We prove the rigidity of isotropic harmonic maps from a 2-torus to a complex projective space, when they are constructed from holomorphic embeddings associated to complete linear systems. We also prove that this rigidity holds for any holomorphic embeddings without special hyperosculation points, with an extra assumption on the pullbacks of Fubini--Study symplectic forms. These results ensure the rigidity of towers of harmonic bands in condensed matter physics.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2512.17150" target="_blank">Harmonic band theory: rigidity of non-zero degree harmonic maps from 2-torus to complex projective space</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yoshinori Hashimoto, Bruno Mera, Tomoki Ozawa</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 22 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.17150" target="_blank">https://arxiv.org/abs/2512.17150</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove the rigidity of isotropic harmonic maps from a 2-torus to a complex projective space, when they are constructed from holomorphic embeddings associated to complete linear systems. We also prove that this rigidity holds for any holomorphic embeddings without special hyperosculation points, with an extra assumption on the pullbacks of Fubini--Study symplectic forms. These results ensure the rigidity of towers of harmonic bands in condensed matter physics.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "Around Segal conjecture in p-adic geometry", "author": "Zhouhang Mao", "published": "Mon, 22 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.17665", "summary": "arXiv:2512.17665v1 Announce Type: cross \nAbstract: This article records multiple results coming from interplay between de-completed topological periodic cyclic homology, Segal conjecture, and F-smoothness.\n  We establish completeness of motivic filtration on de-completed topological periodic cyclic homology of commutative rings with weakly finitely generated absolute cotangent complex. When the ring in question is in addition F-smooth, we show that Segal conjecture holds for its topological Hochschild homology. We also identify our de-completed topological periodic cyclic homology with Manam's Frobenius untwisted topological periodic cyclic homology for quasiregular semiperfectoid rings.\n  We find a crystalline degeneration of Segal conjecture which corresponds to such a statement for F-smoothness. On the other hand, inspired by constructions for topological Hochschild homology, the theory of cyclotomic synthetic spectra allows us to produce a relative conjugate filtration on Hodge--Tate cohomology and its variants, and in the same time, a relative conjugate filtration on topological Hochschild homology and its variants. As a consequence, we deduce transitivity of weak and strong F-smoothness.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2512.17665" target="_blank">Around Segal conjecture in p-adic geometry</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Zhouhang Mao</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 22 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.17665" target="_blank">https://arxiv.org/abs/2512.17665</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This article records multiple results coming from interplay between de-completed topological periodic cyclic homology, Segal conjecture, and F-smoothness.
+  We establish completeness of motivic filtration on de-completed topological periodic cyclic homology of commutative rings with weakly finitely generated absolute cotangent complex. When the ring in question is in addition F-smooth, we show that Segal conjecture holds for its topological Hochschild homology. We also identify our de-completed topological periodic cyclic homology with Manam's Frobenius untwisted topological periodic cyclic homology for quasiregular semiperfectoid rings.
+  We find a crystalline degeneration of Segal conjecture which corresponds to such a statement for F-smoothness. On the other hand, inspired by constructions for topological Hochschild homology, the theory of cyclotomic synthetic spectra allows us to produce a relative conjugate filtration on Hodge--Tate cohomology and its variants, and in the same time, a relative conjugate filtration on topological Hochschild homology and its variants. As a consequence, we deduce transitivity of weak and strong F-smoothness.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "On orientably-regular maps of Euler characteristic $-2p^2$", "author": "Tom\\'as Foncea E., Sebasti\\'an Reyes-Carocca}", "published": "Mon, 22 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.17743", "summary": "arXiv:2512.17743v1 Announce Type: cross \nAbstract: In this article, we study orientably-regular maps of Euler characteristic $-2p^2$ and classify those that admit a group of orientation-preserving automorphisms of order $10p^2$, where $p$ is a prime number. Along the way, we classify all compact Riemann surfaces (or complex algebraic curves) of genus $1+p^2$ endowed with a group of conformal automorphisms of order $5p^2$.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2512.17743" target="_blank">On orientably-regular maps of Euler characteristic $-2p^2$</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Tom\'as Foncea E., Sebasti\'an Reyes-Carocca}</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 22 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.17743" target="_blank">https://arxiv.org/abs/2512.17743</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this article, we study orientably-regular maps of Euler characteristic $-2p^2$ and classify those that admit a group of orientation-preserving automorphisms of order $10p^2$, where $p$ is a prime number. Along the way, we classify all compact Riemann surfaces (or complex algebraic curves) of genus $1+p^2$ endowed with a group of conformal automorphisms of order $5p^2$.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Cellular free resolutions for normalizations of toric ideals", "author": "Christine Berkesch, Lauren Cranton Heller, Gregory G. Smith, Jay Yang", "published": "Mon, 22 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.17871", "summary": "arXiv:2512.17871v1 Announce Type: cross \nAbstract: For any toric ideal $I$ in a polynomial ring $S$, we provide a combinatorial description of a free resolution of the integral closure of the $S$-module $S/I$. These new complexes arise from an extension of Bayer--Sturmfels' theory of cellular free resolutions. As applications, we unify several constructions for a resolution of the diagonal embedding of a toric variety, and compare the locally free resolutions for toric subvarieties introduced by Hanlon--Hicks--Lazarev and Brown--Erman.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2512.17871" target="_blank">Cellular free resolutions for normalizations of toric ideals</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Christine Berkesch, Lauren Cranton Heller, Gregory G. Smith, Jay Yang</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 22 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.17871" target="_blank">https://arxiv.org/abs/2512.17871</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                For any toric ideal $I$ in a polynomial ring $S$, we provide a combinatorial description of a free resolution of the integral closure of the $S$-module $S/I$. These new complexes arise from an extension of Bayer--Sturmfels' theory of cellular free resolutions. As applications, we unify several constructions for a resolution of the diagonal embedding of a toric variety, and compare the locally free resolutions for toric subvarieties introduced by Hanlon--Hicks--Lazarev and Brown--Erman.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Adiabatic Limit and Deformations of Complex Structures", "author": "Dan Popovici", "published": "Mon, 22 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/1901.04087", "summary": "arXiv:1901.04087v5 Announce Type: replace \nAbstract: Based on our recent adaptation of the adiabatic limit construction to the case of complex structures, we prove the fact that the deformation limiting manifold of any holomorphic family of Moishezon manifolds is Moishezon. Two new ingredients, hopefully of independent interest, are introduced. The first one associates with every compact complex manifold $X$, in every degree $k$, a holomorphic vector bundle over $\\C$ of rank equal to the $k$-th Betti number of $X$. This vector bundle, previously given an algebraic construction in the literature, shows that the degenerating page of the Fr\\\"olicher spectral sequence of $X$ is the holomorphic limit, as $h\\in\\C^\\star$ tends to $0$, of the $d_h$-cohomology of $X$, where $d_h=h\\partial + \\bar\\partial$. A relative version of this vector bundle is then associated with every holomorphic family of compact complex manifolds. The second ingredient is a relaxation of the notion of strongly Gauduchon (sG) metric that we introduced in 2009. For a given positive integer $r$, a Gauduchon metric $\\gamma$ on an $n$-dimensional compact complex manifold $X$ is said to be $E_r$-sG if $\\partial\\gamma^{n-1}$ represents the zero cohomology class on the $r$-th page of the Fr\\\"olicher spectral sequence of $X$. Strongly Gauduchon metrics coincide with $E_1$-sG metrics.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/1901.04087" target="_blank">Adiabatic Limit and Deformations of Complex Structures</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Dan Popovici</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 22 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/1901.04087" target="_blank">https://arxiv.org/abs/1901.04087</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Based on our recent adaptation of the adiabatic limit construction to the case of complex structures, we prove the fact that the deformation limiting manifold of any holomorphic family of Moishezon manifolds is Moishezon. Two new ingredients, hopefully of independent interest, are introduced. The first one associates with every compact complex manifold $X$, in every degree $k$, a holomorphic vector bundle over $\C$ of rank equal to the $k$-th Betti number of $X$. This vector bundle, previously given an algebraic construction in the literature, shows that the degenerating page of the Fr\"olicher spectral sequence of $X$ is the holomorphic limit, as $h\in\C^\star$ tends to $0$, of the $d_h$-cohomology of $X$, where $d_h=h\partial + \bar\partial$. A relative version of this vector bundle is then associated with every holomorphic family of compact complex manifolds. The second ingredient is a relaxation of the notion of strongly Gauduchon (sG) metric that we introduced in 2009. For a given positive integer $r$, a Gauduchon metric $\gamma$ on an $n$-dimensional compact complex manifold $X$ is said to be $E_r$-sG if $\partial\gamma^{n-1}$ represents the zero cohomology class on the $r$-th page of the Fr\"olicher spectral sequence of $X$. Strongly Gauduchon metrics coincide with $E_1$-sG metrics.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "Hyperbolicity in presence of a large local system", "author": "Yohan Brunebarbe", "published": "Mon, 22 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2207.03283", "summary": "arXiv:2207.03283v2 Announce Type: replace \nAbstract: We prove that the projective complex algebraic varieties admitting a large complex local system satisfy a strong version of the Green-Griffiths-Lang conjecture.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2207.03283" target="_blank">Hyperbolicity in presence of a large local system</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yohan Brunebarbe</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 22 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2207.03283" target="_blank">https://arxiv.org/abs/2207.03283</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove that the projective complex algebraic varieties admitting a large complex local system satisfy a strong version of the Green-Griffiths-Lang conjecture.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "Varieties of prime tropical ideals and the dimension of the coordinate semiring", "author": "D\\'aniel Jo\\'o, Kalina Mincheva", "published": "Mon, 22 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2501.18053", "summary": "arXiv:2501.18053v2 Announce Type: replace \nAbstract: In this note we study the relationship between ideals and congruences of the tropical polynomial and Laurent polynomial semirings. We show that the variety of a non-zero prime ideal of the tropical (Laurent) polynomial semiring consists of at most one point. We also prove a result relating the dimension of an affine tropical variety and the dimension of its coordinate semiring.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2501.18053" target="_blank">Varieties of prime tropical ideals and the dimension of the coordinate semiring</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> D\'aniel Jo\'o, Kalina Mincheva</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 22 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2501.18053" target="_blank">https://arxiv.org/abs/2501.18053</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this note we study the relationship between ideals and congruences of the tropical polynomial and Laurent polynomial semirings. We show that the variety of a non-zero prime ideal of the tropical (Laurent) polynomial semiring consists of at most one point. We also prove a result relating the dimension of an affine tropical variety and the dimension of its coordinate semiring.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "Ciliberto-Di Gennaro conjecture for sextic hypersurfaces", "author": "Ksenia Kvitko", "published": "Mon, 22 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2505.06742", "summary": "arXiv:2505.06742v2 Announce Type: replace \nAbstract: The Ciliberto-Di Gennaro conjecture addresses the factoriality of three-dimensional nodal hypersurfaces, and their geometric properties. We prove this conjecture for hypersurfaces of degree 6 by adapting a recent technique due to R. Kloosterman.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2505.06742" target="_blank">Ciliberto-Di Gennaro conjecture for sextic hypersurfaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ksenia Kvitko</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 22 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2505.06742" target="_blank">https://arxiv.org/abs/2505.06742</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The Ciliberto-Di Gennaro conjecture addresses the factoriality of three-dimensional nodal hypersurfaces, and their geometric properties. We prove this conjecture for hypersurfaces of degree 6 by adapting a recent technique due to R. Kloosterman.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "Nef cones of Hilbert schemes of points on some K3 surfaces", "author": "Uttaran Dutta, Sean Edwards, Neelarnab Raha", "published": "Mon, 22 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2509.10724", "summary": "arXiv:2509.10724v2 Announce Type: replace \nAbstract: We illustrate the typical usage of Bayer and Macr\\`{i}'s Positivity Lemma to compute the nef cones of the Hilbert schemes $X^{[n]}$ by combining the Bridgeland stability methods (for large $n$) and classical methods (for small $n$). We use Mori dream K3 surfaces $X$ of Picard rank $2$ as our working example. We also compute the nef cones of the nested Hilbert schemes $X^{[n,n+1]}$ for such $X$, for large $n$.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2509.10724" target="_blank">Nef cones of Hilbert schemes of points on some K3 surfaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Uttaran Dutta, Sean Edwards, Neelarnab Raha</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 22 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2509.10724" target="_blank">https://arxiv.org/abs/2509.10724</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We illustrate the typical usage of Bayer and Macr\`{i}'s Positivity Lemma to compute the nef cones of the Hilbert schemes $X^{[n]}$ by combining the Bridgeland stability methods (for large $n$) and classical methods (for small $n$). We use Mori dream K3 surfaces $X$ of Picard rank $2$ as our working example. We also compute the nef cones of the nested Hilbert schemes $X^{[n,n+1]}$ for such $X$, for large $n$.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "A dodecic surface with 320 cusps", "author": "C\\'edric Bonnaf\\'e", "published": "Mon, 22 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.01322", "summary": "arXiv:2511.01322v3 Announce Type: replace \nAbstract: We construct a degree $12$ homogeneous invariant of the complex reflection group $G_{29}$ (in Shephard-Todd's notation) whose associated surface has 320 singularities of type $A_2$, improving previous records for dodecic surfaces.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2511.01322" target="_blank">A dodecic surface with 320 cusps</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> C\'edric Bonnaf\'e</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 22 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.01322" target="_blank">https://arxiv.org/abs/2511.01322</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We construct a degree $12$ homogeneous invariant of the complex reflection group $G_{29}$ (in Shephard-Todd's notation) whose associated surface has 320 singularities of type $A_2$, improving previous records for dodecic surfaces.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Action de groupe sur la compactification hybride", "author": "Alexandre Roy", "published": "Mon, 22 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.00201", "summary": "arXiv:2512.00201v2 Announce Type: replace \nAbstract: Let $X$ be an algebraic variety over $\\mathbb{C}$ and $G$ be an algebraic group acting on $X$ whose action is closed. J. Poineau defined a compactification $X^\\urcorner$ of $X(\\mathbb{C})$ by using hybrid Berkovich spaces. We will focus on the extension of the action of $G$ on this compactification by characterising the set $\\mathcal{U} \\subset X^\\urcorner$ where the action is well defined. We will also show that the quotient of $\\mathcal{U}$ by the action of $G$ is homeomorphic to $(X/G)^\\urcorner$, the compactification of $(X/G)(\\mathbb{C})$. We then apply these results to $X = \\mathrm{Rat}_d$, the space of rational maps and $G = \\mathrm{SL}_2$. It gives the results of C. Favre-C. Gong in a more general setting. Furthermore, we get a compactification of $\\mathrm{M}_d = \\mathrm{Rat}_d/\\mathrm{SL}_2$ where the boundary is made of orbits of non-archimedean rational maps. The results still holds if $\\mathbb{C}$ is replaced by $k$ a non-trivially valued field and complex analytic spaces by Berkovich spaces over $k$ or if $X$ is the set of stable points of a $k$-variety defined in the sense of GIT.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2512.00201" target="_blank">Action de groupe sur la compactification hybride</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Alexandre Roy</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 22 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.00201" target="_blank">https://arxiv.org/abs/2512.00201</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $X$ be an algebraic variety over $\mathbb{C}$ and $G$ be an algebraic group acting on $X$ whose action is closed. J. Poineau defined a compactification $X^\urcorner$ of $X(\mathbb{C})$ by using hybrid Berkovich spaces. We will focus on the extension of the action of $G$ on this compactification by characterising the set $\mathcal{U} \subset X^\urcorner$ where the action is well defined. We will also show that the quotient of $\mathcal{U}$ by the action of $G$ is homeomorphic to $(X/G)^\urcorner$, the compactification of $(X/G)(\mathbb{C})$. We then apply these results to $X = \mathrm{Rat}_d$, the space of rational maps and $G = \mathrm{SL}_2$. It gives the results of C. Favre-C. Gong in a more general setting. Furthermore, we get a compactification of $\mathrm{M}_d = \mathrm{Rat}_d/\mathrm{SL}_2$ where the boundary is made of orbits of non-archimedean rational maps. The results still holds if $\mathbb{C}$ is replaced by $k$ a non-trivially valued field and complex analytic spaces by Berkovich spaces over $k$ or if $X$ is the set of stable points of a $k$-variety defined in the sense of GIT.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Chern character of Schur bundles", "author": "Alessandro D'Andrea, Enrico Fatighenti, Claudio Onorati", "published": "Mon, 22 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.11657", "summary": "arXiv:2512.11657v2 Announce Type: replace \nAbstract: Given a vector bundle $E$, we give an explicit formula to compute Chern classes of Schur bundles $\\operatorname{S}^\\alpha E$ in terms of those of $E$.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2512.11657" target="_blank">Chern character of Schur bundles</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Alessandro D'Andrea, Enrico Fatighenti, Claudio Onorati</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 22 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.11657" target="_blank">https://arxiv.org/abs/2512.11657</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Given a vector bundle $E$, we give an explicit formula to compute Chern classes of Schur bundles $\operatorname{S}^\alpha E$ in terms of those of $E$.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "Non-semisimple Crane-Yetter theory varying over the character stack", "author": "Patrick Kinnear", "published": "Mon, 22 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2404.19667", "summary": "arXiv:2404.19667v3 Announce Type: replace-cross \nAbstract: We construct a relative version of the Crane-Yetter topological quantum field theory in four dimensions, from non-semisimple data. Our theory is defined relative to the classical $G$-gauge theory in five dimensions -- this latter theory assigns to each manifold $M$ the appropriate linearization of the moduli stack of $G$-local systems, called the character stack. Our main result is to establish a relative invertibility property for our construction. This invertibility generalizes the key invertibility property of the original Crane-Yetter theory which allowed it to capture the framing anomaly of the celebrated Witten-Reshetikhin-Turaev theory. In particular our invertibilty statement at the level of surfaces implies a categorical, stacky version of the unicity theorem for skein algebras; at the level of 3-manifolds it equips the character stack with a canonical line bundle. Regarded as a topological symmetry defect of classical gauge theory, our work establishes invertibility of this defect by a gauging procedure.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2404.19667" target="_blank">Non-semisimple Crane-Yetter theory varying over the character stack</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Patrick Kinnear</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 22 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2404.19667" target="_blank">https://arxiv.org/abs/2404.19667</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We construct a relative version of the Crane-Yetter topological quantum field theory in four dimensions, from non-semisimple data. Our theory is defined relative to the classical $G$-gauge theory in five dimensions -- this latter theory assigns to each manifold $M$ the appropriate linearization of the moduli stack of $G$-local systems, called the character stack. Our main result is to establish a relative invertibility property for our construction. This invertibility generalizes the key invertibility property of the original Crane-Yetter theory which allowed it to capture the framing anomaly of the celebrated Witten-Reshetikhin-Turaev theory. In particular our invertibilty statement at the level of surfaces implies a categorical, stacky version of the unicity theorem for skein algebras; at the level of 3-manifolds it equips the character stack with a canonical line bundle. Regarded as a topological symmetry defect of classical gauge theory, our work establishes invertibility of this defect by a gauging procedure.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "Polarization and Gorenstein liaison", "author": "Sara Faridi, Patricia Klein, Jenna Rajchgot, Alexandra Seceleanu", "published": "Mon, 22 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2406.19985", "summary": "arXiv:2406.19985v2 Announce Type: replace-cross \nAbstract: A major open question in the theory of Gorenstein liaison is whether or not every arithmetically Cohen--Macaulay subscheme of $\\mathbb{P}^n$ can be G-linked to a complete intersection. Migliore and Nagel showed that, if such a scheme is generically Gorenstein (e.g., reduced), then, after re-embedding so that it is viewed as a subscheme of $\\mathbb{P}^{n+1}$, indeed it can be G-linked to a complete intersection. Motivated by this result, we consider techniques for constructing G-links on a scheme from G-links on a closely related reduced scheme.\n  Polarization is a tool for producing a squarefree monomial ideal from an arbitrary monomial ideal. Basic double G-links on squarefree monomial ideals can be induced from vertex decompositions of their Stanley--Reisner complexes. Given a monomial ideal $I$ and a vertex decomposition of the Stanley--Reisner complex of its polarization $P(I)$, we give conditions that allow for the lifting of an associated basic double G-link of $P(I)$ to a basic double G-link of $I$ itself. We use the relationship we develop in the process to show that the Stanley--Reisner complexes of polarizations of stable Cohen--Macaulay monomial ideals are vertex decomposable.\n  We then introduce and study polarization of a Gr\\\"obner basis of an arbitrary homogeneous ideal and give a relationship between geometric vertex decomposition of a polarization and elementary G-biliaison that is analogous to our result on vertex decomposition and basic double G-linkage.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2406.19985" target="_blank">Polarization and Gorenstein liaison</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sara Faridi, Patricia Klein, Jenna Rajchgot, Alexandra Seceleanu</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 22 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2406.19985" target="_blank">https://arxiv.org/abs/2406.19985</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                A major open question in the theory of Gorenstein liaison is whether or not every arithmetically Cohen--Macaulay subscheme of $\mathbb{P}^n$ can be G-linked to a complete intersection. Migliore and Nagel showed that, if such a scheme is generically Gorenstein (e.g., reduced), then, after re-embedding so that it is viewed as a subscheme of $\mathbb{P}^{n+1}$, indeed it can be G-linked to a complete intersection. Motivated by this result, we consider techniques for constructing G-links on a scheme from G-links on a closely related reduced scheme.
+  Polarization is a tool for producing a squarefree monomial ideal from an arbitrary monomial ideal. Basic double G-links on squarefree monomial ideals can be induced from vertex decompositions of their Stanley--Reisner complexes. Given a monomial ideal $I$ and a vertex decomposition of the Stanley--Reisner complex of its polarization $P(I)$, we give conditions that allow for the lifting of an associated basic double G-link of $P(I)$ to a basic double G-link of $I$ itself. We use the relationship we develop in the process to show that the Stanley--Reisner complexes of polarizations of stable Cohen--Macaulay monomial ideals are vertex decomposable.
+  We then introduce and study polarization of a Gr\"obner basis of an arbitrary homogeneous ideal and give a relationship between geometric vertex decomposition of a polarization and elementary G-biliaison that is analogous to our result on vertex decomposition and basic double G-linkage.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "Tykhyy's Conjecture on finite mapping class group orbits", "author": "Samuel Bronstein, Arnaud Maret", "published": "Mon, 22 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2409.04379", "summary": "arXiv:2409.04379v3 Announce Type: replace-cross \nAbstract: We classify the finite orbits of the mapping class group action on the character variety of Deroin--Tholozan representations of punctured spheres. In particular, we prove that the action has no finite orbits if the underlying sphere has 7 punctures or more. When the sphere has six punctures, we show that there is a unique 1-parameter family of finite orbits. Our methods also recover Tykhyy's classification of finite orbits for 5-punctured spheres. The proof is inductive and uses Lisovyy--Tykhyy's classification of finite mapping class group orbits for 4-punctured spheres as the base case for the induction.\n  Our results on Deroin--Tholozan representations cover the last missing cases to complete the proof of Tykhyy's Conjecture on finite mapping class group orbits for $\\mathrm{SL}_2\\mathbb{C}$ representations of punctured spheres, after the recent work by Lam--Landesman--Litt.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2409.04379" target="_blank">Tykhyy's Conjecture on finite mapping class group orbits</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Samuel Bronstein, Arnaud Maret</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 22 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2409.04379" target="_blank">https://arxiv.org/abs/2409.04379</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We classify the finite orbits of the mapping class group action on the character variety of Deroin--Tholozan representations of punctured spheres. In particular, we prove that the action has no finite orbits if the underlying sphere has 7 punctures or more. When the sphere has six punctures, we show that there is a unique 1-parameter family of finite orbits. Our methods also recover Tykhyy's classification of finite orbits for 5-punctured spheres. The proof is inductive and uses Lisovyy--Tykhyy's classification of finite mapping class group orbits for 4-punctured spheres as the base case for the induction.
+  Our results on Deroin--Tholozan representations cover the last missing cases to complete the proof of Tykhyy's Conjecture on finite mapping class group orbits for $\mathrm{SL}_2\mathbb{C}$ representations of punctured spheres, after the recent work by Lam--Landesman--Litt.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2025-12-22 18:00:03
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>

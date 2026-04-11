@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Mon, 23 Feb 2026 05:00:15 +0000<br>
+        <strong>論文数:</strong> 16件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Fermat's Last Theorem for Selmer sections</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Cohomological boundedness of twisted coherent Springer sheaves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Degenerations of CoHAs of 2-Calabi-Yau categories</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">Dynamical GCD Problems and a Variant of the Dynamical Mordell-Lang Conjecture</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">An algebraic theory of Lojasiewicz exponents</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">Noncommutative rigidity of the moduli stack of stable pointed curves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Del Pezzo surfaces of degree $5$ over perfect fields</a>
+            <span class="title-label-badge" style="background-color: #9b59b6;">del Pezzo</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Differential Galois groups of $G$-connections with Coxeter singularities</a>
+            <span class="title-label-badge" style="background-color: #ff69b4;">privacy</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">Rank 2 vector bundles and degrees of points of del Pezzo surfaces</a>
+            <span class="title-label-badge" style="background-color: #9b59b6;">del Pezzo</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">On finiteness properties of separating semigroup of real curve</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">Pluricanonical Geometry of Varieties Isogenous to a Product and Pluricanonical Decompositions of Abelian Covers</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">Around the 'Fundamental Theorem of Algebra' (extended version)</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">The motivic Satake equivalence using perverse Nori motives</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Effective Brauer-Siegel on some curves in $Y(1)^n$</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Zilber-Pink in $Y(1)^n$: Beyond multiplicative degeneration</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">Topological Obstructions to Dynamical Convexity</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Fermat's Last Theorem for Selmer sections", "author": "Benjamin Steklov", "published": "Mon, 23 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.17746", "summary": "arXiv:2602.17746v1 Announce Type: cross \nAbstract: We prove, in the context of the section conjecture, that every Selmer section over $\\mathbb{Q}$ of the affine Fermat curve with exponent $\\ell$ is cuspidal for $\\ell\\geq 7$.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2602.17746" target="_blank">Fermat's Last Theorem for Selmer sections</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Benjamin Steklov</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 23 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.17746" target="_blank">https://arxiv.org/abs/2602.17746</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove, in the context of the section conjecture, that every Selmer section over $\mathbb{Q}$ of the affine Fermat curve with exponent $\ell$ is cuspidal for $\ell\geq 7$.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Cohomological boundedness of twisted coherent Springer sheaves", "author": "Oron Y. Propp", "published": "Mon, 23 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.17927", "summary": "arXiv:2602.17927v1 Announce Type: cross \nAbstract: We prove that the coherent Springer sheaf and its parabolic analogues are concentrated in cohomological degree $0$, as predicted by Ben-Zvi-Chen-Helm-Nadler, Zhu, Emerton-Gee-Hellmann, Hansen, and others. More generally, we show that the universal trace functor for a mixed partial affine Hecke category is right t-exact with respect to the exotic t-structure given by Bezrukavnikov-Mirkovi\\'c's noncommutative Springer resolution, and left t-exact with respect to the monoidally dual t-structure. To this end, we construct an explicit complex computing the universal trace functor for certain monoidal categories over quotient stacks.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2602.17927" target="_blank">Cohomological boundedness of twisted coherent Springer sheaves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Oron Y. Propp</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 23 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.17927" target="_blank">https://arxiv.org/abs/2602.17927</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove that the coherent Springer sheaf and its parabolic analogues are concentrated in cohomological degree $0$, as predicted by Ben-Zvi-Chen-Helm-Nadler, Zhu, Emerton-Gee-Hellmann, Hansen, and others. More generally, we show that the universal trace functor for a mixed partial affine Hecke category is right t-exact with respect to the exotic t-structure given by Bezrukavnikov-Mirkovi\'c's noncommutative Springer resolution, and left t-exact with respect to the monoidally dual t-structure. To this end, we construct an explicit complex computing the universal trace functor for certain monoidal categories over quotient stacks.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Degenerations of CoHAs of 2-Calabi-Yau categories", "author": "Lucien Hennecart, Shivang Jindal", "published": "Mon, 23 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.18102", "summary": "arXiv:2602.18102v1 Announce Type: cross \nAbstract: By work of Davison and Meinhardt, the cohomological Hall algebra of a symmetric quiver with potential admits a geometrically defined filtration (the perverse filtration) whose associated graded is a supercommutative algebra. In the case of the triple quiver of a quiver with the canonical cubic potential, which corresponds to the preprojective algebra of the quiver via dimensional reduction, there is an additional filtration (the less perverse filtration), which is defined more generally for cohomological Hall algebras of suitably geometric 2-Calabi-Yau categories in work of Davison. In this paper, we show that the degenerations of the cohomological Hall algebras of preprojective algebras and more generally 2-Calabi-Yau categories with respect to the less perverse filtration is isomorphic to the enveloping algebra of the current Lie algebra of the BPS Lie algebra. This result applies in particular to CoHAs of local systems on Riemann surfaces and Higgs bundles on smooth projective curves. We extend this description to deformations of the cohomological Hall algebra obtained via torus actions on the arrows of the quiver and deformed canonical cubic potentials via the deformed dimensional reduction of Davison-P\\u{a}durariu. Last, we use our results to compare the less perverse filtration on CoHAs of preprojective algebras with the order filtration on the Maulik-Okounkov Yangian, via the comparison isomorphism of Botta-Davison and Schiffmann-Vasserot.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2602.18102" target="_blank">Degenerations of CoHAs of 2-Calabi-Yau categories</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Lucien Hennecart, Shivang Jindal</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 23 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.18102" target="_blank">https://arxiv.org/abs/2602.18102</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                By work of Davison and Meinhardt, the cohomological Hall algebra of a symmetric quiver with potential admits a geometrically defined filtration (the perverse filtration) whose associated graded is a supercommutative algebra. In the case of the triple quiver of a quiver with the canonical cubic potential, which corresponds to the preprojective algebra of the quiver via dimensional reduction, there is an additional filtration (the less perverse filtration), which is defined more generally for cohomological Hall algebras of suitably geometric 2-Calabi-Yau categories in work of Davison. In this paper, we show that the degenerations of the cohomological Hall algebras of preprojective algebras and more generally 2-Calabi-Yau categories with respect to the less perverse filtration is isomorphic to the enveloping algebra of the current Lie algebra of the BPS Lie algebra. This result applies in particular to CoHAs of local systems on Riemann surfaces and Higgs bundles on smooth projective curves. We extend this description to deformations of the cohomological Hall algebra obtained via torus actions on the arrows of the quiver and deformed canonical cubic potentials via the deformed dimensional reduction of Davison-P\u{a}durariu. Last, we use our results to compare the less perverse filtration on CoHAs of preprojective algebras with the order filtration on the Maulik-Okounkov Yangian, via the comparison isomorphism of Botta-Davison and Schiffmann-Vasserot.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "Dynamical GCD Problems and a Variant of the Dynamical Mordell-Lang Conjecture", "author": "She Yang, Xiao Zhong", "published": "Mon, 23 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.18302", "summary": "arXiv:2602.18302v1 Announce Type: cross \nAbstract: In \\cite{NZ25}, the authors resolved the rational function analogue of the finiteness results for greatest common divisors of iterates of polynomials established in \\cite{HT17}. These results may be viewed as dynamical generalizations of a classical problem concerning upper bounds for the greatest common divisors (GCDs) of two integer sequences studied by Bugeaud, Corvaja, and Zannier. The most delicate case arises when the maps involved are automorphisms, where the methods of \\cite{NZ25} and \\cite{HT17} rely heavily on Diophantine approximation and asymptotic analysis.\n  In the present paper, we develop an alternative approach to the automorphism case. This method is more powerful, allowing us to give complete answers to the further questions posed in \\cite{HT17}. In particular, we strengthen the main theorem of \\cite{HT17} and provide an alternative proof of the main theorem of \\cite{NZ25} in the automorphism setting.\n  Moreover, we relate this dynamical GCD problem to a special case of a higher-dimensional generalization of the Dynamical Mordell--Lang Conjecture proposed by Junyi Xie. We establish this generalized conjecture when the dynamics arise from algebraic group actions. In addition, we resolve the corresponding special case associated with dynamical GCD questions when the maps involved are polynomials.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2602.18302" target="_blank">Dynamical GCD Problems and a Variant of the Dynamical Mordell-Lang Conjecture</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> She Yang, Xiao Zhong</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 23 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.18302" target="_blank">https://arxiv.org/abs/2602.18302</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In \cite{NZ25}, the authors resolved the rational function analogue of the finiteness results for greatest common divisors of iterates of polynomials established in \cite{HT17}. These results may be viewed as dynamical generalizations of a classical problem concerning upper bounds for the greatest common divisors (GCDs) of two integer sequences studied by Bugeaud, Corvaja, and Zannier. The most delicate case arises when the maps involved are automorphisms, where the methods of \cite{NZ25} and \cite{HT17} rely heavily on Diophantine approximation and asymptotic analysis.
+  In the present paper, we develop an alternative approach to the automorphism case. This method is more powerful, allowing us to give complete answers to the further questions posed in \cite{HT17}. In particular, we strengthen the main theorem of \cite{HT17} and provide an alternative proof of the main theorem of \cite{NZ25} in the automorphism setting.
+  Moreover, we relate this dynamical GCD problem to a special case of a higher-dimensional generalization of the Dynamical Mordell--Lang Conjecture proposed by Junyi Xie. We establish this generalized conjecture when the dynamics arise from algebraic group actions. In addition, we resolve the corresponding special case associated with dynamical GCD questions when the maps involved are polynomials.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "An algebraic theory of Lojasiewicz exponents", "author": "Tai Huy Ha", "published": "Mon, 23 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.18410", "summary": "arXiv:2602.18410v1 Announce Type: cross \nAbstract: We develop a unified algebraic and valuative theory of Lojasiewicz exponents for pairs of graded families and filtrations of ideals. Within this framework, local Lojasiewicz exponents, gradient exponents, and exponents at infinity are all realized as asymptotic containment thresholds between filtrations, governed by integral closure. This reformulation shows that Lojasiewicz exponents are fundamentally valuative optimization problems.\n  The central structural contribution of the paper is a finite-max principle. Under verifiable algebraic hypotheses, the a priori infinite valuative supremum bounding the Lojasiewicz exponent reduces to a finite maximum, and computes the Lojasiewicz exponent precisely. We identify two complementary mechanisms leading to this phenomenon: finite testing arising from normalized blowups and Noetherian Rees algebras, and attainment via compactness of normalized valuation spaces under linear boundedness assumptions.\n  This finite-max framework yields strong structural consequences. We prove rigidity results showing that common extremal valuations force equality of Lojasiewicz ratios, and we establish stratification and stability phenomena for Lojasiewicz exponents in families, including fractional linearity and wall-chamber behavior along natural one-parameter deformations.\n  The theory recovers and explains classical results in toric and Newton-polyhedral settings, particularly, for Newton nondegenete case, where the Lojasiewicz exponent is computed by finitely many toric divisorial valuations corresponding to facet data.\n  Finally, we illustrate why the hypotheses underlying the finite-max principle are essential, delineating the precise scope of the theory.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2602.18410" target="_blank">An algebraic theory of Lojasiewicz exponents</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Tai Huy Ha</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 23 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.18410" target="_blank">https://arxiv.org/abs/2602.18410</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We develop a unified algebraic and valuative theory of Lojasiewicz exponents for pairs of graded families and filtrations of ideals. Within this framework, local Lojasiewicz exponents, gradient exponents, and exponents at infinity are all realized as asymptotic containment thresholds between filtrations, governed by integral closure. This reformulation shows that Lojasiewicz exponents are fundamentally valuative optimization problems.
+  The central structural contribution of the paper is a finite-max principle. Under verifiable algebraic hypotheses, the a priori infinite valuative supremum bounding the Lojasiewicz exponent reduces to a finite maximum, and computes the Lojasiewicz exponent precisely. We identify two complementary mechanisms leading to this phenomenon: finite testing arising from normalized blowups and Noetherian Rees algebras, and attainment via compactness of normalized valuation spaces under linear boundedness assumptions.
+  This finite-max framework yields strong structural consequences. We prove rigidity results showing that common extremal valuations force equality of Lojasiewicz ratios, and we establish stratification and stability phenomena for Lojasiewicz exponents in families, including fractional linearity and wall-chamber behavior along natural one-parameter deformations.
+  The theory recovers and explains classical results in toric and Newton-polyhedral settings, particularly, for Newton nondegenete case, where the Lojasiewicz exponent is computed by finitely many toric divisorial valuations corresponding to facet data.
+  Finally, we illustrate why the hypotheses underlying the finite-max principle are essential, delineating the precise scope of the theory.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "Noncommutative rigidity of the moduli stack of stable pointed curves", "author": "Shinnosuke Okawa, Taro Sano", "published": "Mon, 23 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/1412.7060", "summary": "arXiv:1412.7060v3 Announce Type: replace \nAbstract: We prove that the second Hochschild cohomology group of the moduli stack of stable $n$-pointed genus $g$ curves vanishes for all but finitely many $(g,n)$.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/1412.7060" target="_blank">Noncommutative rigidity of the moduli stack of stable pointed curves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Shinnosuke Okawa, Taro Sano</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 23 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/1412.7060" target="_blank">https://arxiv.org/abs/1412.7060</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove that the second Hochschild cohomology group of the moduli stack of stable $n$-pointed genus $g$ curves vanishes for all but finitely many $(g,n)$.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Del Pezzo surfaces of degree $5$ over perfect fields", "author": "Aurore Boitrel", "published": "Mon, 23 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2304.05328", "summary": "arXiv:2304.05328v3 Announce Type: replace \nAbstract: In this paper we study the classification of del Pezzo surfaces $X$ of degree $5$ over any perfect field $\\mathbf{k}$ in explicit geometric terms. More precisely, in each case we use the Petersen graph to illustrate the $\\operatorname{Gal}(\\overline{\\mathbf{k}}/\\mathbf{k})$-action on the $(-1)$-curves of $X$ and we describe explicitly its group of automorphisms, $\\operatorname{Aut}_{\\mathbf{k}}(X)$. For the cases when $X$ is not minimal, we describe how to realize it as the blow-up of $\\mathbb{P}^{2}$, or of a (minimal) quadric in $\\mathbb{P}^{3}$, and classify them up to $\\mathbf{k}$-isomorphism. In all cases, the elements of the group $\\operatorname{Aut}_{\\mathbf{k}}(X)$ are described geometrically.", "number": 7, "labels": [{"name": "del Pezzo", "color": "#9b59b6"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2304.05328" target="_blank">Del Pezzo surfaces of degree $5$ over perfect fields</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #9b59b6;">del Pezzo</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Aurore Boitrel</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 23 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2304.05328" target="_blank">https://arxiv.org/abs/2304.05328</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper we study the classification of del Pezzo surfaces $X$ of degree $5$ over any perfect field $\mathbf{k}$ in explicit geometric terms. More precisely, in each case we use the Petersen graph to illustrate the $\operatorname{Gal}(\overline{\mathbf{k}}/\mathbf{k})$-action on the $(-1)$-curves of $X$ and we describe explicitly its group of automorphisms, $\operatorname{Aut}_{\mathbf{k}}(X)$. For the cases when $X$ is not minimal, we describe how to realize it as the blow-up of $\mathbb{P}^{2}$, or of a (minimal) quadric in $\mathbb{P}^{3}$, and classify them up to $\mathbf{k}$-isomorphism. In all cases, the elements of the group $\operatorname{Aut}_{\mathbf{k}}(X)$ are described geometrically.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Differential Galois groups of $G$-connections with Coxeter singularities", "author": "Masoud Kamgarpour, Daniel S. Sage", "published": "Mon, 23 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2309.11742", "summary": "arXiv:2309.11742v2 Announce Type: replace \nAbstract: A fundamental theorem of Katz \\cite{Katz87} determines the differential Galois groups of rank $n$ connections on algebraic curves with slope $r/n$ at a singularity, where $\\gcd(r,n)=1$. We extend this result to $G$-connections, where $G$ is a simple algebraic group and the slope is $r/h$, with $h$ the Coxeter number of $G$ and $\\gcd(r,h)=1$. This allows us to compute the differential Galois groups of a broad class of $G$-connections that have been central to recent advances in the geometric Langlands program and the Deligne--Simpson problem -- namely, Coxeter connections, generalised Frenkel--Gross connections, and Airy connections. We apply our results to inverse differential Galois theory by giving uniform and explicit constructions of $G$-connections whose differential Galois groups realise all reductive subgroups of maximal degree.", "number": 8, "labels": [{"name": "privacy", "color": "#ff69b4"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2309.11742" target="_blank">Differential Galois groups of $G$-connections with Coxeter singularities</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #ff69b4;">privacy</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Masoud Kamgarpour, Daniel S. Sage</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 23 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2309.11742" target="_blank">https://arxiv.org/abs/2309.11742</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                A fundamental theorem of Katz \cite{Katz87} determines the differential Galois groups of rank $n$ connections on algebraic curves with slope $r/n$ at a singularity, where $\gcd(r,n)=1$. We extend this result to $G$-connections, where $G$ is a simple algebraic group and the slope is $r/h$, with $h$ the Coxeter number of $G$ and $\gcd(r,h)=1$. This allows us to compute the differential Galois groups of a broad class of $G$-connections that have been central to recent advances in the geometric Langlands program and the Deligne--Simpson problem -- namely, Coxeter connections, generalised Frenkel--Gross connections, and Airy connections. We apply our results to inverse differential Galois theory by giving uniform and explicit constructions of $G$-connections whose differential Galois groups realise all reductive subgroups of maximal degree.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "Rank 2 vector bundles and degrees of points of del Pezzo surfaces", "author": "Claire Voisin", "published": "Mon, 23 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2509.17996", "summary": "arXiv:2509.17996v2 Announce Type: replace \nAbstract: We study points and 0-cycles on del Pezzo surfaces defined over a field K of characteristic 0, with emphasis on cubic surfaces. We prove that a cubic surface that admits a point defined over a field extension of K of degree coprime to 3 either has a K-point or has a point defined over a field extension of degree 4. This improves a result of Coray (who allowed also field extensions of degree 10). We also prove that 0-cycles of degree at least 18 on a cubic surface are effective and get similar results for degree 2 and degree 1 del Pezzo surfaces, improving results of Colliot-Th\\'{e}l\\`{e}ne. In a different direction, we prove that the third symmetric product of a cubic hypersurface of dimension at least 2 is unirational over any field, and that in dimension 2 or 3, it is not stably rational in general.", "number": 9, "labels": [{"name": "del Pezzo", "color": "#9b59b6"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2509.17996" target="_blank">Rank 2 vector bundles and degrees of points of del Pezzo surfaces</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #9b59b6;">del Pezzo</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Claire Voisin</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 23 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2509.17996" target="_blank">https://arxiv.org/abs/2509.17996</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study points and 0-cycles on del Pezzo surfaces defined over a field K of characteristic 0, with emphasis on cubic surfaces. We prove that a cubic surface that admits a point defined over a field extension of K of degree coprime to 3 either has a K-point or has a point defined over a field extension of degree 4. This improves a result of Coray (who allowed also field extensions of degree 10). We also prove that 0-cycles of degree at least 18 on a cubic surface are effective and get similar results for degree 2 and degree 1 del Pezzo surfaces, improving results of Colliot-Th\'{e}l\`{e}ne. In a different direction, we prove that the third symmetric product of a cubic hypersurface of dimension at least 2 is unirational over any field, and that in dimension 2 or 3, it is not stably rational in general.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "On finiteness properties of separating semigroup of real curve", "author": "Matthew Magin", "published": "Mon, 23 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.18545", "summary": "arXiv:2511.18545v3 Announce Type: replace \nAbstract: A real morphism $f$ from a real algebraic curve $X$ to $\\mathbb{P}^1$ is called separating if $f^{-1}(\\mathbb{R} \\mathbb{P}^1) = \\mathbb{R} X$. A separating morphism defines a covering $\\mathbb{R} X \\to \\mathbb{R} \\mathbb{P}^1$. Let $X_1, \\ldots, X_r$ denote the components of $\\mathbb{R} X$. M. Kummer and K. Shaw defined the separating semigroup of a curve $X$ as the set of all vectors $d(f) = (d_1(f), \\ldots, d_r(f)) \\in \\mathbb{N}^{r}$ where $f$ is a separating morphism $X \\to \\mathbb{P}^1$ and $d_i(f)$ is the degree of the restriction of $f$ to $X_i$.\n  In the present paper we prove that for a non-negative integer number $g$ the set of all separating semigroups of genus $g$ curves is finite.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2511.18545" target="_blank">On finiteness properties of separating semigroup of real curve</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Matthew Magin</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 23 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.18545" target="_blank">https://arxiv.org/abs/2511.18545</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                A real morphism $f$ from a real algebraic curve $X$ to $\mathbb{P}^1$ is called separating if $f^{-1}(\mathbb{R} \mathbb{P}^1) = \mathbb{R} X$. A separating morphism defines a covering $\mathbb{R} X \to \mathbb{R} \mathbb{P}^1$. Let $X_1, \ldots, X_r$ denote the components of $\mathbb{R} X$. M. Kummer and K. Shaw defined the separating semigroup of a curve $X$ as the set of all vectors $d(f) = (d_1(f), \ldots, d_r(f)) \in \mathbb{N}^{r}$ where $f$ is a separating morphism $X \to \mathbb{P}^1$ and $d_i(f)$ is the degree of the restriction of $f$ to $X_i$.
+  In the present paper we prove that for a non-negative integer number $g$ the set of all separating semigroups of genus $g$ curves is finite.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "Pluricanonical Geometry of Varieties Isogenous to a Product and Pluricanonical Decompositions of Abelian Covers", "author": "Massimiliano Alessandro, Davide Frapporti, Christian Gleissner", "published": "Mon, 23 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.21294", "summary": "arXiv:2512.21294v2 Announce Type: replace \nAbstract: We study canonical and pluricanonical maps of varieties isogenous to a product of curves, i.e., quotients of the form $X = (C_1 \\times \\dots \\times C_n)/G$ with $g(C_i)\\ge 2$ and $G$ acting freely. For this purpose, we provide a technical result which is of general interest: a decomposition theorem for pluricanonical systems of abelian covers. This theorem provides an effective tool for the explicit study of geometric properties, such as base loci and the birationality of pluricanonical maps. For threefolds isogenous to a product, we prove that the 4-canonical map is birational for $p_g \\ge 5$ and construct an example attaining the maximal canonical degree for this class of threefolds. In this example, the canonical map is the normalization of its image, which admits isolated non-normal singularities. Computational classifications also reveal threefolds where the bicanonical map fails to be birational, even in the absence of genus-2 fibrations. This illustrates an interesting phenomenon similar to the non-standard case for surfaces.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2512.21294" target="_blank">Pluricanonical Geometry of Varieties Isogenous to a Product and Pluricanonical Decompositions of Abelian Covers</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Massimiliano Alessandro, Davide Frapporti, Christian Gleissner</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 23 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.21294" target="_blank">https://arxiv.org/abs/2512.21294</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study canonical and pluricanonical maps of varieties isogenous to a product of curves, i.e., quotients of the form $X = (C_1 \times \dots \times C_n)/G$ with $g(C_i)\ge 2$ and $G$ acting freely. For this purpose, we provide a technical result which is of general interest: a decomposition theorem for pluricanonical systems of abelian covers. This theorem provides an effective tool for the explicit study of geometric properties, such as base loci and the birationality of pluricanonical maps. For threefolds isogenous to a product, we prove that the 4-canonical map is birational for $p_g \ge 5$ and construct an example attaining the maximal canonical degree for this class of threefolds. In this example, the canonical map is the normalization of its image, which admits isolated non-normal singularities. Computational classifications also reveal threefolds where the bicanonical map fails to be birational, even in the absence of genus-2 fibrations. This illustrates an interesting phenomenon similar to the non-standard case for surfaces.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "Around the 'Fundamental Theorem of Algebra' (extended version)", "author": "Boris Kazarnovskii", "published": "Mon, 23 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.01458", "summary": "arXiv:2601.01458v3 Announce Type: replace \nAbstract: The Fundamental Theorem of Algebra (FTA) asserts that every complex polynomial has as many complex roots, counted with multiplicities, as its degree. A probabilistic analogue of this theorem for real roots of real polynomials, sometimes referred to as the Kac theorem, was found between 1938 and 1943 by J. Littlewood, A. Offord, and M. Kac. In this paper, we present several more versions of FTA: Kac type FTA for Laurent polynomials in one and many variables, Kac type FTA for polynomials on complex reductive groups arising in the context of compact group representations (similar to Laurent polynomials arising in torus representation theory), and FTA for exponential sums in one and many variables. In the case of Laurent polynomials, the result, even in the one-dimensional case, is unexpected: most of the zeros of a real Laurent polynomial are real. This text is a supplemented and more detailed version of \\cite{arx}.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2601.01458" target="_blank">Around the 'Fundamental Theorem of Algebra' (extended version)</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Boris Kazarnovskii</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 23 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.01458" target="_blank">https://arxiv.org/abs/2601.01458</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The Fundamental Theorem of Algebra (FTA) asserts that every complex polynomial has as many complex roots, counted with multiplicities, as its degree. A probabilistic analogue of this theorem for real roots of real polynomials, sometimes referred to as the Kac theorem, was found between 1938 and 1943 by J. Littlewood, A. Offord, and M. Kac. In this paper, we present several more versions of FTA: Kac type FTA for Laurent polynomials in one and many variables, Kac type FTA for polynomials on complex reductive groups arising in the context of compact group representations (similar to Laurent polynomials arising in torus representation theory), and FTA for exponential sums in one and many variables. In the case of Laurent polynomials, the result, even in the one-dimensional case, is unexpected: most of the zeros of a real Laurent polynomial are real. This text is a supplemented and more detailed version of \cite{arx}.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "The motivic Satake equivalence using perverse Nori motives", "author": "Khoa Bang Pham", "published": "Mon, 23 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.02004", "summary": "arXiv:2601.02004v2 Announce Type: replace \nAbstract: In this article, we develop the theory of stratified perverse Nori motives to prove a refinement of the geometric Satake equivalence of Mirkovi\\'c-Vilonen, for which we call the Nori motivic Satake equivalence, in contrast to the \"Tate motivic\" Satake equivalence of Richarz-Scholbach.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2601.02004" target="_blank">The motivic Satake equivalence using perverse Nori motives</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Khoa Bang Pham</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 23 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.02004" target="_blank">https://arxiv.org/abs/2601.02004</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this article, we develop the theory of stratified perverse Nori motives to prove a refinement of the geometric Satake equivalence of Mirkovi\'c-Vilonen, for which we call the Nori motivic Satake equivalence, in contrast to the "Tate motivic" Satake equivalence of Richarz-Scholbach.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Effective Brauer-Siegel on some curves in $Y(1)^n$", "author": "Georgios Papas", "published": "Mon, 23 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2310.04943", "summary": "arXiv:2310.04943v3 Announce Type: replace-cross \nAbstract: We establish an effective version of Siegel's lower bounds for class numbers of imaginary quadratic fields in certain cures in $Y(1)^n$. Our proof goes through the G-functions method of Yves Andr\\'e.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2310.04943" target="_blank">Effective Brauer-Siegel on some curves in $Y(1)^n$</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Georgios Papas</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 23 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2310.04943" target="_blank">https://arxiv.org/abs/2310.04943</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We establish an effective version of Siegel's lower bounds for class numbers of imaginary quadratic fields in certain cures in $Y(1)^n$. Our proof goes through the G-functions method of Yves Andr\'e.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Zilber-Pink in $Y(1)^n$: Beyond multiplicative degeneration", "author": "Georgios Papas", "published": "Mon, 23 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2402.09487", "summary": "arXiv:2402.09487v2 Announce Type: replace-cross \nAbstract: We establish Large Galois orbits conjectures for points of unlikely intersections of curves in $Y(1)^n$, upon assumptions on the intersection of such curves with the boundary $X(1)^n\\backslash Y(1)^n$, in the Zilber-Pink setting. As a corollary, building on work of Habegger-Pila and Daw-Orr, we obtain new cases of the Zilber-Pink conjecture for curves in $Y(1)^n$.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2402.09487" target="_blank">Zilber-Pink in $Y(1)^n$: Beyond multiplicative degeneration</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Georgios Papas</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 23 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2402.09487" target="_blank">https://arxiv.org/abs/2402.09487</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We establish Large Galois orbits conjectures for points of unlikely intersections of curves in $Y(1)^n$, upon assumptions on the intersection of such curves with the boundary $X(1)^n\backslash Y(1)^n$, in the Zilber-Pink setting. As a corollary, building on work of Habegger-Pila and Daw-Orr, we obtain new cases of the Zilber-Pink conjecture for curves in $Y(1)^n$.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "Topological Obstructions to Dynamical Convexity", "author": "Shahnaz Shamim Shahul", "published": "Mon, 23 Feb 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.03893", "summary": "arXiv:2512.03893v2 Announce Type: replace-cross \nAbstract: We study the topological obstructions of dynamical convexity on contact manifolds focusing on fillability by cotangent bundles and subcritical surgeries. Using links to algebraic geometry, we motivate and define a stronger version of dynamical convexity, and investigate the topology of these manifolds. More precisely, we show that strongly dynamically convex contact manifolds cannot arise as a unit cotangent bundle $(ST^*M,\\lambda_{std})$ of a closed manifold $M$ and in particular that simply connected dynamically convex contact manifolds cannot be filled by cotangent bundles. We demonstrate that dynamical convexity can be used to recover homotopy groups of topologically simple fillings with vanishing symplectic homology. We also show obstructions to dynamical convexity that come from studying different kinds of subcritical surgeries.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2512.03893" target="_blank">Topological Obstructions to Dynamical Convexity</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Shahnaz Shamim Shahul</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 23 Feb 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.03893" target="_blank">https://arxiv.org/abs/2512.03893</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the topological obstructions of dynamical convexity on contact manifolds focusing on fillability by cotangent bundles and subcritical surgeries. Using links to algebraic geometry, we motivate and define a stronger version of dynamical convexity, and investigate the topology of these manifolds. More precisely, we show that strongly dynamically convex contact manifolds cannot arise as a unit cotangent bundle $(ST^*M,\lambda_{std})$ of a closed manifold $M$ and in particular that simply connected dynamically convex contact manifolds cannot be filled by cotangent bundles. We demonstrate that dynamical convexity can be used to recover homotopy groups of topologically simple fillings with vanishing symplectic homology. We also show obstructions to dynamical convexity that come from studying different kinds of subcritical surgeries.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-02-23 18:00:03
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>

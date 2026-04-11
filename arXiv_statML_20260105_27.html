@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - stat.ML updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>stat.ML updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Mon, 05 Jan 2026 05:00:05 +0000<br>
+        <strong>論文数:</strong> 27件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Active learning for data-driven reduced models of parametric differential systems with Bayesian operator inference</a>
+            <span class="title-label-badge" style="background-color: #ff69b4;">privacy</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Detecting Unobserved Confounders: A Kernelized Regression Approach</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Generative Conditional Missing Imputation Networks</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">Deep learning estimation of the spectral density of functional time series on large domains</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">Identification and Estimation under Multiple Versions of Treatment: Mixture-of-Experts Approach</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">Sparse Tucker Decomposition and Graph Regularization for High-Dimensional Time Series Forecasting</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Laplacian Kernelized Bandit</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Uncertainty-Adjusted Sorting for Asset Pricing with Machine Learning</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">Integrating Multi-Armed Bandit, Active Learning, and Distributed Computing for Scalable Optimization</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">Categorical Reparameterization with Denoising Diffusion models</a>
+            <span class="title-label-badge" style="background-color: #9b59b6;">diffusion</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">MCD: Marginal Contrastive Discrimination for conditional density estimation</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">Sparse-Input Neural Network using Group Concave Regularization</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">Survey of Data-driven Newsvendor: Unified Analysis and Spectrum of Achievable Regrets</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Sparse Additive Contextual Bandits: A Nonparametric Approach for Online Decision-Making with High-Dimensional Covariates</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Effects of Structural Allocation of Geometric Task Diversity in Linear Meta-Learning Models</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">Mitigating optimistic bias in entropic risk estimation and optimization</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">A Gaussian Process View on Observation Noise and Initialization in Wide Neural Networks</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">From Continual Learning to SGD and Back: Better Rates for Continual Linear Models</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Streaming Sliced Optimal Transport</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">Nonparametric Instrumental Variable Inference with Many Weak Instruments</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-21" onchange="updateSelectedCount()">
+            <span class="title-number">21.</span>
+            <a href="#paper-21">PolarGrad: A Class of Matrix-Gradient Optimizers from a Unifying Preconditioning Perspective</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-22" onchange="updateSelectedCount()">
+            <span class="title-number">22.</span>
+            <a href="#paper-22">Infinite-Width Limit of a Single Attention Layer: Analysis via Tensor Programs</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-23" onchange="updateSelectedCount()">
+            <span class="title-number">23.</span>
+            <a href="#paper-23">Simulation as Supervision: Mechanistic Pretraining for Scientific Discovery</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-24" onchange="updateSelectedCount()">
+            <span class="title-number">24.</span>
+            <a href="#paper-24">uGMM-NN: Univariate Gaussian Mixture Model Neural Network</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-25" onchange="updateSelectedCount()">
+            <span class="title-number">25.</span>
+            <a href="#paper-25">Clustering by Denoising: Latent plug-and-play diffusion for single-cell data</a>
+            <span class="title-label-badge" style="background-color: #9b59b6;">diffusion</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-26" onchange="updateSelectedCount()">
+            <span class="title-number">26.</span>
+            <a href="#paper-26">Designing an Optimal Sensor Network via Minimizing Information Loss</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-27" onchange="updateSelectedCount()">
+            <span class="title-number">27.</span>
+            <a href="#paper-27">Causality-Inspired Safe Residual Correction for Multivariate Time Series</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Active learning for data-driven reduced models of parametric differential systems with Bayesian operator inference", "author": "Shane A. McQuarrie, Mengwu Guo, Anirban Chaudhuri", "published": "Mon, 05 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.00038", "summary": "arXiv:2601.00038v1 Announce Type: new \nAbstract: This work develops an active learning framework to intelligently enrich data-driven reduced-order models (ROMs) of parametric dynamical systems, which can serve as the foundation of virtual assets in a digital twin. Data-driven ROMs are explainable, computationally efficient scientific machine learning models that aim to preserve the underlying physics of complex dynamical simulations. Since the quality of data-driven ROMs is sensitive to the quality of the limited training data, we seek to identify training parameters for which using the associated training data results in the best possible parametric ROM. Our approach uses the operator inference methodology, a regression-based strategy which can be tailored to particular parametric structure for a large class of problems. We establish a probabilistic version of parametric operator inference, casting the learning problem as a Bayesian linear regression. Prediction uncertainties stemming from the resulting probabilistic ROM solutions are used to design a sequential adaptive sampling scheme to select new training parameter vectors that promote ROM stability and accuracy globally in the parameter domain. We conduct numerical experiments for several nonlinear parametric systems of partial differential equations and compare the results to ROMs trained on random parameter samples. The results demonstrate that the proposed adaptive sampling strategy consistently yields more stable and accurate ROMs than random sampling does under the same computational budget.", "number": 1, "labels": [{"name": "privacy", "color": "#ff69b4"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2601.00038" target="_blank">Active learning for data-driven reduced models of parametric differential systems with Bayesian operator inference</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #ff69b4;">privacy</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Shane A. McQuarrie, Mengwu Guo, Anirban Chaudhuri</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 05 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.00038" target="_blank">https://arxiv.org/abs/2601.00038</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This work develops an active learning framework to intelligently enrich data-driven reduced-order models (ROMs) of parametric dynamical systems, which can serve as the foundation of virtual assets in a digital twin. Data-driven ROMs are explainable, computationally efficient scientific machine learning models that aim to preserve the underlying physics of complex dynamical simulations. Since the quality of data-driven ROMs is sensitive to the quality of the limited training data, we seek to identify training parameters for which using the associated training data results in the best possible parametric ROM. Our approach uses the operator inference methodology, a regression-based strategy which can be tailored to particular parametric structure for a large class of problems. We establish a probabilistic version of parametric operator inference, casting the learning problem as a Bayesian linear regression. Prediction uncertainties stemming from the resulting probabilistic ROM solutions are used to design a sequential adaptive sampling scheme to select new training parameter vectors that promote ROM stability and accuracy globally in the parameter domain. We conduct numerical experiments for several nonlinear parametric systems of partial differential equations and compare the results to ROMs trained on random parameter samples. The results demonstrate that the proposed adaptive sampling strategy consistently yields more stable and accurate ROMs than random sampling does under the same computational budget.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Detecting Unobserved Confounders: A Kernelized Regression Approach", "author": "Yikai Chen, Yunxin Mao, Chunyuan Zheng, Hao Zou, Shanzhi Gu, Shixuan Liu, Yang Shi, Wenjing Yang, Kun Kuang, Haotian Wang", "published": "Mon, 05 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.00200", "summary": "arXiv:2601.00200v1 Announce Type: new \nAbstract: Detecting unobserved confounders is crucial for reliable causal inference in observational studies. Existing methods require either linearity assumptions or multiple heterogeneous environments, limiting applicability to nonlinear single-environment settings. To bridge this gap, we propose Kernel Regression Confounder Detection (KRCD), a novel method for detecting unobserved confounding in nonlinear observational data under single-environment conditions. KRCD leverages reproducing kernel Hilbert spaces to model complex dependencies. By comparing standard and higherorder kernel regressions, we derive a test statistic whose significant deviation from zero indicates unobserved confounding. Theoretically, we prove two key results: First, in infinite samples, regression coefficients coincide if and only if no unobserved confounders exist. Second, finite-sample differences converge to zero-mean Gaussian distributions with tractable variance. Extensive experiments on synthetic benchmarks and the Twins dataset demonstrate that KRCD not only outperforms existing baselines but also achieves superior computational efficiency.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2601.00200" target="_blank">Detecting Unobserved Confounders: A Kernelized Regression Approach</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yikai Chen, Yunxin Mao, Chunyuan Zheng, Hao Zou, Shanzhi Gu, Shixuan Liu, Yang Shi, Wenjing Yang, Kun Kuang, Haotian Wang</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 05 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.00200" target="_blank">https://arxiv.org/abs/2601.00200</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Detecting unobserved confounders is crucial for reliable causal inference in observational studies. Existing methods require either linearity assumptions or multiple heterogeneous environments, limiting applicability to nonlinear single-environment settings. To bridge this gap, we propose Kernel Regression Confounder Detection (KRCD), a novel method for detecting unobserved confounding in nonlinear observational data under single-environment conditions. KRCD leverages reproducing kernel Hilbert spaces to model complex dependencies. By comparing standard and higherorder kernel regressions, we derive a test statistic whose significant deviation from zero indicates unobserved confounding. Theoretically, we prove two key results: First, in infinite samples, regression coefficients coincide if and only if no unobserved confounders exist. Second, finite-sample differences converge to zero-mean Gaussian distributions with tractable variance. Extensive experiments on synthetic benchmarks and the Twins dataset demonstrate that KRCD not only outperforms existing baselines but also achieves superior computational efficiency.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Generative Conditional Missing Imputation Networks", "author": "George Sun, Yi-Hui Zhou", "published": "Mon, 05 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.00517", "summary": "arXiv:2601.00517v1 Announce Type: new \nAbstract: In this study, we introduce a sophisticated generative conditional strategy designed to impute missing values within datasets, an area of considerable importance in statistical analysis. Specifically, we initially elucidate the theoretical underpinnings of the Generative Conditional Missing Imputation Networks (GCMI), demonstrating its robust properties in the context of the Missing Completely at Random (MCAR) and the Missing at Random (MAR) mechanisms. Subsequently, we enhance the robustness and accuracy of GCMI by integrating a multiple imputation framework using a chained equations approach. This innovation serves to bolster model stability and improve imputation performance significantly. Finally, through a series of meticulous simulations and empirical assessments utilizing benchmark datasets, we establish the superior efficacy of our proposed methods when juxtaposed with other leading imputation techniques currently available. This comprehensive evaluation not only underscores the practicality of GCMI but also affirms its potential as a leading-edge tool in the field of statistical data analysis.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2601.00517" target="_blank">Generative Conditional Missing Imputation Networks</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> George Sun, Yi-Hui Zhou</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 05 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.00517" target="_blank">https://arxiv.org/abs/2601.00517</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this study, we introduce a sophisticated generative conditional strategy designed to impute missing values within datasets, an area of considerable importance in statistical analysis. Specifically, we initially elucidate the theoretical underpinnings of the Generative Conditional Missing Imputation Networks (GCMI), demonstrating its robust properties in the context of the Missing Completely at Random (MCAR) and the Missing at Random (MAR) mechanisms. Subsequently, we enhance the robustness and accuracy of GCMI by integrating a multiple imputation framework using a chained equations approach. This innovation serves to bolster model stability and improve imputation performance significantly. Finally, through a series of meticulous simulations and empirical assessments utilizing benchmark datasets, we establish the superior efficacy of our proposed methods when juxtaposed with other leading imputation techniques currently available. This comprehensive evaluation not only underscores the practicality of GCMI but also affirms its potential as a leading-edge tool in the field of statistical data analysis.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "Deep learning estimation of the spectral density of functional time series on large domains", "author": "Neda Mohammadi, Soham Sarkar, Piotr Kokoszka", "published": "Mon, 05 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.00284", "summary": "arXiv:2601.00284v1 Announce Type: cross \nAbstract: We derive an estimator of the spectral density of a functional time series that is the output of a multilayer perceptron neural network. The estimator is motivated by difficulties with the computation of existing spectral density estimators for time series of functions defined on very large grids that arise, for example, in climate compute models and medical scans. Existing estimators use autocovariance kernels represented as large $G \\times G$ matrices, where $G$ is the number of grid points on which the functions are evaluated. In many recent applications, functions are defined on 2D and 3D domains, and $G$ can be of the order $G \\sim 10^5$, making the evaluation of the autocovariance kernels computationally intensive or even impossible. We use the theory of spectral functional principal components to derive our deep learning estimator and prove that it is a universal approximator to the spectral density under general assumptions. Our estimator can be trained without computing the autocovariance kernels and it can be parallelized to provide the estimates much faster than existing approaches. We validate its performance by simulations and an application to fMRI images.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2601.00284" target="_blank">Deep learning estimation of the spectral density of functional time series on large domains</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Neda Mohammadi, Soham Sarkar, Piotr Kokoszka</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 05 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.00284" target="_blank">https://arxiv.org/abs/2601.00284</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We derive an estimator of the spectral density of a functional time series that is the output of a multilayer perceptron neural network. The estimator is motivated by difficulties with the computation of existing spectral density estimators for time series of functions defined on very large grids that arise, for example, in climate compute models and medical scans. Existing estimators use autocovariance kernels represented as large $G \times G$ matrices, where $G$ is the number of grid points on which the functions are evaluated. In many recent applications, functions are defined on 2D and 3D domains, and $G$ can be of the order $G \sim 10^5$, making the evaluation of the autocovariance kernels computationally intensive or even impossible. We use the theory of spectral functional principal components to derive our deep learning estimator and prove that it is a universal approximator to the spectral density under general assumptions. Our estimator can be trained without computing the autocovariance kernels and it can be parallelized to provide the estimates much faster than existing approaches. We validate its performance by simulations and an application to fMRI images.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "Identification and Estimation under Multiple Versions of Treatment: Mixture-of-Experts Approach", "author": "Kohei Yoshikawa, Shuichi Kawano", "published": "Mon, 05 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.00287", "summary": "arXiv:2601.00287v1 Announce Type: cross \nAbstract: The Stable Unit Treatment Value Assumption (SUTVA) includes the condition that there are no multiple versions of treatment in causal inference. Though we could not control the implementation of treatment in observational studies, multiple versions may exist in the treatment. It has been pointed out that ignoring such multiple versions of treatment can lead to biased estimates of causal effects, but a causal inference framework that explicitly deals with the unbiased identification and estimation of version-specific causal effects has not been fully developed yet. Thus, obtaining a deeper understanding for mechanisms of the complex treatments is difficult. In this paper, we introduce the Mixture-of-Experts framework into causal inference and develop a methodology for estimating the causal effects of latent versions. This approach enables explicit estimation of version-specific causal effects even if the versions are not observed. Numerical experiments demonstrate the effectiveness of the proposed method.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2601.00287" target="_blank">Identification and Estimation under Multiple Versions of Treatment: Mixture-of-Experts Approach</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Kohei Yoshikawa, Shuichi Kawano</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 05 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.00287" target="_blank">https://arxiv.org/abs/2601.00287</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The Stable Unit Treatment Value Assumption (SUTVA) includes the condition that there are no multiple versions of treatment in causal inference. Though we could not control the implementation of treatment in observational studies, multiple versions may exist in the treatment. It has been pointed out that ignoring such multiple versions of treatment can lead to biased estimates of causal effects, but a causal inference framework that explicitly deals with the unbiased identification and estimation of version-specific causal effects has not been fully developed yet. Thus, obtaining a deeper understanding for mechanisms of the complex treatments is difficult. In this paper, we introduce the Mixture-of-Experts framework into causal inference and develop a methodology for estimating the causal effects of latent versions. This approach enables explicit estimation of version-specific causal effects even if the versions are not observed. Numerical experiments demonstrate the effectiveness of the proposed method.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "Sparse Tucker Decomposition and Graph Regularization for High-Dimensional Time Series Forecasting", "author": "Sijia Xia, Michael K. Ng, Xiongjun Zhang", "published": "Mon, 05 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.00377", "summary": "arXiv:2601.00377v1 Announce Type: cross \nAbstract: Existing methods of vector autoregressive model for multivariate time series analysis make use of low-rank matrix approximation or Tucker decomposition to reduce the dimension of the over-parameterization issue. In this paper, we propose a sparse Tucker decomposition method with graph regularization for high-dimensional vector autoregressive time series. By stacking the time-series transition matrices into a third-order tensor, the sparse Tucker decomposition is employed to characterize important interactions within the transition third-order tensor and reduce the number of parameters. Moreover, the graph regularization is employed to measure the local consistency of the response, predictor and temporal factor matrices in the vector autoregressive model.The two proposed regularization techniques can be shown to more accurate parameters estimation. A non-asymptotic error bound of the estimator of the proposed method is established, which is lower than those of the existing matrix or tensor based methods. A proximal alternating linearized minimization algorithm is designed to solve the resulting model and its global convergence is established under very mild conditions. Extensive numerical experiments on synthetic data and real-world datasets are carried out to verify the superior performance of the proposed method over existing state-of-the-art methods.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2601.00377" target="_blank">Sparse Tucker Decomposition and Graph Regularization for High-Dimensional Time Series Forecasting</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sijia Xia, Michael K. Ng, Xiongjun Zhang</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 05 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.00377" target="_blank">https://arxiv.org/abs/2601.00377</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Existing methods of vector autoregressive model for multivariate time series analysis make use of low-rank matrix approximation or Tucker decomposition to reduce the dimension of the over-parameterization issue. In this paper, we propose a sparse Tucker decomposition method with graph regularization for high-dimensional vector autoregressive time series. By stacking the time-series transition matrices into a third-order tensor, the sparse Tucker decomposition is employed to characterize important interactions within the transition third-order tensor and reduce the number of parameters. Moreover, the graph regularization is employed to measure the local consistency of the response, predictor and temporal factor matrices in the vector autoregressive model.The two proposed regularization techniques can be shown to more accurate parameters estimation. A non-asymptotic error bound of the estimator of the proposed method is established, which is lower than those of the existing matrix or tensor based methods. A proximal alternating linearized minimization algorithm is designed to solve the resulting model and its global convergence is established under very mild conditions. Extensive numerical experiments on synthetic data and real-world datasets are carried out to verify the superior performance of the proposed method over existing state-of-the-art methods.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Laplacian Kernelized Bandit", "author": "Shuang Wu, Arash A. Amini", "published": "Mon, 05 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.00461", "summary": "arXiv:2601.00461v1 Announce Type: cross \nAbstract: We study multi-user contextual bandits where users are related by a graph and their reward functions exhibit both non-linear behavior and graph homophily. We introduce a principled joint penalty for the collection of user reward functions $\\{f_u\\}$, combining a graph smoothness term based on RKHS distances with an individual roughness penalty. Our central contribution is proving that this penalty is equivalent to the squared norm within a single, unified \\emph{multi-user RKHS}. We explicitly derive its reproducing kernel, which elegantly fuses the graph Laplacian with the base arm kernel. This unification allows us to reframe the problem as learning a single ''lifted'' function, enabling the design of principled algorithms, \\texttt{LK-GP-UCB} and \\texttt{LK-GP-TS}, that leverage Gaussian Process posteriors over this new kernel for exploration. We provide high-probability regret bounds that scale with an \\emph{effective dimension} of the multi-user kernel, replacing dependencies on user count or ambient dimension. Empirically, our methods outperform strong linear and non-graph-aware baselines in non-linear settings and remain competitive even when the true rewards are linear. Our work delivers a unified, theoretically grounded, and practical framework that bridges Laplacian regularization with kernelized bandits for structured exploration.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2601.00461" target="_blank">Laplacian Kernelized Bandit</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Shuang Wu, Arash A. Amini</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 05 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.00461" target="_blank">https://arxiv.org/abs/2601.00461</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study multi-user contextual bandits where users are related by a graph and their reward functions exhibit both non-linear behavior and graph homophily. We introduce a principled joint penalty for the collection of user reward functions $\{f_u\}$, combining a graph smoothness term based on RKHS distances with an individual roughness penalty. Our central contribution is proving that this penalty is equivalent to the squared norm within a single, unified \emph{multi-user RKHS}. We explicitly derive its reproducing kernel, which elegantly fuses the graph Laplacian with the base arm kernel. This unification allows us to reframe the problem as learning a single ''lifted'' function, enabling the design of principled algorithms, \texttt{LK-GP-UCB} and \texttt{LK-GP-TS}, that leverage Gaussian Process posteriors over this new kernel for exploration. We provide high-probability regret bounds that scale with an \emph{effective dimension} of the multi-user kernel, replacing dependencies on user count or ambient dimension. Empirically, our methods outperform strong linear and non-graph-aware baselines in non-linear settings and remain competitive even when the true rewards are linear. Our work delivers a unified, theoretically grounded, and practical framework that bridges Laplacian regularization with kernelized bandits for structured exploration.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Uncertainty-Adjusted Sorting for Asset Pricing with Machine Learning", "author": "Yan Liu, Ye Luo, Zigan Wang, Xiaowei Zhang", "published": "Mon, 05 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.00593", "summary": "arXiv:2601.00593v1 Announce Type: cross \nAbstract: Machine learning is central to empirical asset pricing, but portfolio construction still relies on point predictions and largely ignores asset-specific estimation uncertainty. We propose a simple change: sort assets using uncertainty-adjusted prediction bounds instead of point predictions alone. Across a broad set of ML models and a U.S. equity panel, this approach improves portfolio performance relative to point-prediction sorting. These gains persist even when bounds are built from partial or misspecified uncertainty information. They arise mainly from reduced volatility and are strongest for flexible machine learning models. Identification and robustness exercises show that these improvements are driven by asset-level rather than time or aggregate predictive uncertainty.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2601.00593" target="_blank">Uncertainty-Adjusted Sorting for Asset Pricing with Machine Learning</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yan Liu, Ye Luo, Zigan Wang, Xiaowei Zhang</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 05 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.00593" target="_blank">https://arxiv.org/abs/2601.00593</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Machine learning is central to empirical asset pricing, but portfolio construction still relies on point predictions and largely ignores asset-specific estimation uncertainty. We propose a simple change: sort assets using uncertainty-adjusted prediction bounds instead of point predictions alone. Across a broad set of ML models and a U.S. equity panel, this approach improves portfolio performance relative to point-prediction sorting. These gains persist even when bounds are built from partial or misspecified uncertainty information. They arise mainly from reduced volatility and are strongest for flexible machine learning models. Identification and robustness exercises show that these improvements are driven by asset-level rather than time or aggregate predictive uncertainty.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "Integrating Multi-Armed Bandit, Active Learning, and Distributed Computing for Scalable Optimization", "author": "Foo Hui-Mean, Yuan-chin Ivan Chang", "published": "Mon, 05 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.00615", "summary": "arXiv:2601.00615v1 Announce Type: cross \nAbstract: Modern optimization problems in scientific and engineering domains often rely on expensive black-box evaluations, such as those arising in physical simulations or deep learning pipelines, where gradient information is unavailable or unreliable. In these settings, conventional optimization methods quickly become impractical due to prohibitive computational costs and poor scalability. We propose ALMAB-DC, a unified and modular framework for scalable black-box optimization that integrates active learning, multi-armed bandits, and distributed computing, with optional GPU acceleration. The framework leverages surrogate modeling and information-theoretic acquisition functions to guide informative sample selection, while bandit-based controllers dynamically allocate computational resources across candidate evaluations in a statistically principled manner. These decisions are executed asynchronously within a distributed multi-agent system, enabling high-throughput parallel evaluation. We establish theoretical regret bounds for both UCB-based and Thompson-sampling-based variants and develop a scalability analysis grounded in Amdahl's and Gustafson's laws. Empirical results across synthetic benchmarks, reinforcement learning tasks, and scientific simulation problems demonstrate that ALMAB-DC consistently outperforms state-of-the-art black-box optimizers. By design, ALMAB-DC is modular, uncertainty-aware, and extensible, making it particularly well suited for high-dimensional, resource-intensive optimization challenges.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2601.00615" target="_blank">Integrating Multi-Armed Bandit, Active Learning, and Distributed Computing for Scalable Optimization</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Foo Hui-Mean, Yuan-chin Ivan Chang</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 05 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.00615" target="_blank">https://arxiv.org/abs/2601.00615</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Modern optimization problems in scientific and engineering domains often rely on expensive black-box evaluations, such as those arising in physical simulations or deep learning pipelines, where gradient information is unavailable or unreliable. In these settings, conventional optimization methods quickly become impractical due to prohibitive computational costs and poor scalability. We propose ALMAB-DC, a unified and modular framework for scalable black-box optimization that integrates active learning, multi-armed bandits, and distributed computing, with optional GPU acceleration. The framework leverages surrogate modeling and information-theoretic acquisition functions to guide informative sample selection, while bandit-based controllers dynamically allocate computational resources across candidate evaluations in a statistically principled manner. These decisions are executed asynchronously within a distributed multi-agent system, enabling high-throughput parallel evaluation. We establish theoretical regret bounds for both UCB-based and Thompson-sampling-based variants and develop a scalability analysis grounded in Amdahl's and Gustafson's laws. Empirical results across synthetic benchmarks, reinforcement learning tasks, and scientific simulation problems demonstrate that ALMAB-DC consistently outperforms state-of-the-art black-box optimizers. By design, ALMAB-DC is modular, uncertainty-aware, and extensible, making it particularly well suited for high-dimensional, resource-intensive optimization challenges.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "Categorical Reparameterization with Denoising Diffusion models", "author": "Samson Gourevitch, Alain Durmus, Eric Moulines, Jimmy Olsson, Yazid Janati", "published": "Mon, 05 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.00781", "summary": "arXiv:2601.00781v1 Announce Type: cross \nAbstract: Gradient-based optimization with categorical variables typically relies on score-function estimators, which are unbiased but noisy, or on continuous relaxations that replace the discrete distribution with a smooth surrogate admitting a pathwise (reparameterized) gradient, at the cost of optimizing a biased, temperature-dependent objective. In this paper, we extend this family of relaxations by introducing a diffusion-based soft reparameterization for categorical distributions. For these distributions, the denoiser under a Gaussian noising process admits a closed form and can be computed efficiently, yielding a training-free diffusion sampler through which we can backpropagate. Our experiments show that the proposed reparameterization trick yields competitive or improved optimization performance on various benchmarks.", "number": 10, "labels": [{"name": "diffusion", "color": "#9b59b6"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2601.00781" target="_blank">Categorical Reparameterization with Denoising Diffusion models</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #9b59b6;">diffusion</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Samson Gourevitch, Alain Durmus, Eric Moulines, Jimmy Olsson, Yazid Janati</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 05 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.00781" target="_blank">https://arxiv.org/abs/2601.00781</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Gradient-based optimization with categorical variables typically relies on score-function estimators, which are unbiased but noisy, or on continuous relaxations that replace the discrete distribution with a smooth surrogate admitting a pathwise (reparameterized) gradient, at the cost of optimizing a biased, temperature-dependent objective. In this paper, we extend this family of relaxations by introducing a diffusion-based soft reparameterization for categorical distributions. For these distributions, the denoiser under a Gaussian noising process admits a closed form and can be computed efficiently, yielding a training-free diffusion sampler through which we can backpropagate. Our experiments show that the proposed reparameterization trick yields competitive or improved optimization performance on various benchmarks.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "MCD: Marginal Contrastive Discrimination for conditional density estimation", "author": "Katia Meziani, Aminata Ndiaye, Benjamin Riu", "published": "Mon, 05 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2206.01592", "summary": "arXiv:2206.01592v2 Announce Type: replace \nAbstract: We consider the problem of conditional density estimation, which is a major topic of interest in the fields of statistical and machine learning. Our method, called Marginal Contrastive Discrimination, MCD, reformulates the conditional density function into two factors, the marginal density function of the target variable and a ratio of density functions which can be estimated through binary classification. Like noise-contrastive methods, MCD can leverage state-of-the-art supervised learning techniques to perform conditional density estimation, including neural networks. Our benchmark reveals that our method significantly outperforms in practice existing methods on most density models and regression datasets.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2206.01592" target="_blank">MCD: Marginal Contrastive Discrimination for conditional density estimation</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Katia Meziani, Aminata Ndiaye, Benjamin Riu</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 05 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2206.01592" target="_blank">https://arxiv.org/abs/2206.01592</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We consider the problem of conditional density estimation, which is a major topic of interest in the fields of statistical and machine learning. Our method, called Marginal Contrastive Discrimination, MCD, reformulates the conditional density function into two factors, the marginal density function of the target variable and a ratio of density functions which can be estimated through binary classification. Like noise-contrastive methods, MCD can leverage state-of-the-art supervised learning techniques to perform conditional density estimation, including neural networks. Our benchmark reveals that our method significantly outperforms in practice existing methods on most density models and regression datasets.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "Sparse-Input Neural Network using Group Concave Regularization", "author": "Bin Luo, Susan Halabi", "published": "Mon, 05 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2307.00344", "summary": "arXiv:2307.00344v2 Announce Type: replace \nAbstract: Simultaneous feature selection and non-linear function estimation is challenging in modeling, especially in high-dimensional settings where the number of variables exceeds the available sample size. In this article, we investigate the problem of feature selection in neural networks. Although the group least absolute shrinkage and selection operator (LASSO) has been utilized to select variables for learning with neural networks, it tends to select unimportant variables into the model to compensate for its over-shrinkage. To overcome this limitation, we propose a framework of sparse-input neural networks using group concave regularization for feature selection in both low-dimensional and high-dimensional settings. The main idea is to apply a proper concave penalty to the $l_2$ norm of weights from all outgoing connections of each input node, and thus obtain a neural net that only uses a small subset of the original variables. In addition, we develop an effective algorithm based on backward path-wise optimization to yield stable solution paths, in order to tackle the challenge of complex optimization landscapes. We provide a rigorous theoretical analysis of the proposed framework, establishing finite-sample guarantees for both variable selection consistency and prediction accuracy. These results are supported by extensive simulation studies and real data applications, which demonstrate the finite-sample performance of the estimator in feature selection and prediction across continuous, binary, and time-to-event outcomes.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2307.00344" target="_blank">Sparse-Input Neural Network using Group Concave Regularization</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Bin Luo, Susan Halabi</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 05 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2307.00344" target="_blank">https://arxiv.org/abs/2307.00344</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Simultaneous feature selection and non-linear function estimation is challenging in modeling, especially in high-dimensional settings where the number of variables exceeds the available sample size. In this article, we investigate the problem of feature selection in neural networks. Although the group least absolute shrinkage and selection operator (LASSO) has been utilized to select variables for learning with neural networks, it tends to select unimportant variables into the model to compensate for its over-shrinkage. To overcome this limitation, we propose a framework of sparse-input neural networks using group concave regularization for feature selection in both low-dimensional and high-dimensional settings. The main idea is to apply a proper concave penalty to the $l_2$ norm of weights from all outgoing connections of each input node, and thus obtain a neural net that only uses a small subset of the original variables. In addition, we develop an effective algorithm based on backward path-wise optimization to yield stable solution paths, in order to tackle the challenge of complex optimization landscapes. We provide a rigorous theoretical analysis of the proposed framework, establishing finite-sample guarantees for both variable selection consistency and prediction accuracy. These results are supported by extensive simulation studies and real data applications, which demonstrate the finite-sample performance of the estimator in feature selection and prediction across continuous, binary, and time-to-event outcomes.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "Survey of Data-driven Newsvendor: Unified Analysis and Spectrum of Achievable Regrets", "author": "Zhuoxin Chen, Will Ma", "published": "Mon, 05 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2409.03505", "summary": "arXiv:2409.03505v5 Announce Type: replace \nAbstract: In the Newsvendor problem, the goal is to guess the number that will be drawn from some distribution, with asymmetric consequences for guessing too high vs. too low. In the data-driven version, the distribution is unknown, and one must work with samples from the distribution. Data-driven Newsvendor has been studied under many variants: additive vs. multiplicative regret, high probability vs. expectation bounds, and different distribution classes. This paper studies all combinations of these variants, filling in many gaps in the literature and simplifying many proofs. In particular, we provide a unified analysis based on the notion of clustered distributions, which in conjunction with our new lower bounds, shows that the entire spectrum of regrets between $1/\\sqrt{n}$ and $1/n$ can be possible. Simulations on commonly-used distributions demonstrate that our notion is the \"correct\" predictor of empirical regret across varying data sizes.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2409.03505" target="_blank">Survey of Data-driven Newsvendor: Unified Analysis and Spectrum of Achievable Regrets</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Zhuoxin Chen, Will Ma</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 05 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2409.03505" target="_blank">https://arxiv.org/abs/2409.03505</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In the Newsvendor problem, the goal is to guess the number that will be drawn from some distribution, with asymmetric consequences for guessing too high vs. too low. In the data-driven version, the distribution is unknown, and one must work with samples from the distribution. Data-driven Newsvendor has been studied under many variants: additive vs. multiplicative regret, high probability vs. expectation bounds, and different distribution classes. This paper studies all combinations of these variants, filling in many gaps in the literature and simplifying many proofs. In particular, we provide a unified analysis based on the notion of clustered distributions, which in conjunction with our new lower bounds, shows that the entire spectrum of regrets between $1/\sqrt{n}$ and $1/n$ can be possible. Simulations on commonly-used distributions demonstrate that our notion is the "correct" predictor of empirical regret across varying data sizes.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Sparse Additive Contextual Bandits: A Nonparametric Approach for Online Decision-Making with High-Dimensional Covariates", "author": "Wenjia Wang, Qingwen Zhang, Xiaowei Zhang", "published": "Mon, 05 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2503.16941", "summary": "arXiv:2503.16941v2 Announce Type: replace \nAbstract: Personalized services are central to today's digital economy, and their sequential decisions are often modeled as contextual bandits. Modern applications pose two main challenges: high-dimensional covariates and the need for nonparametric models to capture complex reward-covariate relationships. We propose a contextual bandit algorithm based on a sparse additive reward model that addresses both challenges through (i) a doubly penalized estimator for nonparametric reward estimation and (ii) an epoch-based design with adaptive screening to balance exploration and exploitation. We prove a sublinear regret bound that grows only logarithmically in the covariate dimensionality; to our knowledge, this is the first such result for nonparametric contextual bandits with high-dimensional covariates. We also derive an information-theoretic lower bound, and the gap to the upper bound vanishes as the reward smoothness increases. Extensive experiments on synthetic data and real data from video recommendation and personalized medicine show strong performance in high-dimensional settings.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2503.16941" target="_blank">Sparse Additive Contextual Bandits: A Nonparametric Approach for Online Decision-Making with High-Dimensional Covariates</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Wenjia Wang, Qingwen Zhang, Xiaowei Zhang</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 05 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2503.16941" target="_blank">https://arxiv.org/abs/2503.16941</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Personalized services are central to today's digital economy, and their sequential decisions are often modeled as contextual bandits. Modern applications pose two main challenges: high-dimensional covariates and the need for nonparametric models to capture complex reward-covariate relationships. We propose a contextual bandit algorithm based on a sparse additive reward model that addresses both challenges through (i) a doubly penalized estimator for nonparametric reward estimation and (ii) an epoch-based design with adaptive screening to balance exploration and exploitation. We prove a sublinear regret bound that grows only logarithmically in the covariate dimensionality; to our knowledge, this is the first such result for nonparametric contextual bandits with high-dimensional covariates. We also derive an information-theoretic lower bound, and the gap to the upper bound vanishes as the reward smoothness increases. Extensive experiments on synthetic data and real data from video recommendation and personalized medicine show strong performance in high-dimensional settings.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Effects of Structural Allocation of Geometric Task Diversity in Linear Meta-Learning Models", "author": "Saptati Datta, Nicolas W. Hengartner, Yulia Pimonova, Natalie E. Klein, Nicholas Lubbers", "published": "Mon, 05 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2509.18349", "summary": "arXiv:2509.18349v2 Announce Type: replace \nAbstract: Meta-learning aims to leverage information across related tasks to improve prediction on unlabeled data for new tasks when only a small number of labeled observations are available (\"few-shot\" learning). Increased task diversity is often believed to enhance meta-learning by providing richer information across tasks. However, recent work by Kumar et al. (2022) shows that increasing task diversity, quantified through the overall geometric spread of task representations, can in fact degrade meta-learning prediction performance across a range of models and datasets. In this work, we build on this observation by showing that meta-learning performance is affected not only by the overall geometric variability of task parameters, but also by how this variability is allocated relative to an underlying low-dimensional structure. Similar to Pimonova et al. (2025), we decompose task-specific regression effects into a structurally informative component and an orthogonal, non-informative component. We show theoretically and through simulation that meta-learning prediction degrades when a larger fraction of between-task variability lies in orthogonal, non-informative directions, even when the overall geometric variability of tasks is held fixed.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2509.18349" target="_blank">Effects of Structural Allocation of Geometric Task Diversity in Linear Meta-Learning Models</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Saptati Datta, Nicolas W. Hengartner, Yulia Pimonova, Natalie E. Klein, Nicholas Lubbers</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 05 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2509.18349" target="_blank">https://arxiv.org/abs/2509.18349</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Meta-learning aims to leverage information across related tasks to improve prediction on unlabeled data for new tasks when only a small number of labeled observations are available ("few-shot" learning). Increased task diversity is often believed to enhance meta-learning by providing richer information across tasks. However, recent work by Kumar et al. (2022) shows that increasing task diversity, quantified through the overall geometric spread of task representations, can in fact degrade meta-learning prediction performance across a range of models and datasets. In this work, we build on this observation by showing that meta-learning performance is affected not only by the overall geometric variability of task parameters, but also by how this variability is allocated relative to an underlying low-dimensional structure. Similar to Pimonova et al. (2025), we decompose task-specific regression effects into a structurally informative component and an orthogonal, non-informative component. We show theoretically and through simulation that meta-learning prediction degrades when a larger fraction of between-task variability lies in orthogonal, non-informative directions, even when the overall geometric variability of tasks is held fixed.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "Mitigating optimistic bias in entropic risk estimation and optimization", "author": "Utsav Sadana, Erick Delage, Angelos Georghiou", "published": "Mon, 05 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2409.19926", "summary": "arXiv:2409.19926v4 Announce Type: replace-cross \nAbstract: The entropic risk measure is widely used in high-stakes decision-making across economics, management science, finance, and safety-critical control systems because it captures tail risks associated with uncertain losses. However, when data are limited, the empirical entropic risk estimator, formed by replacing the expectation in the risk measure with a sample average, underestimates true risk. We show that this negative bias grows superlinearly with the standard deviation of the loss for distributions with unbounded right tails. We further demonstrate that several existing bias reduction techniques developed for empirical risk either continue to underestimate entropic risk or substantially overestimate it, potentially leading to overly risky or overly conservative decisions. To address this issue, we develop a parametric bootstrap procedure that is strongly asymptotically consistent and provides a controlled overestimation of entropic risk under mild assumptions. The method first fits a distribution to the data and then estimates the empirical estimator's bias via bootstrapping. We show that the fitted distribution must satisfy only weak regularity conditions, and Gaussian mixture models offer a convenient and flexible choice within this class. As an application, we introduce a distributionally robust optimization model for an insurance contract design problem that incorporates correlations in household losses. We show that selecting regularization parameters using standard cross-validation can lead to substantially higher out-of-sample risk for the insurer if the validation bias is not corrected. Our approach improves performance by recommending higher and more accurate premiums, thereby better reflecting the underlying tail risk.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2409.19926" target="_blank">Mitigating optimistic bias in entropic risk estimation and optimization</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Utsav Sadana, Erick Delage, Angelos Georghiou</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 05 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2409.19926" target="_blank">https://arxiv.org/abs/2409.19926</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The entropic risk measure is widely used in high-stakes decision-making across economics, management science, finance, and safety-critical control systems because it captures tail risks associated with uncertain losses. However, when data are limited, the empirical entropic risk estimator, formed by replacing the expectation in the risk measure with a sample average, underestimates true risk. We show that this negative bias grows superlinearly with the standard deviation of the loss for distributions with unbounded right tails. We further demonstrate that several existing bias reduction techniques developed for empirical risk either continue to underestimate entropic risk or substantially overestimate it, potentially leading to overly risky or overly conservative decisions. To address this issue, we develop a parametric bootstrap procedure that is strongly asymptotically consistent and provides a controlled overestimation of entropic risk under mild assumptions. The method first fits a distribution to the data and then estimates the empirical estimator's bias via bootstrapping. We show that the fitted distribution must satisfy only weak regularity conditions, and Gaussian mixture models offer a convenient and flexible choice within this class. As an application, we introduce a distributionally robust optimization model for an insurance contract design problem that incorporates correlations in household losses. We show that selecting regularization parameters using standard cross-validation can lead to substantially higher out-of-sample risk for the insurer if the validation bias is not corrected. Our approach improves performance by recommending higher and more accurate premiums, thereby better reflecting the underlying tail risk.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "A Gaussian Process View on Observation Noise and Initialization in Wide Neural Networks", "author": "Sergio Calvo-Ordo\\~nez, Jonathan Plenk, Richard Bergna, Alvaro Cartea, Jose Miguel Hernandez-Lobato, Konstantina Palla, Kamil Ciosek", "published": "Mon, 05 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2502.01556", "summary": "arXiv:2502.01556v2 Announce Type: replace-cross \nAbstract: Performing gradient descent in a wide neural network is equivalent to computing the posterior mean of a Gaussian Process with the Neural Tangent Kernel (NTK-GP), for a specific prior mean and with zero observation noise. However, existing formulations have two limitations: (i) the NTK-GP assumes noiseless targets, leading to misspecification on noisy data; (ii) the equivalence does not extend to arbitrary prior means, which are essential for well-specified models. To address (i), we introduce a regularizer into the training objective, showing its correspondence to incorporating observation noise in the NTK-GP. To address (ii), we propose a \\textit{shifted network} that enables arbitrary prior means and allows obtaining the posterior mean with gradient descent on a single network, without ensembling or kernel inversion. We validate our results with experiments across datasets and architectures, showing that this approach removes key obstacles to the practical use of NTK-GP equivalence in applied Gaussian process modeling.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2502.01556" target="_blank">A Gaussian Process View on Observation Noise and Initialization in Wide Neural Networks</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sergio Calvo-Ordo\~nez, Jonathan Plenk, Richard Bergna, Alvaro Cartea, Jose Miguel Hernandez-Lobato, Konstantina Palla, Kamil Ciosek</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 05 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2502.01556" target="_blank">https://arxiv.org/abs/2502.01556</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Performing gradient descent in a wide neural network is equivalent to computing the posterior mean of a Gaussian Process with the Neural Tangent Kernel (NTK-GP), for a specific prior mean and with zero observation noise. However, existing formulations have two limitations: (i) the NTK-GP assumes noiseless targets, leading to misspecification on noisy data; (ii) the equivalence does not extend to arbitrary prior means, which are essential for well-specified models. To address (i), we introduce a regularizer into the training objective, showing its correspondence to incorporating observation noise in the NTK-GP. To address (ii), we propose a \textit{shifted network} that enables arbitrary prior means and allows obtaining the posterior mean with gradient descent on a single network, without ensembling or kernel inversion. We validate our results with experiments across datasets and architectures, showing that this approach removes key obstacles to the practical use of NTK-GP equivalence in applied Gaussian process modeling.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "From Continual Learning to SGD and Back: Better Rates for Continual Linear Models", "author": "Itay Evron, Ran Levinstein, Matan Schliserman, Uri Sherman, Tomer Koren, Daniel Soudry, Nathan Srebro", "published": "Mon, 05 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2504.04579", "summary": "arXiv:2504.04579v3 Announce Type: replace-cross \nAbstract: We study the common continual learning setup where an overparameterized model is sequentially fitted to a set of jointly realizable tasks. We analyze forgetting, defined as the loss on previously seen tasks, after $k$ iterations. For continual linear models, we prove that fitting a task is equivalent to a single stochastic gradient descent (SGD) step on a modified objective. We develop novel last-iterate SGD upper bounds in the realizable least squares setup and leverage them to derive new results for continual learning. Focusing on random orderings over $T$ tasks, we establish universal forgetting rates, whereas existing rates depend on problem dimensionality or complexity and become prohibitive in highly overparameterized regimes. In continual regression with replacement, we improve the best existing rate from $O((d-\\bar{r})/k)$ to $O(\\min(1/\\sqrt[4]{k}, \\sqrt{(d-\\bar{r})}/k, \\sqrt{T\\bar{r}}/k))$, where $d$ is the dimensionality and $\\bar{r}$ the average task rank. Furthermore, we establish the first rate for random task orderings without replacement. The resulting rate $O(\\min(1/\\sqrt[4]{T},\\, (d-\\bar{r})/T))$ shows that randomization alone, without task repetition, prevents catastrophic forgetting in sufficiently long task sequences. Finally, we prove a matching $O(1/\\sqrt[4]{k})$ forgetting rate for continual linear classification on separable data. Our universal rates extend to broader methods, such as block Kaczmarz and POCS, illuminating their loss convergence under i.i.d. and single-pass orderings.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2504.04579" target="_blank">From Continual Learning to SGD and Back: Better Rates for Continual Linear Models</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Itay Evron, Ran Levinstein, Matan Schliserman, Uri Sherman, Tomer Koren, Daniel Soudry, Nathan Srebro</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 05 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2504.04579" target="_blank">https://arxiv.org/abs/2504.04579</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the common continual learning setup where an overparameterized model is sequentially fitted to a set of jointly realizable tasks. We analyze forgetting, defined as the loss on previously seen tasks, after $k$ iterations. For continual linear models, we prove that fitting a task is equivalent to a single stochastic gradient descent (SGD) step on a modified objective. We develop novel last-iterate SGD upper bounds in the realizable least squares setup and leverage them to derive new results for continual learning. Focusing on random orderings over $T$ tasks, we establish universal forgetting rates, whereas existing rates depend on problem dimensionality or complexity and become prohibitive in highly overparameterized regimes. In continual regression with replacement, we improve the best existing rate from $O((d-\bar{r})/k)$ to $O(\min(1/\sqrt[4]{k}, \sqrt{(d-\bar{r})}/k, \sqrt{T\bar{r}}/k))$, where $d$ is the dimensionality and $\bar{r}$ the average task rank. Furthermore, we establish the first rate for random task orderings without replacement. The resulting rate $O(\min(1/\sqrt[4]{T},\, (d-\bar{r})/T))$ shows that randomization alone, without task repetition, prevents catastrophic forgetting in sufficiently long task sequences. Finally, we prove a matching $O(1/\sqrt[4]{k})$ forgetting rate for continual linear classification on separable data. Our universal rates extend to broader methods, such as block Kaczmarz and POCS, illuminating their loss convergence under i.i.d. and single-pass orderings.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Streaming Sliced Optimal Transport", "author": "Khai Nguyen", "published": "Mon, 05 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2505.06835", "summary": "arXiv:2505.06835v2 Announce Type: replace-cross \nAbstract: Sliced optimal transport (SOT), or sliced Wasserstein (SW) distance, is widely recognized for its statistical and computational scalability. In this work, we further enhance computational scalability by proposing the first method for estimating SW from sample streams, called \\emph{streaming sliced Wasserstein} (Stream-SW). To define Stream-SW, we first introduce a streaming estimator of the one-dimensional Wasserstein distance (1DW). Since the 1DW has a closed-form expression, given by the absolute difference between the quantile functions of the compared distributions, we leverage quantile approximation techniques for sample streams to define a streaming 1DW estimator. By applying the streaming 1DW to all projections, we obtain Stream-SW. The key advantage of Stream-SW is its low memory complexity while providing theoretical guarantees on the approximation error. We demonstrate that Stream-SW achieves a more accurate approximation of SW than random subsampling, with lower memory consumption, when comparing Gaussian distributions and mixtures of Gaussians from streaming samples. Additionally, we conduct experiments on point cloud classification, point cloud gradient flows, and streaming change point detection to further highlight the favorable performance of the proposed Stream-SW", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2505.06835" target="_blank">Streaming Sliced Optimal Transport</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Khai Nguyen</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 05 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2505.06835" target="_blank">https://arxiv.org/abs/2505.06835</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Sliced optimal transport (SOT), or sliced Wasserstein (SW) distance, is widely recognized for its statistical and computational scalability. In this work, we further enhance computational scalability by proposing the first method for estimating SW from sample streams, called \emph{streaming sliced Wasserstein} (Stream-SW). To define Stream-SW, we first introduce a streaming estimator of the one-dimensional Wasserstein distance (1DW). Since the 1DW has a closed-form expression, given by the absolute difference between the quantile functions of the compared distributions, we leverage quantile approximation techniques for sample streams to define a streaming 1DW estimator. By applying the streaming 1DW to all projections, we obtain Stream-SW. The key advantage of Stream-SW is its low memory complexity while providing theoretical guarantees on the approximation error. We demonstrate that Stream-SW achieves a more accurate approximation of SW than random subsampling, with lower memory consumption, when comparing Gaussian distributions and mixtures of Gaussians from streaming samples. Additionally, we conduct experiments on point cloud classification, point cloud gradient flows, and streaming change point detection to further highlight the favorable performance of the proposed Stream-SW
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "Nonparametric Instrumental Variable Inference with Many Weak Instruments", "author": "Lars van der Laan, Nathan Kallus, Aur\\'elien Bibaut", "published": "Mon, 05 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2505.07729", "summary": "arXiv:2505.07729v3 Announce Type: replace-cross \nAbstract: We study inference on linear functionals in the nonparametric instrumental variable (NPIV) problem with a discretely-valued instrument under a many-weak-instruments asymptotic regime, where the number of instrument values grows with the sample size. A key motivating example is estimating long-term causal effects in a new experiment with only short-term outcomes, using past experiments to instrument for the effect of short- on long-term outcomes. Here, the assignment to a past experiment serves as the instrument: we have many past experiments but only a limited number of units in each. Since the structural function is nonparametric but constrained by only finitely many moment restrictions, point identification typically fails. To address this, we consider linear functionals of the minimum-norm solution to the moment restrictions, which is always well-defined. As the number of instrument levels grows, these functionals define an approximating sequence to a target functional, replacing point identification with a weaker asymptotic notion suited to discrete instruments. Extending the Jackknife Instrumental Variable Estimator (JIVE) beyond the classical parametric setting, we propose npJIVE, a nonparametric estimator for solutions to linear inverse problems with many weak instruments. We construct automatic debiased machine learning estimators for linear functionals of both the structural function and its minimum-norm projection, and establish their efficiency in the many-weak-instruments regime. To do so, we develop a general semiparametric efficiency theory for regular estimators under weak identification and many-weak-instrument asymptotics.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2505.07729" target="_blank">Nonparametric Instrumental Variable Inference with Many Weak Instruments</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Lars van der Laan, Nathan Kallus, Aur\'elien Bibaut</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 05 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2505.07729" target="_blank">https://arxiv.org/abs/2505.07729</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study inference on linear functionals in the nonparametric instrumental variable (NPIV) problem with a discretely-valued instrument under a many-weak-instruments asymptotic regime, where the number of instrument values grows with the sample size. A key motivating example is estimating long-term causal effects in a new experiment with only short-term outcomes, using past experiments to instrument for the effect of short- on long-term outcomes. Here, the assignment to a past experiment serves as the instrument: we have many past experiments but only a limited number of units in each. Since the structural function is nonparametric but constrained by only finitely many moment restrictions, point identification typically fails. To address this, we consider linear functionals of the minimum-norm solution to the moment restrictions, which is always well-defined. As the number of instrument levels grows, these functionals define an approximating sequence to a target functional, replacing point identification with a weaker asymptotic notion suited to discrete instruments. Extending the Jackknife Instrumental Variable Estimator (JIVE) beyond the classical parametric setting, we propose npJIVE, a nonparametric estimator for solutions to linear inverse problems with many weak instruments. We construct automatic debiased machine learning estimators for linear functionals of both the structural function and its minimum-norm projection, and establish their efficiency in the many-weak-instruments regime. To do so, we develop a general semiparametric efficiency theory for regular estimators under weak identification and many-weak-instrument asymptotics.
+            </div>
+        </div>
+        <div class="paper" id="paper-21">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-21" data-paper-data='{"title": "PolarGrad: A Class of Matrix-Gradient Optimizers from a Unifying Preconditioning Perspective", "author": "Tim Tsz-Kit Lau, Qi Long, Weijie Su", "published": "Mon, 05 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2505.21799", "summary": "arXiv:2505.21799v3 Announce Type: replace-cross \nAbstract: The ever-growing scale of deep learning models and training data underscores the critical importance of efficient optimization methods. While preconditioned gradient methods such as Adam and AdamW are the de facto optimizers for training neural networks and large language models, structure-aware preconditioned optimizers like Shampoo and Muon, which utilize the matrix structure of gradients, have demonstrated promising evidence of faster convergence. In this paper, we introduce a unifying framework for analyzing \"matrix-aware\" preconditioned methods, which not only sheds light on the effectiveness of Muon and related optimizers but also leads to a class of new structure-aware preconditioned methods. A key contribution of this framework is its precise distinction between preconditioning strategies that treat neural network weights as vectors (addressing curvature anisotropy) versus those that consider their matrix structure (addressing gradient anisotropy). This perspective provides new insights into several empirical phenomena in language model pre-training, including Adam's training instabilities, Muon's accelerated convergence, and the necessity of learning rate warmup for Adam. Building upon this framework, we introduce PolarGrad, a new class of preconditioned optimization methods based on the polar decomposition of matrix-valued gradients. As a special instance, PolarGrad includes Muon with updates scaled by the nuclear norm of the gradients. We provide numerical implementations of these methods, leveraging efficient numerical polar decomposition algorithms for enhanced convergence. Our extensive evaluations across diverse matrix optimization problems and language model pre-training tasks demonstrate that PolarGrad outperforms both Adam and Muon.", "number": 21, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#21</span>
+                <a href="https://arxiv.org/abs/2505.21799" target="_blank">PolarGrad: A Class of Matrix-Gradient Optimizers from a Unifying Preconditioning Perspective</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Tim Tsz-Kit Lau, Qi Long, Weijie Su</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 05 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2505.21799" target="_blank">https://arxiv.org/abs/2505.21799</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The ever-growing scale of deep learning models and training data underscores the critical importance of efficient optimization methods. While preconditioned gradient methods such as Adam and AdamW are the de facto optimizers for training neural networks and large language models, structure-aware preconditioned optimizers like Shampoo and Muon, which utilize the matrix structure of gradients, have demonstrated promising evidence of faster convergence. In this paper, we introduce a unifying framework for analyzing "matrix-aware" preconditioned methods, which not only sheds light on the effectiveness of Muon and related optimizers but also leads to a class of new structure-aware preconditioned methods. A key contribution of this framework is its precise distinction between preconditioning strategies that treat neural network weights as vectors (addressing curvature anisotropy) versus those that consider their matrix structure (addressing gradient anisotropy). This perspective provides new insights into several empirical phenomena in language model pre-training, including Adam's training instabilities, Muon's accelerated convergence, and the necessity of learning rate warmup for Adam. Building upon this framework, we introduce PolarGrad, a new class of preconditioned optimization methods based on the polar decomposition of matrix-valued gradients. As a special instance, PolarGrad includes Muon with updates scaled by the nuclear norm of the gradients. We provide numerical implementations of these methods, leveraging efficient numerical polar decomposition algorithms for enhanced convergence. Our extensive evaluations across diverse matrix optimization problems and language model pre-training tasks demonstrate that PolarGrad outperforms both Adam and Muon.
+            </div>
+        </div>
+        <div class="paper" id="paper-22">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-22" data-paper-data='{"title": "Infinite-Width Limit of a Single Attention Layer: Analysis via Tensor Programs", "author": "Mana Sakai, Ryo Karakida, Masaaki Imaizumi", "published": "Mon, 05 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2506.00846", "summary": "arXiv:2506.00846v3 Announce Type: replace-cross \nAbstract: In modern theoretical analyses of neural networks, the infinite-width limit is often invoked to justify Gaussian approximations of neuron preactivations (e.g., via neural network Gaussian processes or Tensor Programs). However, these Gaussian-based asymptotic theories have so far been unable to capture the behavior of attention layers, except under special regimes such as infinitely many heads or tailored scaling schemes. In this paper, leveraging the Tensor Programs framework, we rigorously identify the infinite-width limit distribution of variables within a single attention layer under realistic architectural dimensionality and standard $1/\\sqrt{n}$-scaling with $n$ dimensionality. We derive the exact form of this limit law without resorting to infinite-head approximations or tailored scalings, demonstrating that it departs fundamentally from Gaussianity. This limiting distribution exhibits non-Gaussianity from a hierarchical structure, being Gaussian conditional on the random similarity scores. Numerical experiments validate our theoretical predictions, confirming the effectiveness of our theory at finite width and accurate description of finite-head attentions. Beyond characterizing a standalone attention layer, our findings lay the groundwork for developing a unified theory of deep Transformer architectures in the infinite-width regime.", "number": 22, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#22</span>
+                <a href="https://arxiv.org/abs/2506.00846" target="_blank">Infinite-Width Limit of a Single Attention Layer: Analysis via Tensor Programs</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Mana Sakai, Ryo Karakida, Masaaki Imaizumi</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 05 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2506.00846" target="_blank">https://arxiv.org/abs/2506.00846</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In modern theoretical analyses of neural networks, the infinite-width limit is often invoked to justify Gaussian approximations of neuron preactivations (e.g., via neural network Gaussian processes or Tensor Programs). However, these Gaussian-based asymptotic theories have so far been unable to capture the behavior of attention layers, except under special regimes such as infinitely many heads or tailored scaling schemes. In this paper, leveraging the Tensor Programs framework, we rigorously identify the infinite-width limit distribution of variables within a single attention layer under realistic architectural dimensionality and standard $1/\sqrt{n}$-scaling with $n$ dimensionality. We derive the exact form of this limit law without resorting to infinite-head approximations or tailored scalings, demonstrating that it departs fundamentally from Gaussianity. This limiting distribution exhibits non-Gaussianity from a hierarchical structure, being Gaussian conditional on the random similarity scores. Numerical experiments validate our theoretical predictions, confirming the effectiveness of our theory at finite width and accurate description of finite-head attentions. Beyond characterizing a standalone attention layer, our findings lay the groundwork for developing a unified theory of deep Transformer architectures in the infinite-width regime.
+            </div>
+        </div>
+        <div class="paper" id="paper-23">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-23" data-paper-data='{"title": "Simulation as Supervision: Mechanistic Pretraining for Scientific Discovery", "author": "Carson Dudley, Reiden Magdaleno, Christopher Harding, Marisa Eisenberg", "published": "Mon, 05 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2507.08977", "summary": "arXiv:2507.08977v3 Announce Type: replace-cross \nAbstract: Scientific modeling faces a tradeoff between the interpretability of mechanistic theory and the predictive power of machine learning. While hybrid approaches like Physics-Informed Neural Networks (PINNs) embed domain knowledge as functional constraints, they can be brittle under model misspecification. We introduce Simulation-Grounded Neural Networks (SGNNs), a framework that instead embeds domain knowledge into the training data to establish a structural prior.\n  By pretraining on synthetic corpora spanning diverse model structures and observational artifacts, SGNNs learn the broad patterns of physical possibility. This allows the model to internalize the underlying dynamics of a system without being forced to satisfy a single, potentially incorrect equation.\n  We evaluated SGNNs across scientific disciplines and found that this approach confers significant robustness. In prediction tasks, SGNNs nearly tripled COVID-19 forecasting skill versus CDC baselines. In tests on dengue outbreaks, SGNNs outperformed physics-constrained models even when both were restricted to incorrect human-to-human transmission equations, demonstrating that SGNNs are potentially more robust to model misspecification. For inference, SGNNs extend the logic of simulation-based inference to enable supervised learning for unobservable targets, estimating early COVID-19 transmissibility more accurately than traditional methods. Finally, SGNNs enable back-to-simulation attribution, a form of mechanistic interpretability that maps real-world data back to the simulated manifold to identify underlying processes. By unifying these disparate simulation-based techniques into a single framework, we demonstrate that mechanistic simulations can serve as effective training data for robust scientific inference that generalizes beyond the limitations of fixed functional forms.", "number": 23, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#23</span>
+                <a href="https://arxiv.org/abs/2507.08977" target="_blank">Simulation as Supervision: Mechanistic Pretraining for Scientific Discovery</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Carson Dudley, Reiden Magdaleno, Christopher Harding, Marisa Eisenberg</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 05 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2507.08977" target="_blank">https://arxiv.org/abs/2507.08977</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Scientific modeling faces a tradeoff between the interpretability of mechanistic theory and the predictive power of machine learning. While hybrid approaches like Physics-Informed Neural Networks (PINNs) embed domain knowledge as functional constraints, they can be brittle under model misspecification. We introduce Simulation-Grounded Neural Networks (SGNNs), a framework that instead embeds domain knowledge into the training data to establish a structural prior.
+  By pretraining on synthetic corpora spanning diverse model structures and observational artifacts, SGNNs learn the broad patterns of physical possibility. This allows the model to internalize the underlying dynamics of a system without being forced to satisfy a single, potentially incorrect equation.
+  We evaluated SGNNs across scientific disciplines and found that this approach confers significant robustness. In prediction tasks, SGNNs nearly tripled COVID-19 forecasting skill versus CDC baselines. In tests on dengue outbreaks, SGNNs outperformed physics-constrained models even when both were restricted to incorrect human-to-human transmission equations, demonstrating that SGNNs are potentially more robust to model misspecification. For inference, SGNNs extend the logic of simulation-based inference to enable supervised learning for unobservable targets, estimating early COVID-19 transmissibility more accurately than traditional methods. Finally, SGNNs enable back-to-simulation attribution, a form of mechanistic interpretability that maps real-world data back to the simulated manifold to identify underlying processes. By unifying these disparate simulation-based techniques into a single framework, we demonstrate that mechanistic simulations can serve as effective training data for robust scientific inference that generalizes beyond the limitations of fixed functional forms.
+            </div>
+        </div>
+        <div class="paper" id="paper-24">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-24" data-paper-data='{"title": "uGMM-NN: Univariate Gaussian Mixture Model Neural Network", "author": "Zakeria Sharif Ali", "published": "Mon, 05 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2509.07569", "summary": "arXiv:2509.07569v2 Announce Type: replace-cross \nAbstract: This paper introduces the Univariate Gaussian Mixture Model Neural Network (uGMM-NN), a novel neural architecture that embeds probabilistic reasoning directly into the computational units of deep networks. Unlike traditional neurons, which apply weighted sums followed by fixed non-linearities, each uGMM-NN node parameterizes its activations as a univariate Gaussian mixture, with learnable means, variances, and mixing coefficients. This design enables richer representations by capturing multimodality and uncertainty at the level of individual neurons, while retaining the scalability of standard feed-forward networks. We demonstrate that uGMM-NN can achieve competitive discriminative performance compared to conventional multilayer perceptrons, while additionally offering a probabilistic interpretation of activations. The proposed framework provides a foundation for integrating uncertainty-aware components into modern neural architectures, opening new directions for both discriminative and generative modeling.", "number": 24, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#24</span>
+                <a href="https://arxiv.org/abs/2509.07569" target="_blank">uGMM-NN: Univariate Gaussian Mixture Model Neural Network</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Zakeria Sharif Ali</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 05 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2509.07569" target="_blank">https://arxiv.org/abs/2509.07569</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This paper introduces the Univariate Gaussian Mixture Model Neural Network (uGMM-NN), a novel neural architecture that embeds probabilistic reasoning directly into the computational units of deep networks. Unlike traditional neurons, which apply weighted sums followed by fixed non-linearities, each uGMM-NN node parameterizes its activations as a univariate Gaussian mixture, with learnable means, variances, and mixing coefficients. This design enables richer representations by capturing multimodality and uncertainty at the level of individual neurons, while retaining the scalability of standard feed-forward networks. We demonstrate that uGMM-NN can achieve competitive discriminative performance compared to conventional multilayer perceptrons, while additionally offering a probabilistic interpretation of activations. The proposed framework provides a foundation for integrating uncertainty-aware components into modern neural architectures, opening new directions for both discriminative and generative modeling.
+            </div>
+        </div>
+        <div class="paper" id="paper-25">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-25" data-paper-data='{"title": "Clustering by Denoising: Latent plug-and-play diffusion for single-cell data", "author": "Dominik Meier, Shixing Yu, Sagnik Nandy, Promit Ghosal, Kyra Gan", "published": "Mon, 05 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2510.22835", "summary": "arXiv:2510.22835v2 Announce Type: replace-cross \nAbstract: Single-cell RNA sequencing (scRNA-seq) enables the study of cellular heterogeneity. Yet, clustering accuracy, and with it downstream analyses based on cell labels, remain challenging due to measurement noise and biological variability. In standard latent spaces (e.g., obtained through PCA), data from different cell types can be projected close together, making accurate clustering difficult. We introduce a latent plug-and-play diffusion framework that separates the observation and denoising space. This separation is operationalized through a novel Gibbs sampling procedure: the learned diffusion prior is applied in a low-dimensional latent space to perform denoising, while to steer this process, noise is reintroduced into the original high-dimensional observation space. This unique \"input-space steering\" ensures the denoising trajectory remains faithful to the original data structure. Our approach offers three key advantages: (1) adaptive noise handling via a tunable balance between prior and observed data; (2) uncertainty quantification through principled uncertainty estimates for downstream analysis; and (3) generalizable denoising by leveraging clean reference data to denoise noisier datasets, and via averaging, improve quality beyond the training set. We evaluate robustness on both synthetic and real single-cell genomics data. Our method improves clustering accuracy on synthetic data across varied noise levels and dataset shifts. On real-world single-cell data, our method demonstrates improved biological coherence in the resulting cell clusters, with cluster boundaries that better align with known cell type markers and developmental trajectories.", "number": 25, "labels": [{"name": "diffusion", "color": "#9b59b6"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#25</span>
+                <a href="https://arxiv.org/abs/2510.22835" target="_blank">Clustering by Denoising: Latent plug-and-play diffusion for single-cell data</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #9b59b6;">diffusion</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Dominik Meier, Shixing Yu, Sagnik Nandy, Promit Ghosal, Kyra Gan</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 05 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.22835" target="_blank">https://arxiv.org/abs/2510.22835</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Single-cell RNA sequencing (scRNA-seq) enables the study of cellular heterogeneity. Yet, clustering accuracy, and with it downstream analyses based on cell labels, remain challenging due to measurement noise and biological variability. In standard latent spaces (e.g., obtained through PCA), data from different cell types can be projected close together, making accurate clustering difficult. We introduce a latent plug-and-play diffusion framework that separates the observation and denoising space. This separation is operationalized through a novel Gibbs sampling procedure: the learned diffusion prior is applied in a low-dimensional latent space to perform denoising, while to steer this process, noise is reintroduced into the original high-dimensional observation space. This unique "input-space steering" ensures the denoising trajectory remains faithful to the original data structure. Our approach offers three key advantages: (1) adaptive noise handling via a tunable balance between prior and observed data; (2) uncertainty quantification through principled uncertainty estimates for downstream analysis; and (3) generalizable denoising by leveraging clean reference data to denoise noisier datasets, and via averaging, improve quality beyond the training set. We evaluate robustness on both synthetic and real single-cell genomics data. Our method improves clustering accuracy on synthetic data across varied noise levels and dataset shifts. On real-world single-cell data, our method demonstrates improved biological coherence in the resulting cell clusters, with cluster boundaries that better align with known cell type markers and developmental trajectories.
+            </div>
+        </div>
+        <div class="paper" id="paper-26">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-26" data-paper-data='{"title": "Designing an Optimal Sensor Network via Minimizing Information Loss", "author": "Daniel Waxman, Fernando Llorente, Katia Lamer, Petar M. Djuri\\'c", "published": "Mon, 05 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.05940", "summary": "arXiv:2512.05940v2 Announce Type: replace-cross \nAbstract: Optimal experimental design is a classic topic in statistics, with many well-studied problems, applications, and solutions. The design problem we study is the placement of sensors to monitor spatiotemporal processes, explicitly accounting for the temporal dimension in our modeling and optimization. We observe that recent advancements in computational sciences often yield large datasets based on physics-based simulations, which are rarely leveraged in experimental design. We introduce a novel model-based sensor placement criterion, along with a highly-efficient optimization algorithm, which integrates physics-based simulations and Bayesian experimental design principles to identify sensor networks that \"minimize information loss\" from simulated data. Our technique relies on sparse variational inference and (separable) Gauss-Markov priors, and thus may adapt many techniques from Bayesian experimental design. We validate our method through a case study monitoring air temperature in Phoenix, Arizona, using state-of-the-art physics-based simulations. Our results show our framework to be superior to random or quasi-random sampling, particularly with a limited number of sensors. We conclude by discussing practical considerations and implications of our framework, including more complex modeling tools and real-world deployments.", "number": 26, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#26</span>
+                <a href="https://arxiv.org/abs/2512.05940" target="_blank">Designing an Optimal Sensor Network via Minimizing Information Loss</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Daniel Waxman, Fernando Llorente, Katia Lamer, Petar M. Djuri\'c</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 05 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.05940" target="_blank">https://arxiv.org/abs/2512.05940</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Optimal experimental design is a classic topic in statistics, with many well-studied problems, applications, and solutions. The design problem we study is the placement of sensors to monitor spatiotemporal processes, explicitly accounting for the temporal dimension in our modeling and optimization. We observe that recent advancements in computational sciences often yield large datasets based on physics-based simulations, which are rarely leveraged in experimental design. We introduce a novel model-based sensor placement criterion, along with a highly-efficient optimization algorithm, which integrates physics-based simulations and Bayesian experimental design principles to identify sensor networks that "minimize information loss" from simulated data. Our technique relies on sparse variational inference and (separable) Gauss-Markov priors, and thus may adapt many techniques from Bayesian experimental design. We validate our method through a case study monitoring air temperature in Phoenix, Arizona, using state-of-the-art physics-based simulations. Our results show our framework to be superior to random or quasi-random sampling, particularly with a limited number of sensors. We conclude by discussing practical considerations and implications of our framework, including more complex modeling tools and real-world deployments.
+            </div>
+        </div>
+        <div class="paper" id="paper-27">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-27" data-paper-data='{"title": "Causality-Inspired Safe Residual Correction for Multivariate Time Series", "author": "Jianxiang Xie, Yuncheng Hua, Mingyue Cheng, Flora Salim, Hao Xue", "published": "Mon, 05 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.22428", "summary": "arXiv:2512.22428v2 Announce Type: replace-cross \nAbstract: While modern multivariate forecasters such as Transformers and GNNs achieve strong benchmark performance, they often suffer from systematic errors at specific variables or horizons and, critically, lack guarantees against performance degradation in deployment. Existing post-hoc residual correction methods attempt to fix these errors, but are inherently greedy: although they may improve average accuracy, they can also \"help in the wrong way\" by overcorrecting reliable predictions and causing local failures in unseen scenarios.\n  To address this critical \"safety gap,\" we propose CRC (Causality-inspired Safe Residual Correction), a plug-and-play framework explicitly designed to ensure non-degradation. CRC follows a divide-and-conquer philosophy: it employs a causality-inspired encoder to expose direction-aware structure by decoupling self- and cross-variable dynamics, and a hybrid corrector to model residual errors. Crucially, the correction process is governed by a strict four-fold safety mechanism that prevents harmful updates.\n  Experiments across multiple datasets and forecasting backbones show that CRC consistently improves accuracy, while an in-depth ablation study confirms that its core safety mechanisms ensure exceptionally high non-degradation rates (NDR), making CRC a correction framework suited for safe and reliable deployment.", "number": 27, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#27</span>
+                <a href="https://arxiv.org/abs/2512.22428" target="_blank">Causality-Inspired Safe Residual Correction for Multivariate Time Series</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jianxiang Xie, Yuncheng Hua, Mingyue Cheng, Flora Salim, Hao Xue</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 05 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.22428" target="_blank">https://arxiv.org/abs/2512.22428</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                While modern multivariate forecasters such as Transformers and GNNs achieve strong benchmark performance, they often suffer from systematic errors at specific variables or horizons and, critically, lack guarantees against performance degradation in deployment. Existing post-hoc residual correction methods attempt to fix these errors, but are inherently greedy: although they may improve average accuracy, they can also "help in the wrong way" by overcorrecting reliable predictions and causing local failures in unseen scenarios.
+  To address this critical "safety gap," we propose CRC (Causality-inspired Safe Residual Correction), a plug-and-play framework explicitly designed to ensure non-degradation. CRC follows a divide-and-conquer philosophy: it employs a causality-inspired encoder to expose direction-aware structure by decoupling self- and cross-variable dynamics, and a hybrid corrector to model residual errors. Crucially, the correction process is governed by a strict four-fold safety mechanism that prevents harmful updates.
+  Experiments across multiple datasets and forecasting backbones show that CRC consistently improves accuracy, while an in-depth ablation study confirms that its core safety mechanisms ensure exceptionally high non-degradation rates (NDR), making CRC a correction framework suited for safe and reliable deployment.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-01-05 18:00:02
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>

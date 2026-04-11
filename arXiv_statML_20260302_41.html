@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - stat.ML updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>stat.ML updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Mon, 02 Mar 2026 05:00:23 +0000<br>
+        <strong>論文数:</strong> 41件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Uncovering Physical Drivers of Dark Matter Halo Structures with Auxiliary-Variable-Guided Generative Models</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Partition Function Estimation under Bounded f-Divergence</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Moment Matters: Mean and Variance Causal Graph Discovery from Heteroscedastic Observational Data</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">Fairness under Graph Uncertainty: Achieving Interventional Fairness with Partially Known Causal Graphs over Clusters of Variables</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">Multivariate Spatio-Temporal Neural Hawkes Processes</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">General Bayesian Policy Learning</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">A Variational Estimator for $L_p$ Calibration Errors</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Active Bipartite Ranking with Smooth Posterior Distributions</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">Global Interpretability via Automated Preprocessing: A Framework Inspired by Psychiatric Questionnaires</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">Neural Operators Can Discover Functional Clusters</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">VaSST: Variational Inference for Symbolic Regression using Soft Symbolic Trees</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">A distributed semismooth Newton based augmented Lagrangian method for distributed optimization</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">Neural Diffusion Intensity Models for Point Process Data</a>
+            <span class="title-label-badge" style="background-color: #9b59b6;">diffusion</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Efficient Targeted Maximum Likelihood Estimators for Two-Phase Design Problems</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Hypothesis Testing over Observable Regimes in Singular Models</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">The Stability of Online Algorithms in Performative Prediction</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">Assessment of Spatio-Temporal Predictors in the Presence of Missing and Heterogeneous Data</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">Kernel spectral joint embeddings for high-dimensional noisy datasets using duo-landmark integral operators</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Conformal Prediction for Long-Tailed Classification</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">Estimating Treatment Effects with Independent Component Analysis</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-21" onchange="updateSelectedCount()">
+            <span class="title-number">21.</span>
+            <a href="#paper-21">Geometric Autoencoder Priors for Bayesian Inversion: Learn First Observe Later</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-22" onchange="updateSelectedCount()">
+            <span class="title-number">22.</span>
+            <a href="#paper-22">Embracing Discrete Search: A Reasonable Approach to Causal Structure Learning</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-23" onchange="updateSelectedCount()">
+            <span class="title-number">23.</span>
+            <a href="#paper-23">An operator splitting analysis of Wasserstein--Fisher--Rao gradient flows</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-24" onchange="updateSelectedCount()">
+            <span class="title-number">24.</span>
+            <a href="#paper-24">Implicit Bias and Convergence of Matrix Stochastic Mirror Descent</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-25" onchange="updateSelectedCount()">
+            <span class="title-number">25.</span>
+            <a href="#paper-25">Stationary Kernels and Gaussian Processes on Lie Groups and their Homogeneous Spaces I: the compact case</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-26" onchange="updateSelectedCount()">
+            <span class="title-number">26.</span>
+            <a href="#paper-26">Gradient is All You Need? How Consensus-Based Optimization can be Interpreted as a Stochastic Relaxation of Gradient Descent</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-27" onchange="updateSelectedCount()">
+            <span class="title-number">27.</span>
+            <a href="#paper-27">Geometric structure of shallow neural networks and constructive ${\mathcal L}^2$ cost minimization</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-28" onchange="updateSelectedCount()">
+            <span class="title-number">28.</span>
+            <a href="#paper-28">Revisiting Matrix Sketching in Linear Bandits: Achieving Sublinear Regret via Dyadic Block Sketching</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-29" onchange="updateSelectedCount()">
+            <span class="title-number">29.</span>
+            <a href="#paper-29">The Sample Complexity of Online Reinforcement Learning: A Multi-model Perspective</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-30" onchange="updateSelectedCount()">
+            <span class="title-number">30.</span>
+            <a href="#paper-30">InfoBridge: Mutual Information estimation via Bridge Matching</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-31" onchange="updateSelectedCount()">
+            <span class="title-number">31.</span>
+            <a href="#paper-31">Probabilistic Neural Networks (PNNs) with t-Distributed Outputs: Adaptive Prediction Intervals Beyond Gaussian Assumptions</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-32" onchange="updateSelectedCount()">
+            <span class="title-number">32.</span>
+            <a href="#paper-32">What Makes a Reward Model a Good Teacher? An Optimization Perspective</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-33" onchange="updateSelectedCount()">
+            <span class="title-number">33.</span>
+            <a href="#paper-33">Efficient Ensemble Conditional Independence Test Framework for Causal Discovery</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-34" onchange="updateSelectedCount()">
+            <span class="title-number">34.</span>
+            <a href="#paper-34">Learning Mixtures of Linear Dynamical Systems via Hybrid Tensor-EM Method</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-35" onchange="updateSelectedCount()">
+            <span class="title-number">35.</span>
+            <a href="#paper-35">Uncertainty-aware data assimilation through variational inference</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-36" onchange="updateSelectedCount()">
+            <span class="title-number">36.</span>
+            <a href="#paper-36">Smoothing DiLoCo with Primal Averaging for Faster Training of LLMs</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-37" onchange="updateSelectedCount()">
+            <span class="title-number">37.</span>
+            <a href="#paper-37">Singular Fluctuation as Specific Heat in Bayesian Learning</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-38" onchange="updateSelectedCount()">
+            <span class="title-number">38.</span>
+            <a href="#paper-38">Trust Region Masking for Long-Horizon LLM Reinforcement Learning</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-39" onchange="updateSelectedCount()">
+            <span class="title-number">39.</span>
+            <a href="#paper-39">Robust Online Learning</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-40" onchange="updateSelectedCount()">
+            <span class="title-number">40.</span>
+            <a href="#paper-40">Discrete Diffusion with Sample-Efficient Estimators for Conditionals</a>
+            <span class="title-label-badge" style="background-color: #9b59b6;">diffusion</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-41" onchange="updateSelectedCount()">
+            <span class="title-number">41.</span>
+            <a href="#paper-41">Regularized Online RLHF with Generalized Bilinear Preferences</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Uncovering Physical Drivers of Dark Matter Halo Structures with Auxiliary-Variable-Guided Generative Models", "author": "Arkaprabha Ganguli, Anirban Samaddar, Florian K\\'eruzor\\'e, Nesar Ramachandra, Julie Bessac, Sandeep Madireddy, Emil Constantinescu", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.23518", "summary": "arXiv:2602.23518v1 Announce Type: new \nAbstract: Deep generative models (DGMs) compress high-dimensional data but often entangle distinct physical factors in their latent spaces. We present an auxiliary-variable-guided framework for disentangling representations of thermal Sunyaev-Zel'dovich (tSZ) maps of dark matter halos. We introduce halo mass and concentration as auxiliary variables and apply a lightweight alignment penalty to encourage latent dimensions to reflect these physical quantities. To generate sharp and realistic samples, we extend latent conditional flow matching (LCFM), a state-of-the-art generative model, to enforce disentanglement in the latent space. Our Disentangled Latent-CFM (DL-CFM) model recovers the established mass-concentration scaling relation and identifies latent space outliers that may correspond to unusual halo formation histories. By linking latent coordinates to interpretable astrophysical properties, our method transforms the latent space into a diagnostic tool for cosmological structure. This work demonstrates that auxiliary guidance preserves generative flexibility while yielding physically meaningful, disentangled embeddings, providing a generalizable pathway for uncovering independent factors in complex astronomical datasets.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2602.23518" target="_blank">Uncovering Physical Drivers of Dark Matter Halo Structures with Auxiliary-Variable-Guided Generative Models</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Arkaprabha Ganguli, Anirban Samaddar, Florian K\'eruzor\'e, Nesar Ramachandra, Julie Bessac, Sandeep Madireddy, Emil Constantinescu</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.23518" target="_blank">https://arxiv.org/abs/2602.23518</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Deep generative models (DGMs) compress high-dimensional data but often entangle distinct physical factors in their latent spaces. We present an auxiliary-variable-guided framework for disentangling representations of thermal Sunyaev-Zel'dovich (tSZ) maps of dark matter halos. We introduce halo mass and concentration as auxiliary variables and apply a lightweight alignment penalty to encourage latent dimensions to reflect these physical quantities. To generate sharp and realistic samples, we extend latent conditional flow matching (LCFM), a state-of-the-art generative model, to enforce disentanglement in the latent space. Our Disentangled Latent-CFM (DL-CFM) model recovers the established mass-concentration scaling relation and identifies latent space outliers that may correspond to unusual halo formation histories. By linking latent coordinates to interpretable astrophysical properties, our method transforms the latent space into a diagnostic tool for cosmological structure. This work demonstrates that auxiliary guidance preserves generative flexibility while yielding physically meaningful, disentangled embeddings, providing a generalizable pathway for uncovering independent factors in complex astronomical datasets.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Partition Function Estimation under Bounded f-Divergence", "author": "Adam Block, Abhishek Shetty", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.23535", "summary": "arXiv:2602.23535v1 Announce Type: new \nAbstract: We study the statistical complexity of estimating partition functions given sample access to a proposal distribution and an unnormalized density ratio for a target distribution. While partition function estimation is a classical problem, existing guarantees typically rely on structural assumptions about the domain or model geometry. We instead provide a general, information-theoretic characterization that depends only on the relationship between the proposal and target distributions. Our analysis introduces the integrated coverage profile, a functional that quantifies how much target mass lies in regions where the density ratio is large. We show that integrated coverage tightly characterizes the sample complexity of multiplicative partition function estimation and provide matching lower bounds. We further express these bounds in terms of $f$-divergences, yielding sharp phase transitions depending on the growth rate of f and recovering classical results as a special case while extending to heavy-tailed regimes. Matching lower bounds establish tightness in all regimes. As applications, we derive improved finite-sample guarantees for importance sampling and self-normalized importance sampling, and we show a strict separation between the complexity of approximate sampling and counting under the same divergence constraints. Our results unify and generalize prior analyses of importance sampling, rejection sampling, and heavy-tailed mean estimation, providing a minimal-assumption theory of partition function estimation. Along the way we introduce new technical tools including new connections between coverage and $f$-divergences as well as a generalization of the classical Paley-Zygmund inequality.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2602.23535" target="_blank">Partition Function Estimation under Bounded f-Divergence</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Adam Block, Abhishek Shetty</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.23535" target="_blank">https://arxiv.org/abs/2602.23535</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the statistical complexity of estimating partition functions given sample access to a proposal distribution and an unnormalized density ratio for a target distribution. While partition function estimation is a classical problem, existing guarantees typically rely on structural assumptions about the domain or model geometry. We instead provide a general, information-theoretic characterization that depends only on the relationship between the proposal and target distributions. Our analysis introduces the integrated coverage profile, a functional that quantifies how much target mass lies in regions where the density ratio is large. We show that integrated coverage tightly characterizes the sample complexity of multiplicative partition function estimation and provide matching lower bounds. We further express these bounds in terms of $f$-divergences, yielding sharp phase transitions depending on the growth rate of f and recovering classical results as a special case while extending to heavy-tailed regimes. Matching lower bounds establish tightness in all regimes. As applications, we derive improved finite-sample guarantees for importance sampling and self-normalized importance sampling, and we show a strict separation between the complexity of approximate sampling and counting under the same divergence constraints. Our results unify and generalize prior analyses of importance sampling, rejection sampling, and heavy-tailed mean estimation, providing a minimal-assumption theory of partition function estimation. Along the way we introduce new technical tools including new connections between coverage and $f$-divergences as well as a generalization of the classical Paley-Zygmund inequality.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Moment Matters: Mean and Variance Causal Graph Discovery from Heteroscedastic Observational Data", "author": "Yoichi Chikahara", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.23602", "summary": "arXiv:2602.23602v1 Announce Type: new \nAbstract: Heteroscedasticity -- where the variance of a variable changes with other variables -- is pervasive in real data, and elucidating why it arises from the perspective of statistical moments is crucial in scientific knowledge discovery and decision-making. However, standard causal discovery does not reveal which causes act on the mean versus the variance, as it returns a single moment-agnostic graph, limiting interpretability and downstream intervention design. We propose a Bayesian, moment-driven causal discovery framework that infers separate \\textit{mean} and \\textit{variance} causal graphs from observational heteroscedastic data. We first derive the identification results by establishing sufficient conditions under which these two graphs are separately identifiable. Building on this theory, we develop a variational inference method that learns a posterior distribution over both graphs, enabling principled uncertainty quantification of structural features (e.g., edges, paths, and subgraphs). To address the challenges of parameter optimization in heteroscedastic models with two graph structures, we take a curvature-aware optimization approach and develop a prior incorporation technique that leverages domain knowledge on node orderings, improving sample efficiency. Experiments on synthetic, semi-synthetic, and real data show that our approach accurately recovers mean and variance structures and outperforms state-of-the-art baselines.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2602.23602" target="_blank">Moment Matters: Mean and Variance Causal Graph Discovery from Heteroscedastic Observational Data</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yoichi Chikahara</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.23602" target="_blank">https://arxiv.org/abs/2602.23602</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Heteroscedasticity -- where the variance of a variable changes with other variables -- is pervasive in real data, and elucidating why it arises from the perspective of statistical moments is crucial in scientific knowledge discovery and decision-making. However, standard causal discovery does not reveal which causes act on the mean versus the variance, as it returns a single moment-agnostic graph, limiting interpretability and downstream intervention design. We propose a Bayesian, moment-driven causal discovery framework that infers separate \textit{mean} and \textit{variance} causal graphs from observational heteroscedastic data. We first derive the identification results by establishing sufficient conditions under which these two graphs are separately identifiable. Building on this theory, we develop a variational inference method that learns a posterior distribution over both graphs, enabling principled uncertainty quantification of structural features (e.g., edges, paths, and subgraphs). To address the challenges of parameter optimization in heteroscedastic models with two graph structures, we take a curvature-aware optimization approach and develop a prior incorporation technique that leverages domain knowledge on node orderings, improving sample efficiency. Experiments on synthetic, semi-synthetic, and real data show that our approach accurately recovers mean and variance structures and outperforms state-of-the-art baselines.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "Fairness under Graph Uncertainty: Achieving Interventional Fairness with Partially Known Causal Graphs over Clusters of Variables", "author": "Yoichi Chikahara", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.23611", "summary": "arXiv:2602.23611v1 Announce Type: new \nAbstract: Algorithmic decisions about individuals require predictions that are not only accurate but also fair with respect to sensitive attributes such as gender and race. Causal notions of fairness align with legal requirements, yet many methods assume access to detailed knowledge of the underlying causal graph, which is a demanding assumption in practice. We propose a learning framework that achieves interventional fairness by leveraging a causal graph over \\textit{clusters of variables}, which is substantially easier to estimate than a variable-level graph. With possible \\textit{adjustment cluster sets} identified from such a cluster causal graph, our framework trains a prediction model by reducing the worst-case discrepancy between interventional distributions across these sets. To this end, we develop a computationally efficient barycenter kernel maximum mean discrepancy (MMD) that scales favorably with the number of sensitive attribute values. Extensive experiments show that our framework strikes a better balance between fairness and accuracy than existing approaches, highlighting its effectiveness under limited causal graph knowledge.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2602.23611" target="_blank">Fairness under Graph Uncertainty: Achieving Interventional Fairness with Partially Known Causal Graphs over Clusters of Variables</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yoichi Chikahara</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.23611" target="_blank">https://arxiv.org/abs/2602.23611</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Algorithmic decisions about individuals require predictions that are not only accurate but also fair with respect to sensitive attributes such as gender and race. Causal notions of fairness align with legal requirements, yet many methods assume access to detailed knowledge of the underlying causal graph, which is a demanding assumption in practice. We propose a learning framework that achieves interventional fairness by leveraging a causal graph over \textit{clusters of variables}, which is substantially easier to estimate than a variable-level graph. With possible \textit{adjustment cluster sets} identified from such a cluster causal graph, our framework trains a prediction model by reducing the worst-case discrepancy between interventional distributions across these sets. To this end, we develop a computationally efficient barycenter kernel maximum mean discrepancy (MMD) that scales favorably with the number of sensitive attribute values. Extensive experiments show that our framework strikes a better balance between fairness and accuracy than existing approaches, highlighting its effectiveness under limited causal graph knowledge.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "Multivariate Spatio-Temporal Neural Hawkes Processes", "author": "Christopher Chukwuemeka, Hojun You, Mikyoung Jun", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.23629", "summary": "arXiv:2602.23629v1 Announce Type: new \nAbstract: We propose a Multivariate Spatio-Temporal Neural Hawkes Process for modeling complex multivariate event data with spatio-temporal dynamics. The proposed model extends continuous-time neural Hawkes processes by integrating spatial information into latent state evolution through learned temporal and spatial decay dynamics, enabling flexible modeling of excitation and inhibition without predefined triggering kernels. By analyzing fitted intensity functions of deep learning-based temporal Hawkes process models, we identify a modeling gap in how fitted intensity behavior is captured beyond likelihood-based performance, which motivates the proposed spatio-temporal approach. Simulation studies show that the proposed method successfully recovers sensible temporal and spatial intensity structure in multivariate spatio-temporal point patterns, while existing temporal neural Hawkes process approach fails to do so. An application to terrorism data from Pakistan further demonstrates the proposed model's ability to capture complex spatio-temporal interaction across multiple event types.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2602.23629" target="_blank">Multivariate Spatio-Temporal Neural Hawkes Processes</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Christopher Chukwuemeka, Hojun You, Mikyoung Jun</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.23629" target="_blank">https://arxiv.org/abs/2602.23629</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We propose a Multivariate Spatio-Temporal Neural Hawkes Process for modeling complex multivariate event data with spatio-temporal dynamics. The proposed model extends continuous-time neural Hawkes processes by integrating spatial information into latent state evolution through learned temporal and spatial decay dynamics, enabling flexible modeling of excitation and inhibition without predefined triggering kernels. By analyzing fitted intensity functions of deep learning-based temporal Hawkes process models, we identify a modeling gap in how fitted intensity behavior is captured beyond likelihood-based performance, which motivates the proposed spatio-temporal approach. Simulation studies show that the proposed method successfully recovers sensible temporal and spatial intensity structure in multivariate spatio-temporal point patterns, while existing temporal neural Hawkes process approach fails to do so. An application to terrorism data from Pakistan further demonstrates the proposed model's ability to capture complex spatio-temporal interaction across multiple event types.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "General Bayesian Policy Learning", "author": "Masahiro Kato", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.23672", "summary": "arXiv:2602.23672v1 Announce Type: new \nAbstract: This study proposes the General Bayes framework for policy learning. We consider decision problems in which a decision-maker chooses an action from an action set to maximize its expected welfare. Typical examples include treatment choice and portfolio selection. In such problems, the statistical target is a decision rule, and the prediction of each outcome $Y(a)$ is not necessarily of primary interest. We formulate this policy learning problem by loss-based Bayesian updating. Our main technical device is a squared-loss surrogate for welfare maximization. We show that maximizing empirical welfare over a policy class is equivalent to minimizing a scaled squared error in the outcome difference, up to a quadratic regularization controlled by a tuning parameter $\\zeta&gt;0$. This rewriting yields a General Bayes posterior over decision rules that admits a Gaussian pseudo-likelihood interpretation. We clarify two Bayesian interpretations of the resulting generalized posterior, a working Gaussian view and a decision-theoretic loss-based view. As one implementation example, we introduce neural networks with tanh-squashed outputs. Finally, we provide theoretical guarantees in a PAC-Bayes style.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2602.23672" target="_blank">General Bayesian Policy Learning</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Masahiro Kato</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.23672" target="_blank">https://arxiv.org/abs/2602.23672</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This study proposes the General Bayes framework for policy learning. We consider decision problems in which a decision-maker chooses an action from an action set to maximize its expected welfare. Typical examples include treatment choice and portfolio selection. In such problems, the statistical target is a decision rule, and the prediction of each outcome $Y(a)$ is not necessarily of primary interest. We formulate this policy learning problem by loss-based Bayesian updating. Our main technical device is a squared-loss surrogate for welfare maximization. We show that maximizing empirical welfare over a policy class is equivalent to minimizing a scaled squared error in the outcome difference, up to a quadratic regularization controlled by a tuning parameter $\zeta&gt;0$. This rewriting yields a General Bayes posterior over decision rules that admits a Gaussian pseudo-likelihood interpretation. We clarify two Bayesian interpretations of the resulting generalized posterior, a working Gaussian view and a decision-theoretic loss-based view. As one implementation example, we introduce neural networks with tanh-squashed outputs. Finally, we provide theoretical guarantees in a PAC-Bayes style.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "A Variational Estimator for $L_p$ Calibration Errors", "author": "Eug\\`ene Berta, Sacha Braun, David Holzm\\\"uller, Francis Bach, Michael I. Jordan", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.24230", "summary": "arXiv:2602.24230v1 Announce Type: new \nAbstract: Calibration$\\unicode{x2014}$the problem of ensuring that predicted probabilities align with observed class frequencies$\\unicode{x2014}$is a basic desideratum for reliable prediction with machine learning systems. Calibration error is traditionally assessed via a divergence function, using the expected divergence between predictions and empirical frequencies. Accurately estimating this quantity is challenging, especially in the multiclass setting. Here, we show how to extend a recent variational framework for estimating calibration errors beyond divergences induced induced by proper losses, to cover a broad class of calibration errors induced by $L_p$ divergences. Our method can separate over- and under-confidence and, unlike non-variational approaches, avoids overestimation. We provide extensive experiments and integrate our code in the open-source package probmetrics (https://github.com/dholzmueller/probmetrics) for evaluating calibration errors.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2602.24230" target="_blank">A Variational Estimator for $L_p$ Calibration Errors</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Eug\`ene Berta, Sacha Braun, David Holzm\"uller, Francis Bach, Michael I. Jordan</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.24230" target="_blank">https://arxiv.org/abs/2602.24230</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Calibration$\unicode{x2014}$the problem of ensuring that predicted probabilities align with observed class frequencies$\unicode{x2014}$is a basic desideratum for reliable prediction with machine learning systems. Calibration error is traditionally assessed via a divergence function, using the expected divergence between predictions and empirical frequencies. Accurately estimating this quantity is challenging, especially in the multiclass setting. Here, we show how to extend a recent variational framework for estimating calibration errors beyond divergences induced induced by proper losses, to cover a broad class of calibration errors induced by $L_p$ divergences. Our method can separate over- and under-confidence and, unlike non-variational approaches, avoids overestimation. We provide extensive experiments and integrate our code in the open-source package probmetrics (https://github.com/dholzmueller/probmetrics) for evaluating calibration errors.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Active Bipartite Ranking with Smooth Posterior Distributions", "author": "James Cheshire, Stephan Cl\\'emen\\c{c}on", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.24263", "summary": "arXiv:2602.24263v1 Announce Type: new \nAbstract: In this article, bipartite ranking, a statistical learning problem involved in many applications and widely studied in the passive context, is approached in a much more general \\textit{active setting} than the discrete one previously considered in the literature. While the latter assumes that the conditional distribution is piece wise constant, the framework we develop permits in contrast to deal with continuous conditional distributions, provided that they fulfill a H\\\"older smoothness constraint. We first show that a naive approach based on discretisation at a uniform level, fixed \\textit{a priori} and consisting in applying next the active strategy designed for the discrete setting generally fails. Instead, we propose a novel algorithm, referred to as smooth-rank and designed for the continuous setting, which aims to minimise the distance between the ROC curve of the estimated ranking rule and the optimal one w.r.t. the $\\sup$ norm. We show that, for a fixed confidence level $\\epsilon&gt;0$ and probability $\\delta\\in (0,1)$, smooth-rank is PAC$(\\epsilon,\\delta)$. In addition, we provide a problem dependent upper bound on the expected sampling time of smooth-rank and establish a problem dependent lower bound on the expected sampling time of any PAC$(\\epsilon,\\delta)$ algorithm. Beyond the theoretical analysis carried out, numerical results are presented, providing solid empirical evidence of the performance of the algorithm proposed, which compares favorably with alternative approaches.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2602.24263" target="_blank">Active Bipartite Ranking with Smooth Posterior Distributions</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> James Cheshire, Stephan Cl\'emen\c{c}on</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.24263" target="_blank">https://arxiv.org/abs/2602.24263</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this article, bipartite ranking, a statistical learning problem involved in many applications and widely studied in the passive context, is approached in a much more general \textit{active setting} than the discrete one previously considered in the literature. While the latter assumes that the conditional distribution is piece wise constant, the framework we develop permits in contrast to deal with continuous conditional distributions, provided that they fulfill a H\"older smoothness constraint. We first show that a naive approach based on discretisation at a uniform level, fixed \textit{a priori} and consisting in applying next the active strategy designed for the discrete setting generally fails. Instead, we propose a novel algorithm, referred to as smooth-rank and designed for the continuous setting, which aims to minimise the distance between the ROC curve of the estimated ranking rule and the optimal one w.r.t. the $\sup$ norm. We show that, for a fixed confidence level $\epsilon&gt;0$ and probability $\delta\in (0,1)$, smooth-rank is PAC$(\epsilon,\delta)$. In addition, we provide a problem dependent upper bound on the expected sampling time of smooth-rank and establish a problem dependent lower bound on the expected sampling time of any PAC$(\epsilon,\delta)$ algorithm. Beyond the theoretical analysis carried out, numerical results are presented, providing solid empirical evidence of the performance of the algorithm proposed, which compares favorably with alternative approaches.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "Global Interpretability via Automated Preprocessing: A Framework Inspired by Psychiatric Questionnaires", "author": "Eric V. Strobl", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.23459", "summary": "arXiv:2602.23459v1 Announce Type: cross \nAbstract: Psychiatric questionnaires are highly context sensitive and often only weakly predict subsequent symptom severity, which makes the prognostic relationship difficult to learn. Although flexible nonlinear models can improve predictive accuracy, their limited interpretability can erode clinical trust. In fields such as imaging and omics, investigators commonly address visit- and instrument-specific artifacts by extracting stable signal through preprocessing and then fitting an interpretable linear model. We adopt the same strategy for questionnaire data by decoupling preprocessing from prediction: we restrict nonlinear capacity to a baseline preprocessing module that estimates stable item values, and then learn a linear mapping from these stabilized baseline items to future severity. We refer to this two-stage method as REFINE (Redundancy-Exploiting Follow-up-Informed Nonlinear Enhancement), which concentrates nonlinearity in preprocessing while keeping the prognostic relationship transparently linear and therefore globally interpretable through a coefficient matrix, rather than through post hoc local attributions. In experiments, REFINE outperforms other interpretable approaches while preserving clear global attribution of prognostic factors across psychiatric and non-psychiatric longitudinal prediction tasks.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2602.23459" target="_blank">Global Interpretability via Automated Preprocessing: A Framework Inspired by Psychiatric Questionnaires</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Eric V. Strobl</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.23459" target="_blank">https://arxiv.org/abs/2602.23459</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Psychiatric questionnaires are highly context sensitive and often only weakly predict subsequent symptom severity, which makes the prognostic relationship difficult to learn. Although flexible nonlinear models can improve predictive accuracy, their limited interpretability can erode clinical trust. In fields such as imaging and omics, investigators commonly address visit- and instrument-specific artifacts by extracting stable signal through preprocessing and then fitting an interpretable linear model. We adopt the same strategy for questionnaire data by decoupling preprocessing from prediction: we restrict nonlinear capacity to a baseline preprocessing module that estimates stable item values, and then learn a linear mapping from these stabilized baseline items to future severity. We refer to this two-stage method as REFINE (Redundancy-Exploiting Follow-up-Informed Nonlinear Enhancement), which concentrates nonlinearity in preprocessing while keeping the prognostic relationship transparently linear and therefore globally interpretable through a coefficient matrix, rather than through post hoc local attributions. In experiments, REFINE outperforms other interpretable approaches while preserving clear global attribution of prognostic factors across psychiatric and non-psychiatric longitudinal prediction tasks.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "Neural Operators Can Discover Functional Clusters", "author": "Yicen Li, Jose Antonio Lara Benitez, Ruiyang Hong, Anastasis Kratsios, Paul David McNicholas, Maarten Valentijn de Hoop", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.23528", "summary": "arXiv:2602.23528v1 Announce Type: cross \nAbstract: Operator learning is reshaping scientific computing by amortizing inference across infinite families of problems. While neural operators (NOs) are increasingly well understood for regression, far less is known for classification and its unsupervised analogue: clustering. We prove that sample-based neural operators can learn any finite collection of classes in an infinite-dimensional reproducing kernel Hilbert space, even when the classes are neither convex nor connected, under mild kernel sampling assumptions. Our universal clustering theorem shows that any $K$ closed classes can be approximated to arbitrary precision by NO-parameterized classes in the upper Kuratowski topology on closed sets, a notion that can be interpreted as disallowing false-positive misclassifications.\n  Building on this, we develop an NO-powered clustering pipeline for functional data and apply it to unlabeled families of ordinary differential equation (ODE) trajectories. Discretized trajectories are lifted by a fixed pre-trained encoder into a continuous feature map and mapped to soft assignments by a lightweight trainable head. Experiments on diverse synthetic ODE benchmarks show that the resulting practical SNO recovers latent dynamical structure in regimes where classical methods fail, providing evidence consistent with our universal clustering theory.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2602.23528" target="_blank">Neural Operators Can Discover Functional Clusters</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yicen Li, Jose Antonio Lara Benitez, Ruiyang Hong, Anastasis Kratsios, Paul David McNicholas, Maarten Valentijn de Hoop</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.23528" target="_blank">https://arxiv.org/abs/2602.23528</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Operator learning is reshaping scientific computing by amortizing inference across infinite families of problems. While neural operators (NOs) are increasingly well understood for regression, far less is known for classification and its unsupervised analogue: clustering. We prove that sample-based neural operators can learn any finite collection of classes in an infinite-dimensional reproducing kernel Hilbert space, even when the classes are neither convex nor connected, under mild kernel sampling assumptions. Our universal clustering theorem shows that any $K$ closed classes can be approximated to arbitrary precision by NO-parameterized classes in the upper Kuratowski topology on closed sets, a notion that can be interpreted as disallowing false-positive misclassifications.
+  Building on this, we develop an NO-powered clustering pipeline for functional data and apply it to unlabeled families of ordinary differential equation (ODE) trajectories. Discretized trajectories are lifted by a fixed pre-trained encoder into a continuous feature map and mapped to soft assignments by a lightweight trainable head. Experiments on diverse synthetic ODE benchmarks show that the resulting practical SNO recovers latent dynamical structure in regimes where classical methods fail, providing evidence consistent with our universal clustering theory.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "VaSST: Variational Inference for Symbolic Regression using Soft Symbolic Trees", "author": "Somjit Roy, Pritam Dey, Bani K. Mallick", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.23561", "summary": "arXiv:2602.23561v1 Announce Type: cross \nAbstract: Symbolic regression has recently gained traction in AI-driven scientific discovery, aiming to recover explicit closed-form expressions from data that reveal underlying physical laws. Despite recent advances, existing methods remain dominated by heuristic search algorithms or data-intensive approaches that assume low-noise regimes and lack principled uncertainty quantification. Fully probabilistic formulations are scarce, and existing Markov chain Monte Carlo-based Bayesian methods often struggle to efficiently explore the highly multimodal combinatorial space of symbolic expressions. We introduce VaSST, a scalable probabilistic framework for symbolic regression based on variational inference. VaSST employs a continuous relaxation of symbolic expression trees, termed soft symbolic trees, where discrete operator and feature assignments are replaced by soft distributions over allowable components. This relaxation transforms the combinatorial search over an astronomically large symbolic space into an efficient gradient-based optimization problem while preserving a coherent probabilistic interpretation. The learned soft representations induce posterior distributions over symbolic structures, enabling principled uncertainty quantification. Across simulated experiments and Feynman Symbolic Regression Database within SRBench, VaSST achieves superior performance in both structural recovery and predictive accuracy compared to state-of-the-art symbolic regression methods.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2602.23561" target="_blank">VaSST: Variational Inference for Symbolic Regression using Soft Symbolic Trees</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Somjit Roy, Pritam Dey, Bani K. Mallick</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.23561" target="_blank">https://arxiv.org/abs/2602.23561</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Symbolic regression has recently gained traction in AI-driven scientific discovery, aiming to recover explicit closed-form expressions from data that reveal underlying physical laws. Despite recent advances, existing methods remain dominated by heuristic search algorithms or data-intensive approaches that assume low-noise regimes and lack principled uncertainty quantification. Fully probabilistic formulations are scarce, and existing Markov chain Monte Carlo-based Bayesian methods often struggle to efficiently explore the highly multimodal combinatorial space of symbolic expressions. We introduce VaSST, a scalable probabilistic framework for symbolic regression based on variational inference. VaSST employs a continuous relaxation of symbolic expression trees, termed soft symbolic trees, where discrete operator and feature assignments are replaced by soft distributions over allowable components. This relaxation transforms the combinatorial search over an astronomically large symbolic space into an efficient gradient-based optimization problem while preserving a coherent probabilistic interpretation. The learned soft representations induce posterior distributions over symbolic structures, enabling principled uncertainty quantification. Across simulated experiments and Feynman Symbolic Regression Database within SRBench, VaSST achieves superior performance in both structural recovery and predictive accuracy compared to state-of-the-art symbolic regression methods.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "A distributed semismooth Newton based augmented Lagrangian method for distributed optimization", "author": "Qihao Ma, Chengjing Wang, Peipei Tang, Dunbiao Niu, Aimin Xu", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.23854", "summary": "arXiv:2602.23854v1 Announce Type: cross \nAbstract: This paper proposes a novel distributed semismooth Newton based augmented Lagrangian method for solving a class of optimization problems over networks, where the global objective is defined as the sum of locally held cost functions, and communication is restricted to neighboring agents. Specifically, we employ the augmented Lagrangian method to solve an equivalently reformulated constrained version of the original problem. Each resulting subproblem is solved inexactly via a distributed semismooth Newton method. By fully leveraging the structure of the generalized Hessian, a distributed accelerated proximal gradient method is proposed to compute the Newton direction efficiently, eliminating the need to communicate with full Hessian matrices. Theoretical results are also obtained to guarantee the convergence of the proposed algorithm. Numerical experiments demonstrate the efficiency and superiority of our algorithm compared to state-of-the-art distributed algorithms.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2602.23854" target="_blank">A distributed semismooth Newton based augmented Lagrangian method for distributed optimization</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Qihao Ma, Chengjing Wang, Peipei Tang, Dunbiao Niu, Aimin Xu</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.23854" target="_blank">https://arxiv.org/abs/2602.23854</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This paper proposes a novel distributed semismooth Newton based augmented Lagrangian method for solving a class of optimization problems over networks, where the global objective is defined as the sum of locally held cost functions, and communication is restricted to neighboring agents. Specifically, we employ the augmented Lagrangian method to solve an equivalently reformulated constrained version of the original problem. Each resulting subproblem is solved inexactly via a distributed semismooth Newton method. By fully leveraging the structure of the generalized Hessian, a distributed accelerated proximal gradient method is proposed to compute the Newton direction efficiently, eliminating the need to communicate with full Hessian matrices. Theoretical results are also obtained to guarantee the convergence of the proposed algorithm. Numerical experiments demonstrate the efficiency and superiority of our algorithm compared to state-of-the-art distributed algorithms.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "Neural Diffusion Intensity Models for Point Process Data", "author": "Xinlong Du, Harsha Honnappa, Vinayak Rao", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.24083", "summary": "arXiv:2602.24083v1 Announce Type: cross \nAbstract: Cox processes model overdispersed point process data via a latent stochastic intensity, but both nonparametric estimation of the intensity model and posterior inference over intensity paths are typically intractable, relying on expensive MCMC methods. We introduce Neural Diffusion Intensity Models, a variational framework for Cox processes driven by neural SDEs. Our key theoretical result, based on enlargement of filtrations, shows that conditioning on point process observations preserves the diffusion structure of the latent intensity with an explicit drift correction. This guarantees the variational family contains the true posterior, so that ELBO maximization coincides with maximum likelihood estimation under sufficient model capacity. We design an amortized encoder architecture that maps variable-length event sequences to posterior intensity paths by simulating the drift-corrected SDE, replacing repeated MCMC runs with a single forward pass. Experiments on synthetic and real-world data demonstrate accurate recovery of latent intensity dynamics and posterior paths, with orders-of-magnitude speedups over MCMC-based methods.", "number": 13, "labels": [{"name": "diffusion", "color": "#9b59b6"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2602.24083" target="_blank">Neural Diffusion Intensity Models for Point Process Data</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #9b59b6;">diffusion</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Xinlong Du, Harsha Honnappa, Vinayak Rao</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.24083" target="_blank">https://arxiv.org/abs/2602.24083</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Cox processes model overdispersed point process data via a latent stochastic intensity, but both nonparametric estimation of the intensity model and posterior inference over intensity paths are typically intractable, relying on expensive MCMC methods. We introduce Neural Diffusion Intensity Models, a variational framework for Cox processes driven by neural SDEs. Our key theoretical result, based on enlargement of filtrations, shows that conditioning on point process observations preserves the diffusion structure of the latent intensity with an explicit drift correction. This guarantees the variational family contains the true posterior, so that ELBO maximization coincides with maximum likelihood estimation under sufficient model capacity. We design an amortized encoder architecture that maps variable-length event sequences to posterior intensity paths by simulating the drift-corrected SDE, replacing repeated MCMC runs with a single forward pass. Experiments on synthetic and real-world data demonstrate accurate recovery of latent intensity dynamics and posterior paths, with orders-of-magnitude speedups over MCMC-based methods.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Efficient Targeted Maximum Likelihood Estimators for Two-Phase Design Problems", "author": "Sky Qiu, Susan Gruber, Pamela A. Shaw, Brian D. Williamson, Mark J. van der Laan", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.24131", "summary": "arXiv:2602.24131v1 Announce Type: cross \nAbstract: In a typical two-phase design, a random sample is drawn from the target population in phase 1, during which only a subset of variables is collected. In phase 2, a subsample of the phase-1 cohort is selected, and additional variables are measured. This setting induces a coarsened data structure on the data from the second phase. We assume coarsening at random, that is, the phase-2 sampling mechanism depends only on variables fully observed. We review existing estimators, including the generalized raking estimator and the inverse probability of censoring weighted targeted maximum likelihood estimation (IPCW-TMLE) along with its extensions that also target the phase-2 sampling mechanism to improve efficiency. We further introduce a new class of estimators constructed within the TMLE framework that are asymptotically equivalent.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2602.24131" target="_blank">Efficient Targeted Maximum Likelihood Estimators for Two-Phase Design Problems</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sky Qiu, Susan Gruber, Pamela A. Shaw, Brian D. Williamson, Mark J. van der Laan</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.24131" target="_blank">https://arxiv.org/abs/2602.24131</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In a typical two-phase design, a random sample is drawn from the target population in phase 1, during which only a subset of variables is collected. In phase 2, a subsample of the phase-1 cohort is selected, and additional variables are measured. This setting induces a coarsened data structure on the data from the second phase. We assume coarsening at random, that is, the phase-2 sampling mechanism depends only on variables fully observed. We review existing estimators, including the generalized raking estimator and the inverse probability of censoring weighted targeted maximum likelihood estimation (IPCW-TMLE) along with its extensions that also target the phase-2 sampling mechanism to improve efficiency. We further introduce a new class of estimators constructed within the TMLE framework that are asymptotically equivalent.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Hypothesis Testing over Observable Regimes in Singular Models", "author": "Sean Plummer", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.24165", "summary": "arXiv:2602.24165v1 Announce Type: cross \nAbstract: Hypothesis testing in singular statistical models is often regarded as inherently problematic due to non-identifiability and degeneracy of the Fisher information. We show that the fundamental obstruction to testing in such models is not singularity itself, but the formulation of hypotheses on non-identifiable parameter quantities. Testing is inherently a problem in distribution space: if two hypotheses induce overlapping subsets of the model class, then no uniformly consistent test exists. We formalize this overlap obstruction and show that hypotheses depending on non-identifiable parameter functions necessarily fail in this sense. In contrast, hypotheses formulated over identifiable observables-quantities that are determined by the induced distribution-reduce entirely to classical testing theory. When the corresponding distributional regimes are separated in Hellinger distance, uniformly consistent tests exist and posterior contraction follows from standard testing-based arguments. Near singular boundaries, separation may collapse locally, leading to scale-dependent detectability governed jointly by sample size and distance to the singular stratum. We illustrate these phenomena in Gaussian mixture models and reduced-rank regression, exhibiting both untestable non-identifiable hypotheses and classically testable identifiable ones. The results provide a structural classification of which hypotheses in singular models are statistically meaningful.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2602.24165" target="_blank">Hypothesis Testing over Observable Regimes in Singular Models</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sean Plummer</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.24165" target="_blank">https://arxiv.org/abs/2602.24165</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Hypothesis testing in singular statistical models is often regarded as inherently problematic due to non-identifiability and degeneracy of the Fisher information. We show that the fundamental obstruction to testing in such models is not singularity itself, but the formulation of hypotheses on non-identifiable parameter quantities. Testing is inherently a problem in distribution space: if two hypotheses induce overlapping subsets of the model class, then no uniformly consistent test exists. We formalize this overlap obstruction and show that hypotheses depending on non-identifiable parameter functions necessarily fail in this sense. In contrast, hypotheses formulated over identifiable observables-quantities that are determined by the induced distribution-reduce entirely to classical testing theory. When the corresponding distributional regimes are separated in Hellinger distance, uniformly consistent tests exist and posterior contraction follows from standard testing-based arguments. Near singular boundaries, separation may collapse locally, leading to scale-dependent detectability governed jointly by sample size and distance to the singular stratum. We illustrate these phenomena in Gaussian mixture models and reduced-rank regression, exhibiting both untestable non-identifiable hypotheses and classically testable identifiable ones. The results provide a structural classification of which hypotheses in singular models are statistically meaningful.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "The Stability of Online Algorithms in Performative Prediction", "author": "Gabriele Farina, Juan Carlos Perdomo", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.24207", "summary": "arXiv:2602.24207v1 Announce Type: cross \nAbstract: The use of algorithmic predictions in decision-making leads to a feedback loop where the models we deploy actively influence the data distributions we see, and later use to retrain on. This dynamic was formalized by Perdomo et al. 2020 in their work on performative prediction. Our main result is an unconditional reduction showing that any no-regret algorithm deployed in performative settings converges to a (mixed) performatively stable equilibrium: a solution in which models actively shape data distributions in ways that their own predictions look optimal in hindsight. Prior to our work, all positive results in this area made strong restrictions on how models influenced distributions. By using a martingale argument and allowing randomization, we avoid any such assumption and sidestep recent hardness results for finding stable models. Lastly, on a more conceptual note, our connection sheds light on why common algorithms, like gradient descent, are naturally stabilizing and prevent runaway feedback loops. We hope our work enables future technical transfer of ideas between online optimization and performativity.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2602.24207" target="_blank">The Stability of Online Algorithms in Performative Prediction</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Gabriele Farina, Juan Carlos Perdomo</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.24207" target="_blank">https://arxiv.org/abs/2602.24207</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The use of algorithmic predictions in decision-making leads to a feedback loop where the models we deploy actively influence the data distributions we see, and later use to retrain on. This dynamic was formalized by Perdomo et al. 2020 in their work on performative prediction. Our main result is an unconditional reduction showing that any no-regret algorithm deployed in performative settings converges to a (mixed) performatively stable equilibrium: a solution in which models actively shape data distributions in ways that their own predictions look optimal in hindsight. Prior to our work, all positive results in this area made strong restrictions on how models influenced distributions. By using a martingale argument and allowing randomization, we avoid any such assumption and sidestep recent hardness results for finding stable models. Lastly, on a more conceptual note, our connection sheds light on why common algorithms, like gradient descent, are naturally stabilizing and prevent runaway feedback loops. We hope our work enables future technical transfer of ideas between online optimization and performativity.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "Assessment of Spatio-Temporal Predictors in the Presence of Missing and Heterogeneous Data", "author": "Daniele Zambon, Cesare Alippi", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2302.01701", "summary": "arXiv:2302.01701v3 Announce Type: replace \nAbstract: Deep learning methods achieve remarkable predictive performance in modeling complex, large-scale data. However, assessing the quality of derived models has become increasingly challenging, as more classical statistical assumptions may no longer apply. These difficulties are particularly pronounced for spatio-temporal data, which exhibit dependencies across both space and time and are often characterized by nonlinear dynamics, time variance, and missing observations, hence calling for new accuracy assessment methodologies. This paper introduces a residual correlation analysis framework for assessing the optimality of spatio-temporal relational-enabled neural predictive models, notably in settings with incomplete and heterogeneous data. By leveraging the principle that residual correlation indicates information not captured by the model, enabling the identification and localization of regions in space and time where predictive performance can be improved. A strength of the proposed approach is that it operates under minimal assumptions, allowing also for robust evaluation of deep learning models applied to multivariate time series, even in the presence of missing and heterogeneous data. In detail, the methodology constructs tailored spatio-temporal graphs to encode sparse spatial and temporal dependencies and employs asymptotically distribution-free summary statistics to detect time intervals and spatial regions where the model underperforms. The effectiveness of what proposed is demonstrated through experiments on both synthetic and real-world datasets using state-of-the-art predictive models.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2302.01701" target="_blank">Assessment of Spatio-Temporal Predictors in the Presence of Missing and Heterogeneous Data</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Daniele Zambon, Cesare Alippi</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2302.01701" target="_blank">https://arxiv.org/abs/2302.01701</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Deep learning methods achieve remarkable predictive performance in modeling complex, large-scale data. However, assessing the quality of derived models has become increasingly challenging, as more classical statistical assumptions may no longer apply. These difficulties are particularly pronounced for spatio-temporal data, which exhibit dependencies across both space and time and are often characterized by nonlinear dynamics, time variance, and missing observations, hence calling for new accuracy assessment methodologies. This paper introduces a residual correlation analysis framework for assessing the optimality of spatio-temporal relational-enabled neural predictive models, notably in settings with incomplete and heterogeneous data. By leveraging the principle that residual correlation indicates information not captured by the model, enabling the identification and localization of regions in space and time where predictive performance can be improved. A strength of the proposed approach is that it operates under minimal assumptions, allowing also for robust evaluation of deep learning models applied to multivariate time series, even in the presence of missing and heterogeneous data. In detail, the methodology constructs tailored spatio-temporal graphs to encode sparse spatial and temporal dependencies and employs asymptotically distribution-free summary statistics to detect time intervals and spatial regions where the model underperforms. The effectiveness of what proposed is demonstrated through experiments on both synthetic and real-world datasets using state-of-the-art predictive models.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "Kernel spectral joint embeddings for high-dimensional noisy datasets using duo-landmark integral operators", "author": "Xiucai Ding, Rong Ma", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2405.12317", "summary": "arXiv:2405.12317v3 Announce Type: replace \nAbstract: Integrative analysis of multiple heterogeneous datasets has become standard practice in many research fields, especially in single-cell genomics and medical informatics. Existing approaches oftentimes suffer from limited power in capturing nonlinear structures, insufficient account of noisiness and effects of high-dimensionality, lack of adaptivity to signals and sample sizes imbalance, and their results are sometimes difficult to interpret. To address these limitations, we propose a novel kernel spectral method that achieves joint embeddings of two independently observed high-dimensional noisy datasets. The proposed method automatically captures and leverages possibly shared low-dimensional structures across datasets to enhance embedding quality. The obtained low-dimensional embeddings can be utilized for many downstream tasks such as simultaneous clustering, data visualization, and denoising. The proposed method is justified by rigorous theoretical analysis. Specifically, we show the consistency of our method in recovering the low-dimensional noiseless signals, and characterize the effects of the signal-to-noise ratios on the rates of convergence. Under a joint manifolds model framework, we establish the convergence of ultimate embeddings to the eigenfunctions of some newly introduced integral operators. These operators, referred to as duo-landmark integral operators, are defined by the convolutional kernel maps of some reproducing kernel Hilbert spaces (RKHSs). These RKHSs capture the either partially or entirely shared underlying low-dimensional nonlinear signal structures of the two datasets. Our numerical experiments and analyses of two single-cell omics datasets demonstrate the empirical advantages of the proposed method over existing methods in both embeddings and several downstream tasks.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2405.12317" target="_blank">Kernel spectral joint embeddings for high-dimensional noisy datasets using duo-landmark integral operators</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Xiucai Ding, Rong Ma</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2405.12317" target="_blank">https://arxiv.org/abs/2405.12317</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Integrative analysis of multiple heterogeneous datasets has become standard practice in many research fields, especially in single-cell genomics and medical informatics. Existing approaches oftentimes suffer from limited power in capturing nonlinear structures, insufficient account of noisiness and effects of high-dimensionality, lack of adaptivity to signals and sample sizes imbalance, and their results are sometimes difficult to interpret. To address these limitations, we propose a novel kernel spectral method that achieves joint embeddings of two independently observed high-dimensional noisy datasets. The proposed method automatically captures and leverages possibly shared low-dimensional structures across datasets to enhance embedding quality. The obtained low-dimensional embeddings can be utilized for many downstream tasks such as simultaneous clustering, data visualization, and denoising. The proposed method is justified by rigorous theoretical analysis. Specifically, we show the consistency of our method in recovering the low-dimensional noiseless signals, and characterize the effects of the signal-to-noise ratios on the rates of convergence. Under a joint manifolds model framework, we establish the convergence of ultimate embeddings to the eigenfunctions of some newly introduced integral operators. These operators, referred to as duo-landmark integral operators, are defined by the convolutional kernel maps of some reproducing kernel Hilbert spaces (RKHSs). These RKHSs capture the either partially or entirely shared underlying low-dimensional nonlinear signal structures of the two datasets. Our numerical experiments and analyses of two single-cell omics datasets demonstrate the empirical advantages of the proposed method over existing methods in both embeddings and several downstream tasks.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Conformal Prediction for Long-Tailed Classification", "author": "Tiffany Ding, Jean-Baptiste Fermanian, Joseph Salmon", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2507.06867", "summary": "arXiv:2507.06867v3 Announce Type: replace \nAbstract: Many real-world classification problems, such as plant identification, have extremely long-tailed class distributions. In order for prediction sets to be useful in such settings, they should (i) provide good class-conditional coverage, ensuring that rare classes are not systematically omitted from the prediction sets, and (ii) be a reasonable size, allowing users to easily verify candidate labels. Unfortunately, existing conformal prediction methods, when applied to the long-tailed setting, force practitioners to make a binary choice between small sets with poor class-conditional coverage or sets that have very good class-conditional coverage but are extremely large. We propose methods with marginal coverage guarantees that smoothly trade off set size and class-conditional coverage. First, we introduce a new conformal score function called prevalence-adjusted softmax that optimizes for macro-coverage, defined as the average class-conditional coverage across classes. Second, we propose a new procedure that interpolates between marginal and class-conditional conformal prediction by linearly interpolating their conformal score thresholds. We demonstrate our methods on Pl@ntNet-300K and iNaturalist-2018, two long-tailed image datasets with 1,081 and 8,142 classes, respectively.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2507.06867" target="_blank">Conformal Prediction for Long-Tailed Classification</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Tiffany Ding, Jean-Baptiste Fermanian, Joseph Salmon</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2507.06867" target="_blank">https://arxiv.org/abs/2507.06867</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Many real-world classification problems, such as plant identification, have extremely long-tailed class distributions. In order for prediction sets to be useful in such settings, they should (i) provide good class-conditional coverage, ensuring that rare classes are not systematically omitted from the prediction sets, and (ii) be a reasonable size, allowing users to easily verify candidate labels. Unfortunately, existing conformal prediction methods, when applied to the long-tailed setting, force practitioners to make a binary choice between small sets with poor class-conditional coverage or sets that have very good class-conditional coverage but are extremely large. We propose methods with marginal coverage guarantees that smoothly trade off set size and class-conditional coverage. First, we introduce a new conformal score function called prevalence-adjusted softmax that optimizes for macro-coverage, defined as the average class-conditional coverage across classes. Second, we propose a new procedure that interpolates between marginal and class-conditional conformal prediction by linearly interpolating their conformal score thresholds. We demonstrate our methods on Pl@ntNet-300K and iNaturalist-2018, two long-tailed image datasets with 1,081 and 8,142 classes, respectively.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "Estimating Treatment Effects with Independent Component Analysis", "author": "Patrik Reizinger, Lester Mackey, Wieland Brendel, Rahul Krishnan", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2507.16467", "summary": "arXiv:2507.16467v2 Announce Type: replace \nAbstract: Independent Component Analysis (ICA) uses a measure of non-Gaussianity to identify latent sources from data and estimate their mixing coefficients (Shimizu et al., 2006). Meanwhile, higher-order Orthogonal Machine Learning (OML) exploits non-Gaussian treatment noise to provide more accurate estimates of treatment effects in the presence of confounding nuisance effects (Mackey et al., 2018). Remarkably, we find that the two approaches rely on the same moment conditions for consistent estimation. We then seize upon this connection to show how ICA can be effectively used for treatment effect estimation. Specifically, we prove that linear ICA can consistently estimate multiple treatment effects, even in the presence of Gaussian confounders, and identify regimes in which ICA is provably more sample-efficient than OML for treatment effect estimation. Our synthetic demand estimation experiments confirm this theory and demonstrate that linear ICA can accurately estimate treatment effects even in the presence of nonlinear nuisance.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2507.16467" target="_blank">Estimating Treatment Effects with Independent Component Analysis</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Patrik Reizinger, Lester Mackey, Wieland Brendel, Rahul Krishnan</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2507.16467" target="_blank">https://arxiv.org/abs/2507.16467</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Independent Component Analysis (ICA) uses a measure of non-Gaussianity to identify latent sources from data and estimate their mixing coefficients (Shimizu et al., 2006). Meanwhile, higher-order Orthogonal Machine Learning (OML) exploits non-Gaussian treatment noise to provide more accurate estimates of treatment effects in the presence of confounding nuisance effects (Mackey et al., 2018). Remarkably, we find that the two approaches rely on the same moment conditions for consistent estimation. We then seize upon this connection to show how ICA can be effectively used for treatment effect estimation. Specifically, we prove that linear ICA can consistently estimate multiple treatment effects, even in the presence of Gaussian confounders, and identify regimes in which ICA is provably more sample-efficient than OML for treatment effect estimation. Our synthetic demand estimation experiments confirm this theory and demonstrate that linear ICA can accurately estimate treatment effects even in the presence of nonlinear nuisance.
+            </div>
+        </div>
+        <div class="paper" id="paper-21">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-21" data-paper-data='{"title": "Geometric Autoencoder Priors for Bayesian Inversion: Learn First Observe Later", "author": "Arnaud Vadeboncoeur, Gregory Duth\\'e, Mark Girolami, Eleni Chatzi", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2509.19929", "summary": "arXiv:2509.19929v3 Announce Type: replace \nAbstract: Uncertainty Quantification (UQ) is paramount for inference in engineering. A common inference task is to recover full-field information of physical systems from a small number of noisy observations, a usually highly ill-posed problem. Sharing information from multiple distinct yet related physical systems can alleviate this ill-posedness. Critically, engineering systems often have complicated variable geometries prohibiting the use of standard multi-system Bayesian UQ. In this work, we introduce Geometric Autoencoders for Bayesian Inversion (GABI), a framework for learning geometry-aware generative models of physical responses that serve as highly informative geometry-conditioned priors for Bayesian inversion. Following a ''learn first, observe later'' paradigm, GABI distills information from large datasets of systems with varying geometries, without requiring knowledge of governing PDEs, boundary conditions, or observation processes, into a rich latent prior. At inference time, this prior is seamlessly combined with the likelihood of a specific observation process, yielding a geometry-adapted posterior distribution. Our proposed framework is architecture-agnostic. A creative use of Approximate Bayesian Computation (ABC) sampling yields an efficient implementation that utilizes modern GPU hardware. We test our method on: steady-state heat over rectangular domains; Reynolds-Averaged Navier-Stokes (RANS) flow around airfoils; Helmholtz resonance and source localization on 3D car bodies; RANS airflow over terrain. We find: the predictive accuracy to be comparable to deterministic supervised learning approaches in the restricted setting where supervised learning is applicable; UQ to be well calibrated and robust on challenging problems with complex geometries.", "number": 21, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#21</span>
+                <a href="https://arxiv.org/abs/2509.19929" target="_blank">Geometric Autoencoder Priors for Bayesian Inversion: Learn First Observe Later</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Arnaud Vadeboncoeur, Gregory Duth\'e, Mark Girolami, Eleni Chatzi</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2509.19929" target="_blank">https://arxiv.org/abs/2509.19929</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Uncertainty Quantification (UQ) is paramount for inference in engineering. A common inference task is to recover full-field information of physical systems from a small number of noisy observations, a usually highly ill-posed problem. Sharing information from multiple distinct yet related physical systems can alleviate this ill-posedness. Critically, engineering systems often have complicated variable geometries prohibiting the use of standard multi-system Bayesian UQ. In this work, we introduce Geometric Autoencoders for Bayesian Inversion (GABI), a framework for learning geometry-aware generative models of physical responses that serve as highly informative geometry-conditioned priors for Bayesian inversion. Following a ''learn first, observe later'' paradigm, GABI distills information from large datasets of systems with varying geometries, without requiring knowledge of governing PDEs, boundary conditions, or observation processes, into a rich latent prior. At inference time, this prior is seamlessly combined with the likelihood of a specific observation process, yielding a geometry-adapted posterior distribution. Our proposed framework is architecture-agnostic. A creative use of Approximate Bayesian Computation (ABC) sampling yields an efficient implementation that utilizes modern GPU hardware. We test our method on: steady-state heat over rectangular domains; Reynolds-Averaged Navier-Stokes (RANS) flow around airfoils; Helmholtz resonance and source localization on 3D car bodies; RANS airflow over terrain. We find: the predictive accuracy to be comparable to deterministic supervised learning approaches in the restricted setting where supervised learning is applicable; UQ to be well calibrated and robust on challenging problems with complex geometries.
+            </div>
+        </div>
+        <div class="paper" id="paper-22">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-22" data-paper-data='{"title": "Embracing Discrete Search: A Reasonable Approach to Causal Structure Learning", "author": "Marcel Wien\\\"obst, Leonard Henckel, Sebastian Weichwald", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2510.04970", "summary": "arXiv:2510.04970v2 Announce Type: replace \nAbstract: We present FLOP (Fast Learning of Order and Parents), a score-based causal discovery algorithm for linear models. It pairs fast parent selection with iterative Cholesky-based score updates, cutting run-times over prior algorithms. This makes it feasible to fully embrace discrete search, enabling iterated local search with principled order initialization to find graphs with scores at or close to the global optimum. The resulting structures are highly accurate across benchmarks, with near-perfect recovery in standard settings. This performance calls for revisiting discrete search over graphs as a reasonable approach to causal discovery.", "number": 22, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#22</span>
+                <a href="https://arxiv.org/abs/2510.04970" target="_blank">Embracing Discrete Search: A Reasonable Approach to Causal Structure Learning</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Marcel Wien\"obst, Leonard Henckel, Sebastian Weichwald</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.04970" target="_blank">https://arxiv.org/abs/2510.04970</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We present FLOP (Fast Learning of Order and Parents), a score-based causal discovery algorithm for linear models. It pairs fast parent selection with iterative Cholesky-based score updates, cutting run-times over prior algorithms. This makes it feasible to fully embrace discrete search, enabling iterated local search with principled order initialization to find graphs with scores at or close to the global optimum. The resulting structures are highly accurate across benchmarks, with near-perfect recovery in standard settings. This performance calls for revisiting discrete search over graphs as a reasonable approach to causal discovery.
+            </div>
+        </div>
+        <div class="paper" id="paper-23">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-23" data-paper-data='{"title": "An operator splitting analysis of Wasserstein--Fisher--Rao gradient flows", "author": "Francesca Romana Crucinio, Sahani Pathiraja", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.18060", "summary": "arXiv:2511.18060v2 Announce Type: replace \nAbstract: Wasserstein-Fisher-Rao (WFR) gradient flows have been recently proposed as a powerful sampling tool that combines the advantages of pure Wasserstein (W) and pure Fisher-Rao (FR) gradient flows. Existing algorithmic developments implicitly make use of operator splitting techniques to numerically approximate the WFR partial differential equation, whereby the W flow is evaluated over a given step size and then the FR flow (or vice versa). This works investigates the impact of the order in which the W and FR operator are evaluated and aims to provide a quantitative analysis. Somewhat surprisingly, we show that with a judicious choice of step size and operator ordering, the split scheme can converge to the target distribution faster than the exact WFR flow (in terms of model time). We obtain variational formulae describing the evolution over one time step of both splitting schemes and investigate in which settings the W-FR split should be preferred to the FR-W split. As a step towards this goal we show that the WFR gradient flow preserves log-concavity and obtain the first sharp decay bound for WFR flow.", "number": 23, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#23</span>
+                <a href="https://arxiv.org/abs/2511.18060" target="_blank">An operator splitting analysis of Wasserstein--Fisher--Rao gradient flows</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Francesca Romana Crucinio, Sahani Pathiraja</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.18060" target="_blank">https://arxiv.org/abs/2511.18060</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Wasserstein-Fisher-Rao (WFR) gradient flows have been recently proposed as a powerful sampling tool that combines the advantages of pure Wasserstein (W) and pure Fisher-Rao (FR) gradient flows. Existing algorithmic developments implicitly make use of operator splitting techniques to numerically approximate the WFR partial differential equation, whereby the W flow is evaluated over a given step size and then the FR flow (or vice versa). This works investigates the impact of the order in which the W and FR operator are evaluated and aims to provide a quantitative analysis. Somewhat surprisingly, we show that with a judicious choice of step size and operator ordering, the split scheme can converge to the target distribution faster than the exact WFR flow (in terms of model time). We obtain variational formulae describing the evolution over one time step of both splitting schemes and investigate in which settings the W-FR split should be preferred to the FR-W split. As a step towards this goal we show that the WFR gradient flow preserves log-concavity and obtain the first sharp decay bound for WFR flow.
+            </div>
+        </div>
+        <div class="paper" id="paper-24">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-24" data-paper-data='{"title": "Implicit Bias and Convergence of Matrix Stochastic Mirror Descent", "author": "Danil Akhtiamov, Reza Ghane, Omead Pooladzandi, Babak Hassibi", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.18997", "summary": "arXiv:2602.18997v2 Announce Type: replace \nAbstract: We investigate Stochastic Mirror Descent (SMD) with matrix parameters and vector-valued predictions, a framework relevant to multi-class classification and matrix completion problems. Focusing on the overparameterized regime, where the total number of parameters exceeds the number of training samples, we prove that SMD with matrix mirror functions $\\psi(\\cdot)$ converges exponentially to a global interpolator. Furthermore, we generalize classical implicit bias results of vector SMD by demonstrating that the matrix SMD algorithm converges to the unique solution minimizing the Bregman divergence induced by $\\psi(\\cdot)$ from initialization subject to interpolating the data. These findings reveal how matrix mirror maps dictate inductive bias in high-dimensional, multi-output problems.", "number": 24, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#24</span>
+                <a href="https://arxiv.org/abs/2602.18997" target="_blank">Implicit Bias and Convergence of Matrix Stochastic Mirror Descent</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Danil Akhtiamov, Reza Ghane, Omead Pooladzandi, Babak Hassibi</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.18997" target="_blank">https://arxiv.org/abs/2602.18997</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We investigate Stochastic Mirror Descent (SMD) with matrix parameters and vector-valued predictions, a framework relevant to multi-class classification and matrix completion problems. Focusing on the overparameterized regime, where the total number of parameters exceeds the number of training samples, we prove that SMD with matrix mirror functions $\psi(\cdot)$ converges exponentially to a global interpolator. Furthermore, we generalize classical implicit bias results of vector SMD by demonstrating that the matrix SMD algorithm converges to the unique solution minimizing the Bregman divergence induced by $\psi(\cdot)$ from initialization subject to interpolating the data. These findings reveal how matrix mirror maps dictate inductive bias in high-dimensional, multi-output problems.
+            </div>
+        </div>
+        <div class="paper" id="paper-25">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-25" data-paper-data='{"title": "Stationary Kernels and Gaussian Processes on Lie Groups and their Homogeneous Spaces I: the compact case", "author": "Iskander Azangulov, Andrei Smolensky, Alexander Terenin, Viacheslav Borovitskiy", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2208.14960", "summary": "arXiv:2208.14960v5 Announce Type: replace-cross \nAbstract: Gaussian processes are arguably the most important class of spatiotemporal models within machine learning. They encode prior information about the modeled function and can be used for exact or approximate Bayesian learning. In many applications, particularly in physical sciences and engineering, but also in areas such as geostatistics and neuroscience, invariance to symmetries is one of the most fundamental forms of prior information one can consider. The invariance of a Gaussian process' covariance to such symmetries gives rise to the most natural generalization of the concept of stationarity to such spaces. In this work, we develop constructive and practical techniques for building stationary Gaussian processes on a very large class of non-Euclidean spaces arising in the context of symmetries. Our techniques make it possible to (i) calculate covariance kernels and (ii) sample from prior and posterior Gaussian processes defined on such spaces, both in a practical manner. This work is split into two parts, each involving different technical considerations: part I studies compact spaces, while part II studies non-compact spaces possessing certain structure. Our contributions make the non-Euclidean Gaussian process models we study compatible with well-understood computational techniques available in standard Gaussian process software packages, thereby making them accessible to practitioners.", "number": 25, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#25</span>
+                <a href="https://arxiv.org/abs/2208.14960" target="_blank">Stationary Kernels and Gaussian Processes on Lie Groups and their Homogeneous Spaces I: the compact case</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Iskander Azangulov, Andrei Smolensky, Alexander Terenin, Viacheslav Borovitskiy</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2208.14960" target="_blank">https://arxiv.org/abs/2208.14960</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Gaussian processes are arguably the most important class of spatiotemporal models within machine learning. They encode prior information about the modeled function and can be used for exact or approximate Bayesian learning. In many applications, particularly in physical sciences and engineering, but also in areas such as geostatistics and neuroscience, invariance to symmetries is one of the most fundamental forms of prior information one can consider. The invariance of a Gaussian process' covariance to such symmetries gives rise to the most natural generalization of the concept of stationarity to such spaces. In this work, we develop constructive and practical techniques for building stationary Gaussian processes on a very large class of non-Euclidean spaces arising in the context of symmetries. Our techniques make it possible to (i) calculate covariance kernels and (ii) sample from prior and posterior Gaussian processes defined on such spaces, both in a practical manner. This work is split into two parts, each involving different technical considerations: part I studies compact spaces, while part II studies non-compact spaces possessing certain structure. Our contributions make the non-Euclidean Gaussian process models we study compatible with well-understood computational techniques available in standard Gaussian process software packages, thereby making them accessible to practitioners.
+            </div>
+        </div>
+        <div class="paper" id="paper-26">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-26" data-paper-data='{"title": "Gradient is All You Need? How Consensus-Based Optimization can be Interpreted as a Stochastic Relaxation of Gradient Descent", "author": "Konstantin Riedl, Timo Klock, Carina Geldhauser, Massimo Fornasier", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2306.09778", "summary": "arXiv:2306.09778v2 Announce Type: replace-cross \nAbstract: In this paper, we provide a novel analytical perspective on the theoretical understanding of gradient-based learning algorithms by interpreting consensus-based optimization (CBO), a recently proposed multi-particle derivative-free optimization method, as a stochastic relaxation of gradient descent. Remarkably, we observe that through communication of the particles, CBO exhibits a stochastic gradient descent (SGD)-like behavior despite solely relying on evaluations of the objective function. The fundamental value of such link between CBO and SGD lies in the fact that CBO is provably globally convergent to global minimizers for ample classes of nonsmooth and nonconvex objective functions. Hence, on the one side, we offer a novel explanation for the success of stochastic relaxations of gradient descent by furnishing useful and precise insights that explain how problem-tailored stochastic perturbations of gradient descent (like the ones induced by CBO) overcome energy barriers and reach deep levels of nonconvex functions. On the other side, and contrary to the conventional wisdom for which derivative-free methods ought to be inefficient or not to possess generalization abilities, our results unveil an intrinsic gradient descent nature of heuristics. Instructive numerical illustrations support the provided theoretical insights.", "number": 26, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#26</span>
+                <a href="https://arxiv.org/abs/2306.09778" target="_blank">Gradient is All You Need? How Consensus-Based Optimization can be Interpreted as a Stochastic Relaxation of Gradient Descent</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Konstantin Riedl, Timo Klock, Carina Geldhauser, Massimo Fornasier</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2306.09778" target="_blank">https://arxiv.org/abs/2306.09778</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we provide a novel analytical perspective on the theoretical understanding of gradient-based learning algorithms by interpreting consensus-based optimization (CBO), a recently proposed multi-particle derivative-free optimization method, as a stochastic relaxation of gradient descent. Remarkably, we observe that through communication of the particles, CBO exhibits a stochastic gradient descent (SGD)-like behavior despite solely relying on evaluations of the objective function. The fundamental value of such link between CBO and SGD lies in the fact that CBO is provably globally convergent to global minimizers for ample classes of nonsmooth and nonconvex objective functions. Hence, on the one side, we offer a novel explanation for the success of stochastic relaxations of gradient descent by furnishing useful and precise insights that explain how problem-tailored stochastic perturbations of gradient descent (like the ones induced by CBO) overcome energy barriers and reach deep levels of nonconvex functions. On the other side, and contrary to the conventional wisdom for which derivative-free methods ought to be inefficient or not to possess generalization abilities, our results unveil an intrinsic gradient descent nature of heuristics. Instructive numerical illustrations support the provided theoretical insights.
+            </div>
+        </div>
+        <div class="paper" id="paper-27">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-27" data-paper-data='{"title": "Geometric structure of shallow neural networks and constructive ${\\mathcal L}^2$ cost minimization", "author": "Thomas Chen, Patr\\'icia Mu\\~noz Ewald", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2309.10370", "summary": "arXiv:2309.10370v4 Announce Type: replace-cross \nAbstract: In this paper, we approach the problem of cost (loss) minimization in underparametrized shallow ReLU networks through the explicit construction of upper bounds which appeal to the structure of classification data, without use of gradient descent. A key focus is on elucidating the geometric structure of approximate and precise minimizers. We consider an $L^2$ cost function, input space $\\mathbb{R}^M$, output space ${\\mathbb R}^Q$ with $Q\\leq M$, and training input sample size that can be arbitrarily large. We prove an upper bound on the minimum of the cost function of order $O(\\delta_P)$ where $\\delta_P$ measures the signal-to-noise ratio of training data. In the special case $M=Q$, we explicitly determine an exact degenerate local minimum of the cost function, and show that the sharp value differs from the upper bound obtained for $Q\\leq M$ by a relative error $O(\\delta_P^2)$. The proof of the upper bound yields a constructively trained network; we show that it metrizes a particular $Q$-dimensional subspace in the input space ${\\mathbb R}^M$. We comment on the characterization of the global minimum of the cost function in the given context.", "number": 27, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#27</span>
+                <a href="https://arxiv.org/abs/2309.10370" target="_blank">Geometric structure of shallow neural networks and constructive ${\mathcal L}^2$ cost minimization</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Thomas Chen, Patr\'icia Mu\~noz Ewald</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2309.10370" target="_blank">https://arxiv.org/abs/2309.10370</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we approach the problem of cost (loss) minimization in underparametrized shallow ReLU networks through the explicit construction of upper bounds which appeal to the structure of classification data, without use of gradient descent. A key focus is on elucidating the geometric structure of approximate and precise minimizers. We consider an $L^2$ cost function, input space $\mathbb{R}^M$, output space ${\mathbb R}^Q$ with $Q\leq M$, and training input sample size that can be arbitrarily large. We prove an upper bound on the minimum of the cost function of order $O(\delta_P)$ where $\delta_P$ measures the signal-to-noise ratio of training data. In the special case $M=Q$, we explicitly determine an exact degenerate local minimum of the cost function, and show that the sharp value differs from the upper bound obtained for $Q\leq M$ by a relative error $O(\delta_P^2)$. The proof of the upper bound yields a constructively trained network; we show that it metrizes a particular $Q$-dimensional subspace in the input space ${\mathbb R}^M$. We comment on the characterization of the global minimum of the cost function in the given context.
+            </div>
+        </div>
+        <div class="paper" id="paper-28">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-28" data-paper-data='{"title": "Revisiting Matrix Sketching in Linear Bandits: Achieving Sublinear Regret via Dyadic Block Sketching", "author": "Dongxie Wen, Hanyan Yin, Xiao Zhang, Peng Zhao, Lijun Zhang, Zhewei Wei", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2410.10258", "summary": "arXiv:2410.10258v2 Announce Type: replace-cross \nAbstract: Linear bandits have become a cornerstone of online learning and sequential decision-making, providing solid theoretical foundations for balancing exploration and exploitation. Within this domain, matrix sketching serves as a critical component for achieving computational efficiency, especially when confronting high-dimensional problem instances. The sketch-based approaches reduce per-round complexity from $\\Omega(d^2)$ to $O(dl)$, where $d$ is the dimension and $l&lt;d$ is the sketch size. However, this computational efficiency comes with a fundamental pitfall: when the streaming matrix exhibits heavy spectral tails, such algorithms can incur vacuous \\textit{linear regret}. In this paper, we revisit the regret bounds and algorithmic design for sketch-based linear bandits. Our analysis reveals that inappropriate sketch sizes can lead to substantial spectral error, severely undermining regret guarantees. To overcome this issue, we propose Dyadic Block Sketching, a novel multi-scale matrix sketching approach that dynamically adjusts the sketch size during the learning process. We apply this technique to linear bandits and demonstrate that the new algorithm achieves \\textit{sublinear regret} bounds without requiring prior knowledge of the streaming matrix properties. It establishes a general framework for efficient sketch-based linear bandits, which can be integrated with any matrix sketching method that provides covariance guarantees. Comprehensive experimental evaluation demonstrates the superior utility-efficiency trade-off achieved by our approach.", "number": 28, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#28</span>
+                <a href="https://arxiv.org/abs/2410.10258" target="_blank">Revisiting Matrix Sketching in Linear Bandits: Achieving Sublinear Regret via Dyadic Block Sketching</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Dongxie Wen, Hanyan Yin, Xiao Zhang, Peng Zhao, Lijun Zhang, Zhewei Wei</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2410.10258" target="_blank">https://arxiv.org/abs/2410.10258</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Linear bandits have become a cornerstone of online learning and sequential decision-making, providing solid theoretical foundations for balancing exploration and exploitation. Within this domain, matrix sketching serves as a critical component for achieving computational efficiency, especially when confronting high-dimensional problem instances. The sketch-based approaches reduce per-round complexity from $\Omega(d^2)$ to $O(dl)$, where $d$ is the dimension and $l&lt;d$ is the sketch size. However, this computational efficiency comes with a fundamental pitfall: when the streaming matrix exhibits heavy spectral tails, such algorithms can incur vacuous \textit{linear regret}. In this paper, we revisit the regret bounds and algorithmic design for sketch-based linear bandits. Our analysis reveals that inappropriate sketch sizes can lead to substantial spectral error, severely undermining regret guarantees. To overcome this issue, we propose Dyadic Block Sketching, a novel multi-scale matrix sketching approach that dynamically adjusts the sketch size during the learning process. We apply this technique to linear bandits and demonstrate that the new algorithm achieves \textit{sublinear regret} bounds without requiring prior knowledge of the streaming matrix properties. It establishes a general framework for efficient sketch-based linear bandits, which can be integrated with any matrix sketching method that provides covariance guarantees. Comprehensive experimental evaluation demonstrates the superior utility-efficiency trade-off achieved by our approach.
+            </div>
+        </div>
+        <div class="paper" id="paper-29">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-29" data-paper-data='{"title": "The Sample Complexity of Online Reinforcement Learning: A Multi-model Perspective", "author": "Michael Muehlebach, Zhiyu He, Michael I. Jordan", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2501.15910", "summary": "arXiv:2501.15910v3 Announce Type: replace-cross \nAbstract: We study the sample complexity of online reinforcement learning in the general \\hzyrev{non-episodic} setting of nonlinear dynamical systems with continuous state and action spaces. Our analysis accommodates a large class of dynamical systems ranging from a finite set of nonlinear candidate models to models with bounded and Lipschitz continuous dynamics, to systems that are parametrized by a compact and real-valued set of parameters. In the most general setting, our algorithm achieves a policy regret of $\\mathcal{O}(N \\epsilon^2 + d_\\mathrm{u}\\mathrm{ln}(m(\\epsilon))/\\epsilon^2)$, where $N$ is the time horizon, $\\epsilon$ is a user-specified discretization width, $d_\\mathrm{u}$ the input dimension, and $m(\\epsilon)$ measures the complexity of the function class under consideration via its packing number. In the special case where the dynamics are parametrized by a compact and real-valued set of parameters (such as neural networks, transformers, etc.), we prove a policy regret of $\\mathcal{O}(\\sqrt{d_\\mathrm{u}N p})$, where $p$ denotes the number of parameters, recovering earlier sample-complexity results that were derived for linear time-invariant dynamical systems. While this article focuses on characterizing sample complexity, the proposed algorithms are likely to be useful in practice, due to their simplicity, their ability to incorporate prior knowledge, and their benign transient behaviors.", "number": 29, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#29</span>
+                <a href="https://arxiv.org/abs/2501.15910" target="_blank">The Sample Complexity of Online Reinforcement Learning: A Multi-model Perspective</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Michael Muehlebach, Zhiyu He, Michael I. Jordan</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2501.15910" target="_blank">https://arxiv.org/abs/2501.15910</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the sample complexity of online reinforcement learning in the general \hzyrev{non-episodic} setting of nonlinear dynamical systems with continuous state and action spaces. Our analysis accommodates a large class of dynamical systems ranging from a finite set of nonlinear candidate models to models with bounded and Lipschitz continuous dynamics, to systems that are parametrized by a compact and real-valued set of parameters. In the most general setting, our algorithm achieves a policy regret of $\mathcal{O}(N \epsilon^2 + d_\mathrm{u}\mathrm{ln}(m(\epsilon))/\epsilon^2)$, where $N$ is the time horizon, $\epsilon$ is a user-specified discretization width, $d_\mathrm{u}$ the input dimension, and $m(\epsilon)$ measures the complexity of the function class under consideration via its packing number. In the special case where the dynamics are parametrized by a compact and real-valued set of parameters (such as neural networks, transformers, etc.), we prove a policy regret of $\mathcal{O}(\sqrt{d_\mathrm{u}N p})$, where $p$ denotes the number of parameters, recovering earlier sample-complexity results that were derived for linear time-invariant dynamical systems. While this article focuses on characterizing sample complexity, the proposed algorithms are likely to be useful in practice, due to their simplicity, their ability to incorporate prior knowledge, and their benign transient behaviors.
+            </div>
+        </div>
+        <div class="paper" id="paper-30">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-30" data-paper-data='{"title": "InfoBridge: Mutual Information estimation via Bridge Matching", "author": "Sergei Kholkin, Ivan Butakov, Evgeny Burnaev, Nikita Gushchin, Alexander Korotin", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2502.01383", "summary": "arXiv:2502.01383v4 Announce Type: replace-cross \nAbstract: Diffusion bridge models have recently become a powerful tool in the field of generative modeling. In this work, we leverage their power to address another important problem in machine learning and information theory, the estimation of the mutual information (MI) between two random variables. Neatly framing MI estimation as a domain transfer problem, we construct an unbiased estimator for data posing difficulties for conventional MI estimators. We showcase the performance of our estimator on three standard MI estimation benchmarks, i.e., low-dimensional, image-based and high MI, and on real-world data, i.e., protein language model embeddings.", "number": 30, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#30</span>
+                <a href="https://arxiv.org/abs/2502.01383" target="_blank">InfoBridge: Mutual Information estimation via Bridge Matching</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sergei Kholkin, Ivan Butakov, Evgeny Burnaev, Nikita Gushchin, Alexander Korotin</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2502.01383" target="_blank">https://arxiv.org/abs/2502.01383</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Diffusion bridge models have recently become a powerful tool in the field of generative modeling. In this work, we leverage their power to address another important problem in machine learning and information theory, the estimation of the mutual information (MI) between two random variables. Neatly framing MI estimation as a domain transfer problem, we construct an unbiased estimator for data posing difficulties for conventional MI estimators. We showcase the performance of our estimator on three standard MI estimation benchmarks, i.e., low-dimensional, image-based and high MI, and on real-world data, i.e., protein language model embeddings.
+            </div>
+        </div>
+        <div class="paper" id="paper-31">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-31" data-paper-data='{"title": "Probabilistic Neural Networks (PNNs) with t-Distributed Outputs: Adaptive Prediction Intervals Beyond Gaussian Assumptions", "author": "Farhad Pourkamali-Anaraki", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2503.12354", "summary": "arXiv:2503.12354v2 Announce Type: replace-cross \nAbstract: Traditional neural network regression models provide only point estimates, failing to capture predictive uncertainty. Probabilistic neural networks (PNNs) address this limitation by producing output distributions, enabling the construction of prediction intervals. However, the common assumption of Gaussian output distributions often results in overly wide intervals, particularly in the presence of outliers or deviations from normality. To enhance the adaptability of PNNs, we propose t-Distributed Neural Networks (TDistNNs), which generate t-distributed outputs, parameterized by location, scale, and degrees of freedom. The degrees of freedom parameter allows TDistNNs to model heavy-tailed predictive distributions, improving robustness to non-Gaussian data and enabling more adaptive uncertainty quantification. We incorporate a likelihood based on the t-distribution into neural network training and derive efficient gradient computations for seamless integration into deep learning frameworks. Empirical evaluations on synthetic and real-world data demonstrate that TDistNNs improve the balance between coverage and interval width. Notably, for identical architectures, TDistNNs consistently produce narrower prediction intervals than Gaussian-based PNNs while maintaining proper coverage. This work contributes a flexible framework for uncertainty estimation in neural networks tasked with regression, particularly suited to settings involving complex output distributions.", "number": 31, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#31</span>
+                <a href="https://arxiv.org/abs/2503.12354" target="_blank">Probabilistic Neural Networks (PNNs) with t-Distributed Outputs: Adaptive Prediction Intervals Beyond Gaussian Assumptions</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Farhad Pourkamali-Anaraki</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2503.12354" target="_blank">https://arxiv.org/abs/2503.12354</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Traditional neural network regression models provide only point estimates, failing to capture predictive uncertainty. Probabilistic neural networks (PNNs) address this limitation by producing output distributions, enabling the construction of prediction intervals. However, the common assumption of Gaussian output distributions often results in overly wide intervals, particularly in the presence of outliers or deviations from normality. To enhance the adaptability of PNNs, we propose t-Distributed Neural Networks (TDistNNs), which generate t-distributed outputs, parameterized by location, scale, and degrees of freedom. The degrees of freedom parameter allows TDistNNs to model heavy-tailed predictive distributions, improving robustness to non-Gaussian data and enabling more adaptive uncertainty quantification. We incorporate a likelihood based on the t-distribution into neural network training and derive efficient gradient computations for seamless integration into deep learning frameworks. Empirical evaluations on synthetic and real-world data demonstrate that TDistNNs improve the balance between coverage and interval width. Notably, for identical architectures, TDistNNs consistently produce narrower prediction intervals than Gaussian-based PNNs while maintaining proper coverage. This work contributes a flexible framework for uncertainty estimation in neural networks tasked with regression, particularly suited to settings involving complex output distributions.
+            </div>
+        </div>
+        <div class="paper" id="paper-32">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-32" data-paper-data='{"title": "What Makes a Reward Model a Good Teacher? An Optimization Perspective", "author": "Noam Razin, Zixuan Wang, Hubert Strauss, Stanley Wei, Jason D. Lee, Sanjeev Arora", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2503.15477", "summary": "arXiv:2503.15477v4 Announce Type: replace-cross \nAbstract: The success of Reinforcement Learning from Human Feedback (RLHF) critically depends on the quality of the reward model. However, while this quality is primarily evaluated through accuracy, it remains unclear whether accuracy fully captures what makes a reward model an effective teacher. We address this question from an optimization perspective. First, we prove that regardless of how accurate a reward model is, if it induces low reward variance, then the RLHF objective suffers from a flat landscape. Consequently, even a perfectly accurate reward model can lead to extremely slow optimization, underperforming less accurate models that induce higher reward variance. We additionally show that a reward model that works well for one language model can induce low reward variance, and thus a flat objective landscape, for another. These results establish a fundamental limitation of evaluating reward models solely based on accuracy or independently of the language model they guide. Experiments using models of up to 8B parameters corroborate our theory, demonstrating the interplay between reward variance, accuracy, and reward maximization rate. Overall, our findings highlight that beyond accuracy, a reward model needs to induce sufficient variance for efficient optimization.", "number": 32, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#32</span>
+                <a href="https://arxiv.org/abs/2503.15477" target="_blank">What Makes a Reward Model a Good Teacher? An Optimization Perspective</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Noam Razin, Zixuan Wang, Hubert Strauss, Stanley Wei, Jason D. Lee, Sanjeev Arora</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2503.15477" target="_blank">https://arxiv.org/abs/2503.15477</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The success of Reinforcement Learning from Human Feedback (RLHF) critically depends on the quality of the reward model. However, while this quality is primarily evaluated through accuracy, it remains unclear whether accuracy fully captures what makes a reward model an effective teacher. We address this question from an optimization perspective. First, we prove that regardless of how accurate a reward model is, if it induces low reward variance, then the RLHF objective suffers from a flat landscape. Consequently, even a perfectly accurate reward model can lead to extremely slow optimization, underperforming less accurate models that induce higher reward variance. We additionally show that a reward model that works well for one language model can induce low reward variance, and thus a flat objective landscape, for another. These results establish a fundamental limitation of evaluating reward models solely based on accuracy or independently of the language model they guide. Experiments using models of up to 8B parameters corroborate our theory, demonstrating the interplay between reward variance, accuracy, and reward maximization rate. Overall, our findings highlight that beyond accuracy, a reward model needs to induce sufficient variance for efficient optimization.
+            </div>
+        </div>
+        <div class="paper" id="paper-33">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-33" data-paper-data='{"title": "Efficient Ensemble Conditional Independence Test Framework for Causal Discovery", "author": "Zhengkang Guan, Kun Kuang", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2509.21021", "summary": "arXiv:2509.21021v2 Announce Type: replace-cross \nAbstract: Constraint-based causal discovery relies on numerous conditional independence tests (CITs), but its practical applicability is severely constrained by the prohibitive computational cost, especially as CITs themselves have high time complexity with respect to the sample size. To address this key bottleneck, we introduce the Ensemble Conditional Independence Test (E-CIT), a general-purpose and plug-and-play framework. E-CIT operates on an intuitive divide-and-aggregate strategy: it partitions the data into subsets, applies a given base CIT independently to each subset, and aggregates the resulting p-values using a novel method grounded in the properties of stable distributions. This framework reduces the computational complexity of a base CIT to linear in the sample size when the subset size is fixed. Moreover, our tailored p-value combination method offers theoretical consistency guarantees under mild conditions on the subtests. Experimental results demonstrate that E-CIT not only significantly reduces the computational burden of CITs and causal discovery but also achieves competitive performance. Notably, it exhibits an improvement in complex testing scenarios, particularly on real-world datasets.", "number": 33, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#33</span>
+                <a href="https://arxiv.org/abs/2509.21021" target="_blank">Efficient Ensemble Conditional Independence Test Framework for Causal Discovery</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Zhengkang Guan, Kun Kuang</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2509.21021" target="_blank">https://arxiv.org/abs/2509.21021</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Constraint-based causal discovery relies on numerous conditional independence tests (CITs), but its practical applicability is severely constrained by the prohibitive computational cost, especially as CITs themselves have high time complexity with respect to the sample size. To address this key bottleneck, we introduce the Ensemble Conditional Independence Test (E-CIT), a general-purpose and plug-and-play framework. E-CIT operates on an intuitive divide-and-aggregate strategy: it partitions the data into subsets, applies a given base CIT independently to each subset, and aggregates the resulting p-values using a novel method grounded in the properties of stable distributions. This framework reduces the computational complexity of a base CIT to linear in the sample size when the subset size is fixed. Moreover, our tailored p-value combination method offers theoretical consistency guarantees under mild conditions on the subtests. Experimental results demonstrate that E-CIT not only significantly reduces the computational burden of CITs and causal discovery but also achieves competitive performance. Notably, it exhibits an improvement in complex testing scenarios, particularly on real-world datasets.
+            </div>
+        </div>
+        <div class="paper" id="paper-34">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-34" data-paper-data='{"title": "Learning Mixtures of Linear Dynamical Systems via Hybrid Tensor-EM Method", "author": "Lulu Gong, Shreya Saxena", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2510.06091", "summary": "arXiv:2510.06091v2 Announce Type: replace-cross \nAbstract: Mixtures of linear dynamical systems (MoLDS) provide a path to model time-series data that exhibit diverse temporal dynamics across trajectories. However, its application remains challenging in complex and noisy settings, limiting its effectiveness for neural data analysis. Tensor-based moment methods can provide global identifiability guarantees for MoLDS, but their performance degrades under noise and complexity. Commonly used expectation-maximization (EM) methods offer flexibility in fitting latent models but are highly sensitive to initialization and prone to poor local minima. Here, we propose a tensor-based method that provides identifiability guarantees for learning MoLDS, which is followed by EM updates to combine the strengths of both approaches. The novelty in our approach lies in the construction of moment tensors using the input-output data to recover globally consistent estimates of mixture weights and system parameters. These estimates can then be refined through a Kalman EM algorithm, with closed-form updates for all LDS parameters. We validate our framework on synthetic benchmarks and real-world datasets. On synthetic data, the proposed Tensor-EM method achieves more reliable recovery and improved robustness compared to either pure tensor or randomly initialized EM methods. We then analyze neural recordings from the primate somatosensory cortex while a non-human primate performs reaches in different directions. Our method successfully models and clusters different conditions as separate subsystems, consistent with supervised single-LDS fits for each condition. Finally, we apply this approach to another neural dataset where monkeys perform a sequential reaching task. These results demonstrate that MoLDS provides an effective framework for modeling complex neural data, and that Tensor-EM is a reliable approach to MoLDS learning for these applications.", "number": 34, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#34</span>
+                <a href="https://arxiv.org/abs/2510.06091" target="_blank">Learning Mixtures of Linear Dynamical Systems via Hybrid Tensor-EM Method</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Lulu Gong, Shreya Saxena</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.06091" target="_blank">https://arxiv.org/abs/2510.06091</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Mixtures of linear dynamical systems (MoLDS) provide a path to model time-series data that exhibit diverse temporal dynamics across trajectories. However, its application remains challenging in complex and noisy settings, limiting its effectiveness for neural data analysis. Tensor-based moment methods can provide global identifiability guarantees for MoLDS, but their performance degrades under noise and complexity. Commonly used expectation-maximization (EM) methods offer flexibility in fitting latent models but are highly sensitive to initialization and prone to poor local minima. Here, we propose a tensor-based method that provides identifiability guarantees for learning MoLDS, which is followed by EM updates to combine the strengths of both approaches. The novelty in our approach lies in the construction of moment tensors using the input-output data to recover globally consistent estimates of mixture weights and system parameters. These estimates can then be refined through a Kalman EM algorithm, with closed-form updates for all LDS parameters. We validate our framework on synthetic benchmarks and real-world datasets. On synthetic data, the proposed Tensor-EM method achieves more reliable recovery and improved robustness compared to either pure tensor or randomly initialized EM methods. We then analyze neural recordings from the primate somatosensory cortex while a non-human primate performs reaches in different directions. Our method successfully models and clusters different conditions as separate subsystems, consistent with supervised single-LDS fits for each condition. Finally, we apply this approach to another neural dataset where monkeys perform a sequential reaching task. These results demonstrate that MoLDS provides an effective framework for modeling complex neural data, and that Tensor-EM is a reliable approach to MoLDS learning for these applications.
+            </div>
+        </div>
+        <div class="paper" id="paper-35">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-35" data-paper-data='{"title": "Uncertainty-aware data assimilation through variational inference", "author": "Anthony Frion, David S Greenberg", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2510.17268", "summary": "arXiv:2510.17268v2 Announce Type: replace-cross \nAbstract: Data assimilation, consisting in the combination of a dynamical model with a set of noisy and incomplete observations in order to infer the state of a system over time, involves uncertainty in most settings. Building upon an existing deterministic machine learning approach, we propose a variational inference-based extension in which the predicted state follows a multivariate Gaussian distribution. Using the chaotic Lorenz-96 dynamics as a testing ground, we show that our new model enables to obtain nearly perfectly calibrated predictions, and can be integrated in a wider variational data assimilation pipeline in order to achieve greater benefit from increasing lengths of data assimilation windows. Our code is available at https://github.com/anthony-frion/Stochastic_CODA.", "number": 35, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#35</span>
+                <a href="https://arxiv.org/abs/2510.17268" target="_blank">Uncertainty-aware data assimilation through variational inference</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Anthony Frion, David S Greenberg</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.17268" target="_blank">https://arxiv.org/abs/2510.17268</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Data assimilation, consisting in the combination of a dynamical model with a set of noisy and incomplete observations in order to infer the state of a system over time, involves uncertainty in most settings. Building upon an existing deterministic machine learning approach, we propose a variational inference-based extension in which the predicted state follows a multivariate Gaussian distribution. Using the chaotic Lorenz-96 dynamics as a testing ground, we show that our new model enables to obtain nearly perfectly calibrated predictions, and can be integrated in a wider variational data assimilation pipeline in order to achieve greater benefit from increasing lengths of data assimilation windows. Our code is available at https://github.com/anthony-frion/Stochastic_CODA.
+            </div>
+        </div>
+        <div class="paper" id="paper-36">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-36" data-paper-data='{"title": "Smoothing DiLoCo with Primal Averaging for Faster Training of LLMs", "author": "Aaron Defazio, Konstantin Mishchenko, Parameswaran Raman, Hao-Jun Michael Shi, Lin Xiao", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.17131", "summary": "arXiv:2512.17131v3 Announce Type: replace-cross \nAbstract: We propose Generalized Primal Averaging (GPA), an extension of Nesterov's method that unifies and generalizes recent averaging-based optimizers like single-worker DiLoCo and Schedule-Free, within a non-distributed setting. While DiLoCo relies on a memory-intensive two-loop structure to periodically aggregate pseudo-gradients using Nesterov momentum, GPA eliminates this complexity by decoupling Nesterov's interpolation constants to enable smooth iterate averaging at every step. Structurally, GPA resembles Schedule-Free but replaces uniform averaging with exponential moving averaging. Empirically, GPA consistently outperforms single-worker DiLoCo and AdamW with reduced memory overhead. GPA achieves speedups of 8.71%, 10.13%, and 9.58% over the AdamW baseline in terms of steps to reach target validation loss for Llama-160M, 1B, and 8B models, respectively. Similarly, on the ImageNet ViT workload, GPA achieves speedups of 7% and 25.5% in the small and large batch settings respectively. Furthermore, we prove that for any base optimizer with $O(\\sqrt{T})$ regret, where $T$ is the number of iterations, GPA matches or exceeds the original convergence guarantees depending on the interpolation constants.", "number": 36, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#36</span>
+                <a href="https://arxiv.org/abs/2512.17131" target="_blank">Smoothing DiLoCo with Primal Averaging for Faster Training of LLMs</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Aaron Defazio, Konstantin Mishchenko, Parameswaran Raman, Hao-Jun Michael Shi, Lin Xiao</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.17131" target="_blank">https://arxiv.org/abs/2512.17131</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We propose Generalized Primal Averaging (GPA), an extension of Nesterov's method that unifies and generalizes recent averaging-based optimizers like single-worker DiLoCo and Schedule-Free, within a non-distributed setting. While DiLoCo relies on a memory-intensive two-loop structure to periodically aggregate pseudo-gradients using Nesterov momentum, GPA eliminates this complexity by decoupling Nesterov's interpolation constants to enable smooth iterate averaging at every step. Structurally, GPA resembles Schedule-Free but replaces uniform averaging with exponential moving averaging. Empirically, GPA consistently outperforms single-worker DiLoCo and AdamW with reduced memory overhead. GPA achieves speedups of 8.71%, 10.13%, and 9.58% over the AdamW baseline in terms of steps to reach target validation loss for Llama-160M, 1B, and 8B models, respectively. Similarly, on the ImageNet ViT workload, GPA achieves speedups of 7% and 25.5% in the small and large batch settings respectively. Furthermore, we prove that for any base optimizer with $O(\sqrt{T})$ regret, where $T$ is the number of iterations, GPA matches or exceeds the original convergence guarantees depending on the interpolation constants.
+            </div>
+        </div>
+        <div class="paper" id="paper-37">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-37" data-paper-data='{"title": "Singular Fluctuation as Specific Heat in Bayesian Learning", "author": "Sean Plummer", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.21411", "summary": "arXiv:2512.21411v2 Announce Type: replace-cross \nAbstract: Singular learning theory characterizes Bayesian models with non-identifiable parameterizations through two central quantities: the real log canonical threshold (RLCT), which governs marginal likelihood asymptotics, and the singular fluctuation, which determines second-order generalization behavior and the complexity term in WAIC. While the geometric meaning of the RLCT is well understood, the interpretation of singular fluctuation has remained comparatively opaque. We show that singular fluctuation admits a precise thermodynamic interpretation. Under a tempered (Gibbs) posterior, it is exactly the curvature of the Bayesian free energy with respect to inverse temperature; equivalently, the variance of the log-likelihood observable. In this sense, singular fluctuation is the statistical analogue of specific heat. This identity clarifies why singular fluctuation controls the equation of state relating training and generalization error and explains the success of WAIC in singular models: WAIC estimates a fluctuation coefficient rather than a parameter dimension. Across Gaussian mixture models and reduced-rank regression, we demonstrate that singular fluctuation behaves as a thermodynamic response coefficient. As temperature decreases, posterior reorganization suppresses fluctuation directions that affect predictive performance, and model-specific geometric observables track the decay of singular fluctuation. Rather than introducing new asymptotic expansions, this work unifies existing variance identities, equation-of-state results, and WAIC complexity corrections under a single free-energy curvature framework.", "number": 37, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#37</span>
+                <a href="https://arxiv.org/abs/2512.21411" target="_blank">Singular Fluctuation as Specific Heat in Bayesian Learning</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sean Plummer</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.21411" target="_blank">https://arxiv.org/abs/2512.21411</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Singular learning theory characterizes Bayesian models with non-identifiable parameterizations through two central quantities: the real log canonical threshold (RLCT), which governs marginal likelihood asymptotics, and the singular fluctuation, which determines second-order generalization behavior and the complexity term in WAIC. While the geometric meaning of the RLCT is well understood, the interpretation of singular fluctuation has remained comparatively opaque. We show that singular fluctuation admits a precise thermodynamic interpretation. Under a tempered (Gibbs) posterior, it is exactly the curvature of the Bayesian free energy with respect to inverse temperature; equivalently, the variance of the log-likelihood observable. In this sense, singular fluctuation is the statistical analogue of specific heat. This identity clarifies why singular fluctuation controls the equation of state relating training and generalization error and explains the success of WAIC in singular models: WAIC estimates a fluctuation coefficient rather than a parameter dimension. Across Gaussian mixture models and reduced-rank regression, we demonstrate that singular fluctuation behaves as a thermodynamic response coefficient. As temperature decreases, posterior reorganization suppresses fluctuation directions that affect predictive performance, and model-specific geometric observables track the decay of singular fluctuation. Rather than introducing new asymptotic expansions, this work unifies existing variance identities, equation-of-state results, and WAIC complexity corrections under a single free-energy curvature framework.
+            </div>
+        </div>
+        <div class="paper" id="paper-38">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-38" data-paper-data='{"title": "Trust Region Masking for Long-Horizon LLM Reinforcement Learning", "author": "Yingru Li, Jiacai Liu, Jiawei Xu, Yuxuan Tong, Ziniu Li, Qian Liu, Baoxiang Wang", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.23075", "summary": "arXiv:2512.23075v4 Announce Type: replace-cross \nAbstract: Policy gradient methods for Large Language Models optimize a policy $\\pi_\\theta$ via a surrogate objective computed from samples of a rollout policy $\\pi_{\\text{roll}}$. However, modern LLM-RL pipelines suffer from unavoidable implementation divergences -- backend discrepancies, Mixture-of-Experts routing discontinuities, and distributed training staleness -- causing off-policy mismatch ($\\pi_{\\text{roll}} \\neq \\pi_\\theta$) and approximation errors between the surrogate and the true objective. We demonstrate that classical trust region bounds on this error scale as $O(T^2)$ with sequence length $T$, rendering them vacuous for long-horizon tasks. To address this, we derive a family of bounds -- both KL-based and TV-based -- including a Pinsker-Marginal bound ($O(T^{3/2})$), a Mixed bound ($O(T)$), and an Adaptive bound that strictly generalizes the Pinsker-Marginal bound via per-position importance-ratio decomposition. Taking the minimum over all bounds yields the tightest known guarantee across all divergence regimes. Crucially, all bounds depend on the maximum token-level divergence $D_{\\mathrm{KL}}^{\\mathrm{tok,max}}$ (or $D_{\\mathrm{TV}}^{\\mathrm{tok,max}}$), a sequence-level quantity that cannot be controlled by token-independent methods like PPO clipping. We propose Trust Region Masking (TRM), which masks entire sequences violating the trust region, enabling the first non-vacuous monotonic improvement guarantees for long-horizon LLM-RL.", "number": 38, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#38</span>
+                <a href="https://arxiv.org/abs/2512.23075" target="_blank">Trust Region Masking for Long-Horizon LLM Reinforcement Learning</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yingru Li, Jiacai Liu, Jiawei Xu, Yuxuan Tong, Ziniu Li, Qian Liu, Baoxiang Wang</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.23075" target="_blank">https://arxiv.org/abs/2512.23075</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Policy gradient methods for Large Language Models optimize a policy $\pi_\theta$ via a surrogate objective computed from samples of a rollout policy $\pi_{\text{roll}}$. However, modern LLM-RL pipelines suffer from unavoidable implementation divergences -- backend discrepancies, Mixture-of-Experts routing discontinuities, and distributed training staleness -- causing off-policy mismatch ($\pi_{\text{roll}} \neq \pi_\theta$) and approximation errors between the surrogate and the true objective. We demonstrate that classical trust region bounds on this error scale as $O(T^2)$ with sequence length $T$, rendering them vacuous for long-horizon tasks. To address this, we derive a family of bounds -- both KL-based and TV-based -- including a Pinsker-Marginal bound ($O(T^{3/2})$), a Mixed bound ($O(T)$), and an Adaptive bound that strictly generalizes the Pinsker-Marginal bound via per-position importance-ratio decomposition. Taking the minimum over all bounds yields the tightest known guarantee across all divergence regimes. Crucially, all bounds depend on the maximum token-level divergence $D_{\mathrm{KL}}^{\mathrm{tok,max}}$ (or $D_{\mathrm{TV}}^{\mathrm{tok,max}}$), a sequence-level quantity that cannot be controlled by token-independent methods like PPO clipping. We propose Trust Region Masking (TRM), which masks entire sequences violating the trust region, enabling the first non-vacuous monotonic improvement guarantees for long-horizon LLM-RL.
+            </div>
+        </div>
+        <div class="paper" id="paper-39">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-39" data-paper-data='{"title": "Robust Online Learning", "author": "Sajad Ashkezari", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.06775", "summary": "arXiv:2602.06775v2 Announce Type: replace-cross \nAbstract: We study the problem of learning robust classifiers where the classifier will receive a perturbed input. Unlike robust PAC learning studied in prior work, here the clean data and its label are also adversarially chosen. We formulate this setting as an online learning problem and consider both the realizable and agnostic learnability of hypothesis classes. We define a new dimension of classes and show it controls the mistake bounds in the realizable setting and the regret bounds in the agnostic setting. In contrast to the dimension that characterizes learnability in the PAC setting, our dimension is rather simple and resembles the Littlestone dimension. We generalize our dimension to multiclass hypothesis classes and prove similar results in the realizable case. Finally, we study the case where the learner does not know the set of allowed perturbations for each point and only has some prior on them.", "number": 39, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#39</span>
+                <a href="https://arxiv.org/abs/2602.06775" target="_blank">Robust Online Learning</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sajad Ashkezari</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.06775" target="_blank">https://arxiv.org/abs/2602.06775</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the problem of learning robust classifiers where the classifier will receive a perturbed input. Unlike robust PAC learning studied in prior work, here the clean data and its label are also adversarially chosen. We formulate this setting as an online learning problem and consider both the realizable and agnostic learnability of hypothesis classes. We define a new dimension of classes and show it controls the mistake bounds in the realizable setting and the regret bounds in the agnostic setting. In contrast to the dimension that characterizes learnability in the PAC setting, our dimension is rather simple and resembles the Littlestone dimension. We generalize our dimension to multiclass hypothesis classes and prove similar results in the realizable case. Finally, we study the case where the learner does not know the set of allowed perturbations for each point and only has some prior on them.
+            </div>
+        </div>
+        <div class="paper" id="paper-40">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-40" data-paper-data='{"title": "Discrete Diffusion with Sample-Efficient Estimators for Conditionals", "author": "Karthik Elamvazhuthi, Abhijith Jayakumar, Andrey Y. Lokhov", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.20293", "summary": "arXiv:2602.20293v2 Announce Type: replace-cross \nAbstract: We study a discrete denoising diffusion framework that integrates a sample-efficient estimator of single-site conditionals with round-robin noising and denoising dynamics for generative modeling over discrete state spaces. Rather than approximating a discrete analog of a score function, our formulation treats single-site conditional probabilities as the fundamental objects that parameterize the reverse diffusion process. We employ a sample-efficient method known as Neural Interaction Screening Estimator (NeurISE) to estimate these conditionals in the diffusion dynamics. Controlled experiments on synthetic Ising models, MNIST, and scientific data sets produced by a D-Wave quantum annealer, synthetic Potts model and one-dimensional quantum systems demonstrate the proposed approach. On the binary data sets, these experiments demonstrate that the proposed approach outperforms popular existing methods including ratio-based approaches, achieving improved performance in total variation, cross-correlations, and kernel density estimation metrics.", "number": 40, "labels": [{"name": "diffusion", "color": "#9b59b6"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#40</span>
+                <a href="https://arxiv.org/abs/2602.20293" target="_blank">Discrete Diffusion with Sample-Efficient Estimators for Conditionals</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #9b59b6;">diffusion</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Karthik Elamvazhuthi, Abhijith Jayakumar, Andrey Y. Lokhov</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.20293" target="_blank">https://arxiv.org/abs/2602.20293</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study a discrete denoising diffusion framework that integrates a sample-efficient estimator of single-site conditionals with round-robin noising and denoising dynamics for generative modeling over discrete state spaces. Rather than approximating a discrete analog of a score function, our formulation treats single-site conditional probabilities as the fundamental objects that parameterize the reverse diffusion process. We employ a sample-efficient method known as Neural Interaction Screening Estimator (NeurISE) to estimate these conditionals in the diffusion dynamics. Controlled experiments on synthetic Ising models, MNIST, and scientific data sets produced by a D-Wave quantum annealer, synthetic Potts model and one-dimensional quantum systems demonstrate the proposed approach. On the binary data sets, these experiments demonstrate that the proposed approach outperforms popular existing methods including ratio-based approaches, achieving improved performance in total variation, cross-correlations, and kernel density estimation metrics.
+            </div>
+        </div>
+        <div class="paper" id="paper-41">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-41" data-paper-data='{"title": "Regularized Online RLHF with Generalized Bilinear Preferences", "author": "Junghyun Lee, Minju Hong, Kwang-Sung Jun, Chulhee Yun, Se-Young Yun", "published": "Mon, 02 Mar 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2602.23116", "summary": "arXiv:2602.23116v2 Announce Type: replace-cross \nAbstract: We consider the problem of contextual online RLHF with general preferences, where the goal is to identify the Nash Equilibrium. We adopt the Generalized Bilinear Preference Model (GBPM) to capture potentially intransitive preferences via low-rank, skew-symmetric matrices. We investigate general preference learning with any strongly convex regularizer and regularization strength $\\eta^{-1}$, generalizing beyond prior work limited to reverse KL-regularization. Central to our analysis is proving that the dual gap of the greedy policy is bounded by the square of the estimation error, a result derived solely from strong convexity and the skew-symmetry of GBPM. Building on this insight and a feature diversity assumption, we establish two regret bounds via two simple algorithms: (1) Greedy Sampling achieves polylogarithmic, $e^{\\mathcal{O}(\\eta)}$-free regret $\\tilde{\\mathcal{O}}(\\eta d^4 (\\log T)^2)$. (2) Explore-Then-Commit achieves $\\mathrm{poly}(d)$-free regret $\\tilde{\\mathcal{O}}(\\sqrt{\\eta r T})$ by exploiting the low-rank structure; this is the first statistically efficient guarantee for online RLHF in high-dimensions.", "number": 41, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#41</span>
+                <a href="https://arxiv.org/abs/2602.23116" target="_blank">Regularized Online RLHF with Generalized Bilinear Preferences</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Junghyun Lee, Minju Hong, Kwang-Sung Jun, Chulhee Yun, Se-Young Yun</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 02 Mar 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.23116" target="_blank">https://arxiv.org/abs/2602.23116</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We consider the problem of contextual online RLHF with general preferences, where the goal is to identify the Nash Equilibrium. We adopt the Generalized Bilinear Preference Model (GBPM) to capture potentially intransitive preferences via low-rank, skew-symmetric matrices. We investigate general preference learning with any strongly convex regularizer and regularization strength $\eta^{-1}$, generalizing beyond prior work limited to reverse KL-regularization. Central to our analysis is proving that the dual gap of the greedy policy is bounded by the square of the estimation error, a result derived solely from strong convexity and the skew-symmetry of GBPM. Building on this insight and a feature diversity assumption, we establish two regret bounds via two simple algorithms: (1) Greedy Sampling achieves polylogarithmic, $e^{\mathcal{O}(\eta)}$-free regret $\tilde{\mathcal{O}}(\eta d^4 (\log T)^2)$. (2) Explore-Then-Commit achieves $\mathrm{poly}(d)$-free regret $\tilde{\mathcal{O}}(\sqrt{\eta r T})$ by exploiting the low-rank structure; this is the first statistically efficient guarantee for online RLHF in high-dimensions.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-03-02 18:00:03
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>

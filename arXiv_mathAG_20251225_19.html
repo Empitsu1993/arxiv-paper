@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Thu, 25 Dec 2025 05:00:10 +0000<br>
+        <strong>論文数:</strong> 19件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Orbifold modifications of complex analytic spaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Adjoint log canonical foliated singularities on surfaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Virtual volumes of strata of meromorphic differentials with simple poles</a>
+            <span class="title-label-badge" style="background-color: #ff69b4;">privacy</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">On the Euclidean Distance Degree of Quadratic Two-Neuron Neural Networks</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">Critical Points of Degenerate Metrics on Algebraic Varieties: A Tale of Overparametrization</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">From logarithmic Hilbert schemes to degenerations of hyperk\"ahler varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Pluricanonical Geometry of Varieties Isogenous to a Product: Chevalley-Weil Theory and Pluricanonical Decompositions of Abelian Covers</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Is there a smooth lattice polytope which does not have the integer decomposition property?</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">Limits of equi-affine equi-distant loci of planar convex domains with two non-parallel asymptotes</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">The intersection cohomology Hodge module of toric varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">The Gauss map of a projective foliation</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">Remodeling Conjecture with Descendants</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">A note on the Brill-Noether loci of small codimension in moduli space of stable bundles</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Prym maps of cyclic coverings of hyperelliptic curves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Nakajima quiver varieties in dimension four</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">Derived isogenies between abelian varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">Topological Gauge Theories with Sixteen Supercharges: Higher $A_\infty$-categorification of Floer Homologies</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">Compact K\"{a}hler manifolds with partially semi-positive curvature</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Shifted twisted Yangians and affine Grassmannian islices</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Orbifold modifications of complex analytic spaces", "author": "J\\'anos Koll\\'ar, Wenhao Ou", "published": "Thu, 25 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.20708", "summary": "arXiv:2512.20708v1 Announce Type: new \nAbstract: We show that a compact, complex analytic space $X$ has a bimeromorphic orbifold modification\n  that is an isomorphism over the locally trivial orbifold locus of $X$.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2512.20708" target="_blank">Orbifold modifications of complex analytic spaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> J\'anos Koll\'ar, Wenhao Ou</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 25 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.20708" target="_blank">https://arxiv.org/abs/2512.20708</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We show that a compact, complex analytic space $X$ has a bimeromorphic orbifold modification
+  that is an isomorphism over the locally trivial orbifold locus of $X$.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Adjoint log canonical foliated singularities on surfaces", "author": "Shi Xu", "published": "Thu, 25 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.20744", "summary": "arXiv:2512.20744v1 Announce Type: new \nAbstract: Let $(X,\\mathcal{F})$ be a foliated surface over $\\mathbb{C}$. We study the singularities of the adjoint foliated divisor $K_{\\mathcal{F}}+\\epsilon K_X$. We provide a complete classification of $\\epsilon$-adjoint log canonical singularities of foliated surfaces for $\\epsilon\\in(0,1/3)$. Moreover, we prove that for any $\\epsilon\\in(0,1/5)$, every $\\epsilon$-adjoint log canonical singularity is log canonical for $\\mathcal{F}$, and that for any $\\epsilon\\in(0,1/4)$, every $\\epsilon$-adjoint canonical singularity is log canonical for $\\mathcal{F}$. Finally, we present examples showing that both bounds are sharp.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2512.20744" target="_blank">Adjoint log canonical foliated singularities on surfaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Shi Xu</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 25 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.20744" target="_blank">https://arxiv.org/abs/2512.20744</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $(X,\mathcal{F})$ be a foliated surface over $\mathbb{C}$. We study the singularities of the adjoint foliated divisor $K_{\mathcal{F}}+\epsilon K_X$. We provide a complete classification of $\epsilon$-adjoint log canonical singularities of foliated surfaces for $\epsilon\in(0,1/3)$. Moreover, we prove that for any $\epsilon\in(0,1/5)$, every $\epsilon$-adjoint log canonical singularity is log canonical for $\mathcal{F}$, and that for any $\epsilon\in(0,1/4)$, every $\epsilon$-adjoint canonical singularity is log canonical for $\mathcal{F}$. Finally, we present examples showing that both bounds are sharp.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Virtual volumes of strata of meromorphic differentials with simple poles", "author": "Adrien Sauvaget", "published": "Thu, 25 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.20819", "summary": "arXiv:2512.20819v1 Announce Type: new \nAbstract: We work over strata of meromorphic differentials with poles of order 1, and on affine subspaces defined by linear conditions on the residues. We propose a definition of the volume of these objects as the integral of a tautological class on the projectivization of the stratum. By previous work with Chen-M\\\"oller-Zagier, this definition agrees with the Masur-Veech volumes in the holomorphic case. We show that these algebraic constants can be computed by induction on the genus and number of singularities. Besides, for strata with a single zero, we prove that the generating series of these volumes is a solution of an integrable system associated with the PDE: $u_tu_{xx}=u_tu_x+u_t - 1$.", "number": 3, "labels": [{"name": "privacy", "color": "#ff69b4"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2512.20819" target="_blank">Virtual volumes of strata of meromorphic differentials with simple poles</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #ff69b4;">privacy</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Adrien Sauvaget</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 25 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.20819" target="_blank">https://arxiv.org/abs/2512.20819</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We work over strata of meromorphic differentials with poles of order 1, and on affine subspaces defined by linear conditions on the residues. We propose a definition of the volume of these objects as the integral of a tautological class on the projectivization of the stratum. By previous work with Chen-M\"oller-Zagier, this definition agrees with the Masur-Veech volumes in the holomorphic case. We show that these algebraic constants can be computed by induction on the genus and number of singularities. Besides, for strata with a single zero, we prove that the generating series of these volumes is a solution of an integrable system associated with the PDE: $u_tu_{xx}=u_tu_x+u_t - 1$.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "On the Euclidean Distance Degree of Quadratic Two-Neuron Neural Networks", "author": "Giacomo Graziani", "published": "Thu, 25 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.21016", "summary": "arXiv:2512.21016v1 Announce Type: new \nAbstract: We study the Euclidean Distance degree of algebraic neural network models from the perspective of algebraic geometry. Focusing on shallow networks with two neurons, quadratic activation, and scalar output, we identify the associated neurovariety with the second secant variety of a quadratic Veronese embedding. We introduce and analyze the virtual Euclidean Distance degree, a projective invariant defined as the sum of the polar degrees of the variety, which coincides with the usual Euclidean Distance degree for a generic choice of scalar product. Using intersection theory, Chern-Mather classes, and the Nash blow-up provided by Kempf's resolution, we reduce the computation of the virtual Euclidean Distance degree to explicit intersection numbers on a Grassmannian. Applying equivariant localization, we prove that this invariant depends stably polynomially on the input dimension. Numerical experiments based on homotopy continuation illustrate the dependence of the Euclidean Distance degree on the chosen metric and highlight the distinction between the generic and nongeneric cases, such as the Bombieri-Weyl metric.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2512.21016" target="_blank">On the Euclidean Distance Degree of Quadratic Two-Neuron Neural Networks</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Giacomo Graziani</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 25 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.21016" target="_blank">https://arxiv.org/abs/2512.21016</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the Euclidean Distance degree of algebraic neural network models from the perspective of algebraic geometry. Focusing on shallow networks with two neurons, quadratic activation, and scalar output, we identify the associated neurovariety with the second secant variety of a quadratic Veronese embedding. We introduce and analyze the virtual Euclidean Distance degree, a projective invariant defined as the sum of the polar degrees of the variety, which coincides with the usual Euclidean Distance degree for a generic choice of scalar product. Using intersection theory, Chern-Mather classes, and the Nash blow-up provided by Kempf's resolution, we reduce the computation of the virtual Euclidean Distance degree to explicit intersection numbers on a Grassmannian. Applying equivariant localization, we prove that this invariant depends stably polynomially on the input dimension. Numerical experiments based on homotopy continuation illustrate the dependence of the Euclidean Distance degree on the chosen metric and highlight the distinction between the generic and nongeneric cases, such as the Bombieri-Weyl metric.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "Critical Points of Degenerate Metrics on Algebraic Varieties: A Tale of Overparametrization", "author": "Giovanni Luca Marchetti, Erin Connelly, Paul Breiding, Kathl\\'en Kohn", "published": "Thu, 25 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.21029", "summary": "arXiv:2512.21029v1 Announce Type: new \nAbstract: We study the critical points over an algebraic variety of an optimization problem defined by a quadratic objective that is degenerate. This scenario arises in machine learning when the dataset size is small with respect to the model, and is typically referred to as overparametrization. Our main result relates the degenerate optimization problem to a nondegenerate one via a projection. In the highly-degenerate regime, we find that a central role is played by the ramification locus of the projection. Additionally, we provide tools for counting the number of critical points over projective varieties, and discuss specific cases arising from deep learning. Our work bridges tools from algebraic geometry with ideas from machine learning, and it extends the line of literature around the Euclidean distance degree to the degenerate setting.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2512.21029" target="_blank">Critical Points of Degenerate Metrics on Algebraic Varieties: A Tale of Overparametrization</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Giovanni Luca Marchetti, Erin Connelly, Paul Breiding, Kathl\'en Kohn</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 25 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.21029" target="_blank">https://arxiv.org/abs/2512.21029</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the critical points over an algebraic variety of an optimization problem defined by a quadratic objective that is degenerate. This scenario arises in machine learning when the dataset size is small with respect to the model, and is typically referred to as overparametrization. Our main result relates the degenerate optimization problem to a nondegenerate one via a projection. In the highly-degenerate regime, we find that a central role is played by the ramification locus of the projection. Additionally, we provide tools for counting the number of critical points over projective varieties, and discuss specific cases arising from deep learning. Our work bridges tools from algebraic geometry with ideas from machine learning, and it extends the line of literature around the Euclidean distance degree to the degenerate setting.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "From logarithmic Hilbert schemes to degenerations of hyperk\\\"ahler varieties", "author": "Qaasim Shafi, Calla Tschanz", "published": "Thu, 25 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.21190", "summary": "arXiv:2512.21190v1 Announce Type: new \nAbstract: We construct the first examples of good type III degenerations of hyperk\\\"ahler varieties in dimension greater than 2. These are presented as moduli of 0-dimensional subschemes on expansions of a degeneration of K3 surfaces. We prove projectivity for our expanded degenerations and compute the dual complexes of the special fibre for two specific degenerations of hyperkahler fourfolds. Moreover, we explain the correspondence between geometric strata of the special fibre and simplices in its dual complex.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2512.21190" target="_blank">From logarithmic Hilbert schemes to degenerations of hyperk\"ahler varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Qaasim Shafi, Calla Tschanz</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 25 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.21190" target="_blank">https://arxiv.org/abs/2512.21190</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We construct the first examples of good type III degenerations of hyperk\"ahler varieties in dimension greater than 2. These are presented as moduli of 0-dimensional subschemes on expansions of a degeneration of K3 surfaces. We prove projectivity for our expanded degenerations and compute the dual complexes of the special fibre for two specific degenerations of hyperkahler fourfolds. Moreover, we explain the correspondence between geometric strata of the special fibre and simplices in its dual complex.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Pluricanonical Geometry of Varieties Isogenous to a Product: Chevalley-Weil Theory and Pluricanonical Decompositions of Abelian Covers", "author": "Massimiliano Alessandro, Davide Frapporti, Christian Gleissner", "published": "Thu, 25 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.21294", "summary": "arXiv:2512.21294v1 Announce Type: new \nAbstract: We study canonical and pluricanonical maps of varieties isogenous to a product of curves, i.e., quotients of the form $ X = (C_1 \\times \\dots \\times C_n)/G $ with $g(C_i)\\ge 2$ and $G$ acting freely. We establish the Chevalley-Weil formula for pluricanonical representations of a curve with a finite group action and a decomposition theorem for pluricanonical systems of abelian covers. These tools allow an explicit study of geometric properties of $X$, such as base loci and the birationality of pluricanonical maps. For threefolds isogenous to a product, we prove that the 4-canonical map is birational for $p_g \\ge 5$ and construct an example attaining the maximal canonical degree for this class of threefolds. In this example, the canonical map is the normalization of its image, which admits isolated non-normal singularities. Computational classifications also reveal threefolds where the bicanonical map fails to be birational, even in the absence of genus-2 fibrations. This illustrates an interesting phenomenon similar to the non-standard case for surfaces.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2512.21294" target="_blank">Pluricanonical Geometry of Varieties Isogenous to a Product: Chevalley-Weil Theory and Pluricanonical Decompositions of Abelian Covers</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Massimiliano Alessandro, Davide Frapporti, Christian Gleissner</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 25 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.21294" target="_blank">https://arxiv.org/abs/2512.21294</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study canonical and pluricanonical maps of varieties isogenous to a product of curves, i.e., quotients of the form $ X = (C_1 \times \dots \times C_n)/G $ with $g(C_i)\ge 2$ and $G$ acting freely. We establish the Chevalley-Weil formula for pluricanonical representations of a curve with a finite group action and a decomposition theorem for pluricanonical systems of abelian covers. These tools allow an explicit study of geometric properties of $X$, such as base loci and the birationality of pluricanonical maps. For threefolds isogenous to a product, we prove that the 4-canonical map is birational for $p_g \ge 5$ and construct an example attaining the maximal canonical degree for this class of threefolds. In this example, the canonical map is the normalization of its image, which admits isolated non-normal singularities. Computational classifications also reveal threefolds where the bicanonical map fails to be birational, even in the absence of genus-2 fibrations. This illustrates an interesting phenomenon similar to the non-standard case for surfaces.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Is there a smooth lattice polytope which does not have the integer decomposition property?", "author": "Johannes Hofscheier, Alexander Kasprzyk", "published": "Thu, 25 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.20680", "summary": "arXiv:2512.20680v1 Announce Type: cross \nAbstract: We introduce Tadao Oda's famous question on lattice polytopes which was originally posed at Oberwolfach in 1997 and, although simple to state, has remained unanswered. The question is motivated by a discussion of the two-dimensional case - including a proof of Pick's Theorem, which elegantly relates the area of a lattice polygon to the number of lattice points it contains in its interior and on its boundary.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2512.20680" target="_blank">Is there a smooth lattice polytope which does not have the integer decomposition property?</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Johannes Hofscheier, Alexander Kasprzyk</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 25 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.20680" target="_blank">https://arxiv.org/abs/2512.20680</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We introduce Tadao Oda's famous question on lattice polytopes which was originally posed at Oberwolfach in 1997 and, although simple to state, has remained unanswered. The question is motivated by a discussion of the two-dimensional case - including a proof of Pick's Theorem, which elegantly relates the area of a lattice polygon to the number of lattice points it contains in its interior and on its boundary.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "Limits of equi-affine equi-distant loci of planar convex domains with two non-parallel asymptotes", "author": "Nikita Kalinin, Mikhail Shkolnikov", "published": "Thu, 25 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.21154", "summary": "arXiv:2512.21154v1 Announce Type: cross \nAbstract: In this note we discuss the novel approach to define equi-affine invariants starting from tropical geometry, where one averages over the space of tropical structures of fixed co-volume. Applied to the tropical distance series, this gives a family of equi-affine invariant functions associated with convex domains which are expected to satisfy a number of remarkable properties. The present note contains a conjecture about the limit structure of corresponding level sets in the compact case, as well as the proof of an analogue of this conjecture for unbounded domains with two non-parallel asymptotes. In addition, we carry out an explicit computation for the arithmetic mean value at center of the unit disk.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2512.21154" target="_blank">Limits of equi-affine equi-distant loci of planar convex domains with two non-parallel asymptotes</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Nikita Kalinin, Mikhail Shkolnikov</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 25 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.21154" target="_blank">https://arxiv.org/abs/2512.21154</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this note we discuss the novel approach to define equi-affine invariants starting from tropical geometry, where one averages over the space of tropical structures of fixed co-volume. Applied to the tropical distance series, this gives a family of equi-affine invariant functions associated with convex domains which are expected to satisfy a number of remarkable properties. The present note contains a conjecture about the limit structure of corresponding level sets in the compact case, as well as the proof of an analogue of this conjecture for unbounded domains with two non-parallel asymptotes. In addition, we carry out an explicit computation for the arithmetic mean value at center of the unit disk.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "The intersection cohomology Hodge module of toric varieties", "author": "Hyunsuk Kim, Sridhar Venkatesh", "published": "Thu, 25 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2404.04767", "summary": "arXiv:2404.04767v4 Announce Type: replace \nAbstract: We study the Hodge filtration of the intersection cohomology Hodge module for toric varieties. More precisely, we study the cohomology sheaves of the graded de Rham complex of the intersection cohomology Hodge module and give a precise formula relating it with the stalks of the intersection cohomology as a constructible complex. The main idea is to use the Ishida complex in order to compute the higher direct images of the sheaf of reflexive differentials.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2404.04767" target="_blank">The intersection cohomology Hodge module of toric varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Hyunsuk Kim, Sridhar Venkatesh</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 25 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2404.04767" target="_blank">https://arxiv.org/abs/2404.04767</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the Hodge filtration of the intersection cohomology Hodge module for toric varieties. More precisely, we study the cohomology sheaves of the graded de Rham complex of the intersection cohomology Hodge module and give a precise formula relating it with the stalks of the intersection cohomology as a constructible complex. The main idea is to use the Ishida complex in order to compute the higher direct images of the sheaf of reflexive differentials.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "The Gauss map of a projective foliation", "author": "Claudia R. Alc\\'antara, Dominique Cerveau, Alcides Lins Neto", "published": "Thu, 25 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2406.19270", "summary": "arXiv:2406.19270v3 Announce Type: replace \nAbstract: In this paper, we study the Gauss map of a holomorphic codimension one foliation on the projective space $\\mathbb{P}^n$, $n\\ge 2$, mainly the case $n=3$. Among other things, we will investigate the case where the Gauss map is birational.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2406.19270" target="_blank">The Gauss map of a projective foliation</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Claudia R. Alc\'antara, Dominique Cerveau, Alcides Lins Neto</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 25 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2406.19270" target="_blank">https://arxiv.org/abs/2406.19270</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we study the Gauss map of a holomorphic codimension one foliation on the projective space $\mathbb{P}^n$, $n\ge 2$, mainly the case $n=3$. Among other things, we will investigate the case where the Gauss map is birational.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "Remodeling Conjecture with Descendants", "author": "Bohan Fang, Chiu-Chu Melissa Liu, Song Yu, Zhengyu Zong", "published": "Thu, 25 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2504.15696", "summary": "arXiv:2504.15696v2 Announce Type: replace \nAbstract: We formulate and prove the Remodeling Conjecture with descendants, which is a version of all-genus equivariant descendant mirror symmetry for semi-projective toric Calabi-Yau 3-orbifolds with integral structures. We construct an isomorphism between the $K$-group of equivariant coherent sheaves on the toric Calabi-Yau 3-orbifold with support bounded in a direction and a certain integral relative first homology group of the equivariant mirror curve. Under this isomorphism, we prove the equivariant mirror symmetric Gamma conjecture which equates quantum cohomology central charges of coherent sheaves and oscillatory integrals along corresponding relative 1-cycles. As a consequence in the non-equivariant setting, we prove a conjecture of Hosono which equates central charges of compactly supported coherent sheaves and period integrals of integral 3-cycles on the Hori-Vafa mirror 3-fold. Furthermore, we establish a correspondence between all-genus equivariant descendant Gromov-Witten invariants with $K$-theoretic framings and oscillatory integrals (Laplace transforms) of the Chekhov-Eynard-Orantin topological recursion invariants along relative 1-cycles on the equivariant mirror curve.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2504.15696" target="_blank">Remodeling Conjecture with Descendants</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Bohan Fang, Chiu-Chu Melissa Liu, Song Yu, Zhengyu Zong</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 25 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2504.15696" target="_blank">https://arxiv.org/abs/2504.15696</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We formulate and prove the Remodeling Conjecture with descendants, which is a version of all-genus equivariant descendant mirror symmetry for semi-projective toric Calabi-Yau 3-orbifolds with integral structures. We construct an isomorphism between the $K$-group of equivariant coherent sheaves on the toric Calabi-Yau 3-orbifold with support bounded in a direction and a certain integral relative first homology group of the equivariant mirror curve. Under this isomorphism, we prove the equivariant mirror symmetric Gamma conjecture which equates quantum cohomology central charges of coherent sheaves and oscillatory integrals along corresponding relative 1-cycles. As a consequence in the non-equivariant setting, we prove a conjecture of Hosono which equates central charges of compactly supported coherent sheaves and period integrals of integral 3-cycles on the Hori-Vafa mirror 3-fold. Furthermore, we establish a correspondence between all-genus equivariant descendant Gromov-Witten invariants with $K$-theoretic framings and oscillatory integrals (Laplace transforms) of the Chekhov-Eynard-Orantin topological recursion invariants along relative 1-cycles on the equivariant mirror curve.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "A note on the Brill-Noether loci of small codimension in moduli space of stable bundles", "author": "Pritthijit Biswas, Jaya NN Iyer", "published": "Thu, 25 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2505.15749", "summary": "arXiv:2505.15749v2 Announce Type: replace \nAbstract: Let $X$ be a smooth projective curve of genus $g$ over the field $\\mathbb{C}$. Let $M_{X}(2,L)$ denote the moduli space of stable rank $2$ vector bundles on $X$ with fixed determinant $L$ of degree $2g-1$. Consider the Brill-Noether subvariety $W^{1}_{X}(2,L)$ of $M_{X}(2,L)$ which parametrises stable vector bundles having at least two linearly independent global sections. In this article, for generic $X$ and $L$, we show that $W^{1}_{X}(2,L)$ is stably-rational when $g=3$, unirational when $g=4$, and rationally chain connected by Hecke curves, when $g\\geq 5$. We also show triviality of low dimensional rational Chow groups of an associated Brill-Noether hypersurface.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2505.15749" target="_blank">A note on the Brill-Noether loci of small codimension in moduli space of stable bundles</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Pritthijit Biswas, Jaya NN Iyer</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 25 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2505.15749" target="_blank">https://arxiv.org/abs/2505.15749</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $X$ be a smooth projective curve of genus $g$ over the field $\mathbb{C}$. Let $M_{X}(2,L)$ denote the moduli space of stable rank $2$ vector bundles on $X$ with fixed determinant $L$ of degree $2g-1$. Consider the Brill-Noether subvariety $W^{1}_{X}(2,L)$ of $M_{X}(2,L)$ which parametrises stable vector bundles having at least two linearly independent global sections. In this article, for generic $X$ and $L$, we show that $W^{1}_{X}(2,L)$ is stably-rational when $g=3$, unirational when $g=4$, and rationally chain connected by Hecke curves, when $g\geq 5$. We also show triviality of low dimensional rational Chow groups of an associated Brill-Noether hypersurface.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Prym maps of cyclic coverings of hyperelliptic curves", "author": "Pawe{\\l} Bor\\'owka, Juan Carlos Naranjo, Angela Ortega, Anatoli Shatsila", "published": "Thu, 25 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2510.01330", "summary": "arXiv:2510.01330v2 Announce Type: replace \nAbstract: We prove that the Prym map corresponding to \\'etale cyclic coverings of hyperelliptic curves is injective whenever the degree of the covering $d \\geq 6$ is not a power of an odd prime. For other degrees $d\\geq 9$, we show that the Prym map is generically injective. In particular, we complete the study of Prym maps of \\'etale cyclic coverings of genus 2 curves.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2510.01330" target="_blank">Prym maps of cyclic coverings of hyperelliptic curves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Pawe{\l} Bor\'owka, Juan Carlos Naranjo, Angela Ortega, Anatoli Shatsila</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 25 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.01330" target="_blank">https://arxiv.org/abs/2510.01330</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove that the Prym map corresponding to \'etale cyclic coverings of hyperelliptic curves is injective whenever the degree of the covering $d \geq 6$ is not a power of an odd prime. For other degrees $d\geq 9$, we show that the Prym map is generically injective. In particular, we complete the study of Prym maps of \'etale cyclic coverings of genus 2 curves.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Nakajima quiver varieties in dimension four", "author": "Samuel Lewis, Pavel Shlykov", "published": "Thu, 25 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2510.15160", "summary": "arXiv:2510.15160v2 Announce Type: replace \nAbstract: This paper classifies all 4d Nakajima quiver varieties through a combinatorial approach. For each such variety, we describe the symplectic leaves and minimal degenerations between them. Using the resulting Hasse diagrams and secondary hyperplane arrangements, we fully classify the quiver varieties up to isomorphism, a step in the problem of classifying all 4d conical symplectic singularities and the (2, 2) case of quiver varieties. As an application, we answer in the negative a question posed by Bellamy, Craw, Rayan, Schedler, and Weiss regarding whether the $G_4$ quotient singularity (or its projective crepant resolutions) can be realised as a quiver variety.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2510.15160" target="_blank">Nakajima quiver varieties in dimension four</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Samuel Lewis, Pavel Shlykov</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 25 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.15160" target="_blank">https://arxiv.org/abs/2510.15160</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This paper classifies all 4d Nakajima quiver varieties through a combinatorial approach. For each such variety, we describe the symplectic leaves and minimal degenerations between them. Using the resulting Hasse diagrams and secondary hyperplane arrangements, we fully classify the quiver varieties up to isomorphism, a step in the problem of classifying all 4d conical symplectic singularities and the (2, 2) case of quiver varieties. As an application, we answer in the negative a question posed by Bellamy, Craw, Rayan, Schedler, and Weiss regarding whether the $G_4$ quotient singularity (or its projective crepant resolutions) can be realised as a quiver variety.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "Derived isogenies between abelian varieties", "author": "Zhiyuan Li, Ziwei Lu, Zhichao Tang", "published": "Thu, 25 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2510.22612", "summary": "arXiv:2510.22612v2 Announce Type: replace \nAbstract: In this paper, we establish a derived Torelli Theorem for twisted abelian varieties. Starting from this, we explore the relation between derived isogenies and classical isogenies. We show that two abelian varieties of dimension $\\geq 2$ are derived isogenous if and only if they are principally isogenous over fields of characteristic zero. This generalized the result for abelian surfaces and completely solves the question raised in [arXiv:2108.08710].", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2510.22612" target="_blank">Derived isogenies between abelian varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Zhiyuan Li, Ziwei Lu, Zhichao Tang</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 25 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.22612" target="_blank">https://arxiv.org/abs/2510.22612</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we establish a derived Torelli Theorem for twisted abelian varieties. Starting from this, we explore the relation between derived isogenies and classical isogenies. We show that two abelian varieties of dimension $\geq 2$ are derived isogenous if and only if they are principally isogenous over fields of characteristic zero. This generalized the result for abelian surfaces and completely solves the question raised in [arXiv:2108.08710].
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "Topological Gauge Theories with Sixteen Supercharges: Higher $A_\\infty$-categorification of Floer Homologies", "author": "Arif Er, Meng-Chwan Tan", "published": "Thu, 25 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2412.20067", "summary": "arXiv:2412.20067v4 Announce Type: replace-cross \nAbstract: This work is a sequel to [arXiv:2410.18575], and a third and final installment of the program initiated in [arXiv:2311.18302]. We show how, via a 3d gauged Landau-Ginzburg model interpretation of certain topologically-twisted 5d $\\mathcal{N} = 2$ and 8d $\\mathcal{N} = 1$ gauge theories, one can derive novel Fueter type $A_{\\infty}$-2-categories that 2-categorify the 3d-Haydys-Witten, Haydys-Witten, and holomorphic Donaldson-Thomas Floer homology of two, four, and five-manifolds, respectively. Via a 2d gauged Landau-Ginzburg model interpretation of the aforementioned twisted gauge theories, these Fueter type $A_{\\infty}$-2-categories can be shown to be equivalent to corresponding Fukaya-Seidel type $A_{\\infty}$-categories. In the 8d case, one can also derive higher $A_{\\infty}$-categories, such as a novel Cauchy-Riemann-Fueter type $A_{\\infty}$-3-category that 3-categorifies the Haydys-Witten Floer homology of four-manifolds via a 4d gauged Landau-Ginzburg model interpretation of the theory. Together with previous results from [arXiv:2410.18575] and [arXiv:2311.18302], our work furnishes purely physical proofs and generalizations of the mathematical conjectures by Bousseau [3], Doan-Rezchikov [4], and Cao [5].", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2412.20067" target="_blank">Topological Gauge Theories with Sixteen Supercharges: Higher $A_\infty$-categorification of Floer Homologies</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Arif Er, Meng-Chwan Tan</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 25 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2412.20067" target="_blank">https://arxiv.org/abs/2412.20067</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This work is a sequel to [arXiv:2410.18575], and a third and final installment of the program initiated in [arXiv:2311.18302]. We show how, via a 3d gauged Landau-Ginzburg model interpretation of certain topologically-twisted 5d $\mathcal{N} = 2$ and 8d $\mathcal{N} = 1$ gauge theories, one can derive novel Fueter type $A_{\infty}$-2-categories that 2-categorify the 3d-Haydys-Witten, Haydys-Witten, and holomorphic Donaldson-Thomas Floer homology of two, four, and five-manifolds, respectively. Via a 2d gauged Landau-Ginzburg model interpretation of the aforementioned twisted gauge theories, these Fueter type $A_{\infty}$-2-categories can be shown to be equivalent to corresponding Fukaya-Seidel type $A_{\infty}$-categories. In the 8d case, one can also derive higher $A_{\infty}$-categories, such as a novel Cauchy-Riemann-Fueter type $A_{\infty}$-3-category that 3-categorifies the Haydys-Witten Floer homology of four-manifolds via a 4d gauged Landau-Ginzburg model interpretation of the theory. Together with previous results from [arXiv:2410.18575] and [arXiv:2311.18302], our work furnishes purely physical proofs and generalizations of the mathematical conjectures by Bousseau [3], Doan-Rezchikov [4], and Cao [5].
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "Compact K\\\"{a}hler manifolds with partially semi-positive curvature", "author": "Shiyu Zhang, Xi Zhang", "published": "Thu, 25 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2504.13155", "summary": "arXiv:2504.13155v3 Announce Type: replace-cross \nAbstract: In this paper, we study MRC fibrations of compact K\\\"ahler manifolds with partially semi-positive curvature. We first prove that a compact K\\\"ahler manifold is rationally connected if its tangent bundle is BC-$p$ positive for all $1\\leq p\\leq \\dim X$. As applications, we confirm a conjecture of Lei Ni that any compact K\\\"ahler manifold with positive orthogonal Ricci curvature must be rationally connected, and generalize a result of Heier-Wong and Yang to the conformally K\\\"ahler case. The second result concern structure theorems for two immediate curvature conditions. We prove that, a compact K\\\"ahler manifold with $k$-semi-positive Ricci curvature or semi-positive $k$-scalar curvature, either the rational dimension $\\geq n-k+1$ or it admits a locally constant fibration $f: X\\rightarrow Y$ such that the fibre is rationally connected and the image $Y$ is Ricci-flat.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2504.13155" target="_blank">Compact K\"{a}hler manifolds with partially semi-positive curvature</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Shiyu Zhang, Xi Zhang</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 25 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2504.13155" target="_blank">https://arxiv.org/abs/2504.13155</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we study MRC fibrations of compact K\"ahler manifolds with partially semi-positive curvature. We first prove that a compact K\"ahler manifold is rationally connected if its tangent bundle is BC-$p$ positive for all $1\leq p\leq \dim X$. As applications, we confirm a conjecture of Lei Ni that any compact K\"ahler manifold with positive orthogonal Ricci curvature must be rationally connected, and generalize a result of Heier-Wong and Yang to the conformally K\"ahler case. The second result concern structure theorems for two immediate curvature conditions. We prove that, a compact K\"ahler manifold with $k$-semi-positive Ricci curvature or semi-positive $k$-scalar curvature, either the rational dimension $\geq n-k+1$ or it admits a locally constant fibration $f: X\rightarrow Y$ such that the fibre is rationally connected and the image $Y$ is Ricci-flat.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Shifted twisted Yangians and affine Grassmannian islices", "author": "Kang Lu, Weiqiang Wang, Alex Weekes", "published": "Thu, 25 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2510.10652", "summary": "arXiv:2510.10652v2 Announce Type: replace-cross \nAbstract: In a prequel we introduced the shifted iYangians ${}^\\imath Y_\\mu$ associated to quasi-split Satake diagrams of type ADE and even spherical coweights $\\mu$, and constructed the iGKLO representations of ${}^\\imath Y_\\mu$, which factor through truncated shifted iYangians ${}^\\imath Y_\\mu^\\lambda$. In this paper, we show that ${}^\\imath Y_\\mu$ quantizes the involutive fixed point locus ${}^\\imath W_\\mu$ arising from affine Grassmannians of type ADE, and supply strong evidence toward the expectation that ${}^\\imath Y_\\mu^\\lambda$ quantizes a top-dimensional component of the affine Grassmannian islice ${}^\\imath\\overline{W}_\\mu^\\lambda$. We identify the islices ${}^\\imath\\overline{W}_\\mu^\\lambda$ in type AI with suitable nilpotent Slodowy slices of type BCD, building on the work of Lusztig and Mirkovi\\'c-Vybornov in type A. We propose a framework for producing ortho-symplectic (and hybrid) Coulomb branches from split (and nonsplit) Satake framed double quivers, which are conjectured to relate closely to the islices ${}^\\imath\\overline{W}_\\mu^\\lambda$ and the algebras ${}^\\imath Y_\\mu^\\lambda$.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2510.10652" target="_blank">Shifted twisted Yangians and affine Grassmannian islices</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Kang Lu, Weiqiang Wang, Alex Weekes</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 25 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.10652" target="_blank">https://arxiv.org/abs/2510.10652</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In a prequel we introduced the shifted iYangians ${}^\imath Y_\mu$ associated to quasi-split Satake diagrams of type ADE and even spherical coweights $\mu$, and constructed the iGKLO representations of ${}^\imath Y_\mu$, which factor through truncated shifted iYangians ${}^\imath Y_\mu^\lambda$. In this paper, we show that ${}^\imath Y_\mu$ quantizes the involutive fixed point locus ${}^\imath W_\mu$ arising from affine Grassmannians of type ADE, and supply strong evidence toward the expectation that ${}^\imath Y_\mu^\lambda$ quantizes a top-dimensional component of the affine Grassmannian islice ${}^\imath\overline{W}_\mu^\lambda$. We identify the islices ${}^\imath\overline{W}_\mu^\lambda$ in type AI with suitable nilpotent Slodowy slices of type BCD, building on the work of Lusztig and Mirkovi\'c-Vybornov in type A. We propose a framework for producing ortho-symplectic (and hybrid) Coulomb branches from split (and nonsplit) Satake framed double quivers, which are conjectured to relate closely to the islices ${}^\imath\overline{W}_\mu^\lambda$ and the algebras ${}^\imath Y_\mu^\lambda$.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2025-12-25 18:00:02
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>

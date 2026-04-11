@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Mon, 30 Mar 2026 04:00:10 +0000<br>
+        <strong>論文数:</strong> 21件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Conics Quadrics Mapping &amp; Cones</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Geometric classification of primes modulo a (bend) congruence</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Tropical singular intersection homology</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">On Effective Iitaka Fibration Indices for Stable Minimal Models with Large Iitaka Volumes</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">Smooth plane curves with a unique outer Galois point and their automorphism groups</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">Lattice homology of integrally closed submodules and Artin algebras</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Coble surfaces: projective models and automorphisms with related topics</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Motivic local density of isolated surface singularities</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">Automorphism groups of Mori Del Pezzo fibrations over an irrational curve</a>
+            <span class="title-label-badge" style="background-color: #9b59b6;">del Pezzo</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">The motivic tt-geometry of real quadrics</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">Toolkit for the algebraic geometer</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">A categorical Torelli theorem for quartic del Pezzo surfaces</a>
+            <span class="title-label-badge" style="background-color: #9b59b6;">del Pezzo</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">Exactness property of Breuil-Kisin functors and Bloch-Kato Selmer groups</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Local-global principles for the existence of Levi factors</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Real regulator maps with finite 0-locus</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">Motivic principal value integrals for hyperplane arrangements</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">Algebraic surfaces as Hadamard products of curves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">Combinatorics and Hodge theory of degenerations of abelian varieties: A survey of the Mumford construction</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">A Matrix Rank Formula for Vector Bundles of Vertex Operator Algebra Coinvariants and Conformal Blocks</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">Motivic cohomology of equicharacteristic schemes</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-21" onchange="updateSelectedCount()">
+            <span class="title-number">21.</span>
+            <a href="#paper-21">Thick subcategories on weighted projective curves and nilpotent representations of quivers</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Conics Quadrics Mapping &amp; Cones", "author": "Paul Zsombor-Murray, Martin Pfurner", "published": "Mon, 30 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.25907", "summary": "arXiv:2603.25907v1 Announce Type: new \nAbstract: An efficient way to get implicit equations of conics on five points and quadrics on nine, using pencils of conics and quadrics, is revealed. Parallel axis right cones intersect on a conic. An example, to show how to place five coplanar points on a cone, using kinematic mapping with dual quaternions is presented. A second congruent cone is found as a translation of the first. Cone symmetry helps to explain how mapping produces eight real solutions, apparently all different, belong to a unique cone pair intersection. Future extension of this, pertaining to a nine point quadric, can be contrived if a way to map planar points to parallel axis cones is formulated.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2603.25907" target="_blank">Conics Quadrics Mapping &amp; Cones</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Paul Zsombor-Murray, Martin Pfurner</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 30 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.25907" target="_blank">https://arxiv.org/abs/2603.25907</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                An efficient way to get implicit equations of conics on five points and quadrics on nine, using pencils of conics and quadrics, is revealed. Parallel axis right cones intersect on a conic. An example, to show how to place five coplanar points on a cone, using kinematic mapping with dual quaternions is presented. A second congruent cone is found as a translation of the first. Cone symmetry helps to explain how mapping produces eight real solutions, apparently all different, belong to a unique cone pair intersection. Future extension of this, pertaining to a nine point quadric, can be contrived if a way to map planar points to parallel axis cones is formulated.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Geometric classification of primes modulo a (bend) congruence", "author": "Netanel Friedenberg, Kalina Mincheva", "published": "Mon, 30 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.25953", "summary": "arXiv:2603.25953v1 Announce Type: new \nAbstract: In this paper we continue the program to develop the algebraic foundations of tropical (algebraic) geometry. We give strong characterizations of prime congruences containing a given congruence on a toric semiring. We give four applications of this result. (1) We prove an analogue of the strong Nullstellensatz for congruences with finite tropical basis. This extends the existing result of Jo\\'o-Mincheva to cases, such as the bend congruence of a tropical(ized) ideal, where the congruence is not finitely generated. (2) We show that, if $I$ is the ideal of an affine variety not contained in the coordinate hyperplanes, then $\\mathbb{T}[x_1, \\dots, x_n]/\\sqrt{\\operatorname{Bend}(\\operatorname{trop} I)}$ is cancellative. This result has applications to the integral closure (as per Tolliver) of $\\mathbb{T}[x_1, \\dots, x_n]/\\operatorname{Bend}(\\operatorname{trop} I)$ which we explore in a forthcoming paper. (3) We show that $\\mathbb{T}[x_1, \\dots, x_n]/\\sqrt{\\operatorname{Bend}(\\operatorname{trop} I)}$ is the tropical function semiring on $\\operatorname{trop} V(I)$, which creates a bridge between the algebraic approach to non-embedded tropicalization in the work of J. Song and the bend congruence approach of Giansiracusa-Giansiracusa and Maclagan-Rinc\\'on. (4) As a consequence of one of our lemmas, we describe the closure of a polyhedron in a tropical toric variety even when the polyhedron is not compatible with the fan defining the tropical toric variety.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2603.25953" target="_blank">Geometric classification of primes modulo a (bend) congruence</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Netanel Friedenberg, Kalina Mincheva</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 30 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.25953" target="_blank">https://arxiv.org/abs/2603.25953</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper we continue the program to develop the algebraic foundations of tropical (algebraic) geometry. We give strong characterizations of prime congruences containing a given congruence on a toric semiring. We give four applications of this result. (1) We prove an analogue of the strong Nullstellensatz for congruences with finite tropical basis. This extends the existing result of Jo\'o-Mincheva to cases, such as the bend congruence of a tropical(ized) ideal, where the congruence is not finitely generated. (2) We show that, if $I$ is the ideal of an affine variety not contained in the coordinate hyperplanes, then $\mathbb{T}[x_1, \dots, x_n]/\sqrt{\operatorname{Bend}(\operatorname{trop} I)}$ is cancellative. This result has applications to the integral closure (as per Tolliver) of $\mathbb{T}[x_1, \dots, x_n]/\operatorname{Bend}(\operatorname{trop} I)$ which we explore in a forthcoming paper. (3) We show that $\mathbb{T}[x_1, \dots, x_n]/\sqrt{\operatorname{Bend}(\operatorname{trop} I)}$ is the tropical function semiring on $\operatorname{trop} V(I)$, which creates a bridge between the algebraic approach to non-embedded tropicalization in the work of J. Song and the bend congruence approach of Giansiracusa-Giansiracusa and Maclagan-Rinc\'on. (4) As a consequence of one of our lemmas, we describe the closure of a polyhedron in a tropical toric variety even when the polyhedron is not compatible with the fan defining the tropical toric variety.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Tropical singular intersection homology", "author": "Junta Kamiya", "published": "Mon, 30 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.26021", "summary": "arXiv:2603.26021v1 Announce Type: new \nAbstract: We introduce tropical singular intersection homologies (non-GM and GM) with the tropical coefficients on rational polyhedral spaces using their filtrations. We investigate their fundamental properties. In the non-GM case, we give a Poincar\\'e duality and two bilinear pairings analogous to the cup and cap products under some assumptions. We compute the homologies in some cases.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2603.26021" target="_blank">Tropical singular intersection homology</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Junta Kamiya</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 30 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.26021" target="_blank">https://arxiv.org/abs/2603.26021</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We introduce tropical singular intersection homologies (non-GM and GM) with the tropical coefficients on rational polyhedral spaces using their filtrations. We investigate their fundamental properties. In the non-GM case, we give a Poincar\'e duality and two bilinear pairings analogous to the cup and cap products under some assumptions. We compute the homologies in some cases.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "On Effective Iitaka Fibration Indices for Stable Minimal Models with Large Iitaka Volumes", "author": "Hexu Liu", "published": "Mon, 30 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.26047", "summary": "arXiv:2603.26047v1 Announce Type: new \nAbstract: Given a pair $(V,C)$ that admits a stable minimal model with fixed dimension, fixed coefficient set, and bounded relative volume, we study when the linear system $|m(K_V+C)|$ induces an Iitaka fibration, assuming the Iitaka volume of $K_V+C$ is sufficiently large.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2603.26047" target="_blank">On Effective Iitaka Fibration Indices for Stable Minimal Models with Large Iitaka Volumes</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Hexu Liu</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 30 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.26047" target="_blank">https://arxiv.org/abs/2603.26047</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Given a pair $(V,C)$ that admits a stable minimal model with fixed dimension, fixed coefficient set, and bounded relative volume, we study when the linear system $|m(K_V+C)|$ induces an Iitaka fibration, assuming the Iitaka volume of $K_V+C$ is sufficiently large.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "Smooth plane curves with a unique outer Galois point and their automorphism groups", "author": "Eslam Badr, Takeshi Harui", "published": "Mon, 30 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.26180", "summary": "arXiv:2603.26180v1 Announce Type: new \nAbstract: We consider smooth plane curves $\\mathcal{X}$ of degree $d\\geq4$, defined over an algebraically closed field of characteristic $0$, that possess a unique outer Galois point. This geometric condition forces the curve to be a cyclic covering of the projective line, and ensures that its automorphism group fits into a specific theoretical framework. For each possible non-cyclic reduced automorphism group $\\operatorname{Aut}_{\\operatorname{red}}(\\mathcal{X})$, we fully characterize the defining equation of $\\mathcal{X}$ and the precise structure of its full automorphism group $\\operatorname{Aut}(\\mathcal{X})$.\n  This comprehensive analysis not only identifies the exact form of the equation for each automorphism type but also establishes the detailed criteria under which these scenarios can occur, thereby offering a complete classification of defining equations for smooth plane curves with a unique outer Galois point and a non-cyclic reduced automorphism group.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2603.26180" target="_blank">Smooth plane curves with a unique outer Galois point and their automorphism groups</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Eslam Badr, Takeshi Harui</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 30 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.26180" target="_blank">https://arxiv.org/abs/2603.26180</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We consider smooth plane curves $\mathcal{X}$ of degree $d\geq4$, defined over an algebraically closed field of characteristic $0$, that possess a unique outer Galois point. This geometric condition forces the curve to be a cyclic covering of the projective line, and ensures that its automorphism group fits into a specific theoretical framework. For each possible non-cyclic reduced automorphism group $\operatorname{Aut}_{\operatorname{red}}(\mathcal{X})$, we fully characterize the defining equation of $\mathcal{X}$ and the precise structure of its full automorphism group $\operatorname{Aut}(\mathcal{X})$.
+  This comprehensive analysis not only identifies the exact form of the equation for each automorphism type but also establishes the detailed criteria under which these scenarios can occur, thereby offering a complete classification of defining equations for smooth plane curves with a unique outer Galois point and a non-cyclic reduced automorphism group.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "Lattice homology of integrally closed submodules and Artin algebras", "author": "Andr\\'as N\\'emethi, Gerg\\H{o} Schefler", "published": "Mon, 30 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.26189", "summary": "arXiv:2603.26189v1 Announce Type: new \nAbstract: The general construction of lattice (co)homology assigns to a lattice $\\mathbb{Z}^r$ and a weight function $w:\\mathbb{Z}^r \\to \\mathbb{Z}$ a bigraded $\\mathbb{Z}[U]$-module $\\mathbb{H}_*$. The weight function $w$ is often obtained from some geometric data as the difference of two `height functions'. In this paper we consider the case when these height functions are Hilbert functions of valuative multifiltrations on a Noetherian $k$-algebra $\\mathcal{O}$ and a finitely generated $\\mathcal{O}$-module $M$. We introduce the notion of `realizable submodules' in $M$, the prime example of which are finite codimensional integrally closed submodules in the sense of Rees (or integrally closed ideals when $M=\\mathcal{O}$). We prove, that whenever two sets of `extended' discrete valuations `realize' the same submodule $N \\leq M$, then, although the corresponding lattices and weight functions might be different, the resulting lattice homology modules are isomorphic and have Euler characteristic $\\dim_k(M/N)$. In this way, we associate a well-defined lattice homology to any quotient of type $M/N$, where $N$ is a realizable submodule of $M$. We also present some structural and computational results: e.g., we geometrically characterize the (lattice) homological dimension of integrally closed monomial ideals of $k[x,y]$.\n  The main upshot of the paper, however, is the possibility of categorifying numerical invariants defined as codimensions of realizable submodules or integrally closed ideals. The geometric applications include: the delta invariant $\\delta(C, o)$ of a reduced curve singularity; the geometric genus $p_g(X, o)$, the irregularity $q(X, o)$ and the various plurigenera of higher dimensional isolated normal singularities. The corresponding categorifications generalize the analytic lattice homologies of \\'Agoston and the first author.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2603.26189" target="_blank">Lattice homology of integrally closed submodules and Artin algebras</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Andr\'as N\'emethi, Gerg\H{o} Schefler</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 30 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.26189" target="_blank">https://arxiv.org/abs/2603.26189</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The general construction of lattice (co)homology assigns to a lattice $\mathbb{Z}^r$ and a weight function $w:\mathbb{Z}^r \to \mathbb{Z}$ a bigraded $\mathbb{Z}[U]$-module $\mathbb{H}_*$. The weight function $w$ is often obtained from some geometric data as the difference of two `height functions'. In this paper we consider the case when these height functions are Hilbert functions of valuative multifiltrations on a Noetherian $k$-algebra $\mathcal{O}$ and a finitely generated $\mathcal{O}$-module $M$. We introduce the notion of `realizable submodules' in $M$, the prime example of which are finite codimensional integrally closed submodules in the sense of Rees (or integrally closed ideals when $M=\mathcal{O}$). We prove, that whenever two sets of `extended' discrete valuations `realize' the same submodule $N \leq M$, then, although the corresponding lattices and weight functions might be different, the resulting lattice homology modules are isomorphic and have Euler characteristic $\dim_k(M/N)$. In this way, we associate a well-defined lattice homology to any quotient of type $M/N$, where $N$ is a realizable submodule of $M$. We also present some structural and computational results: e.g., we geometrically characterize the (lattice) homological dimension of integrally closed monomial ideals of $k[x,y]$.
+  The main upshot of the paper, however, is the possibility of categorifying numerical invariants defined as codimensions of realizable submodules or integrally closed ideals. The geometric applications include: the delta invariant $\delta(C, o)$ of a reduced curve singularity; the geometric genus $p_g(X, o)$, the irregularity $q(X, o)$ and the various plurigenera of higher dimensional isolated normal singularities. The corresponding categorifications generalize the analytic lattice homologies of \'Agoston and the first author.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Coble surfaces: projective models and automorphisms with related topics", "author": "Federico Pieroni", "published": "Mon, 30 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.26338", "summary": "arXiv:2603.26338v1 Announce Type: new \nAbstract: In this work, we want to show several properties of an unnodal, complex Coble surface $X$ with irreducible boundary curve $C \\in |-2 K_X|$. Namely, we show that every isotropic sequence ${\\cal E}_1, \\ldots, {\\cal E}_r$ with $r \\le 8$ and ${\\cal E}_i {\\cal E}_j = 1 - \\delta_{i, j}$ can be extended to a sequence of length $10$. Moreover, such a surface admits a birational quintic model $\\overline X \\subset \\mathbb{P}^3$, with equation $\\alpha X_0 X_1^2 X_2^2 + \\beta X_0 X_1^2 X_3^2 + \\gamma X_0 X_2^2 X_3^2 + X_1 X_2 X_3 q = 0$, where $q$ is a quadric form. Finally, we use this birational model to show that every biregular involution $i : X \\to X$ on such a Coble surface is the lift of a Bertini involution.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2603.26338" target="_blank">Coble surfaces: projective models and automorphisms with related topics</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Federico Pieroni</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 30 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.26338" target="_blank">https://arxiv.org/abs/2603.26338</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this work, we want to show several properties of an unnodal, complex Coble surface $X$ with irreducible boundary curve $C \in |-2 K_X|$. Namely, we show that every isotropic sequence ${\cal E}_1, \ldots, {\cal E}_r$ with $r \le 8$ and ${\cal E}_i {\cal E}_j = 1 - \delta_{i, j}$ can be extended to a sequence of length $10$. Moreover, such a surface admits a birational quintic model $\overline X \subset \mathbb{P}^3$, with equation $\alpha X_0 X_1^2 X_2^2 + \beta X_0 X_1^2 X_3^2 + \gamma X_0 X_2^2 X_3^2 + X_1 X_2 X_3 q = 0$, where $q$ is a quadric form. Finally, we use this birational model to show that every biregular involution $i : X \to X$ on such a Coble surface is the lift of a Bertini involution.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Motivic local density of isolated surface singularities", "author": "Sidonie Ratajczak", "published": "Mon, 30 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.26391", "summary": "arXiv:2603.26391v1 Announce Type: new \nAbstract: The goal of this paper is to compute the motivic local density of an isolated algebraic surface singularity, in order to explain its link with algebraic multiplicity. In this context, we can use an additional data: the inner rate related to the bilipschitz geoemtry of the singularity, as studied by A. Belotto da Silva, L. Fantini and A. Pichon.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2603.26391" target="_blank">Motivic local density of isolated surface singularities</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sidonie Ratajczak</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 30 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.26391" target="_blank">https://arxiv.org/abs/2603.26391</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The goal of this paper is to compute the motivic local density of an isolated algebraic surface singularity, in order to explain its link with algebraic multiplicity. In this context, we can use an additional data: the inner rate related to the bilipschitz geoemtry of the singularity, as studied by A. Belotto da Silva, L. Fantini and A. Pichon.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "Automorphism groups of Mori Del Pezzo fibrations over an irrational curve", "author": "Pascal Fong, Susanna Zimmermann", "published": "Mon, 30 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.26416", "summary": "arXiv:2603.26416v1 Announce Type: new \nAbstract: We study the automorphism groups of Mori Del Pezzo fibrations over a smooth projective curve $C$ of positive genus. From that, we obtain a classification of maximal connected algebraic subgroups of $\\mathrm{Bir}(C\\times \\mathbb{P}^2)$. Our results hold over any algebraically closed field of characteristic zero.", "number": 9, "labels": [{"name": "del Pezzo", "color": "#9b59b6"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2603.26416" target="_blank">Automorphism groups of Mori Del Pezzo fibrations over an irrational curve</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #9b59b6;">del Pezzo</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Pascal Fong, Susanna Zimmermann</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 30 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.26416" target="_blank">https://arxiv.org/abs/2603.26416</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the automorphism groups of Mori Del Pezzo fibrations over a smooth projective curve $C$ of positive genus. From that, we obtain a classification of maximal connected algebraic subgroups of $\mathrm{Bir}(C\times \mathbb{P}^2)$. Our results hold over any algebraically closed field of characteristic zero.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "The motivic tt-geometry of real quadrics", "author": "Jean Paul Schemeil", "published": "Mon, 30 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.26492", "summary": "arXiv:2603.26492v1 Announce Type: new \nAbstract: We study the tensor-triangular geometry of the category of Voevodsky motives generated by real quadrics. At the prime 2, we determine its Balmer spectrum, and find that it is a countably infinite, non-Noetherian space of Krull dimension 2. We detail the relationship between this space, the real Artin-Tate spectrum computed by Balmer-Gallauer, and Vishik's isotropic points. We conclude by combining our computation with Balmer-Gallauer's results on Artin-Tate motives to obtain a full description of the spectrum of integral motives of quadrics over real algebraic numbers.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2603.26492" target="_blank">The motivic tt-geometry of real quadrics</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jean Paul Schemeil</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 30 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.26492" target="_blank">https://arxiv.org/abs/2603.26492</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the tensor-triangular geometry of the category of Voevodsky motives generated by real quadrics. At the prime 2, we determine its Balmer spectrum, and find that it is a countably infinite, non-Noetherian space of Krull dimension 2. We detail the relationship between this space, the real Artin-Tate spectrum computed by Balmer-Gallauer, and Vishik's isotropic points. We conclude by combining our computation with Balmer-Gallauer's results on Artin-Tate motives to obtain a full description of the spectrum of integral motives of quadrics over real algebraic numbers.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "Toolkit for the algebraic geometer", "author": "Sourayan Banerjee, Oliver Lorscheid, Alejandro Mart\\'inez M\\'endez, Alejandro Vargas", "published": "Mon, 30 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.26500", "summary": "arXiv:2603.26500v1 Announce Type: new \nAbstract: In this text, we outline a theory of schemes associated with a site, which generalizes a variety of geometries, such as manifolds, schemes, analytic spaces, simplicial complexes, and more. We present an abstract process of gluing model spaces via sheaf theory and recover a posteriori the underlying topological spaces that are often present in the construction of such geometric objects. We apply this formalism to semiring schemes and reason why the usual definition of semiring schemes has to be considered as the good approach to the geometry of semirings.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2603.26500" target="_blank">Toolkit for the algebraic geometer</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sourayan Banerjee, Oliver Lorscheid, Alejandro Mart\'inez M\'endez, Alejandro Vargas</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 30 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.26500" target="_blank">https://arxiv.org/abs/2603.26500</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this text, we outline a theory of schemes associated with a site, which generalizes a variety of geometries, such as manifolds, schemes, analytic spaces, simplicial complexes, and more. We present an abstract process of gluing model spaces via sheaf theory and recover a posteriori the underlying topological spaces that are often present in the construction of such geometric objects. We apply this formalism to semiring schemes and reason why the usual definition of semiring schemes has to be considered as the good approach to the geometry of semirings.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "A categorical Torelli theorem for quartic del Pezzo surfaces", "author": "Alexey Elagin", "published": "Mon, 30 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.26579", "summary": "arXiv:2603.26579v1 Announce Type: new \nAbstract: We solve categorical Torelli problem for quartic del Pezzo surfaces. That is, we prove that a del Pezzo surface of degree $4$ can be canonically reconstructed from its Kuznetsov component, which is the orthogonal subcategory to the structure sheaf in the derived category of the surface. Our methods work in equivariant setting and over arbitrary perfect fields. Using recent theory of atomic semi-orthogonal decompositions arXiv:2512.05064, we conclude that two minimal quartic del Pezzo surfaces are birational if and only if they are isomorphic. We also verify that the Kuznetsov component of a minimal quartic del Pezzo surface is semi-orthogonally indecomposable, confirming a conjecture by Auel and Bernardara.", "number": 12, "labels": [{"name": "del Pezzo", "color": "#9b59b6"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2603.26579" target="_blank">A categorical Torelli theorem for quartic del Pezzo surfaces</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #9b59b6;">del Pezzo</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Alexey Elagin</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 30 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.26579" target="_blank">https://arxiv.org/abs/2603.26579</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We solve categorical Torelli problem for quartic del Pezzo surfaces. That is, we prove that a del Pezzo surface of degree $4$ can be canonically reconstructed from its Kuznetsov component, which is the orthogonal subcategory to the structure sheaf in the derived category of the surface. Our methods work in equivariant setting and over arbitrary perfect fields. Using recent theory of atomic semi-orthogonal decompositions arXiv:2512.05064, we conclude that two minimal quartic del Pezzo surfaces are birational if and only if they are isomorphic. We also verify that the Kuznetsov component of a minimal quartic del Pezzo surface is semi-orthogonally indecomposable, confirming a conjecture by Auel and Bernardara.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "Exactness property of Breuil-Kisin functors and Bloch-Kato Selmer groups", "author": "Pavel \\v{C}oupek, Evangelia Gazaki, Adriano Marmora", "published": "Mon, 30 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.26035", "summary": "arXiv:2603.26035v1 Announce Type: cross \nAbstract: Let $K$ be a $p$-adic field and $T$ a lattice in a semistable representation of $\\mathrm{Gal}(\\overline{K}/K)$ with Hodge-Tate weights in $[0, r]$. Assuming $0\\leq r&lt;p-1$, we prove that for a semistable extension of $\\mathbb{Z}_p$ by $T$, the corresponding sequence of strongly divisible modules is exact. The same statement is proved for Breuil-Kisin modules for all $r\\geq 0$. In the crystalline case, we deduce that the integral Bloch-Kato Selmer group $H^1_f(K, T)$ is computed by $\\mathrm{Ext}^1$ in the category of crystalline strongly divisible modules. Using further exactness results, we define a tensor product of strongly divisible modules, which commutes with the functors to Galois representations. As an application, we show that for abelian varieties $A_1, A_2$ over $K$ with good reduction, the cup product map $\\delta_1\\cup\\delta_2:A_1(K)\\otimes A_2(K)\\rightarrow H^2(K, T_p(A_1)\\otimes T_p(A_2))$ induced by the Kummer sequences of $A_1, A_2$ factors through an $\\mathrm{Ext}^2$ group of strongly divisible modules.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2603.26035" target="_blank">Exactness property of Breuil-Kisin functors and Bloch-Kato Selmer groups</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Pavel \v{C}oupek, Evangelia Gazaki, Adriano Marmora</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 30 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.26035" target="_blank">https://arxiv.org/abs/2603.26035</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $K$ be a $p$-adic field and $T$ a lattice in a semistable representation of $\mathrm{Gal}(\overline{K}/K)$ with Hodge-Tate weights in $[0, r]$. Assuming $0\leq r&lt;p-1$, we prove that for a semistable extension of $\mathbb{Z}_p$ by $T$, the corresponding sequence of strongly divisible modules is exact. The same statement is proved for Breuil-Kisin modules for all $r\geq 0$. In the crystalline case, we deduce that the integral Bloch-Kato Selmer group $H^1_f(K, T)$ is computed by $\mathrm{Ext}^1$ in the category of crystalline strongly divisible modules. Using further exactness results, we define a tensor product of strongly divisible modules, which commutes with the functors to Galois representations. As an application, we show that for abelian varieties $A_1, A_2$ over $K$ with good reduction, the cup product map $\delta_1\cup\delta_2:A_1(K)\otimes A_2(K)\rightarrow H^2(K, T_p(A_1)\otimes T_p(A_2))$ induced by the Kummer sequences of $A_1, A_2$ factors through an $\mathrm{Ext}^2$ group of strongly divisible modules.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Local-global principles for the existence of Levi factors", "author": "David Harbater, Julia Hartmann, George McNinch", "published": "Mon, 30 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.26501", "summary": "arXiv:2603.26501v1 Announce Type: cross \nAbstract: We discuss local-global principles for the existence of Levi factors (i.e., complements to the unipotent radical) for linear algebraic groups over one-variable function fields. We give examples of disconnected groups that fail the local-global principle, and prove a strong local-global principle in the presence of Levi descent.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2603.26501" target="_blank">Local-global principles for the existence of Levi factors</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> David Harbater, Julia Hartmann, George McNinch</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 30 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.26501" target="_blank">https://arxiv.org/abs/2603.26501</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We discuss local-global principles for the existence of Levi factors (i.e., complements to the unipotent radical) for linear algebraic groups over one-variable function fields. We give examples of disconnected groups that fail the local-global principle, and prove a strong local-global principle in the presence of Levi descent.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Real regulator maps with finite 0-locus", "author": "RJ Acuna, Devin Akman, Matt Kerr", "published": "Mon, 30 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2407.10392", "summary": "arXiv:2407.10392v2 Announce Type: replace \nAbstract: A Laurent polynomial in two variables is tempered if its edge polynomials are cyclotomic. Variation of coefficients leads to a family of smooth complete genus $g$ curves carrying a canonical algebraic $K_2$-class over a $g$-dimensional base $S$, hence to an extension of admissible variations of MHS (or normal function) on $S$. We prove that the $\\mathbb{R}$-split locus of this extension is finite. Consequently, the torsion locus of the normal function and the $A$-polynomial locus for the family of curves are also finite.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2407.10392" target="_blank">Real regulator maps with finite 0-locus</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> RJ Acuna, Devin Akman, Matt Kerr</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 30 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2407.10392" target="_blank">https://arxiv.org/abs/2407.10392</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                A Laurent polynomial in two variables is tempered if its edge polynomials are cyclotomic. Variation of coefficients leads to a family of smooth complete genus $g$ curves carrying a canonical algebraic $K_2$-class over a $g$-dimensional base $S$, hence to an extension of admissible variations of MHS (or normal function) on $S$. We prove that the $\mathbb{R}$-split locus of this extension is finite. Consequently, the torsion locus of the normal function and the $A$-polynomial locus for the family of curves are also finite.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "Motivic principal value integrals for hyperplane arrangements", "author": "Nero Budur, Quan Shi, Huaiqing Zuo", "published": "Mon, 30 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2411.01305", "summary": "arXiv:2411.01305v2 Announce Type: replace \nAbstract: A conjecture of Denef-Jacobs-Veys relates motivic principal value integrals of multivalued rational top-forms with cohomology support loci of rank one local systems. We give a stronger positive answer to this conjecture for hyperplane arrangements.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2411.01305" target="_blank">Motivic principal value integrals for hyperplane arrangements</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Nero Budur, Quan Shi, Huaiqing Zuo</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 30 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2411.01305" target="_blank">https://arxiv.org/abs/2411.01305</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                A conjecture of Denef-Jacobs-Veys relates motivic principal value integrals of multivalued rational top-forms with cohomology support loci of rank one local systems. We give a stronger positive answer to this conjecture for hyperplane arrangements.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "Algebraic surfaces as Hadamard products of curves", "author": "Dario Antolini, Edoardo Ballico, Alessandro Oneto", "published": "Mon, 30 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2502.18813", "summary": "arXiv:2502.18813v2 Announce Type: replace \nAbstract: We study projective surfaces in $\\mathbb{P}^3$ which can be written as Hadamard product of two curves. We show that quadratic surfaces which are Hadamard product of two lines are smooth and tangent to all coordinate planes, and such tangency points uniquely identify the quadric. The variety of such quadratic surfaces corresponds to the Zariski closure of the space of symmetric matrices whose inverse has null diagonal. For higher-degree surfaces which are Hadamard product of a line and a curve we show that the intersection with the coordinate planes is always non-transversal.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2502.18813" target="_blank">Algebraic surfaces as Hadamard products of curves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Dario Antolini, Edoardo Ballico, Alessandro Oneto</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 30 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2502.18813" target="_blank">https://arxiv.org/abs/2502.18813</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study projective surfaces in $\mathbb{P}^3$ which can be written as Hadamard product of two curves. We show that quadratic surfaces which are Hadamard product of two lines are smooth and tangent to all coordinate planes, and such tangency points uniquely identify the quadric. The variety of such quadratic surfaces corresponds to the Zariski closure of the space of symmetric matrices whose inverse has null diagonal. For higher-degree surfaces which are Hadamard product of a line and a curve we show that the intersection with the coordinate planes is always non-transversal.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "Combinatorics and Hodge theory of degenerations of abelian varieties: A survey of the Mumford construction", "author": "Philip Engel, Olivier de Gaay Fortman, Stefan Schreieder", "published": "Mon, 30 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2507.15695", "summary": "arXiv:2507.15695v3 Announce Type: replace \nAbstract: We survey the Mumford construction of degenerating abelian varieties, with a focus on the analytic version of the construction, and its relation to toric geometry. Moreover, we study the geometry and Hodge theory of multivariable degenerations of abelian varieties associated to regular matroids, and extend some fundamental results of Clemens on 1-parameter semistable degenerations to the multivariable setting.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2507.15695" target="_blank">Combinatorics and Hodge theory of degenerations of abelian varieties: A survey of the Mumford construction</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Philip Engel, Olivier de Gaay Fortman, Stefan Schreieder</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 30 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2507.15695" target="_blank">https://arxiv.org/abs/2507.15695</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We survey the Mumford construction of degenerating abelian varieties, with a focus on the analytic version of the construction, and its relation to toric geometry. Moreover, we study the geometry and Hodge theory of multivariable degenerations of abelian varieties associated to regular matroids, and extend some fundamental results of Clemens on 1-parameter semistable degenerations to the multivariable setting.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "A Matrix Rank Formula for Vector Bundles of Vertex Operator Algebra Coinvariants and Conformal Blocks", "author": "Xiangrui Luo", "published": "Mon, 30 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.22028", "summary": "arXiv:2603.22028v2 Announce Type: replace \nAbstract: We introduce FA-matrices for computing ranks of vector bundles of coinvariants and conformal blocks associated with modules over vertex operator algebras on the moduli space of stable pointed curves, unifying the notions of fusion and averaging matrices and generalizing Ueno's work. To illustrate, we compute ranks of vector bundles determined by pointed VOAs and the tensor product of certain VOAs, as well as other examples. As an application, positivity properties of their first Chern classes are analyzed.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2603.22028" target="_blank">A Matrix Rank Formula for Vector Bundles of Vertex Operator Algebra Coinvariants and Conformal Blocks</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Xiangrui Luo</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 30 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.22028" target="_blank">https://arxiv.org/abs/2603.22028</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We introduce FA-matrices for computing ranks of vector bundles of coinvariants and conformal blocks associated with modules over vertex operator algebras on the moduli space of stable pointed curves, unifying the notions of fusion and averaging matrices and generalizing Ueno's work. To illustrate, we compute ranks of vector bundles determined by pointed VOAs and the tensor product of certain VOAs, as well as other examples. As an application, positivity properties of their first Chern classes are analyzed.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "Motivic cohomology of equicharacteristic schemes", "author": "Elden Elmanto, Matthew Morrow", "published": "Mon, 30 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2309.08463", "summary": "arXiv:2309.08463v2 Announce Type: replace-cross \nAbstract: We construct a theory of motivic cohomology for quasi-compact, quasi-separated schemes of equal characteristic, which is related to non-connective algebraic $K$-theory via an Atiyah--Hirzebruch spectral sequence, and to \\'etale cohomology in the range predicted by Beilinson and Lichtenbaum. On smooth varieties over a field our theory recovers classical motivic cohomology, defined for example via Bloch's cycle complex. Our construction uses trace methods and (topological) cyclic homology.\n  As predicted by the behaviour of algebraic $K$-theory, the motivic cohomology is in general sensitive to singularities, including non-reduced structure, and is not $\\mathbb{A}^1$-invariant. It nevertheless has good geometric properties, satisfying for example the projective bundle formula and pro cdh descent.\n  Further properties of the theory include a Nesterenko--Suslin comparison isomorphism to Milnor $K$-theory, and a vanishing range which simultaneously refines Weibel's conjecture about negative $K$-theory and a vanishing result of Soul\\'e for the Adams eigenspaces of higher algebraic $K$-groups. We also explore the relation of the theory to algebraic cycles, showing in particular that the Levine--Weibel Chow group of zero cycles on a surface arises as a motivic cohomology group.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2309.08463" target="_blank">Motivic cohomology of equicharacteristic schemes</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Elden Elmanto, Matthew Morrow</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 30 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2309.08463" target="_blank">https://arxiv.org/abs/2309.08463</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We construct a theory of motivic cohomology for quasi-compact, quasi-separated schemes of equal characteristic, which is related to non-connective algebraic $K$-theory via an Atiyah--Hirzebruch spectral sequence, and to \'etale cohomology in the range predicted by Beilinson and Lichtenbaum. On smooth varieties over a field our theory recovers classical motivic cohomology, defined for example via Bloch's cycle complex. Our construction uses trace methods and (topological) cyclic homology.
+  As predicted by the behaviour of algebraic $K$-theory, the motivic cohomology is in general sensitive to singularities, including non-reduced structure, and is not $\mathbb{A}^1$-invariant. It nevertheless has good geometric properties, satisfying for example the projective bundle formula and pro cdh descent.
+  Further properties of the theory include a Nesterenko--Suslin comparison isomorphism to Milnor $K$-theory, and a vanishing range which simultaneously refines Weibel's conjecture about negative $K$-theory and a vanishing result of Soul\'e for the Adams eigenspaces of higher algebraic $K$-groups. We also explore the relation of the theory to algebraic cycles, showing in particular that the Levine--Weibel Chow group of zero cycles on a surface arises as a motivic cohomology group.
+            </div>
+        </div>
+        <div class="paper" id="paper-21">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-21" data-paper-data='{"title": "Thick subcategories on weighted projective curves and nilpotent representations of quivers", "author": "Alexey Elagin", "published": "Mon, 30 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2407.01207", "summary": "arXiv:2407.01207v3 Announce Type: replace-cross \nAbstract: We continue the study of thick triangulated subcategories, started by Valery Lunts and the author in arXiv:2007.02134, and consider thick subcategories in the derived category of coherent sheaves on a weighted projective curve and the corresponding abelian thick subcategories. Our main result is that any thick subcategory on a weighted projective curve either is equivalent to the derived category of nilpotent representations of some quiver (we call such categories quiver-like) or is the orthogonal to an exceptional collection of torsion sheaves (we call such subcategories big). We examine the structure of thick subcategories: in particular, for weighted projective lines we prove that any admissible subcategory is generated by an exceptional collection and any exceptional collection is a part of a full one. We show that the derived categories of weighted projective curves satisfy Jordan-Holder property and do not contain phantoms. Finally, we extend and simplify results from arXiv:2007.02134, providing sufficient criteria for a triangulated or abelian category to be quiver-like.", "number": 21, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#21</span>
+                <a href="https://arxiv.org/abs/2407.01207" target="_blank">Thick subcategories on weighted projective curves and nilpotent representations of quivers</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Alexey Elagin</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 30 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2407.01207" target="_blank">https://arxiv.org/abs/2407.01207</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We continue the study of thick triangulated subcategories, started by Valery Lunts and the author in arXiv:2007.02134, and consider thick subcategories in the derived category of coherent sheaves on a weighted projective curve and the corresponding abelian thick subcategories. Our main result is that any thick subcategory on a weighted projective curve either is equivalent to the derived category of nilpotent representations of some quiver (we call such categories quiver-like) or is the orthogonal to an exceptional collection of torsion sheaves (we call such subcategories big). We examine the structure of thick subcategories: in particular, for weighted projective lines we prove that any admissible subcategory is generated by an exceptional collection and any exceptional collection is a part of a full one. We show that the derived categories of weighted projective curves satisfy Jordan-Holder property and do not contain phantoms. Finally, we extend and simplify results from arXiv:2007.02134, providing sufficient criteria for a triangulated or abelian category to be quiver-like.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-03-30 18:00:02
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>

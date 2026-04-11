@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Fri, 10 Apr 2026 04:00:10 +0000<br>
+        <strong>論文数:</strong> 19件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">A one-step counterexample to the normalized Nash blowup conjecture</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">The parity of theta characteristics is preserved by infinitesimal deformations</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Quasi-Compactness in Infinite Dimension</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">Elementary links from prime Fano threefolds along two lines</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">Rank one foliations on toroidal varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">On a descent conjecture of Wittenberg</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Derived jet and arc spaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Formulae for indices of holomorphic foliations via reduction of singularities</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">Resurgence of high-energy string amplitudes</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">An axiomatization of six-functor formalisms</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">Lectures on algebraic stacks</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">Generalized Kummer surfaces over finite fields</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">Permutation-equivariant quantum K-theory of Fermat singularities</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">On the coupled stability thresholds of graded linear series</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Hypersurfaces passing through the Galois orbit of a point</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">Principal twistor models and asymptotic hyperk\"ahler metrics</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">Integral models of Shimura varieties with parahoric level structure, II</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">Additive Rigidity for Images of Rational Points on Abelian Varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Polylab: A MATLAB Toolbox for Multivariate Polynomial Modeling</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "A one-step counterexample to the normalized Nash blowup conjecture", "author": "Alvaro Liendo, Ana Julisa Palomino, Gonzalo Rodr\\'iguez", "published": "Fri, 10 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.07519", "summary": "arXiv:2604.07519v1 Announce Type: new \nAbstract: We construct an explicit normal singular affine toric variety X of dimension five over an algebraically closed field of characteristic three such that the normalized Nash blowup of X already contains an open affine subset isomorphic to X. Combined with previously known examples, this yields one-step counterexamples in every dimension greater than or equal to five and every characteristic. The characteristic-three case is the most delicate: the previously known counterexample in dimension four requires a two-step iteration of the normalized Nash blowup, and our example demonstrates that in dimension five and higher the minimal number of iterations needed to produce a loop is one.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2604.07519" target="_blank">A one-step counterexample to the normalized Nash blowup conjecture</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Alvaro Liendo, Ana Julisa Palomino, Gonzalo Rodr\'iguez</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 10 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.07519" target="_blank">https://arxiv.org/abs/2604.07519</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We construct an explicit normal singular affine toric variety X of dimension five over an algebraically closed field of characteristic three such that the normalized Nash blowup of X already contains an open affine subset isomorphic to X. Combined with previously known examples, this yields one-step counterexamples in every dimension greater than or equal to five and every characteristic. The characteristic-three case is the most delicate: the previously known counterexample in dimension four requires a two-step iteration of the normalized Nash blowup, and our example demonstrates that in dimension five and higher the minimal number of iterations needed to produce a loop is one.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "The parity of theta characteristics is preserved by infinitesimal deformations", "author": "Margarida Mendes Lopes, Rita Pardini, Roberto Pignatelli", "published": "Fri, 10 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.07876", "summary": "arXiv:2604.07876v1 Announce Type: new \nAbstract: In this note, given a family of relative dimension one over a smooth curve, we determine the parity of the restriction of a relative theta characteristic to an arbitrary multiple of a fiber in terms of the parity of the restriction to a general fibre.\n  This result can be regarded as a variant of the well-known theorem on the invariance of the parity of theta characteristics in families.\n  As a corollary, we obtain that the torsion subsheaf of the first higher direct image sheaf of a relative theta characteristic splits as a direct sum of two isomorphic sheaves.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2604.07876" target="_blank">The parity of theta characteristics is preserved by infinitesimal deformations</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Margarida Mendes Lopes, Rita Pardini, Roberto Pignatelli</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 10 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.07876" target="_blank">https://arxiv.org/abs/2604.07876</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this note, given a family of relative dimension one over a smooth curve, we determine the parity of the restriction of a relative theta characteristic to an arbitrary multiple of a fiber in terms of the parity of the restriction to a general fibre.
+  This result can be regarded as a variant of the well-known theorem on the invariance of the parity of theta characteristics in families.
+  As a corollary, we obtain that the torsion subsheaf of the first higher direct image sheaf of a relative theta characteristic splits as a direct sum of two isomorphic sheaves.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Quasi-Compactness in Infinite Dimension", "author": "A. Bernhard Zeidler", "published": "Fri, 10 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.08026", "summary": "arXiv:2604.08026v1 Announce Type: new \nAbstract: We give extensive characterizations for an open subset of an affine space of arbitrary dimension, resp. of an inverse limit of prime spectra to be quasi-compact. Among other things weak stability, retro-compactness, and cylinder sets provide equivalent criteria in both settings. We also exhibit an example of a non-quasi-compact affine space.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2604.08026" target="_blank">Quasi-Compactness in Infinite Dimension</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> A. Bernhard Zeidler</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 10 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.08026" target="_blank">https://arxiv.org/abs/2604.08026</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We give extensive characterizations for an open subset of an affine space of arbitrary dimension, resp. of an inverse limit of prime spectra to be quasi-compact. Among other things weak stability, retro-compactness, and cylinder sets provide equivalent criteria in both settings. We also exhibit an example of a non-quasi-compact affine space.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "Elementary links from prime Fano threefolds along two lines", "author": "Kento Fujita", "published": "Fri, 10 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.08097", "summary": "arXiv:2604.08097v1 Announce Type: new \nAbstract: For prime Fano threefolds $X$ of genus $g=12$, $10$ or $9$, and for totally disjoint pairs of lines $Z_1$, $Z_2$ in $X$, we establish links from the blowups of $X$ along $Z_1$ and $Z_2$. If $g=12$, then the links end with the blowups of Fano threefolds of type 2.21 along bi-cubic curves; if $g=10$, then the links end with the blowups of the projectivization of the tangent bundle of the projective plane along genus $2$ bi-quintic curves with a mild condition; if $g=9$, then the links end with conic bundles over the product of two projective lines with the discriminant loci of bidegree $(3,3)$. When $g=12$ or $g=10$, we also establish the converses of the above links. Moreover, we especially focus on the links when $g=12$ and the links are $\\mathbb{G}_m$-equivariant.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2604.08097" target="_blank">Elementary links from prime Fano threefolds along two lines</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Kento Fujita</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 10 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.08097" target="_blank">https://arxiv.org/abs/2604.08097</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                For prime Fano threefolds $X$ of genus $g=12$, $10$ or $9$, and for totally disjoint pairs of lines $Z_1$, $Z_2$ in $X$, we establish links from the blowups of $X$ along $Z_1$ and $Z_2$. If $g=12$, then the links end with the blowups of Fano threefolds of type 2.21 along bi-cubic curves; if $g=10$, then the links end with the blowups of the projectivization of the tangent bundle of the projective plane along genus $2$ bi-quintic curves with a mild condition; if $g=9$, then the links end with conic bundles over the product of two projective lines with the discriminant loci of bidegree $(3,3)$. When $g=12$ or $g=10$, we also establish the converses of the above links. Moreover, we especially focus on the links when $g=12$ and the links are $\mathbb{G}_m$-equivariant.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "Rank one foliations on toroidal varieties", "author": "Calum Spicer, Luca Tasin", "published": "Fri, 10 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.08100", "summary": "arXiv:2604.08100v1 Announce Type: new \nAbstract: Consider a log canonical pair $(X,B)$ such that there is a Cartier divisor $D$ for which $T_X(-\\log B) \\otimes \\mathcal O(D)$ is locally free and globally generated. Let $\\mathcal F$ be a log canonical foliation of rank 1 on $X$. We prove that there exists a divisor $\\Gamma$ such that $(X, \\Gamma)$ is log canonical and $K_X + \\Gamma \\sim K_{\\mathcal F} + D$.\n  We then apply this result to prove several statements on the birational geometry of rank 1 log canonical foliations on log homogeneous varieties.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2604.08100" target="_blank">Rank one foliations on toroidal varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Calum Spicer, Luca Tasin</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 10 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.08100" target="_blank">https://arxiv.org/abs/2604.08100</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Consider a log canonical pair $(X,B)$ such that there is a Cartier divisor $D$ for which $T_X(-\log B) \otimes \mathcal O(D)$ is locally free and globally generated. Let $\mathcal F$ be a log canonical foliation of rank 1 on $X$. We prove that there exists a divisor $\Gamma$ such that $(X, \Gamma)$ is log canonical and $K_X + \Gamma \sim K_{\mathcal F} + D$.
+  We then apply this result to prove several statements on the birational geometry of rank 1 log canonical foliations on log homogeneous varieties.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "On a descent conjecture of Wittenberg", "author": "Yisheng Tian", "published": "Fri, 10 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.08146", "summary": "arXiv:2604.08146v1 Announce Type: new \nAbstract: A descent conjecture of Wittenberg predicts that if all the twists of a rationally connected torsor over a smooth base satisfy weak approximation with Brauer--Manin obstruction, then the base also has weak approximation with Brauer--Manin obstruction. We give a proof of Wittenberg's conjecture via Cao's descent formula.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2604.08146" target="_blank">On a descent conjecture of Wittenberg</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yisheng Tian</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 10 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.08146" target="_blank">https://arxiv.org/abs/2604.08146</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                A descent conjecture of Wittenberg predicts that if all the twists of a rationally connected torsor over a smooth base satisfy weak approximation with Brauer--Manin obstruction, then the base also has weak approximation with Brauer--Manin obstruction. We give a proof of Wittenberg's conjecture via Cao's descent formula.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Derived jet and arc spaces", "author": "Roi Docampo, Lance Edward Miller, C. Eric Overton-Walker", "published": "Fri, 10 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.08429", "summary": "arXiv:2604.08429v1 Announce Type: new \nAbstract: We study jet schemes and arc spaces in the context of derived algebraic geometry. Explicitly, we consider the jet and arc functors in the category of schemes and study their animations to the category of derived schemes -- what we call the derived jet and arc spaces. We show that the derived constructions agree with the classical versions when the base scheme is smooth, or more generally for local complete intersection log canonical singularities, giving a derived interpretation to a theorem of Musta\\c{t}\\u{a}. For more singular spaces we get new singularity invariants in the form of higher homotopy groups. We also study cotangent complexes for derived jet and arc spaces, generalizing previous formulas for sheaves of differentials of classical jet and arc spaces. Several applications are obtained. Specifically, we revisit recent results on the local structure of arc spaces from the lens of cotangent complexes, giving more unified proofs and removing unnecessary hypotheses. In particular, we extend a version of Reguera's curve selection lemma for arc spaces to the case of non-perfect base fields.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2604.08429" target="_blank">Derived jet and arc spaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Roi Docampo, Lance Edward Miller, C. Eric Overton-Walker</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 10 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.08429" target="_blank">https://arxiv.org/abs/2604.08429</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study jet schemes and arc spaces in the context of derived algebraic geometry. Explicitly, we consider the jet and arc functors in the category of schemes and study their animations to the category of derived schemes -- what we call the derived jet and arc spaces. We show that the derived constructions agree with the classical versions when the base scheme is smooth, or more generally for local complete intersection log canonical singularities, giving a derived interpretation to a theorem of Musta\c{t}\u{a}. For more singular spaces we get new singularity invariants in the form of higher homotopy groups. We also study cotangent complexes for derived jet and arc spaces, generalizing previous formulas for sheaves of differentials of classical jet and arc spaces. Several applications are obtained. Specifically, we revisit recent results on the local structure of arc spaces from the lens of cotangent complexes, giving more unified proofs and removing unnecessary hypotheses. In particular, we extend a version of Reguera's curve selection lemma for arc spaces to the case of non-perfect base fields.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Formulae for indices of holomorphic foliations via reduction of singularities", "author": "Maycol Falla Luza, Percy Fern\\'andez S\\'anchez, David marin", "published": "Fri, 10 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.08464", "summary": "arXiv:2604.08464v1 Announce Type: new \nAbstract: We study numerical invariants associated with the reduction of singularities of holomorphic foliation germs on $(\\mathbb{C}^2, 0)$. Building on our previous work on generalized curve foliations, we extend explicit formulas for several fundamental invariants to arbitrary foliations. In particular, we provide general expressions for the discrepancy vector, the Milnor and intrinsic Milnor numbers, and classical indices along a separatrix as Camacho-Sad, Variation, G\\'omez-Mont-Seade-Verjovsky and also the Baum-Bott index. These extensions require a careful analysis of the contributions of saddle-nodes arising in the desingularization process. As applications, we recover results of Brunella and Cavalier-Lehmann, as well as a related statement appearing in [8], within a unified and purely numerical framework. Furthermore, we obtain intrinsic characterizations of generalized curve foliations in terms of indices and of second type foliations in terms of the discrepancy vector.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2604.08464" target="_blank">Formulae for indices of holomorphic foliations via reduction of singularities</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Maycol Falla Luza, Percy Fern\'andez S\'anchez, David marin</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 10 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.08464" target="_blank">https://arxiv.org/abs/2604.08464</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study numerical invariants associated with the reduction of singularities of holomorphic foliation germs on $(\mathbb{C}^2, 0)$. Building on our previous work on generalized curve foliations, we extend explicit formulas for several fundamental invariants to arbitrary foliations. In particular, we provide general expressions for the discrepancy vector, the Milnor and intrinsic Milnor numbers, and classical indices along a separatrix as Camacho-Sad, Variation, G\'omez-Mont-Seade-Verjovsky and also the Baum-Bott index. These extensions require a careful analysis of the contributions of saddle-nodes arising in the desingularization process. As applications, we recover results of Brunella and Cavalier-Lehmann, as well as a related statement appearing in [8], within a unified and purely numerical framework. Furthermore, we obtain intrinsic characterizations of generalized curve foliations in terms of indices and of second type foliations in terms of the discrepancy vector.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "Resurgence of high-energy string amplitudes", "author": "Xavier Kervyn, Stephan Stieberger", "published": "Fri, 10 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.07444", "summary": "arXiv:2604.07444v1 Announce Type: cross \nAbstract: We analyze the fixed-angle high-energy ($\\alpha' \\to \\infty$) structure of $n$-point tree-level string amplitudes from complementary perspectives: locally via saddle-point expansions, algebraically via difference equations and their asymptotic structure, analytically via Aomoto-Gauss-Manin connection and Mellin-Barnes representation, and geometrically via twisted intersection theory and Lefschetz thimbles. Using, in turn, saddle-point analysis and finite-difference equations in the kinematic variables, we show that the perturbative coefficients in the resulting asymptotic series in $1/\\alpha'$ are organized by Bernoulli-number data, rather than by the multiple zeta values characteristic of the low-energy $\\alpha' \\to 0$ regime. Resurgence theory allows upgrading these divergent series to transseries whose Stokes data capture the analytic continuation between unphysical and physical kinematic regions in the form of non-perturbative monodromy contributions. We derive the transseries for four-point open string amplitudes explicitly. We also construct a differential and Mellin formulation which place their low- and high-energy expansions in a common analytic framework and unifies them as asymptotic sectors of the same underlying object. We extend the difference-equation analysis to $n \\geq 5$, where it yields perturbative high-energy asymptotic expansions and leads naturally to a higher-rank connection problem. Finally, translating our asymptotic analysis into the language of twisted de Rham theory, we derive an alternative double-copy representation of the high-energy limit of closed-string amplitudes in terms of Lefschetz thimbles for any $n$.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2604.07444" target="_blank">Resurgence of high-energy string amplitudes</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Xavier Kervyn, Stephan Stieberger</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 10 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.07444" target="_blank">https://arxiv.org/abs/2604.07444</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We analyze the fixed-angle high-energy ($\alpha' \to \infty$) structure of $n$-point tree-level string amplitudes from complementary perspectives: locally via saddle-point expansions, algebraically via difference equations and their asymptotic structure, analytically via Aomoto-Gauss-Manin connection and Mellin-Barnes representation, and geometrically via twisted intersection theory and Lefschetz thimbles. Using, in turn, saddle-point analysis and finite-difference equations in the kinematic variables, we show that the perturbative coefficients in the resulting asymptotic series in $1/\alpha'$ are organized by Bernoulli-number data, rather than by the multiple zeta values characteristic of the low-energy $\alpha' \to 0$ regime. Resurgence theory allows upgrading these divergent series to transseries whose Stokes data capture the analytic continuation between unphysical and physical kinematic regions in the form of non-perturbative monodromy contributions. We derive the transseries for four-point open string amplitudes explicitly. We also construct a differential and Mellin formulation which place their low- and high-energy expansions in a common analytic framework and unifies them as asymptotic sectors of the same underlying object. We extend the difference-equation analysis to $n \geq 5$, where it yields perturbative high-energy asymptotic expansions and leads naturally to a higher-rank connection problem. Finally, translating our asymptotic analysis into the language of twisted de Rham theory, we derive an alternative double-copy representation of the high-energy limit of closed-string amplitudes in terms of Lefschetz thimbles for any $n$.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "An axiomatization of six-functor formalisms", "author": "Josefien Kuijper", "published": "Fri, 10 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2309.11449", "summary": "arXiv:2309.11449v4 Announce Type: replace \nAbstract: In this paper, we consider some variations on Mann's definition $\\infty$-categorical definition of abstract six-functor formalisms. We consider Nagata six-functor formalisms, that have the additional requirement of having Grothendieck and Wirthm\\\"uller contexts. We also consider local six-functor formalisms, which in addition to this, take values in presentable stable $\\infty$-categories, and have recollements. Using Nagata's compactification theorem, we show that Nagata six-functor formalism on varieties can be given by just specifying adjoint triples for open immersions and for proper morphisms, satisfying certain compatibilities. The existence of recollements is (almost) equivalent to a hypersheaf condition for a Grothendieck topology on the category of ``varieties and spans consisting of an open immersion and a proper map''. Using this characterisation, we show that the category of local six-functor formalisms embeds faithfully into the category of lax symmetric monoidal functors from the category of smooth and complete varieties to the category of presentable stable $\\infty$-categories and adjoint triples. We characterise which lax symmetric monoidal functors on complete varieties, taking values in the category of presentable stable $\\infty$-categories and adjoint triples, extend to local six-functor formalisms.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2309.11449" target="_blank">An axiomatization of six-functor formalisms</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Josefien Kuijper</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 10 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2309.11449" target="_blank">https://arxiv.org/abs/2309.11449</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we consider some variations on Mann's definition $\infty$-categorical definition of abstract six-functor formalisms. We consider Nagata six-functor formalisms, that have the additional requirement of having Grothendieck and Wirthm\"uller contexts. We also consider local six-functor formalisms, which in addition to this, take values in presentable stable $\infty$-categories, and have recollements. Using Nagata's compactification theorem, we show that Nagata six-functor formalism on varieties can be given by just specifying adjoint triples for open immersions and for proper morphisms, satisfying certain compatibilities. The existence of recollements is (almost) equivalent to a hypersheaf condition for a Grothendieck topology on the category of ``varieties and spans consisting of an open immersion and a proper map''. Using this characterisation, we show that the category of local six-functor formalisms embeds faithfully into the category of lax symmetric monoidal functors from the category of smooth and complete varieties to the category of presentable stable $\infty$-categories and adjoint triples. We characterise which lax symmetric monoidal functors on complete varieties, taking values in the category of presentable stable $\infty$-categories and adjoint triples, extend to local six-functor formalisms.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "Lectures on algebraic stacks", "author": "Adeel A. Khan", "published": "Fri, 10 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2310.12456", "summary": "arXiv:2310.12456v3 Announce Type: replace \nAbstract: Notes on algebraic stacks, prepared for an 11-lecture course at the NCTS, Taipei, during the fall of 2022.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2310.12456" target="_blank">Lectures on algebraic stacks</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Adeel A. Khan</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 10 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2310.12456" target="_blank">https://arxiv.org/abs/2310.12456</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Notes on algebraic stacks, prepared for an 11-lecture course at the NCTS, Taipei, during the fall of 2022.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "Generalized Kummer surfaces over finite fields", "author": "Sergey Rybakov", "published": "Fri, 10 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2404.00945", "summary": "arXiv:2404.00945v4 Announce Type: replace \nAbstract: In this paper, we prove a refinement of the Katsura theorem on finite group actions on abelian surfaces such that the quotient is birational to a $K3$ surface. As an application, we compute traces of Frobenius on the Neron--Severi groups of supersingular generalized Kummer surfaces over finite fields.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2404.00945" target="_blank">Generalized Kummer surfaces over finite fields</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sergey Rybakov</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 10 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2404.00945" target="_blank">https://arxiv.org/abs/2404.00945</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we prove a refinement of the Katsura theorem on finite group actions on abelian surfaces such that the quotient is birational to a $K3$ surface. As an application, we compute traces of Frobenius on the Neron--Severi groups of supersingular generalized Kummer surfaces over finite fields.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "Permutation-equivariant quantum K-theory of Fermat singularities", "author": "Maxime Cazaux", "published": "Fri, 10 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2410.17730", "summary": "arXiv:2410.17730v2 Announce Type: replace \nAbstract: We compute the genus-0 permutation-equivariant quantum K-theory of Fermat singularities, in parallel with the Givental-Lee theory for projective varieties. We extend Givental-Tonita's formalism of adelic Lagrangian cones to the singularity theory, and we obtain explicit $I$-functions for the invariants, which satisfy the same $q$-difference equation as Givental's $I$-function of the associated hypersurface. This can be regarded as an extension of the Landau-Ginzburg/Calabi-Yau correspondence, although a discrepancy between the two sides sides emerges in K-theory. In the case of the quintic threefold, both generating functions satisfy a $q$-difference equation of degree $25$; the hypersurface $I$-function only spans a $5$-dimensional subspace of solutions, while the singularity $I$-function spans the full space of solutions.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2410.17730" target="_blank">Permutation-equivariant quantum K-theory of Fermat singularities</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Maxime Cazaux</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 10 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2410.17730" target="_blank">https://arxiv.org/abs/2410.17730</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We compute the genus-0 permutation-equivariant quantum K-theory of Fermat singularities, in parallel with the Givental-Lee theory for projective varieties. We extend Givental-Tonita's formalism of adelic Lagrangian cones to the singularity theory, and we obtain explicit $I$-functions for the invariants, which satisfy the same $q$-difference equation as Givental's $I$-function of the associated hypersurface. This can be regarded as an extension of the Landau-Ginzburg/Calabi-Yau correspondence, although a discrepancy between the two sides sides emerges in K-theory. In the case of the quintic threefold, both generating functions satisfy a $q$-difference equation of degree $25$; the hypersurface $I$-function only spans a $5$-dimensional subspace of solutions, while the singularity $I$-function spans the full space of solutions.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "On the coupled stability thresholds of graded linear series", "author": "Kento Fujita", "published": "Fri, 10 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2412.04019", "summary": "arXiv:2412.04019v2 Announce Type: replace \nAbstract: In this paper, we see several basic properties of graded linear series. We firstly see that, if a graded linear series contains an ample series, then so are the pullbacks of the system under birational morphisms. Using this proposition, we define the refinements of graded linear series with respects to primitive flags. Moreover, we give several formulas to compute the $S$-invariant of those refinements. Secondly, we introduce the notion of coupled stability thresholds for graded linear series, which is a generalization of the notion introduced by Rubinstein--Tian--Zhang. We see that, over the interior of the support for finite numbers of graded linear series containing an ample series, the coupled stability threshold function can be uniquely extended continuously, which generalizes the work by Kewei Zhang. Thirdly, we get a product-type formula for coupled stability thresholds, which generalizes the work of Zhuang. Fourthly, we see Abban--Zhuang's type formulas for estimating local coupled stability thresholds.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2412.04019" target="_blank">On the coupled stability thresholds of graded linear series</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Kento Fujita</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 10 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2412.04019" target="_blank">https://arxiv.org/abs/2412.04019</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we see several basic properties of graded linear series. We firstly see that, if a graded linear series contains an ample series, then so are the pullbacks of the system under birational morphisms. Using this proposition, we define the refinements of graded linear series with respects to primitive flags. Moreover, we give several formulas to compute the $S$-invariant of those refinements. Secondly, we introduce the notion of coupled stability thresholds for graded linear series, which is a generalization of the notion introduced by Rubinstein--Tian--Zhang. We see that, over the interior of the support for finite numbers of graded linear series containing an ample series, the coupled stability threshold function can be uniquely extended continuously, which generalizes the work by Kewei Zhang. Thirdly, we get a product-type formula for coupled stability thresholds, which generalizes the work of Zhuang. Fourthly, we see Abban--Zhuang's type formulas for estimating local coupled stability thresholds.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Hypersurfaces passing through the Galois orbit of a point", "author": "Shamil Asgarli, Jonathan Love, Chi Hoi Yip", "published": "Fri, 10 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2501.01906", "summary": "arXiv:2501.01906v2 Announce Type: replace \nAbstract: Asgarli, Ghioca, and Reichstein proved that if $K$ is a field with $|K|&gt;2$, then for any positive integers $d$ and $n$, and separable field extension $L/K$ with degree $m=\\binom{n+d}{d}$, there exists a point $P\\in \\mathbb{P}^n(L)$ which does not lie on any degree $d$ hypersurface defined over $K$. They asked whether the result holds when $|K| = 2$. We answer their question in the affirmative by combining various ideas from arithmetic geometry. More generally, we show that for each positive integer $r$ and separable field extension $L/K$ with degree $r$, there exists a point $P \\in \\mathbb{P}^n(L)$ such that the vector space of degree $d$ forms over $K$ that vanish at $P$ has the expected dimension. We also discuss applications to linear systems of hypersurfaces with special properties.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2501.01906" target="_blank">Hypersurfaces passing through the Galois orbit of a point</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Shamil Asgarli, Jonathan Love, Chi Hoi Yip</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 10 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2501.01906" target="_blank">https://arxiv.org/abs/2501.01906</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Asgarli, Ghioca, and Reichstein proved that if $K$ is a field with $|K|&gt;2$, then for any positive integers $d$ and $n$, and separable field extension $L/K$ with degree $m=\binom{n+d}{d}$, there exists a point $P\in \mathbb{P}^n(L)$ which does not lie on any degree $d$ hypersurface defined over $K$. They asked whether the result holds when $|K| = 2$. We answer their question in the affirmative by combining various ideas from arithmetic geometry. More generally, we show that for each positive integer $r$ and separable field extension $L/K$ with degree $r$, there exists a point $P \in \mathbb{P}^n(L)$ such that the vector space of degree $d$ forms over $K$ that vanish at $P$ has the expected dimension. We also discuss applications to linear systems of hypersurfaces with special properties.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "Principal twistor models and asymptotic hyperk\\\"ahler metrics", "author": "Ryota Kotani", "published": "Fri, 10 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.03923", "summary": "arXiv:2603.03923v3 Announce Type: replace \nAbstract: Let $X$ be a conical symplectic variety admitting a crepant resolution $Y$. Based on the theory of universal Poisson deformations, we construct a complex manifold called the principal twistor model associated with $Y$. We prove a universality theorem for this model: if the regular locus of $X$ admits a hyperk\\\"ahler cone metric, then the twistor space of any algebraic hyperk\\\"ahler metric on $Y$ asymptotic to this cone metric is uniquely recovered by slicing the principal twistor model. As an application, we use this universality to study the moduli space of hyperk\\\"ahler structures with asymptotic behavior, and show that it admits an inclusion into a finite-dimensional real vector space.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2603.03923" target="_blank">Principal twistor models and asymptotic hyperk\"ahler metrics</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ryota Kotani</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 10 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.03923" target="_blank">https://arxiv.org/abs/2603.03923</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $X$ be a conical symplectic variety admitting a crepant resolution $Y$. Based on the theory of universal Poisson deformations, we construct a complex manifold called the principal twistor model associated with $Y$. We prove a universality theorem for this model: if the regular locus of $X$ admits a hyperk\"ahler cone metric, then the twistor space of any algebraic hyperk\"ahler metric on $Y$ asymptotic to this cone metric is uniquely recovered by slicing the principal twistor model. As an application, we use this universality to study the moduli space of hyperk\"ahler structures with asymptotic behavior, and show that it admits an inclusion into a finite-dimensional real vector space.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "Integral models of Shimura varieties with parahoric level structure, II", "author": "Mark Kisin, Georgios Pappas, Rong Zhou", "published": "Fri, 10 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2409.03689", "summary": "arXiv:2409.03689v3 Announce Type: replace-cross \nAbstract: We construct integral models of Shimura varieties of abelian type with parahoric level structure over odd primes. These models are \\'etale locally isomorphic to corresponding local models.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2409.03689" target="_blank">Integral models of Shimura varieties with parahoric level structure, II</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Mark Kisin, Georgios Pappas, Rong Zhou</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 10 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2409.03689" target="_blank">https://arxiv.org/abs/2409.03689</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We construct integral models of Shimura varieties of abelian type with parahoric level structure over odd primes. These models are \'etale locally isomorphic to corresponding local models.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "Additive Rigidity for Images of Rational Points on Abelian Varieties", "author": "Seokhyun Choi", "published": "Fri, 10 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.24340", "summary": "arXiv:2603.24340v2 Announce Type: replace-cross \nAbstract: We study the interaction between the group law on an abelian variety and the additive structure induced on its image under a morphism to projective space. Let $A/F$ be a simple abelian variety, $f:A \\rightarrow \\mathbb{P}^n$ be a morphism which is finite onto its image, and $\\Gamma \\subseteq A(F)$ be a finite-rank subgroup. We show that for any affine chart $\\mathbb{A}^n \\subseteq \\mathbb{P}^n$ and any finite subset $X \\subseteq f(\\Gamma) \\cap \\mathbb{A}^n$, the energy satisfies $E(X) \\ll \\lvert X \\rvert^2$ and the sumset satisfies $\\lvert X+X \\rvert \\gg \\lvert X \\rvert^2$. We then ask whether the same additive rigidity holds for arbitrary abelian varieties, and prove that this is indeed the case when the morphism $f$ is compatible with the decomposition of $A$ into simple factors. The proof uses the uniform Mordell-Lang conjecture.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2603.24340" target="_blank">Additive Rigidity for Images of Rational Points on Abelian Varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Seokhyun Choi</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 10 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.24340" target="_blank">https://arxiv.org/abs/2603.24340</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the interaction between the group law on an abelian variety and the additive structure induced on its image under a morphism to projective space. Let $A/F$ be a simple abelian variety, $f:A \rightarrow \mathbb{P}^n$ be a morphism which is finite onto its image, and $\Gamma \subseteq A(F)$ be a finite-rank subgroup. We show that for any affine chart $\mathbb{A}^n \subseteq \mathbb{P}^n$ and any finite subset $X \subseteq f(\Gamma) \cap \mathbb{A}^n$, the energy satisfies $E(X) \ll \lvert X \rvert^2$ and the sumset satisfies $\lvert X+X \rvert \gg \lvert X \rvert^2$. We then ask whether the same additive rigidity holds for arbitrary abelian varieties, and prove that this is indeed the case when the morphism $f$ is compatible with the decomposition of $A$ into simple factors. The proof uses the uniform Mordell-Lang conjecture.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Polylab: A MATLAB Toolbox for Multivariate Polynomial Modeling", "author": "Yi-Shuai Niu, Shing-Tung Yau", "published": "Fri, 10 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.06575", "summary": "arXiv:2604.06575v2 Announce Type: replace-cross \nAbstract: Polylab is a MATLAB toolbox for multivariate polynomial scalars and polynomial matrices with a unified symbolic-numeric interface across CPU and GPU-oriented backends. The software exposes three aligned classes: MPOLY for CPU execution, MPOLY_GPU as a legacy GPU baseline, and MPOLY_HP as an improved GPU-oriented implementation. Across these backends, Polylab supports polynomial construction, algebraic manipulation, simplification, matrix operations, differentiation, Jacobian and Hessian construction, LaTeX export, CPU-side LaTeX reconstruction, backend conversion, and interoperability with YALMIP and SOSTOOLS. Versions 3.0 and 3.1 add two practically important extensions: explicit variable identity and naming for safe mixed-variable expression handling, and affine-normal direction computation via automatic differentiation, MF-logDet-Exact, and MF-logDet-Stochastic. The toolbox has already been used successfully in prior research applications, and Polylab Version 3.1 adds a new geometry-oriented computational layer on top of a mature polynomial modeling core. This article documents the architecture and user-facing interface of the software, organizes its functionality by workflow, presents representative MATLAB sessions with actual outputs, and reports reproducible benchmarks. The results show that MPOLY is the right default for lightweight interactive workloads, whereas MPOLY-HP becomes advantageous for reduction-heavy simplification and medium-to-large affine-normal computation; the stochastic log-determinant variant becomes attractive in larger sparse regimes under approximation-oriented parameter choices.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2604.06575" target="_blank">Polylab: A MATLAB Toolbox for Multivariate Polynomial Modeling</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yi-Shuai Niu, Shing-Tung Yau</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 10 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.06575" target="_blank">https://arxiv.org/abs/2604.06575</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Polylab is a MATLAB toolbox for multivariate polynomial scalars and polynomial matrices with a unified symbolic-numeric interface across CPU and GPU-oriented backends. The software exposes three aligned classes: MPOLY for CPU execution, MPOLY_GPU as a legacy GPU baseline, and MPOLY_HP as an improved GPU-oriented implementation. Across these backends, Polylab supports polynomial construction, algebraic manipulation, simplification, matrix operations, differentiation, Jacobian and Hessian construction, LaTeX export, CPU-side LaTeX reconstruction, backend conversion, and interoperability with YALMIP and SOSTOOLS. Versions 3.0 and 3.1 add two practically important extensions: explicit variable identity and naming for safe mixed-variable expression handling, and affine-normal direction computation via automatic differentiation, MF-logDet-Exact, and MF-logDet-Stochastic. The toolbox has already been used successfully in prior research applications, and Polylab Version 3.1 adds a new geometry-oriented computational layer on top of a mature polynomial modeling core. This article documents the architecture and user-facing interface of the software, organizes its functionality by workflow, presents representative MATLAB sessions with actual outputs, and reports reproducible benchmarks. The results show that MPOLY is the right default for lightweight interactive workloads, whereas MPOLY-HP becomes advantageous for reduction-heavy simplification and medium-to-large affine-normal computation; the stochastic log-determinant variant becomes attractive in larger sparse regimes under approximation-oriented parameter choices.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-04-10 15:52:34
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>

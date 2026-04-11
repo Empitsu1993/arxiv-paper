@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Mon, 23 Mar 2026 04:01:04 +0000<br>
+        <strong>論文数:</strong> 17件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Formal splitting and stack-theoretic normal crossings desingularization</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Weierstrass gap sequences and their weights on tropical curves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Semisimple derivations, rational slice and kernels over affine domains</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">A Dimension Bound for Symmetrizer Groups of Projective Hypersurfaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">The log homotopy exact sequence</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">Existence of minimal del Pezzo surfaces of degree 1 with conic bundles over finite fields</a>
+            <span class="title-label-badge" style="background-color: #9b59b6;">del Pezzo</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Integrable Systems for Generalized Toric Polygons and Higgsed 5d N=1 Theories</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Automorphisms of finite fields from isogeny cycles</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">Computation and sampling for Schubert specializations</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">Singular symplectic surfaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">Non-proportional wall crossing for K-stability</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">Dual of Algebraic Geometry codes from Hirzebruch surfaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">Integrals of stable envelopes for cotangent bundles to Grassmannians</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Some moduli spaces of $\alpha$-stable coherent systems on algebraic surfaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Segre surfaces and geometry of the Painlev\'e equations</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">Special Lagrangians and Bridgeland stable objects beyond geometric stability conditions: the product case</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">Characterizing almost Cohen-Macaulay $3$-generated ideals of codimension $2$ in terms of prescribed shifts</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Formal splitting and stack-theoretic normal crossings desingularization", "author": "Andr\\'e Belotto da Silva, Fran\\c{c}ois Bernard, Edward Bierstone", "published": "Mon, 23 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.19365", "summary": "arXiv:2603.19365v1 Announce Type: new \nAbstract: We show that stack-theoretic resolution of singularities preserving normal crossings (partial desingularization) by weighted blowings-up, can be obtained in a simple direct way from a splitting theorem of the first and third authors, using the algorithm of Abramovich, Temkin and W{\\l}odarczyk for resolution of singularities by weighted blowings-up.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2603.19365" target="_blank">Formal splitting and stack-theoretic normal crossings desingularization</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Andr\'e Belotto da Silva, Fran\c{c}ois Bernard, Edward Bierstone</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 23 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.19365" target="_blank">https://arxiv.org/abs/2603.19365</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We show that stack-theoretic resolution of singularities preserving normal crossings (partial desingularization) by weighted blowings-up, can be obtained in a simple direct way from a splitting theorem of the first and third authors, using the algorithm of Abramovich, Temkin and W{\l}odarczyk for resolution of singularities by weighted blowings-up.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Weierstrass gap sequences and their weights on tropical curves", "author": "Omid Amini, Shu Kawaguchi", "published": "Mon, 23 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.19393", "summary": "arXiv:2603.19393v1 Announce Type: new \nAbstract: Given a divisor on a tropical curve, we associate to each point of the curve a Weierstrass gap sequence. We investigate structural properties of these gap sequences and explore their relationship with the Weierstrass gap sequences of line bundles on algebraic curves via the tropicalization process.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2603.19393" target="_blank">Weierstrass gap sequences and their weights on tropical curves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Omid Amini, Shu Kawaguchi</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 23 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.19393" target="_blank">https://arxiv.org/abs/2603.19393</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Given a divisor on a tropical curve, we associate to each point of the curve a Weierstrass gap sequence. We investigate structural properties of these gap sequences and explore their relationship with the Weierstrass gap sequences of line bundles on algebraic curves via the tropicalization process.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Semisimple derivations, rational slice and kernels over affine domains", "author": "Luis Cid", "published": "Mon, 23 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.19587", "summary": "arXiv:2603.19587v1 Announce Type: new \nAbstract: Let k be an algebraically closed field of characteristic zero and let B be a finitely generated k-domain. We study semisimple derivations on B, with special emphasis on those whose eigenvalues are integers. For such derivations, after passing to the field of fractions and choosing a rational slice s with D(s) = s, we describe the kernel of D explicitly in terms of semi-invariant generators. We also obtain descriptions of the kernel on suitable localizations of B and on B itself by intersection. Several basic properties of semisimple derivations and their behavior under conjugation are also discussed", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2603.19587" target="_blank">Semisimple derivations, rational slice and kernels over affine domains</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Luis Cid</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 23 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.19587" target="_blank">https://arxiv.org/abs/2603.19587</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let k be an algebraically closed field of characteristic zero and let B be a finitely generated k-domain. We study semisimple derivations on B, with special emphasis on those whose eigenvalues are integers. For such derivations, after passing to the field of fractions and choosing a rational slice s with D(s) = s, we describe the kernel of D explicitly in terms of semi-invariant generators. We also obtain descriptions of the kernel on suitable localizations of B and on B itself by intersection. Several basic properties of semisimple derivations and their behavior under conjugation are also discussed
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "A Dimension Bound for Symmetrizer Groups of Projective Hypersurfaces", "author": "Jegyeong Jung", "published": "Mon, 23 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.19642", "summary": "arXiv:2603.19642v1 Announce Type: new \nAbstract: Let $X$ be a projective hypersurface that is not a cone. The symmetrizer group of $X$ is an algebraic group parametrizing hypersurfaces whose Jacobian ideal coincides with that of $X$. We show that if the locus of points in $X$ with multiplicity $d-1$ does not contain a line, then the dimension of the nilpotent part of the Lie algebra associated to the symmetrizer group is at most $2$, and the dimension of the symmetrizer group is bounded by $\\dim X + 2$. To achieve this, we investigate the relation between a class of singularities on $X$ with highly degenerate tangent cones and the unipotent part of its symmetrizer group.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2603.19642" target="_blank">A Dimension Bound for Symmetrizer Groups of Projective Hypersurfaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jegyeong Jung</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 23 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.19642" target="_blank">https://arxiv.org/abs/2603.19642</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $X$ be a projective hypersurface that is not a cone. The symmetrizer group of $X$ is an algebraic group parametrizing hypersurfaces whose Jacobian ideal coincides with that of $X$. We show that if the locus of points in $X$ with multiplicity $d-1$ does not contain a line, then the dimension of the nilpotent part of the Lie algebra associated to the symmetrizer group is at most $2$, and the dimension of the symmetrizer group is bounded by $\dim X + 2$. To achieve this, we investigate the relation between a class of singularities on $X$ with highly degenerate tangent cones and the unipotent part of its symmetrizer group.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "The log homotopy exact sequence", "author": "Mattia Talpo", "published": "Mon, 23 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.19998", "summary": "arXiv:2603.19998v1 Announce Type: new \nAbstract: We show exactness of the homotopy sequence for the logarithmic fundamental group in the case of log smooth, finitely presented, proper and saturated morphisms of fs log schemes over a field. This generalizes earlier results of Hoshi in the log regular case. In passing, we also construct a \"log Stein factorization\" in some particular cases.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2603.19998" target="_blank">The log homotopy exact sequence</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Mattia Talpo</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 23 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.19998" target="_blank">https://arxiv.org/abs/2603.19998</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We show exactness of the homotopy sequence for the logarithmic fundamental group in the case of log smooth, finitely presented, proper and saturated morphisms of fs log schemes over a field. This generalizes earlier results of Hoshi in the log regular case. In passing, we also construct a "log Stein factorization" in some particular cases.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "Existence of minimal del Pezzo surfaces of degree 1 with conic bundles over finite fields", "author": "Manoy T. Trip", "published": "Mon, 23 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.20054", "summary": "arXiv:2603.20054v1 Announce Type: new \nAbstract: We study minimal del Pezzo surfaces of degree 1 with a conic bundle over a finite field $\\mathbb{F}_q$ according to the action of the absolute Galois group on the singular fibers (which is known as their type). We give a lower bound on the size of the field over which they exist, and determine values of $q$ for which certain types cannot exist. In particular, we solve the inverse Galois problem for certain types of minimal del Pezzo surfaces of degree 1 over finite fields with a conic bundle structure. Additionally, we give bounds on the values of $q$ for which del Pezzo surfaces of degree 1 of index 8 exist over $\\mathbb{F}_q$.", "number": 6, "labels": [{"name": "del Pezzo", "color": "#9b59b6"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2603.20054" target="_blank">Existence of minimal del Pezzo surfaces of degree 1 with conic bundles over finite fields</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #9b59b6;">del Pezzo</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Manoy T. Trip</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 23 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.20054" target="_blank">https://arxiv.org/abs/2603.20054</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study minimal del Pezzo surfaces of degree 1 with a conic bundle over a finite field $\mathbb{F}_q$ according to the action of the absolute Galois group on the singular fibers (which is known as their type). We give a lower bound on the size of the field over which they exist, and determine values of $q$ for which certain types cannot exist. In particular, we solve the inverse Galois problem for certain types of minimal del Pezzo surfaces of degree 1 over finite fields with a conic bundle structure. Additionally, we give bounds on the values of $q$ for which del Pezzo surfaces of degree 1 of index 8 exist over $\mathbb{F}_q$.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Integrable Systems for Generalized Toric Polygons and Higgsed 5d N=1 Theories", "author": "Minsung Kho, Kimyeong Lee, Norton Lee, Rak-Kyeong Seong", "published": "Mon, 23 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.19353", "summary": "arXiv:2603.19353v1 Announce Type: cross \nAbstract: The interplay between toric Calabi-Yau 3-folds, dimer integrable systems, and 5-dimensional quantum field theories has proved fruitful. We extend this framework to generalized toric polygons (GTPs) and show that their integrable systems arise from refined birational transformations of known dimer integrable systems acting on the Casimirs and Hamiltonians as well as the Poisson structure and spectral curves. We argue that these transformations are realized as Hanany-Witten transitions producing (p,q) 5-brane webs dual to GTPs. We show that the resulting 5d N=1 theory is obtained by Higgsing a higher-rank theory whose associated toric Calabi-Yau has a toric diagram of the same shape as the GTP.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2603.19353" target="_blank">Integrable Systems for Generalized Toric Polygons and Higgsed 5d N=1 Theories</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Minsung Kho, Kimyeong Lee, Norton Lee, Rak-Kyeong Seong</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 23 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.19353" target="_blank">https://arxiv.org/abs/2603.19353</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The interplay between toric Calabi-Yau 3-folds, dimer integrable systems, and 5-dimensional quantum field theories has proved fruitful. We extend this framework to generalized toric polygons (GTPs) and show that their integrable systems arise from refined birational transformations of known dimer integrable systems acting on the Casimirs and Hamiltonians as well as the Poisson structure and spectral curves. We argue that these transformations are realized as Hanany-Witten transitions producing (p,q) 5-brane webs dual to GTPs. We show that the resulting 5d N=1 theory is obtained by Higgsing a higher-rank theory whose associated toric Calabi-Yau has a toric diagram of the same shape as the GTP.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Automorphisms of finite fields from isogeny cycles", "author": "K\\'eva Djamba\\'e", "published": "Mon, 23 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.19428", "summary": "arXiv:2603.19428v1 Announce Type: cross \nAbstract: We develop an explicit geometric construction of automorphisms of finite fields arising from isogeny cycles. Let $k$ be a finite field, $E/k$ an elliptic curve, and $\\ell$ an integer coprime to $\\mathrm{char}(k)$. Let $\\mathfrak{h}$ be an ideal of $\\mathrm{End}(E)$ dividing $\\ell$, and consider the corresponding torsion subgroup $E[\\mathfrak{h}]\\subseteq E[\\ell]$. From the action of End(E) on $E[\\mathfrak{h}]$, we construct the splitting field $K$ of the $x$-coordinates of points in $E[\\mathfrak{h}]$ and the associated Galois group $\\mathrm{Gal}(K/k)$. This yields $(\\mathrm{End}(E)/\\mathfrak{h})^* \\to \\mathrm{Gal}(K/k)$ a group homomorphism.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2603.19428" target="_blank">Automorphisms of finite fields from isogeny cycles</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> K\'eva Djamba\'e</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 23 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.19428" target="_blank">https://arxiv.org/abs/2603.19428</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We develop an explicit geometric construction of automorphisms of finite fields arising from isogeny cycles. Let $k$ be a finite field, $E/k$ an elliptic curve, and $\ell$ an integer coprime to $\mathrm{char}(k)$. Let $\mathfrak{h}$ be an ideal of $\mathrm{End}(E)$ dividing $\ell$, and consider the corresponding torsion subgroup $E[\mathfrak{h}]\subseteq E[\ell]$. From the action of End(E) on $E[\mathfrak{h}]$, we construct the splitting field $K$ of the $x$-coordinates of points in $E[\mathfrak{h}]$ and the associated Galois group $\mathrm{Gal}(K/k)$. This yields $(\mathrm{End}(E)/\mathfrak{h})^* \to \mathrm{Gal}(K/k)$ a group homomorphism.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "Computation and sampling for Schubert specializations", "author": "David Anderson, Greta Panova, Leonid Petrov", "published": "Mon, 23 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.20104", "summary": "arXiv:2603.20104v1 Announce Type: cross \nAbstract: We present computational results on principal specializations $\\mathfrak{S}_w(1^n)$ of Schubert polynomials, which count reduced pipe dreams and reduced bumpless pipe dreams (RBPD). We find the first counterexample, at $n=17$, to the Merzon-Smirnov conjecture (arXiv:1410.6857) that the maximum of $\\mathfrak{S}_w(1^n)$ over $S_n$ is attained at a layered permutation. The simulations suggest that $\\lim_{n \\to \\infty} \\log(\\max_{w\\in S_n}\\mathfrak{S}_w(1^n))/n^2$ equals the maximal layered permutations' constant from Morales-Pak-Panova (arXiv:1805.04341). We also explore the random permutation drawn from the distribution proportional to $\\mathfrak{S}_w(1^n)$, revealing permuton-like asymptotics similar to those for Grothendieck polynomials by Morales-Panova-Petrov-Yeliussizov (arXiv:2407.21653).\n  We implement and compare three recurrences for $\\mathfrak{S}_w(1^n)$: the descent formula (Macdonald), transition formula (Lascoux--Schutzenberger), and cotransition formula (Knutson). For sampling uniformly random RBPDs (whose count is $\\sum_{w\\in S_n} \\mathfrak{S}_w(1^n)$), we show that reducedness breaks the sublattice property of the ASM lattice, preventing monotone CFTP and causing false coalescence. We develop an efficient MCMC sampler with macroscopic \"droop\" updates for connectivity and fast mixing. Our code computes $\\mathfrak{S}_w(1^n)$ up to $n\\sim 20$ and samples random RBPDs up to $n\\sim 60$ on a personal computer ($n\\sim 100$ on a cluster).", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2603.20104" target="_blank">Computation and sampling for Schubert specializations</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> David Anderson, Greta Panova, Leonid Petrov</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 23 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.20104" target="_blank">https://arxiv.org/abs/2603.20104</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We present computational results on principal specializations $\mathfrak{S}_w(1^n)$ of Schubert polynomials, which count reduced pipe dreams and reduced bumpless pipe dreams (RBPD). We find the first counterexample, at $n=17$, to the Merzon-Smirnov conjecture (arXiv:1410.6857) that the maximum of $\mathfrak{S}_w(1^n)$ over $S_n$ is attained at a layered permutation. The simulations suggest that $\lim_{n \to \infty} \log(\max_{w\in S_n}\mathfrak{S}_w(1^n))/n^2$ equals the maximal layered permutations' constant from Morales-Pak-Panova (arXiv:1805.04341). We also explore the random permutation drawn from the distribution proportional to $\mathfrak{S}_w(1^n)$, revealing permuton-like asymptotics similar to those for Grothendieck polynomials by Morales-Panova-Petrov-Yeliussizov (arXiv:2407.21653).
+  We implement and compare three recurrences for $\mathfrak{S}_w(1^n)$: the descent formula (Macdonald), transition formula (Lascoux--Schutzenberger), and cotransition formula (Knutson). For sampling uniformly random RBPDs (whose count is $\sum_{w\in S_n} \mathfrak{S}_w(1^n)$), we show that reducedness breaks the sublattice property of the ASM lattice, preventing monotone CFTP and causing false coalescence. We develop an efficient MCMC sampler with macroscopic "droop" updates for connectivity and fast mixing. Our code computes $\mathfrak{S}_w(1^n)$ up to $n\sim 20$ and samples random RBPDs up to $n\sim 60$ on a personal computer ($n\sim 100$ on a cluster).
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "Singular symplectic surfaces", "author": "Alice Garbagnati, Matteo Penegini, Arvid Perego", "published": "Mon, 23 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2407.21173", "summary": "arXiv:2407.21173v2 Announce Type: replace \nAbstract: In this paper we classify all singular irreducible symplectic surfaces, i.e., compact, connected complex surfaces with canonical singularities that have a holomorphic symplectic form $\\sigma$ on the smooth locus, and for which every finite quasi-\\'etale covering has the algebra of reflexive forms spanned by the reflexive pull-back of $\\sigma$. We moreover prove that the Hilbert scheme of two points on such a surface $X$ is an irreducible symplectic variety, at least in the case where the smooth locus of $X$ is simply connected.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2407.21173" target="_blank">Singular symplectic surfaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Alice Garbagnati, Matteo Penegini, Arvid Perego</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 23 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2407.21173" target="_blank">https://arxiv.org/abs/2407.21173</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper we classify all singular irreducible symplectic surfaces, i.e., compact, connected complex surfaces with canonical singularities that have a holomorphic symplectic form $\sigma$ on the smooth locus, and for which every finite quasi-\'etale covering has the algebra of reflexive forms spanned by the reflexive pull-back of $\sigma$. We moreover prove that the Hilbert scheme of two points on such a surface $X$ is an irreducible symplectic variety, at least in the case where the smooth locus of $X$ is simply connected.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "Non-proportional wall crossing for K-stability", "author": "Yuchen Liu, Chuyu Zhou", "published": "Mon, 23 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2412.15725", "summary": "arXiv:2412.15725v2 Announce Type: replace \nAbstract: In this paper, we present a general wall crossing theory for K-stability and K-moduli of log Fano pairs whose boundary divisors can be non-proportional to the anti-canonical divisor. Along the way, we prove that there are only finitely many K-semistable domains associated to the fibers of a log bounded family of couples. Under the additional assumption of volume bounded from below, we show that K-semistable domains are semi-algebraic sets (although not necessarily polytopes). As a consequence, we obtain a finite semi-algebraic chamber decomposition for wall crossing of K-moduli spaces. In the case of one boundary divisor, this decomposition is an expected finite interval chamber decomposition. As an application of the theory, we prove a comparison theorem between GIT-stability and K-stability in non-proportional setting when the coefficient of the boundary is sufficiently small.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2412.15725" target="_blank">Non-proportional wall crossing for K-stability</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yuchen Liu, Chuyu Zhou</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 23 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2412.15725" target="_blank">https://arxiv.org/abs/2412.15725</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we present a general wall crossing theory for K-stability and K-moduli of log Fano pairs whose boundary divisors can be non-proportional to the anti-canonical divisor. Along the way, we prove that there are only finitely many K-semistable domains associated to the fibers of a log bounded family of couples. Under the additional assumption of volume bounded from below, we show that K-semistable domains are semi-algebraic sets (although not necessarily polytopes). As a consequence, we obtain a finite semi-algebraic chamber decomposition for wall crossing of K-moduli spaces. In the case of one boundary divisor, this decomposition is an expected finite interval chamber decomposition. As an application of the theory, we prove a comparison theorem between GIT-stability and K-stability in non-proportional setting when the coefficient of the boundary is sufficiently small.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "Dual of Algebraic Geometry codes from Hirzebruch surfaces", "author": "Alix Barraud", "published": "Mon, 23 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2509.07761", "summary": "arXiv:2509.07761v2 Announce Type: replace \nAbstract: In this paper, we give an explicit form for the dual of the algebraic geometry code $C_e(a,b)$ defined on an Hirzebruch surface $\\mathcal{H}_e$ and parametrized by the divisor $aS_e + bF_e$, where $a,b\\in\\mathbb{N}$ and $S_e$ and $F_e$ generate the Picard group $\\mathrm{Pic}( \\mathcal{H}_e)$. Notably, we compute a lower bound for the minimum distance of $C_e(a,b)^\\perp$. One of the main ingredient for our study is a new explicit form of the code $C_e(a,b)$ which we provide at the beginning of the paper. We also investigate some puncturing of $C_e(a,b)$, recovering other previously studied AG codes from toric surfaces. Finally, we provide a sufficient condition for orthogonal inclusions between the codes $C_e(a,b)$, and construct CSS quantum codes from them.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2509.07761" target="_blank">Dual of Algebraic Geometry codes from Hirzebruch surfaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Alix Barraud</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 23 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2509.07761" target="_blank">https://arxiv.org/abs/2509.07761</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we give an explicit form for the dual of the algebraic geometry code $C_e(a,b)$ defined on an Hirzebruch surface $\mathcal{H}_e$ and parametrized by the divisor $aS_e + bF_e$, where $a,b\in\mathbb{N}$ and $S_e$ and $F_e$ generate the Picard group $\mathrm{Pic}( \mathcal{H}_e)$. Notably, we compute a lower bound for the minimum distance of $C_e(a,b)^\perp$. One of the main ingredient for our study is a new explicit form of the code $C_e(a,b)$ which we provide at the beginning of the paper. We also investigate some puncturing of $C_e(a,b)$, recovering other previously studied AG codes from toric surfaces. Finally, we provide a sufficient condition for orthogonal inclusions between the codes $C_e(a,b)$, and construct CSS quantum codes from them.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "Integrals of stable envelopes for cotangent bundles to Grassmannians", "author": "Matthew Crawford, Pavan Kartik, Reese Lance", "published": "Mon, 23 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2510.21573", "summary": "arXiv:2510.21573v2 Announce Type: replace \nAbstract: We consider cohomological stable envelopes for a natural torus action $\\mathsf{T}$ on $X=T^*Gr(k,n)$, introduced by Maulik-Okounkov. We define the $\\mathbb{C}^*_\\hbar$-equivariant integral of the stable envelope using equivariant localization over the subtorus $\\mathbb{C}^*_\\hbar\\subset\\mathsf{T}$, and compute the integral as a non-equivariant limit of the localization over the full torus, $\\mathsf{T}$. The integral of such a class is an integer times a power of $\\hbar$, and the main result of this paper is a combinatorial formula for these integers. In 3d mirror symmetry, these non-equivariant limits are expected to reflect some curve counting phenomena on the 3d mirror dual, $X^\\vee$. When $k=1$, we obtain the binomial coefficients, and we study some of the combinatorics of the integers for higher $k$, which haven't appeared in the literature before. We give some conjectures and interpretations on extending this phenomena to type A quiver and bow varieties.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2510.21573" target="_blank">Integrals of stable envelopes for cotangent bundles to Grassmannians</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Matthew Crawford, Pavan Kartik, Reese Lance</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 23 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.21573" target="_blank">https://arxiv.org/abs/2510.21573</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We consider cohomological stable envelopes for a natural torus action $\mathsf{T}$ on $X=T^*Gr(k,n)$, introduced by Maulik-Okounkov. We define the $\mathbb{C}^*_\hbar$-equivariant integral of the stable envelope using equivariant localization over the subtorus $\mathbb{C}^*_\hbar\subset\mathsf{T}$, and compute the integral as a non-equivariant limit of the localization over the full torus, $\mathsf{T}$. The integral of such a class is an integer times a power of $\hbar$, and the main result of this paper is a combinatorial formula for these integers. In 3d mirror symmetry, these non-equivariant limits are expected to reflect some curve counting phenomena on the 3d mirror dual, $X^\vee$. When $k=1$, we obtain the binomial coefficients, and we study some of the combinatorics of the integers for higher $k$, which haven't appeared in the literature before. We give some conjectures and interpretations on extending this phenomena to type A quiver and bow varieties.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Some moduli spaces of $\\alpha$-stable coherent systems on algebraic surfaces", "author": "L. Costa, I. Mac\\'ias Tarr\\'io, L. Roa-Leguizam\\'on", "published": "Mon, 23 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2511.16581", "summary": "arXiv:2511.16581v2 Announce Type: replace \nAbstract: Let $X$ be a smooth, irreducible, projective algebraic surface, and let $\\alpha \\in \\mathbb{Q}[m]_{&gt;0}$ be a polynomial. In this paper, we determine topological and geometric properties of the moduli space of $\\alpha$-stable coherent systems of type $(n; c_{1}, c_{2}, k)$ with $k &lt; n$ on $X$, for sufficiently large values of $\\alpha$. We prove that, for $\\alpha$ sufficiently large, the moduli space admits a description as a Grassmann bundle over a moduli space of $H$-stable torsion free sheaves. As a consequence, we obtain results on irreducibility, dimension. Our approach relies on establishing a correspondence between $\\alpha$-stable coherent systems and extensions of $H$-stable torsion free sheaves by trivial bundles.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2511.16581" target="_blank">Some moduli spaces of $\alpha$-stable coherent systems on algebraic surfaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> L. Costa, I. Mac\'ias Tarr\'io, L. Roa-Leguizam\'on</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 23 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.16581" target="_blank">https://arxiv.org/abs/2511.16581</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $X$ be a smooth, irreducible, projective algebraic surface, and let $\alpha \in \mathbb{Q}[m]_{&gt;0}$ be a polynomial. In this paper, we determine topological and geometric properties of the moduli space of $\alpha$-stable coherent systems of type $(n; c_{1}, c_{2}, k)$ with $k &lt; n$ on $X$, for sufficiently large values of $\alpha$. We prove that, for $\alpha$ sufficiently large, the moduli space admits a description as a Grassmann bundle over a moduli space of $H$-stable torsion free sheaves. As a consequence, we obtain results on irreducibility, dimension. Our approach relies on establishing a correspondence between $\alpha$-stable coherent systems and extensions of $H$-stable torsion free sheaves by trivial bundles.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Segre surfaces and geometry of the Painlev\\'e equations", "author": "Nalini Joshi, Marta Mazzocco, Pieter Roffelsen", "published": "Mon, 23 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2405.10541", "summary": "arXiv:2405.10541v2 Announce Type: replace-cross \nAbstract: In this paper, we consider a six parameter family of affine Segre surfaces embedded in $\\mathbb C^6$. For generic values of the parameters, this family is associated to the $q$-difference sixth Painlev\\'e equation. We show that different limiting forms of this family give Segre surfaces that are isomorphic as affine varieties to the the monodromy manifolds of each Painlev\\'e differential equation.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2405.10541" target="_blank">Segre surfaces and geometry of the Painlev\'e equations</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Nalini Joshi, Marta Mazzocco, Pieter Roffelsen</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 23 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2405.10541" target="_blank">https://arxiv.org/abs/2405.10541</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we consider a six parameter family of affine Segre surfaces embedded in $\mathbb C^6$. For generic values of the parameters, this family is associated to the $q$-difference sixth Painlev\'e equation. We show that different limiting forms of this family give Segre surfaces that are isomorphic as affine varieties to the the monodromy manifolds of each Painlev\'e differential equation.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "Special Lagrangians and Bridgeland stable objects beyond geometric stability conditions: the product case", "author": "Yu-Wei Fan", "published": "Mon, 23 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2602.03041", "summary": "arXiv:2602.03041v2 Announce Type: replace-cross \nAbstract: We construct a family of non-geometric Bridgeland stability conditions on certain wrapped Fukaya categories, using homological mirror symmetry and categorical K\\\"unneth formulae. These stability conditions correspond to certain holomorphic volume forms, under which we prove that every stable object admits a special Lagrangian representative. This provides the first higher-dimensional examples of stability conditions away from the large complex structure limit for which ``stable implies special Lagrangian\" is proved.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2602.03041" target="_blank">Special Lagrangians and Bridgeland stable objects beyond geometric stability conditions: the product case</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yu-Wei Fan</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 23 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.03041" target="_blank">https://arxiv.org/abs/2602.03041</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We construct a family of non-geometric Bridgeland stability conditions on certain wrapped Fukaya categories, using homological mirror symmetry and categorical K\"unneth formulae. These stability conditions correspond to certain holomorphic volume forms, under which we prove that every stable object admits a special Lagrangian representative. This provides the first higher-dimensional examples of stability conditions away from the large complex structure limit for which ``stable implies special Lagrangian" is proved.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "Characterizing almost Cohen-Macaulay $3$-generated ideals of codimension $2$ in terms of prescribed shifts", "author": "Ricardo Burity, Thiago Fiel, Zaqueu Ramos, Aron Simis", "published": "Mon, 23 Mar 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.19175", "summary": "arXiv:2603.19175v2 Announce Type: replace-cross \nAbstract: Let $R$ be a standard graded polynomial ring over a field $k$.\n  The paper focuses on homogeneous ideals $J \\subset R$ of codimension $2$ generated by three forms of the same degree $d \\geq 2$ that are almost Cohen--Macaulay, i.e., of homological dimension $2$. Based on the structure of the minimal graded free resolution of $J$ and numerical data encoded in certain \\emph{latent shifts}, one introduces the notion of \\emph{level matrices} associated with these shifts. Our main result provides a complete characterization of almost Cohen--Macaulay ideals of codimension $2$ in terms of the existence of an associated level matrix for which $J$ arises as the ideal of minors obtained by fixing the lower block. We provide algebraic and geometric examples illustrating the results.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2603.19175" target="_blank">Characterizing almost Cohen-Macaulay $3$-generated ideals of codimension $2$ in terms of prescribed shifts</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ricardo Burity, Thiago Fiel, Zaqueu Ramos, Aron Simis</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 23 Mar 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.19175" target="_blank">https://arxiv.org/abs/2603.19175</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $R$ be a standard graded polynomial ring over a field $k$.
+  The paper focuses on homogeneous ideals $J \subset R$ of codimension $2$ generated by three forms of the same degree $d \geq 2$ that are almost Cohen--Macaulay, i.e., of homological dimension $2$. Based on the structure of the minimal graded free resolution of $J$ and numerical data encoded in certain \emph{latent shifts}, one introduces the notion of \emph{level matrices} associated with these shifts. Our main result provides a complete characterization of almost Cohen--Macaulay ideals of codimension $2$ in terms of the existence of an associated level matrix for which $J$ arises as the ideal of minors obtained by fixing the lower block. We provide algebraic and geometric examples illustrating the results.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-03-23 18:00:03
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>

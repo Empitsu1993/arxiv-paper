@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Fri, 07 Nov 2025 05:00:53 +0000<br>
+        <strong>論文数:</strong> 25件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Birational sequences for the Grassmannian Gr(3,n)</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Schemes of Objects in Abelian Categories</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Inversion of the Abel--Prym map for real curves with involutions</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">Hyperbolicity and fundamental groups of complex quasi-projective varieties (I): Maximal quasi-Albanese dimension by Nevanlinna theory</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">${\mathbb Z}_{p}^{m}$-actions of type $(d;p,n)$</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">The cyclic open--closed map and variations of Hodge structures</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Moduli space of connections on a irregular rational curve</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Torsor and Quotient Presentations for $D$-homogeneous Spectra</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">An orthogonal perspective on Gauss composition</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">On splittings of deformations of pairs of complex structures and holomorphic vector bundles</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">Quantum Entanglement as a Cohomological Obstruction</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">Uniform irreducibility of Galois action on the $\ell$-primary part of Abelian $3$-folds of Picard type</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">On the behavior of $F$-thresholds with respect to the fibers of blow-ups and $F$-rationality</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">The role of Coulomb branches in 2D gauge theory</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Cohomological Hall algebras, their categorification, and their representations via torsion pairs</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">Braid variety cluster structures, II: general type</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">Cycle carac\'eristique pour les D-modules coadmissibles sur une courbe formelle</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">Length of triangulated categories</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Strong approximation for the intersection of two quadrics</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">Hodge-Riemann polynomials</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-21" onchange="updateSelectedCount()">
+            <span class="title-number">21.</span>
+            <a href="#paper-21">Stable toric sheaves. I : Chern classes</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-22" onchange="updateSelectedCount()">
+            <span class="title-number">22.</span>
+            <a href="#paper-22">A Mapping Theorem for Derived Foliations</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-23" onchange="updateSelectedCount()">
+            <span class="title-number">23.</span>
+            <a href="#paper-23">Polarizations, torsors and theta groups</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-24" onchange="updateSelectedCount()">
+            <span class="title-number">24.</span>
+            <a href="#paper-24">Local-global principles for semi-integral points on Markoff orbifold pairs</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-25" onchange="updateSelectedCount()">
+            <span class="title-number">25.</span>
+            <a href="#paper-25">On the cohomological dimension of Siegel modular varieties and the modularity of formal Siegel modular forms</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Birational sequences for the Grassmannian Gr(3,n)", "author": "Joaquin Torres Henestroza", "published": "Fri, 07 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.03885", "summary": "arXiv:2511.03885v1 Announce Type: new \nAbstract: Following the ideas of Bossinger and Fang, Fourier, and Littelman, we study iterated sequences for the Grassmannian $\\operatorname{Gr} (3, n)$ as a special class of birational sequences. For each iterated sequence $S$, there is a weighting matrix $M_{S}$ corresponding to a valuation on the rational coordinate ring and we show that the initial form of a Pl\\\"{u}cker relation $\\operatorname{in}_{M_S} (R_{I,J} )$ is binomial. We show that, in some cases, the cones $C_S$ in the tropical Grassmannian that satisfy $\\operatorname{in}_{M_S} (\\mathcal{I}_{3,n}) = \\operatorname{in}_{C_S} (\\mathcal{I}_{3,n})$ only depend on the first two indices used in each iteration. In the case of $\\operatorname{Gr} (3, 6)$, these cones are obtained computationally and are classified up to automorphism induced by the symmetric group $S_6$.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2511.03885" target="_blank">Birational sequences for the Grassmannian Gr(3,n)</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Joaquin Torres Henestroza</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 07 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.03885" target="_blank">https://arxiv.org/abs/2511.03885</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Following the ideas of Bossinger and Fang, Fourier, and Littelman, we study iterated sequences for the Grassmannian $\operatorname{Gr} (3, n)$ as a special class of birational sequences. For each iterated sequence $S$, there is a weighting matrix $M_{S}$ corresponding to a valuation on the rational coordinate ring and we show that the initial form of a Pl\"{u}cker relation $\operatorname{in}_{M_S} (R_{I,J} )$ is binomial. We show that, in some cases, the cones $C_S$ in the tropical Grassmannian that satisfy $\operatorname{in}_{M_S} (\mathcal{I}_{3,n}) = \operatorname{in}_{C_S} (\mathcal{I}_{3,n})$ only depend on the first two indices used in each iteration. In the case of $\operatorname{Gr} (3, 6)$, these cones are obtained computationally and are classified up to automorphism induced by the symmetric group $S_6$.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Schemes of Objects in Abelian Categories", "author": "Arvid Siqveland", "published": "Fri, 07 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.04191", "summary": "arXiv:2511.04191v1 Announce Type: new \nAbstract: In the article Categorical Construction of Schemes, arXiv:2511.03433 we gave a natural definition of ordinary schemes based on the fact that the localization of a ring in a maximal ideal is a local representation of the corresponding function field. In this text, we replace the category of rings with a general locally small category $\\cat C$, we consider a subcategory $\\cat B\\subset C$ of base-points, and assume that each $X\\in\\ob\\cat C$ that contains $P\\in\\ob\\cat B,$ i.e. there is a morphism $P\\rightarrow X,$ there exists a local representing object $X_P.$ Assuming that coproducts exists, we can use the construction of ordinary schemes to construct schemes of objects in any such category.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2511.04191" target="_blank">Schemes of Objects in Abelian Categories</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Arvid Siqveland</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 07 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.04191" target="_blank">https://arxiv.org/abs/2511.04191</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In the article Categorical Construction of Schemes, arXiv:2511.03433 we gave a natural definition of ordinary schemes based on the fact that the localization of a ring in a maximal ideal is a local representation of the corresponding function field. In this text, we replace the category of rings with a general locally small category $\cat C$, we consider a subcategory $\cat B\subset C$ of base-points, and assume that each $X\in\ob\cat C$ that contains $P\in\ob\cat B,$ i.e. there is a morphism $P\rightarrow X,$ there exists a local representing object $X_P.$ Assuming that coproducts exists, we can use the construction of ordinary schemes to construct schemes of objects in any such category.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Inversion of the Abel--Prym map for real curves with involutions", "author": "Oleg K. Sheinman", "published": "Fri, 07 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.04229", "summary": "arXiv:2511.04229v1 Announce Type: new \nAbstract: Riemann vanishing theorem is a main ingredient of the conventional technique related to the Jacobi inversion problem. In the case of curves with a holomorphic involution, it has been exhaustively expounded in wellknown Fay's Lectures on theta functions. The case of real algebraic curves with involution is presented with less completeness in the literature. We give a detailed presentation of that case, including real curves of non-separating type (with involution) not considered before with this relation. We obtain the Novikov--Veselov realness conditions in a different set-up.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2511.04229" target="_blank">Inversion of the Abel--Prym map for real curves with involutions</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Oleg K. Sheinman</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 07 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.04229" target="_blank">https://arxiv.org/abs/2511.04229</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Riemann vanishing theorem is a main ingredient of the conventional technique related to the Jacobi inversion problem. In the case of curves with a holomorphic involution, it has been exhaustively expounded in wellknown Fay's Lectures on theta functions. The case of real algebraic curves with involution is presented with less completeness in the literature. We give a detailed presentation of that case, including real curves of non-separating type (with involution) not considered before with this relation. We obtain the Novikov--Veselov realness conditions in a different set-up.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "Hyperbolicity and fundamental groups of complex quasi-projective varieties (I): Maximal quasi-Albanese dimension by Nevanlinna theory", "author": "Benoit Cadorel, Ya Deng, Katsutoshi Yamanoi", "published": "Fri, 07 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.04405", "summary": "arXiv:2511.04405v1 Announce Type: new \nAbstract: This is the first part of a series of three papers. In this paper, we establish a Big Picard type theorem for holomorphic maps $f:Y \\to X$, where $Y$ is a ramified covering of the punctured disc $\\mathbb{D}^*$ with small ramification and $X$ is a complex quasi-projective variety of log-general type and of maximal quasi-Albanese dimension. As a byproduct, we prove the generalized Green-Griffiths-Lang conjecture for such $X$. This paper summarizes the parts of the three-paper series that are based primarily on Nevanlinna theory.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2511.04405" target="_blank">Hyperbolicity and fundamental groups of complex quasi-projective varieties (I): Maximal quasi-Albanese dimension by Nevanlinna theory</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Benoit Cadorel, Ya Deng, Katsutoshi Yamanoi</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 07 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.04405" target="_blank">https://arxiv.org/abs/2511.04405</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This is the first part of a series of three papers. In this paper, we establish a Big Picard type theorem for holomorphic maps $f:Y \to X$, where $Y$ is a ramified covering of the punctured disc $\mathbb{D}^*$ with small ramification and $X$ is a complex quasi-projective variety of log-general type and of maximal quasi-Albanese dimension. As a byproduct, we prove the generalized Green-Griffiths-Lang conjecture for such $X$. This paper summarizes the parts of the three-paper series that are based primarily on Nevanlinna theory.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "${\\mathbb Z}_{p}^{m}$-actions of type $(d;p,n)$", "author": "Ruben A. HIdalgo, Maximiliano Leyton-Alvarez", "published": "Fri, 07 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.04462", "summary": "arXiv:2511.04462v1 Announce Type: new \nAbstract: A ${\\mathbb Z}_{p}^{m}$-action of type $(d;p,n)$, where $2 \\leq d \\leq m \\leq n$ are integers, is a pair $(S,N)$ where $S$ is a $d$-dimensional compact complex manifold, $N \\cong {\\mathbb Z}_{p}^{m}$ is a group of holomorphic automorphisms of $S$ such that the quotient orbifold $S/N$ is the $d$-dimensional projective space ${\\mathbb P}^{d}$ whose branch locus consists of $n+1$ hyperplanes in general position, each one of branch order $p$.\n  If $(d;p,n) \\notin \\{(2;2,5),(2;4,3)\\}$ and $d+1 \\leq n$, then we prove that: (i) $N$ is a normal subgroup of ${\\rm Aut}(S)$ and (ii) if $(S,M)$ is a ${\\mathbb Z}_{\\hat{p}}^{\\hat{m}}$-action of type $(d;\\hat{p},\\hat{n})$, then $M=N$. If, moreover, $d+1 \\leq n \\leq 2d-1$, then we observe that $S$ is not algebraically hyperbolic", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2511.04462" target="_blank">${\mathbb Z}_{p}^{m}$-actions of type $(d;p,n)$</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ruben A. HIdalgo, Maximiliano Leyton-Alvarez</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 07 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.04462" target="_blank">https://arxiv.org/abs/2511.04462</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                A ${\mathbb Z}_{p}^{m}$-action of type $(d;p,n)$, where $2 \leq d \leq m \leq n$ are integers, is a pair $(S,N)$ where $S$ is a $d$-dimensional compact complex manifold, $N \cong {\mathbb Z}_{p}^{m}$ is a group of holomorphic automorphisms of $S$ such that the quotient orbifold $S/N$ is the $d$-dimensional projective space ${\mathbb P}^{d}$ whose branch locus consists of $n+1$ hyperplanes in general position, each one of branch order $p$.
+  If $(d;p,n) \notin \{(2;2,5),(2;4,3)\}$ and $d+1 \leq n$, then we prove that: (i) $N$ is a normal subgroup of ${\rm Aut}(S)$ and (ii) if $(S,M)$ is a ${\mathbb Z}_{\hat{p}}^{\hat{m}}$-action of type $(d;\hat{p},\hat{n})$, then $M=N$. If, moreover, $d+1 \leq n \leq 2d-1$, then we observe that $S$ is not algebraically hyperbolic
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "The cyclic open--closed map and variations of Hodge structures", "author": "Sheel Ganatra, Nick Sheridan", "published": "Fri, 07 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.04498", "summary": "arXiv:2511.04498v1 Announce Type: new \nAbstract: We construct the cyclic open--closed map for the big (i.e., bulk-deformed) relative Fukaya category, in the semipositive case, and show that it is a morphism of `polarized variations of semi-infinite Hodge structures'. We also give a natural criterion for the map to be an isomorphism, which is verified for example in the context of Batyrev mirror pairs. We conclude in such Calabi-Yau cases that the rational Gromov--Witten invariants can be extracted from the relative Fukaya category, and hence that enumerative mirror symmetry is a consequence of homological mirror symmetry for Calabi--Yau mirror pairs.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2511.04498" target="_blank">The cyclic open--closed map and variations of Hodge structures</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sheel Ganatra, Nick Sheridan</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 07 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.04498" target="_blank">https://arxiv.org/abs/2511.04498</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We construct the cyclic open--closed map for the big (i.e., bulk-deformed) relative Fukaya category, in the semipositive case, and show that it is a morphism of `polarized variations of semi-infinite Hodge structures'. We also give a natural criterion for the map to be an isomorphism, which is verified for example in the context of Batyrev mirror pairs. We conclude in such Calabi-Yau cases that the rational Gromov--Witten invariants can be extracted from the relative Fukaya category, and hence that enumerative mirror symmetry is a consequence of homological mirror symmetry for Calabi--Yau mirror pairs.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Moduli space of connections on a irregular rational curve", "author": "Mattia Morbello", "published": "Fri, 07 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.04561", "summary": "arXiv:2511.04561v1 Announce Type: new \nAbstract: We study the compactification of the moduli space of a certain class of rank-two irregular connections on the Riemann sphere, presenting one double pole and two simple poles. To explicitely build the compactification, we identify a class of irregular connections with an irregular rational curve and an extra complex parameter. As a first step, we will inspire to the Deligne and Mumford's work to compactify the moduli space of such irregular rational curves, introducing the notion of irregular stable nodal curve. Secondly, we will understand the behaviour of the extra complex parameter to conclude the compactification.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2511.04561" target="_blank">Moduli space of connections on a irregular rational curve</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Mattia Morbello</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 07 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.04561" target="_blank">https://arxiv.org/abs/2511.04561</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the compactification of the moduli space of a certain class of rank-two irregular connections on the Riemann sphere, presenting one double pole and two simple poles. To explicitely build the compactification, we identify a class of irregular connections with an irregular rational curve and an extra complex parameter. As a first step, we will inspire to the Deligne and Mumford's work to compactify the moduli space of such irregular rational curves, introducing the notion of irregular stable nodal curve. Secondly, we will understand the behaviour of the extra complex parameter to conclude the compactification.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Torsor and Quotient Presentations for $D$-homogeneous Spectra", "author": "Felix G\\\"obler", "published": "Fri, 07 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.04624", "summary": "arXiv:2511.04624v1 Announce Type: new \nAbstract: The $D$-graded Proj construction provides a general framework for constructing schemes from rings graded by finitely generated abelian groups $D$, yet its properties and applications remain underdeveloped compared to the classical $\\BN$-graded case. This paper establishes the essential characteristics of $D$-graded rings $S$, like the distinction between $D$-homogeneous prime ideals and $D$-prime ideals if $D$ has torsion. We particularly focus on describing the quotient by the associated group scheme, generalizing the construction of a toric variety from its Cox ring. As in the $\\BN$-graded construction, the basic affine opens of the Proj construction are given in terms of degree-zero localizations $S_{(f)}$, where $f$ in $S$ homogeneous is \\emph{relevant}. We prove that $\\pi_f: \\Spec(S_f) \\to \\Spec(S_{(f)})$ is a geometric quotient under mild finiteness assumptions if $f$ is relevant, and give necessary and sufficient conditions for this map to be a pseudo $\\Spec(S_0[D])$-torsor.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2511.04624" target="_blank">Torsor and Quotient Presentations for $D$-homogeneous Spectra</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Felix G\"obler</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 07 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.04624" target="_blank">https://arxiv.org/abs/2511.04624</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The $D$-graded Proj construction provides a general framework for constructing schemes from rings graded by finitely generated abelian groups $D$, yet its properties and applications remain underdeveloped compared to the classical $\BN$-graded case. This paper establishes the essential characteristics of $D$-graded rings $S$, like the distinction between $D$-homogeneous prime ideals and $D$-prime ideals if $D$ has torsion. We particularly focus on describing the quotient by the associated group scheme, generalizing the construction of a toric variety from its Cox ring. As in the $\BN$-graded construction, the basic affine opens of the Proj construction are given in terms of degree-zero localizations $S_{(f)}$, where $f$ in $S$ homogeneous is \emph{relevant}. We prove that $\pi_f: \Spec(S_f) \to \Spec(S_{(f)})$ is a geometric quotient under mild finiteness assumptions if $f$ is relevant, and give necessary and sufficient conditions for this map to be a pseudo $\Spec(S_0[D])$-torsor.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "An orthogonal perspective on Gauss composition", "author": "John Voight, Haochen Wu", "published": "Fri, 07 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.03987", "summary": "arXiv:2511.03987v1 Announce Type: cross \nAbstract: We revisit Gauss composition over a general base scheme, with a focus on orthogonal groups. We show that the Clifford and norm functors provide a discriminant-preserving equivalence of categories between binary quadratic modules and pseudoregular modules over quadratic algebras. This perspective synthesizes the constructions of Kneser and Wood, reconciling algebraic and geometric approaches and clarifying the role of orientations and the natural emergence of narrow class groups. As an application, we restrict to lattices and show that binary orthogonal eigenforms correspond to Hecke characters.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2511.03987" target="_blank">An orthogonal perspective on Gauss composition</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> John Voight, Haochen Wu</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 07 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.03987" target="_blank">https://arxiv.org/abs/2511.03987</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We revisit Gauss composition over a general base scheme, with a focus on orthogonal groups. We show that the Clifford and norm functors provide a discriminant-preserving equivalence of categories between binary quadratic modules and pseudoregular modules over quadratic algebras. This perspective synthesizes the constructions of Kneser and Wood, reconciling algebraic and geometric approaches and clarifying the role of orientations and the natural emergence of narrow class groups. As an application, we restrict to lattices and show that binary orthogonal eigenforms correspond to Hecke characters.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "On splittings of deformations of pairs of complex structures and holomorphic vector bundles", "author": "Hisashi Kasuya, Valto Purho", "published": "Fri, 07 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.04134", "summary": "arXiv:2511.04134v1 Announce Type: cross \nAbstract: We can show that the Kuranishi space of a pair $(M,E)$ of a compact K\\\"ahler manifold $M$ and its flat Hermitian vector bundle $E$ is isomorphic to the direct product of the Kuranishi space of $M$ and the Kuranishi space of $E$. We study non-K\\\"ahler case. We show that the Kuranishi space of a pair $(M,E)$ of a complex parallelizable nilmanifold $M$ and its trivial holomorphic vector bundle $E$ is isomorphic to the direct product of the Kuranishi space of $M$ and the Kuranishi space of $E$. We give examples of pairs $(M,E)$ of nilmanifolds $M$ with left-invariant abelian complex structures and their trivial holomorphic line bundles $E$ such that the Kuranishi spaces of pairs $(M,E)$ are not isomorphic to direct products of the Kuranishi spaces of $M$ and the Kuranishi spaces of $E$.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2511.04134" target="_blank">On splittings of deformations of pairs of complex structures and holomorphic vector bundles</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Hisashi Kasuya, Valto Purho</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 07 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.04134" target="_blank">https://arxiv.org/abs/2511.04134</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We can show that the Kuranishi space of a pair $(M,E)$ of a compact K\"ahler manifold $M$ and its flat Hermitian vector bundle $E$ is isomorphic to the direct product of the Kuranishi space of $M$ and the Kuranishi space of $E$. We study non-K\"ahler case. We show that the Kuranishi space of a pair $(M,E)$ of a complex parallelizable nilmanifold $M$ and its trivial holomorphic vector bundle $E$ is isomorphic to the direct product of the Kuranishi space of $M$ and the Kuranishi space of $E$. We give examples of pairs $(M,E)$ of nilmanifolds $M$ with left-invariant abelian complex structures and their trivial holomorphic line bundles $E$ such that the Kuranishi spaces of pairs $(M,E)$ are not isomorphic to direct products of the Kuranishi spaces of $M$ and the Kuranishi spaces of $E$.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "Quantum Entanglement as a Cohomological Obstruction", "author": "Kazuki Ikeda", "published": "Fri, 07 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.04326", "summary": "arXiv:2511.04326v1 Announce Type: cross \nAbstract: We recast quantum entanglement as a cohomological obstruction to reconstructing a global quantum state from locally compatible information. We address this by considering presheaf cohomologies of states and entanglement witnesses. Sheafification erases the global-from-local signature while leaving within-patch multipartite structure, captured by local entanglement groups introduced here. For smooth parameter families, the obstruction admits a differential-geometric representative obtained by pairing an appropriate witness field with the curvature of a natural unitary connection on the associated bundle of amplitudes. We also introduce a Quantum Entanglement Index (QEI) as an index-theoretic invariant of entangled states and explain its behavior. Finally, we outline a theoretical physics approach to probe these ideas in quantum many-body systems and suggest a possible entanglement-induced correction as an experimental target.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2511.04326" target="_blank">Quantum Entanglement as a Cohomological Obstruction</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Kazuki Ikeda</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 07 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.04326" target="_blank">https://arxiv.org/abs/2511.04326</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We recast quantum entanglement as a cohomological obstruction to reconstructing a global quantum state from locally compatible information. We address this by considering presheaf cohomologies of states and entanglement witnesses. Sheafification erases the global-from-local signature while leaving within-patch multipartite structure, captured by local entanglement groups introduced here. For smooth parameter families, the obstruction admits a differential-geometric representative obtained by pairing an appropriate witness field with the curvature of a natural unitary connection on the associated bundle of amplitudes. We also introduce a Quantum Entanglement Index (QEI) as an index-theoretic invariant of entangled states and explain its behavior. Finally, we outline a theoretical physics approach to probe these ideas in quantum many-body systems and suggest a possible entanglement-induced correction as an experimental target.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "Uniform irreducibility of Galois action on the $\\ell$-primary part of Abelian $3$-folds of Picard type", "author": "Mladen Dimitrov, Dinakar Ramakrishnan", "published": "Fri, 07 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.04609", "summary": "arXiv:2511.04609v1 Announce Type: cross \nAbstract: Half a century ago Manin showed that given a number field $k$ and a rational prime $\\ell$, there exists a uniform bound for the order of cyclic $\\ell$-power isogenies between two non-CM elliptic curves over $k$. We generalize this to certain $2$-dimensional families of abelian $3$-folds with multiplication by an imaginary quadratic field.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2511.04609" target="_blank">Uniform irreducibility of Galois action on the $\ell$-primary part of Abelian $3$-folds of Picard type</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Mladen Dimitrov, Dinakar Ramakrishnan</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 07 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.04609" target="_blank">https://arxiv.org/abs/2511.04609</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Half a century ago Manin showed that given a number field $k$ and a rational prime $\ell$, there exists a uniform bound for the order of cyclic $\ell$-power isogenies between two non-CM elliptic curves over $k$. We generalize this to certain $2$-dimensional families of abelian $3$-folds with multiplication by an imaginary quadratic field.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "On the behavior of $F$-thresholds with respect to the fibers of blow-ups and $F$-rationality", "author": "Ghazaleh FakhriVaighan", "published": "Fri, 07 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.04625", "summary": "arXiv:2511.04625v1 Announce Type: cross \nAbstract: We establish a general inequality comparing the $F$-thresholds of a local ring and its associated graded ring. As an application, we deduce that the $F$-rationality of the graded ring descends to the local ring.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2511.04625" target="_blank">On the behavior of $F$-thresholds with respect to the fibers of blow-ups and $F$-rationality</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ghazaleh FakhriVaighan</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 07 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.04625" target="_blank">https://arxiv.org/abs/2511.04625</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We establish a general inequality comparing the $F$-thresholds of a local ring and its associated graded ring. As an application, we deduce that the $F$-rationality of the graded ring descends to the local ring.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "The role of Coulomb branches in 2D gauge theory", "author": "Constantin Teleman", "published": "Fri, 07 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/1801.10124", "summary": "arXiv:1801.10124v4 Announce Type: replace \nAbstract: I give a simple construction of certain Coulomb branches $C_{3,4}(G;E)$ of gauge theory in 3 and 4 dimensions defined by Nakajima et al. for a compact Lie group $G$ and a polarisable quaternionic representation $E$. The manifolds $C(G; 0)$ are abelian group schemes (over the bases of regular adjoint $G_c$-orbits, respectively conjugacy classes), and $C(G;E)$ is glued together from two copies of $C(G;0)$ shifted by a rational Lagrangian section $\\varepsilon_V$, the Euler class of the index bundle of a polarisation $V$ of $E$. Extending the interpretation of $C_3(G;0)$ as \"classifying space\" for topological 2D gauge theories, I characterise functions on $C_3(G;E)$ as operators on the equivariant quantum cohomologies of $M\\times V$, for all compact symplectic $G$-manifolds $M$. The non-commutative version has an analogous description in terms of the $\\Gamma$-function of $V$, appearing to play the role of Fourier transformed J-function of the gauged linear Sigma-model $V/G$.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/1801.10124" target="_blank">The role of Coulomb branches in 2D gauge theory</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Constantin Teleman</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 07 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/1801.10124" target="_blank">https://arxiv.org/abs/1801.10124</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                I give a simple construction of certain Coulomb branches $C_{3,4}(G;E)$ of gauge theory in 3 and 4 dimensions defined by Nakajima et al. for a compact Lie group $G$ and a polarisable quaternionic representation $E$. The manifolds $C(G; 0)$ are abelian group schemes (over the bases of regular adjoint $G_c$-orbits, respectively conjugacy classes), and $C(G;E)$ is glued together from two copies of $C(G;0)$ shifted by a rational Lagrangian section $\varepsilon_V$, the Euler class of the index bundle of a polarisation $V$ of $E$. Extending the interpretation of $C_3(G;0)$ as "classifying space" for topological 2D gauge theories, I characterise functions on $C_3(G;E)$ as operators on the equivariant quantum cohomologies of $M\times V$, for all compact symplectic $G$-manifolds $M$. The non-commutative version has an analogous description in terms of the $\Gamma$-function of $V$, appearing to play the role of Fourier transformed J-function of the gauged linear Sigma-model $V/G$.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Cohomological Hall algebras, their categorification, and their representations via torsion pairs", "author": "Duiliu-Emanuel Diaconescu, Mauro Porta, Francesco Sala", "published": "Fri, 07 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2207.08926", "summary": "arXiv:2207.08926v2 Announce Type: replace \nAbstract: In this paper we provide a systematic way of producing representations of cohomological, K-theoretical and categorified Hall algebras, and study the output of our construction in several cases. We thus recover and categorify in a unified framework the action of the COHA of a quiver on the cohomology of Nakajima quiver variety, the action of the COHA of zero-dimensional sheaves on the the cohomology of Hilbert schemes of points and moduli spaces of Gieseker-stable sheaves on smooth surfaces, recovering the constructions of Negu\\c{t} and DeHority. We also obtain new examples, associated to Pandharipande-Thomas stable pairs.\n  Along the way, we explain carefully under which conditions one can associate to a pair $(\\mathscr{C},\\tau)$ consisting of a stable $\\infty$-category with a t-structure a COHA. This requires a careful analysis and extension of Khan's theory of motivic Borel-Moore homology to the non quasi-compact setting, and it allows to produce new examples of COHAs arising from Bridgeland's stability conditions.\n  The representations that we construct take an extra categorical input: that of a torsion pair $(\\mathscr{T},\\mathscr{F})$ on the heart $\\mathscr{C}^\\heartsuit$ of $\\tau$. Under favorable conditions, the homology of the moduli stack associated to $\\mathscr{T}$ acquires a Hall multiplication, that acts both on the left and on the right on the homology of the moduli stack associated to $\\mathscr{F}$. The left action generalizes and categorifies Nakajima's positive operators, while the right action corresponds to negative operators.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2207.08926" target="_blank">Cohomological Hall algebras, their categorification, and their representations via torsion pairs</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Duiliu-Emanuel Diaconescu, Mauro Porta, Francesco Sala</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 07 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2207.08926" target="_blank">https://arxiv.org/abs/2207.08926</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper we provide a systematic way of producing representations of cohomological, K-theoretical and categorified Hall algebras, and study the output of our construction in several cases. We thus recover and categorify in a unified framework the action of the COHA of a quiver on the cohomology of Nakajima quiver variety, the action of the COHA of zero-dimensional sheaves on the the cohomology of Hilbert schemes of points and moduli spaces of Gieseker-stable sheaves on smooth surfaces, recovering the constructions of Negu\c{t} and DeHority. We also obtain new examples, associated to Pandharipande-Thomas stable pairs.
+  Along the way, we explain carefully under which conditions one can associate to a pair $(\mathscr{C},\tau)$ consisting of a stable $\infty$-category with a t-structure a COHA. This requires a careful analysis and extension of Khan's theory of motivic Borel-Moore homology to the non quasi-compact setting, and it allows to produce new examples of COHAs arising from Bridgeland's stability conditions.
+  The representations that we construct take an extra categorical input: that of a torsion pair $(\mathscr{T},\mathscr{F})$ on the heart $\mathscr{C}^\heartsuit$ of $\tau$. Under favorable conditions, the homology of the moduli stack associated to $\mathscr{T}$ acquires a Hall multiplication, that acts both on the left and on the right on the homology of the moduli stack associated to $\mathscr{F}$. The left action generalizes and categorifies Nakajima's positive operators, while the right action corresponds to negative operators.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "Braid variety cluster structures, II: general type", "author": "Pavel Galashin, Thomas Lam, Melissa Sherman-Bennett", "published": "Fri, 07 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2301.07268", "summary": "arXiv:2301.07268v3 Announce Type: replace \nAbstract: We show that braid varieties for any complex simple algebraic group $G$ are cluster varieties. This includes open Richardson varieties inside the flag variety $G/B$.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2301.07268" target="_blank">Braid variety cluster structures, II: general type</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Pavel Galashin, Thomas Lam, Melissa Sherman-Bennett</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 07 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2301.07268" target="_blank">https://arxiv.org/abs/2301.07268</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We show that braid varieties for any complex simple algebraic group $G$ are cluster varieties. This includes open Richardson varieties inside the flag variety $G/B$.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "Cycle carac\\'eristique pour les D-modules coadmissibles sur une courbe formelle", "author": "Raoul Hallopeau", "published": "Fri, 07 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2302.03959", "summary": "arXiv:2302.03959v5 Announce Type: replace \nAbstract: Let $\\mathfrak{X}$ be a formal smooth quasi-compact curve over a complete discrete valuation ring of mixed characteristic. We consider over $\\mathfrak{X}$ the sheaves of differential operators $\\widehat{\\mathcal{D}}^{(0)}_{\\mathfrak{X}, k , \\mathbb{Q}}$ with a congruence level $k \\in \\mathbb{N}$ and their projective limit $\\mathcal{D}_{\\mathfrak{X}, \\infty} = \\varprojlim_k \\widehat{\\mathcal{D}}^{(0)}_{\\mathfrak{X}, k , \\mathbb{Q}}$. In this article, we define a characteristic variety for coadmissible $\\mathcal{D}_{\\mathfrak{X}, \\infty}$-modules as a closed subset of the cotangent space $T^*\\mathfrak{X}$. For this purpose, we introduce a microlocalization sheaf of $\\mathcal{D}_{\\mathfrak{X}, \\infty}$ in which the derivation is locally invertible. We deduce a notion of \"sub-holonomicity\" for coadmissible $\\mathcal{D}_{\\mathfrak{X}, \\infty}$-modules which is equivalent to being generically an integrable connection. Finally, we associate characteristic cycles to sub-holonomic modules proving that the latter are of finite length.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2302.03959" target="_blank">Cycle carac\'eristique pour les D-modules coadmissibles sur une courbe formelle</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Raoul Hallopeau</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 07 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2302.03959" target="_blank">https://arxiv.org/abs/2302.03959</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $\mathfrak{X}$ be a formal smooth quasi-compact curve over a complete discrete valuation ring of mixed characteristic. We consider over $\mathfrak{X}$ the sheaves of differential operators $\widehat{\mathcal{D}}^{(0)}_{\mathfrak{X}, k , \mathbb{Q}}$ with a congruence level $k \in \mathbb{N}$ and their projective limit $\mathcal{D}_{\mathfrak{X}, \infty} = \varprojlim_k \widehat{\mathcal{D}}^{(0)}_{\mathfrak{X}, k , \mathbb{Q}}$. In this article, we define a characteristic variety for coadmissible $\mathcal{D}_{\mathfrak{X}, \infty}$-modules as a closed subset of the cotangent space $T^*\mathfrak{X}$. For this purpose, we introduce a microlocalization sheaf of $\mathcal{D}_{\mathfrak{X}, \infty}$ in which the derivation is locally invertible. We deduce a notion of "sub-holonomicity" for coadmissible $\mathcal{D}_{\mathfrak{X}, \infty}$-modules which is equivalent to being generically an integrable connection. Finally, we associate characteristic cycles to sub-holonomic modules proving that the latter are of finite length.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "Length of triangulated categories", "author": "Yuki Hirano, Martin Kalck, Genki Ouchi", "published": "Fri, 07 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2404.07583", "summary": "arXiv:2404.07583v5 Announce Type: replace \nAbstract: We introduce the notion of composition series of triangulated categories, which generalizes full exceptional sequences. The lengths of composition series yield invariants for triangulated categories. We study composition series of derived categories for some classes of projective varieties and finite-dimensional algebras. We prove that certain negative rational curves on rational surfaces cause composition series of different lengths in the derived categories of the surfaces. On the other hand, we show that for derived categories of finite-dimensional hereditary algebras, for nontrivial admissible subcategories of ${\\rm D}^{\\rm b}(\\mathbb{P}^2)$ and for derived categories of some singular varieties, all composition series have the same length.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2404.07583" target="_blank">Length of triangulated categories</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yuki Hirano, Martin Kalck, Genki Ouchi</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 07 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2404.07583" target="_blank">https://arxiv.org/abs/2404.07583</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We introduce the notion of composition series of triangulated categories, which generalizes full exceptional sequences. The lengths of composition series yield invariants for triangulated categories. We study composition series of derived categories for some classes of projective varieties and finite-dimensional algebras. We prove that certain negative rational curves on rational surfaces cause composition series of different lengths in the derived categories of the surfaces. On the other hand, we show that for derived categories of finite-dimensional hereditary algebras, for nontrivial admissible subcategories of ${\rm D}^{\rm b}(\mathbb{P}^2)$ and for derived categories of some singular varieties, all composition series have the same length.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Strong approximation for the intersection of two quadrics", "author": "Dasheng Wei, Jie Xu, Yi Zhu", "published": "Fri, 07 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2412.01144", "summary": "arXiv:2412.01144v3 Announce Type: replace \nAbstract: We study strong approximation for the intersection of two affine quadrics. As its application, we prove the fibration method for weak approximation over number fields of rank four with nonsplit fibers split by quadratic extensions.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2412.01144" target="_blank">Strong approximation for the intersection of two quadrics</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Dasheng Wei, Jie Xu, Yi Zhu</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 07 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2412.01144" target="_blank">https://arxiv.org/abs/2412.01144</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study strong approximation for the intersection of two affine quadrics. As its application, we prove the fibration method for weak approximation over number fields of rank four with nonsplit fibers split by quadratic extensions.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "Hodge-Riemann polynomials", "author": "Qing Lu, Weizhe Zheng", "published": "Fri, 07 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2506.16992", "summary": "arXiv:2506.16992v5 Announce Type: replace \nAbstract: We show that Schur classes of ample vector bundles on smooth projective varieties satisfy Hodge-Riemann relations on $H^{p,q}$ under the assumption that $H^{p-2,q-2}$ vanishes. More generally, we study Hodge-Riemann polynomials, which are partially symmetric polynomials that produce cohomology classes satisfying the Hodge-Riemann property when evaluated at Chern roots of ample vector bundles. In the case of line bundles and in bidegree $(1,1)$, these are precisely the nonzero dually Lorentzian polynomials. We prove various properties of Hodge-Riemann polynomials, confirming predictions and answering questions of Ross and Toma. As an application, we show that the derivative sequence of any product of Schur polynomials is Schur log-concave, confirming conjectures of Ross and Wu.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2506.16992" target="_blank">Hodge-Riemann polynomials</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Qing Lu, Weizhe Zheng</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 07 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2506.16992" target="_blank">https://arxiv.org/abs/2506.16992</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We show that Schur classes of ample vector bundles on smooth projective varieties satisfy Hodge-Riemann relations on $H^{p,q}$ under the assumption that $H^{p-2,q-2}$ vanishes. More generally, we study Hodge-Riemann polynomials, which are partially symmetric polynomials that produce cohomology classes satisfying the Hodge-Riemann property when evaluated at Chern roots of ample vector bundles. In the case of line bundles and in bidegree $(1,1)$, these are precisely the nonzero dually Lorentzian polynomials. We prove various properties of Hodge-Riemann polynomials, confirming predictions and answering questions of Ross and Toma. As an application, we show that the derivative sequence of any product of Schur polynomials is Schur log-concave, confirming conjectures of Ross and Wu.
+            </div>
+        </div>
+        <div class="paper" id="paper-21">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-21" data-paper-data='{"title": "Stable toric sheaves. I : Chern classes", "author": "Carl Tipler", "published": "Fri, 07 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2510.14651", "summary": "arXiv:2510.14651v2 Announce Type: replace \nAbstract: We study rank 2 torus-equivariant torsion-free sheaves on the complex projective space. For reflexive sheaves we derive a simple formula for the Chern polynomial, and in the general torsion-free case we introduce an iterative construction method based on elementary injections, allowing us to prescribe Chern classes. This yields infinite families of explicit examples on $\\mathbb{P}^4$ and $\\mathbb{P}^5$, and establishes existence on $\\mathbb{P}^n$ for all $n\\geq 3$, with Chern classes satisfying all known constraints arising from locally freeness and indecomposability. We also provide simple obstructions for smoothability.", "number": 21, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#21</span>
+                <a href="https://arxiv.org/abs/2510.14651" target="_blank">Stable toric sheaves. I : Chern classes</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Carl Tipler</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 07 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.14651" target="_blank">https://arxiv.org/abs/2510.14651</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study rank 2 torus-equivariant torsion-free sheaves on the complex projective space. For reflexive sheaves we derive a simple formula for the Chern polynomial, and in the general torsion-free case we introduce an iterative construction method based on elementary injections, allowing us to prescribe Chern classes. This yields infinite families of explicit examples on $\mathbb{P}^4$ and $\mathbb{P}^5$, and establishes existence on $\mathbb{P}^n$ for all $n\geq 3$, with Chern classes satisfying all known constraints arising from locally freeness and indecomposability. We also provide simple obstructions for smoothability.
+            </div>
+        </div>
+        <div class="paper" id="paper-22">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-22" data-paper-data='{"title": "A Mapping Theorem for Derived Foliations", "author": "Victor Alfieri", "published": "Fri, 07 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2510.21497", "summary": "arXiv:2510.21497v2 Announce Type: replace \nAbstract: In this paper, we construct in characteristic zero a derived foliation on derived mapping stacks $\\underline{\\mathbf{Map}}_S(X,Y)$, for $S$ a base derived stack, $X$ a proper schematic, flat, and local complete intersection derived stack over $S$, and $Y$ a relative derived Deligne-Mumford stack over $S$, when $Y$ is equipped with a derived foliation relative to $S$. In the process, given a relative derived Deligne-Mumford stack $Z$ over a derived stack $X$, we will first show that the $\\infty$-category of derived foliations over $Z$ relative to $X$ embeds as a full subcategory of derived stacks over $Z$ equipped with extra structure, and describe its essential image explicitly. We will then show that given a proper schematic, flat, and local complete intersection map of derived stacks $f : X \\to Y$, the push-forward functor $f_*$ from derived stacks over $X$ to derived stacks over $Y$ preserves the preceding essential images, and thus defines a push-forward, from derived foliations over $Z$ relative to $X$, to derived foliations over $f_* Z$ relative to $Y$. The aforementioned result on derived mapping stacks is obtained as a special case of this statement. As example applications, given a smooth projective scheme $X$ equipped with a derived folation, we obtain derived folations on the derived moduli stacks $\\mathbb R \\overline{\\mathbf M}_{g,n}(X)$ and $\\mathbb R \\mathbf{Hilb}^{lci}(X)$, which are respectively the derived enhancements of the moduli stack of families of stable curves of genus $g$ with $n$ marked points on $X$, and of the Hilbert scheme of closed subschemes of $X$.", "number": 22, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#22</span>
+                <a href="https://arxiv.org/abs/2510.21497" target="_blank">A Mapping Theorem for Derived Foliations</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Victor Alfieri</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 07 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.21497" target="_blank">https://arxiv.org/abs/2510.21497</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we construct in characteristic zero a derived foliation on derived mapping stacks $\underline{\mathbf{Map}}_S(X,Y)$, for $S$ a base derived stack, $X$ a proper schematic, flat, and local complete intersection derived stack over $S$, and $Y$ a relative derived Deligne-Mumford stack over $S$, when $Y$ is equipped with a derived foliation relative to $S$. In the process, given a relative derived Deligne-Mumford stack $Z$ over a derived stack $X$, we will first show that the $\infty$-category of derived foliations over $Z$ relative to $X$ embeds as a full subcategory of derived stacks over $Z$ equipped with extra structure, and describe its essential image explicitly. We will then show that given a proper schematic, flat, and local complete intersection map of derived stacks $f : X \to Y$, the push-forward functor $f_*$ from derived stacks over $X$ to derived stacks over $Y$ preserves the preceding essential images, and thus defines a push-forward, from derived foliations over $Z$ relative to $X$, to derived foliations over $f_* Z$ relative to $Y$. The aforementioned result on derived mapping stacks is obtained as a special case of this statement. As example applications, given a smooth projective scheme $X$ equipped with a derived folation, we obtain derived folations on the derived moduli stacks $\mathbb R \overline{\mathbf M}_{g,n}(X)$ and $\mathbb R \mathbf{Hilb}^{lci}(X)$, which are respectively the derived enhancements of the moduli stack of families of stable curves of genus $g$ with $n$ marked points on $X$, and of the Hilbert scheme of closed subschemes of $X$.
+            </div>
+        </div>
+        <div class="paper" id="paper-23">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-23" data-paper-data='{"title": "Polarizations, torsors and theta groups", "author": "Jef Laga", "published": "Fri, 07 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2510.24678", "summary": "arXiv:2510.24678v2 Announce Type: replace \nAbstract: Let $\\lambda\\colon A\\rightarrow A^{\\vee}$ be a polarization on an abelian variety over a field $k$. If $k$ is not algebraically closed, there might not exist an ample line bundle on $A$ defined over $k$ that represents $\\lambda$. To remedy this, Poonen and Stoll have asked the following question: does there exist a line bundle on an $A$-torsor that represents $\\lambda$? We give a criterion for the existence of such a torsor and line bundle which only depends on the kernel of $\\lambda$. Using this criterion, we show that the answer to the question is yes when the polarization has odd or small even degree. On the other hand, we show that for every $g\\geq 7$, there exists a polarized $g$-dimensional abelian variety for which the answer to the question is no.", "number": 23, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#23</span>
+                <a href="https://arxiv.org/abs/2510.24678" target="_blank">Polarizations, torsors and theta groups</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jef Laga</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 07 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.24678" target="_blank">https://arxiv.org/abs/2510.24678</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $\lambda\colon A\rightarrow A^{\vee}$ be a polarization on an abelian variety over a field $k$. If $k$ is not algebraically closed, there might not exist an ample line bundle on $A$ defined over $k$ that represents $\lambda$. To remedy this, Poonen and Stoll have asked the following question: does there exist a line bundle on an $A$-torsor that represents $\lambda$? We give a criterion for the existence of such a torsor and line bundle which only depends on the kernel of $\lambda$. Using this criterion, we show that the answer to the question is yes when the polarization has odd or small even degree. On the other hand, we show that for every $g\geq 7$, there exists a polarized $g$-dimensional abelian variety for which the answer to the question is no.
+            </div>
+        </div>
+        <div class="paper" id="paper-24">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-24" data-paper-data='{"title": "Local-global principles for semi-integral points on Markoff orbifold pairs", "author": "Vladimir Mitankin, Justin Uhlemann", "published": "Fri, 07 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2411.02629", "summary": "arXiv:2411.02629v3 Announce Type: replace-cross \nAbstract: We study local-global principles for semi-integral points on orbifold pairs of Markoff type. In particular, we analyse when these orbifold pairs satisfy weak weak approximation, weak approximation and strong approximation off a finite set of places. We show that Markoff orbifold pairs satisfy the semi-integral Hasse principle and we measure how often such orbifold pairs have strict semi-integral points but the corresponding Markoff surface lacks integral points.", "number": 24, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#24</span>
+                <a href="https://arxiv.org/abs/2411.02629" target="_blank">Local-global principles for semi-integral points on Markoff orbifold pairs</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Vladimir Mitankin, Justin Uhlemann</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 07 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2411.02629" target="_blank">https://arxiv.org/abs/2411.02629</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study local-global principles for semi-integral points on orbifold pairs of Markoff type. In particular, we analyse when these orbifold pairs satisfy weak weak approximation, weak approximation and strong approximation off a finite set of places. We show that Markoff orbifold pairs satisfy the semi-integral Hasse principle and we measure how often such orbifold pairs have strict semi-integral points but the corresponding Markoff surface lacks integral points.
+            </div>
+        </div>
+        <div class="paper" id="paper-25">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-25" data-paper-data='{"title": "On the cohomological dimension of Siegel modular varieties and the modularity of formal Siegel modular forms", "author": "Haocheng Fan", "published": "Fri, 07 Nov 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.00799", "summary": "arXiv:2511.00799v2 Announce Type: replace-cross \nAbstract: We prove that the coherent cohomological dimension of the Siegel modular variety $A_{g,\\Gamma}$ is at most $g(g+1)/2-2$ for $g\\geq 2$. As a corollary, we show that the boundary of the compactified Siegel modular variety satisfies the Grothendieck-Lefschetz condition. This implies, in particular, that formal Siegel modular forms of genus $g\\geq2$ are automatically classical Siegel modular forms. Our result generalizes the work of Bruinier and Raum on the modularity of formal Siegel modular forms.", "number": 25, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#25</span>
+                <a href="https://arxiv.org/abs/2511.00799" target="_blank">On the cohomological dimension of Siegel modular varieties and the modularity of formal Siegel modular forms</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Haocheng Fan</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 07 Nov 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.00799" target="_blank">https://arxiv.org/abs/2511.00799</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove that the coherent cohomological dimension of the Siegel modular variety $A_{g,\Gamma}$ is at most $g(g+1)/2-2$ for $g\geq 2$. As a corollary, we show that the boundary of the compactified Siegel modular variety satisfies the Grothendieck-Lefschetz condition. This implies, in particular, that formal Siegel modular forms of genus $g\geq2$ are automatically classical Siegel modular forms. Our result generalizes the work of Bruinier and Raum on the modularity of formal Siegel modular forms.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2025-11-07 18:00:12
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>

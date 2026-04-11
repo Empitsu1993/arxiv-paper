@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Mon, 12 Jan 2026 05:00:26 +0000<br>
+        <strong>論文数:</strong> 19件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Localization of Singularities and Universal Geometric Rank Bounds in the Satake Correspondence</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">The Brauer group of $BG$ and gerbe structures of moduli spaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Categories of Constructible Sheaves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">New proofs for technical results in "Infinitesimal invariants of mixed Hodge structures'' (arXiv:2406.17118v1)</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">Special vs Essential</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">Geometric Rigidity in Moduli Stacks of Algebras</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">$\mathbb{A}^1$-Euler Characteristic of Low Symmetric Powers and Split Toric Varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">The low degree cohomology of compactifications of $A_g$</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">Abelian surfaces in Hesse form and explicit isogeny formulas</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">Canonical Lattices and Integer Relations Associated to Rational Fans</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">Unlikely intersections with CM abelian varieties in a family and explicit bounds for canonical heights under endomorphisms</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">Refinement of the Infinitesimal Variation of Hodge Structure: the case of canonical curves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">A relative orientation for the moduli space of stable maps to a del Pezzo surface</a>
+            <span class="title-label-badge" style="background-color: #9b59b6;">del Pezzo</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Self-intersection Number of Negative Curves on Fermat Surfaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Modular Serre Correspondence via stable pairs</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">On the cohomological representations of finite automorphism groups of singular curves and compact complex spaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">Quadratically enriched binomial coefficients over a finite field</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">Closed real plane curves of hyperelliptic solutions of focusing gauged modified KdV equation of genus $g$</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Reconstrucion of oriented matroids from Varchenko-Gelfand algebras</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Localization of Singularities and Universal Geometric Rank Bounds in the Satake Correspondence", "author": "George Petroulakis", "published": "Mon, 12 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.05369", "summary": "arXiv:2601.05369v1 Announce Type: new \nAbstract: This article introduces a framework for the localization and isolation of singularities in the affine Grassmannian. Our primary result is a structural factorization of the transition matrix $C$ between the Mirkovi\\'c--Vilonen (MV) basis and the convolution basis into $C = P \\cdot M \\cdot A \\cdot Q^{-1}$, where the four factors represent: equivariant localization ($Q$), fusion via nearby cycles ($A$), local intersection cohomology stalks ($M$), and diagonal normalization ($P$). Utilizing this factorization, and by introducing the Geometric Efficiency metric ($\\eta$) we establish a Universal Geometric Rank Bound, proving that the rank of the transition matrix $C$ is bounded by the dimension of the local Braden--MacPherson (BMP) stalks.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2601.05369" target="_blank">Localization of Singularities and Universal Geometric Rank Bounds in the Satake Correspondence</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> George Petroulakis</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 12 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.05369" target="_blank">https://arxiv.org/abs/2601.05369</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This article introduces a framework for the localization and isolation of singularities in the affine Grassmannian. Our primary result is a structural factorization of the transition matrix $C$ between the Mirkovi\'c--Vilonen (MV) basis and the convolution basis into $C = P \cdot M \cdot A \cdot Q^{-1}$, where the four factors represent: equivariant localization ($Q$), fusion via nearby cycles ($A$), local intersection cohomology stalks ($M$), and diagonal normalization ($P$). Utilizing this factorization, and by introducing the Geometric Efficiency metric ($\eta$) we establish a Universal Geometric Rank Bound, proving that the rank of the transition matrix $C$ is bounded by the dimension of the local Braden--MacPherson (BMP) stalks.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "The Brauer group of $BG$ and gerbe structures of moduli spaces", "author": "Rose Lopez", "published": "Mon, 12 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.05370", "summary": "arXiv:2601.05370v1 Announce Type: new \nAbstract: We study the $\\mu _N$-gerbe of curves of genus $g$ with an order $N$ automorphism, and explore what corresponding $H^2$-cohomology classes the components of this stack can have. In particular, we look at curves whose quotients by the order $N$ automorphism are genus 0, and completely determine the Brauer classes of these gerbes. The key technical input is the calculation of the Brauer group of $BG$, for $G$ a smooth connected semisimple linear algebraic group.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2601.05370" target="_blank">The Brauer group of $BG$ and gerbe structures of moduli spaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Rose Lopez</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 12 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.05370" target="_blank">https://arxiv.org/abs/2601.05370</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the $\mu _N$-gerbe of curves of genus $g$ with an order $N$ automorphism, and explore what corresponding $H^2$-cohomology classes the components of this stack can have. In particular, we look at curves whose quotients by the order $N$ automorphism are genus 0, and completely determine the Brauer classes of these gerbes. The key technical input is the calculation of the Brauer group of $BG$, for $G$ a smooth connected semisimple linear algebraic group.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Categories of Constructible Sheaves", "author": "Valery Lunts, Olaf Schnuerer", "published": "Mon, 12 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.05477", "summary": "arXiv:2601.05477v1 Announce Type: new \nAbstract: Given a stratified topological space, we answer the question whether the functor from the derived category of constructible sheaves to the derived category of sheaves with constructible cohomology is an equivalence. We also establish basic facts on the category of locally constant sheaves and on the category of constructible sheaves.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2601.05477" target="_blank">Categories of Constructible Sheaves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Valery Lunts, Olaf Schnuerer</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 12 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.05477" target="_blank">https://arxiv.org/abs/2601.05477</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Given a stratified topological space, we answer the question whether the functor from the derived category of constructible sheaves to the derived category of sheaves with constructible cohomology is an equivalence. We also establish basic facts on the category of locally constant sheaves and on the category of constructible sheaves.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "New proofs for technical results in \"Infinitesimal invariants of mixed Hodge structures'' (arXiv:2406.17118v1)", "author": "Zhenjian Wang", "published": "Mon, 12 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.05571", "summary": "arXiv:2601.05571v1 Announce Type: new \nAbstract: Cubic forms $C$ are constructed in the work of R. Aguilar, M. Green and P. Griffiths to establish the generic global Torelli theorem for Fano-K3 pairs $(X,Y)$, where $X: F=0$ is a cubic threefold in $\\mathbb{P}^4$ and $Y\\in|-K_X|$ is an anticanonical smooth section of $X$ defined by a quadratic form $Q$. In this article, we prove the following two results, which were previously verified with the computer aid of Macaulay2: for a generic pair $(X,Y)$, (i) the cubic form $C$ is smooth; (2) $(J_{F,3}:Q)=0$, and thereby give a precise meaning of the word ``generic\" in this context.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2601.05571" target="_blank">New proofs for technical results in "Infinitesimal invariants of mixed Hodge structures'' (arXiv:2406.17118v1)</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Zhenjian Wang</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 12 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.05571" target="_blank">https://arxiv.org/abs/2601.05571</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Cubic forms $C$ are constructed in the work of R. Aguilar, M. Green and P. Griffiths to establish the generic global Torelli theorem for Fano-K3 pairs $(X,Y)$, where $X: F=0$ is a cubic threefold in $\mathbb{P}^4$ and $Y\in|-K_X|$ is an anticanonical smooth section of $X$ defined by a quadratic form $Q$. In this article, we prove the following two results, which were previously verified with the computer aid of Macaulay2: for a generic pair $(X,Y)$, (i) the cubic form $C$ is smooth; (2) $(J_{F,3}:Q)=0$, and thereby give a precise meaning of the word ``generic" in this context.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "Special vs Essential", "author": "Yukari Ito, Kohei Sato, Yusuke Sato", "published": "Mon, 12 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.05634", "summary": "arXiv:2601.05634v1 Announce Type: new \nAbstract: We show a correspondence between the compact exceptional curves and divisors on $G-{\\rm Hilb}(\\mathbf{C}^3)$ and some non-trivial irreducible representations of $G \\subset GL(n,C)$ which are special (or essential). Moreover, we provide an explicit construction of the small resolution of $G-{\\rm Hilb}(\\mathbf{C}^3)$ and, using this resolution, we construct a correspondence between special and essential representations. These results are an extension of ``Special McKay correspondence'' and ``Reid's recipe''.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2601.05634" target="_blank">Special vs Essential</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yukari Ito, Kohei Sato, Yusuke Sato</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 12 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.05634" target="_blank">https://arxiv.org/abs/2601.05634</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We show a correspondence between the compact exceptional curves and divisors on $G-{\rm Hilb}(\mathbf{C}^3)$ and some non-trivial irreducible representations of $G \subset GL(n,C)$ which are special (or essential). Moreover, we provide an explicit construction of the small resolution of $G-{\rm Hilb}(\mathbf{C}^3)$ and, using this resolution, we construct a correspondence between special and essential representations. These results are an extension of ``Special McKay correspondence'' and ``Reid's recipe''.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "Geometric Rigidity in Moduli Stacks of Algebras", "author": "Atabey Kaygun", "published": "Mon, 12 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.05715", "summary": "arXiv:2601.05715v1 Announce Type: new \nAbstract: We study quadratic moduli schemes $X$ of algebra laws on a fixed vector space $W$ under the transport-of-structure action of $GL(W)$ on $Hom(W^{\\otimes 2},W)$. We construct an intrinsic three-term deformation complex on $X$ whose fibers encode transverse first-order classes and primary obstructions, and whose cohomology agrees on the operadic loci with the standard low-degree deformation cohomology (\\`a la Gerstenhaber and Nijenhuis--Richardson). We then define a canonical quadratic map $\\kappa^{inc}_{2,\\mu}\\colon H^2_{inc}(\\mu)\\to H^3_{inc}(\\mu)$ that controls second-order lifts modulo isotriviality. If $\\mu$ is smooth point in a reduced component and $(\\kappa^{inc}_{2,\\mu})^{-1}(0)=\\{0\\}$, then the $G$-orbit of $\\mu$ is Zariski open in that component. This provides a coordinate-free explanation of Richardson-type geometric rigidity even when the second deformation cohomology does not vanish.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2601.05715" target="_blank">Geometric Rigidity in Moduli Stacks of Algebras</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Atabey Kaygun</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 12 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.05715" target="_blank">https://arxiv.org/abs/2601.05715</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study quadratic moduli schemes $X$ of algebra laws on a fixed vector space $W$ under the transport-of-structure action of $GL(W)$ on $Hom(W^{\otimes 2},W)$. We construct an intrinsic three-term deformation complex on $X$ whose fibers encode transverse first-order classes and primary obstructions, and whose cohomology agrees on the operadic loci with the standard low-degree deformation cohomology (\`a la Gerstenhaber and Nijenhuis--Richardson). We then define a canonical quadratic map $\kappa^{inc}_{2,\mu}\colon H^2_{inc}(\mu)\to H^3_{inc}(\mu)$ that controls second-order lifts modulo isotriviality. If $\mu$ is smooth point in a reduced component and $(\kappa^{inc}_{2,\mu})^{-1}(0)=\{0\}$, then the $G$-orbit of $\mu$ is Zariski open in that component. This provides a coordinate-free explanation of Richardson-type geometric rigidity even when the second deformation cohomology does not vanish.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "$\\mathbb{A}^1$-Euler Characteristic of Low Symmetric Powers and Split Toric Varieties", "author": "Louisa F. Br\\\"oring", "published": "Mon, 12 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.05796", "summary": "arXiv:2601.05796v1 Announce Type: new \nAbstract: For a smooth, projective scheme $X$ over a field $k$ or any variety $X$ if $k$ has characteristic zero, we compute the compactly supported $\\mathbb{A}^1$-Euler characteristic of $\\operatorname{Sym}^2(X)$ if $\\operatorname{char}(k) \\ne 2$ and of $\\operatorname{Sym}^3(X)$ if $\\operatorname{char}(k) \\ne 2,3$. We do so by extending the definition of a $G$-equivariant quadratic Euler characteristic first studied by Pajwani-P\\'al to arbitrary characteristic and by studying its relation to the $\\mathbb{A}^1$-Euler characteristic of quotients. As an application, we show that the compactly supported $\\mathbb{A}^1$-Euler characteristic of $\\operatorname{Sym}^n(X)$ agrees with the prediction from the power structure constructed by Pajwani-P\\'al for $n = 2,3$.\n  Furthermore, we compute the compactly supported $\\mathbb{A}^1$-Euler characteristic of split toric varieties and show that the compactly supported $\\mathbb{A}^1$-Euler characteristic of all of their symmetric powers agrees with the prediction from the power structure constructed by Pajwani-P\\'al.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2601.05796" target="_blank">$\mathbb{A}^1$-Euler Characteristic of Low Symmetric Powers and Split Toric Varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Louisa F. Br\"oring</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 12 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.05796" target="_blank">https://arxiv.org/abs/2601.05796</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                For a smooth, projective scheme $X$ over a field $k$ or any variety $X$ if $k$ has characteristic zero, we compute the compactly supported $\mathbb{A}^1$-Euler characteristic of $\operatorname{Sym}^2(X)$ if $\operatorname{char}(k) \ne 2$ and of $\operatorname{Sym}^3(X)$ if $\operatorname{char}(k) \ne 2,3$. We do so by extending the definition of a $G$-equivariant quadratic Euler characteristic first studied by Pajwani-P\'al to arbitrary characteristic and by studying its relation to the $\mathbb{A}^1$-Euler characteristic of quotients. As an application, we show that the compactly supported $\mathbb{A}^1$-Euler characteristic of $\operatorname{Sym}^n(X)$ agrees with the prediction from the power structure constructed by Pajwani-P\'al for $n = 2,3$.
+  Furthermore, we compute the compactly supported $\mathbb{A}^1$-Euler characteristic of split toric varieties and show that the compactly supported $\mathbb{A}^1$-Euler characteristic of all of their symmetric powers agrees with the prediction from the power structure constructed by Pajwani-P\'al.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "The low degree cohomology of compactifications of $A_g$", "author": "Samir Canning, Dan Petersen, Olivier Ta\\\"ibi", "published": "Mon, 12 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.05888", "summary": "arXiv:2601.05888v1 Announce Type: new \nAbstract: We compute the low degree $\\ell$-adic intersection cohomology of symplectic local systems on the Satake compactification of the moduli space $A_g$ of principally polarized abelian varieties. We prove that only a small finite list of irreducible Galois representations can appear in the low degree cohomology of any nonsingular toroidal compactification of $A_g$ or $X_{g,s}$, the $s$-fold fiber product of the universal abelian variety. We give several applications, including to spaces of holomorphic forms on toroidal compactifications and to the cohomology of the interior. In particular, we give a complete characterization of when the cohomology of $X_{g,s}$, or one of its toroidal compactifications, is of Tate type. The result is independent of the choice of toroidal compactification.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2601.05888" target="_blank">The low degree cohomology of compactifications of $A_g$</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Samir Canning, Dan Petersen, Olivier Ta\"ibi</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 12 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.05888" target="_blank">https://arxiv.org/abs/2601.05888</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We compute the low degree $\ell$-adic intersection cohomology of symplectic local systems on the Satake compactification of the moduli space $A_g$ of principally polarized abelian varieties. We prove that only a small finite list of irreducible Galois representations can appear in the low degree cohomology of any nonsingular toroidal compactification of $A_g$ or $X_{g,s}$, the $s$-fold fiber product of the universal abelian variety. We give several applications, including to spaces of holomorphic forms on toroidal compactifications and to the cohomology of the interior. In particular, we give a complete characterization of when the cohomology of $X_{g,s}$, or one of its toroidal compactifications, is of Tate type. The result is independent of the choice of toroidal compactification.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "Abelian surfaces in Hesse form and explicit isogeny formulas", "author": "Thomas Decru, Sabrina Kunzweiler", "published": "Mon, 12 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.05922", "summary": "arXiv:2601.05922v1 Announce Type: new \nAbstract: We develop a new method for the computation of $(3,3)$-isogenies between principally polarized abelian surfaces. The idea is to work with models in $\\mathbb{P}^8$ induced by a symmetric level-$3$ theta structure. In this setting, the action of three-torsion points is linear, and the isogeny formulas can be described in a simple way as the composition of easy-to-evaluate maps. In the description of these formulas, the relation with the Burkhardt quartic threefold plays an important role. Furthermore, we discuss generalizations of the idea to higher dimensions as well as different isogeny degrees.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2601.05922" target="_blank">Abelian surfaces in Hesse form and explicit isogeny formulas</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Thomas Decru, Sabrina Kunzweiler</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 12 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.05922" target="_blank">https://arxiv.org/abs/2601.05922</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We develop a new method for the computation of $(3,3)$-isogenies between principally polarized abelian surfaces. The idea is to work with models in $\mathbb{P}^8$ induced by a symmetric level-$3$ theta structure. In this setting, the action of three-torsion points is linear, and the isogeny formulas can be described in a simple way as the composition of easy-to-evaluate maps. In the description of these formulas, the relation with the Burkhardt quartic threefold plays an important role. Furthermore, we discuss generalizations of the idea to higher dimensions as well as different isogeny degrees.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "Canonical Lattices and Integer Relations Associated to Rational Fans", "author": "Rizwan Jahangir", "published": "Mon, 12 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.05678", "summary": "arXiv:2601.05678v1 Announce Type: cross \nAbstract: We propose a canonical local-to-global lattice theory for rational fans. We define the $\\textit{ray lattice } L_{\\mathrm{rays}}(\\Sigma)$ and the $\\textit{relation lattice } L_{\\mathrm{rel}}(\\Sigma)$ as invariants functorial under fan isomorphisms. We introduce $\\textit{star-local relation lattices}$, defined via the relation lattice of the localized quotient fan, which capture the linear dependencies visible within local neighborhoods. We define a $\\textit{codimension filtration}$ on the global relation lattice and prove a generation theorem: the global lattice is generated by local relations supported on the stars of cones of codimension at least 1. This filtration is sensitive to the facial structure of $\\Sigma$; explicit examples and a conjecture suggest that subdivisions can only preserve or lower filtration depths, distinguishing fans with different combinatorial topologies.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2601.05678" target="_blank">Canonical Lattices and Integer Relations Associated to Rational Fans</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Rizwan Jahangir</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 12 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.05678" target="_blank">https://arxiv.org/abs/2601.05678</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We propose a canonical local-to-global lattice theory for rational fans. We define the $\textit{ray lattice } L_{\mathrm{rays}}(\Sigma)$ and the $\textit{relation lattice } L_{\mathrm{rel}}(\Sigma)$ as invariants functorial under fan isomorphisms. We introduce $\textit{star-local relation lattices}$, defined via the relation lattice of the localized quotient fan, which capture the linear dependencies visible within local neighborhoods. We define a $\textit{codimension filtration}$ on the global relation lattice and prove a generation theorem: the global lattice is generated by local relations supported on the stars of cones of codimension at least 1. This filtration is sensitive to the facial structure of $\Sigma$; explicit examples and a conjecture suggest that subdivisions can only preserve or lower filtration depths, distinguishing fans with different combinatorial topologies.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "Unlikely intersections with CM abelian varieties in a family and explicit bounds for canonical heights under endomorphisms", "author": "Luca Ferrigno", "published": "Mon, 12 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.05919", "summary": "arXiv:2601.05919v1 Announce Type: cross \nAbstract: Let $S$ be a smooth irreducible curve over $\\overline{\\mathbb{Q}}$, and let $\\mathcal{A} \\to S$ be an abelian scheme with a curve $C \\subset \\mathcal{A}$, both defined over $\\overline{\\mathbb{Q}}$. In 2020, Barroero and Capuano proved that if $C$ is not contained in a proper subgroup scheme, then the intersection of $C$ with the union of the flat subgroup schemes of $\\mathcal{A}$ of codimension at least 2 is finite. In this article, we continue to study this problem by considering the intersections with the algebraic subgroups of the CM fibers, generalizing a previous result of Barroero for fibered powers of elliptic schemes. A key ingredient of the proof is an explicit control of canonical heights under endomorphisms: for an abelian variety $A/\\overline{\\mathbb{Q}}$, an ample symmetric divisor $D$, and $f \\in \\mathrm{End}(A)$, we bound explicitly $\\widehat{h}_{A, D}(f(P))$ in terms of $\\widehat{h}_{A, D}(P)$ by determining the values of $\\lambda \\in \\mathbb{R}$ for which the divisors $\\lambda D - f^* D$ and $f^* D - \\lambda D$ are ample.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2601.05919" target="_blank">Unlikely intersections with CM abelian varieties in a family and explicit bounds for canonical heights under endomorphisms</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Luca Ferrigno</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 12 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.05919" target="_blank">https://arxiv.org/abs/2601.05919</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $S$ be a smooth irreducible curve over $\overline{\mathbb{Q}}$, and let $\mathcal{A} \to S$ be an abelian scheme with a curve $C \subset \mathcal{A}$, both defined over $\overline{\mathbb{Q}}$. In 2020, Barroero and Capuano proved that if $C$ is not contained in a proper subgroup scheme, then the intersection of $C$ with the union of the flat subgroup schemes of $\mathcal{A}$ of codimension at least 2 is finite. In this article, we continue to study this problem by considering the intersections with the algebraic subgroups of the CM fibers, generalizing a previous result of Barroero for fibered powers of elliptic schemes. A key ingredient of the proof is an explicit control of canonical heights under endomorphisms: for an abelian variety $A/\overline{\mathbb{Q}}$, an ample symmetric divisor $D$, and $f \in \mathrm{End}(A)$, we bound explicitly $\widehat{h}_{A, D}(f(P))$ in terms of $\widehat{h}_{A, D}(P)$ by determining the values of $\lambda \in \mathbb{R}$ for which the divisors $\lambda D - f^* D$ and $f^* D - \lambda D$ are ample.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "Refinement of the Infinitesimal Variation of Hodge Structure: the case of canonical curves", "author": "Igor Reider", "published": "Mon, 12 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2306.11442", "summary": "arXiv:2306.11442v4 Announce Type: replace \nAbstract: Let $C$ be a smooth complex projective curve with canonical divisor $K_C$ very ample. We explore the relation between the cup-product $$ H^1 (\\Theta_C ) \\longrightarrow (H^0({\\cal O}_C (K_C))^{\\ast} \\otimes H^1 ({\\cal O}_C) $$ where $\\Theta_C ={\\cal O}_C (-K_C)$ is the holomorphic tangent bundle of $C$, and the geometry of the canonical embedding of $C$. The cup-product, following Griffiths, stratifies ${\\mathbb P}(H^1 (\\Theta_C ))$ by the subvarieties $\\Sigma_r$, according to the rank $r$ of $\\xi \\in H^1 (\\Theta_C )$ viewed as the linear map $$ \\xi:H^0({\\cal O}_C (K_C)) \\longrightarrow H^1 ({\\cal O}_C) $$ or, equivalently, by the dimension of the kernel of $\\xi$ $$ W_{\\xi}=ker(\\xi). $$ The refinement consists of the filtration of $W^{\\bullet}_{\\xi} ([\\phi])$ of $W_{\\xi}$, varying with $[\\phi] \\in {\\mathbb P}(W_{\\xi})$. This filtration has geometric meaning:\n  1) it is related to special divisors on $C$,\n  2) it `counts' certain rational normal curves in the canonical embedding of $C$.\n  As an illustration, the results about the strata $\\Sigma_0$ and $\\Sigma_1$ are recovered and as corollaries one obtains the classical theorems of Max Noether on projective normality of the canonical embedding and Babbage-Enriques-Petri about the canonical curve being cut out by quadrics.\n  The refinement brings out new aspects: quiver representations, Fano toric varieties with a distinguished anti-canonical divisor, dimer models. The quiver emerges from the construction and properties of the refinement; the Fano variety arises from the graph underlying the quiver and related to the Higgs structures. The graph underlying the refinement becomes an important part of the theory: it connects to topics such as the Topological Quantum field theory, moduli of elliptic curves with marked points, modular curves, higher categorical structures.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2306.11442" target="_blank">Refinement of the Infinitesimal Variation of Hodge Structure: the case of canonical curves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Igor Reider</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 12 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2306.11442" target="_blank">https://arxiv.org/abs/2306.11442</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $C$ be a smooth complex projective curve with canonical divisor $K_C$ very ample. We explore the relation between the cup-product $$ H^1 (\Theta_C ) \longrightarrow (H^0({\cal O}_C (K_C))^{\ast} \otimes H^1 ({\cal O}_C) $$ where $\Theta_C ={\cal O}_C (-K_C)$ is the holomorphic tangent bundle of $C$, and the geometry of the canonical embedding of $C$. The cup-product, following Griffiths, stratifies ${\mathbb P}(H^1 (\Theta_C ))$ by the subvarieties $\Sigma_r$, according to the rank $r$ of $\xi \in H^1 (\Theta_C )$ viewed as the linear map $$ \xi:H^0({\cal O}_C (K_C)) \longrightarrow H^1 ({\cal O}_C) $$ or, equivalently, by the dimension of the kernel of $\xi$ $$ W_{\xi}=ker(\xi). $$ The refinement consists of the filtration of $W^{\bullet}_{\xi} ([\phi])$ of $W_{\xi}$, varying with $[\phi] \in {\mathbb P}(W_{\xi})$. This filtration has geometric meaning:
+  1) it is related to special divisors on $C$,
+  2) it `counts' certain rational normal curves in the canonical embedding of $C$.
+  As an illustration, the results about the strata $\Sigma_0$ and $\Sigma_1$ are recovered and as corollaries one obtains the classical theorems of Max Noether on projective normality of the canonical embedding and Babbage-Enriques-Petri about the canonical curve being cut out by quadrics.
+  The refinement brings out new aspects: quiver representations, Fano toric varieties with a distinguished anti-canonical divisor, dimer models. The quiver emerges from the construction and properties of the refinement; the Fano variety arises from the graph underlying the quiver and related to the Higgs structures. The graph underlying the refinement becomes an important part of the theory: it connects to topics such as the Topological Quantum field theory, moduli of elliptic curves with marked points, modular curves, higher categorical structures.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "A relative orientation for the moduli space of stable maps to a del Pezzo surface", "author": "Jesse Leo Kass, Marc Levine, Jake P. Solomon, Kirsten Wickelgren", "published": "Mon, 12 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2307.01941", "summary": "arXiv:2307.01941v2 Announce Type: replace \nAbstract: We prove orientation results for evaluation maps of moduli spaces of rational stable maps to del Pezzo surfaces over a field, both in characteristic $0$ and in positive characteristic. These results and the theory of degree developed in a sequel produce quadratically enriched counts of rational curves over non-algebraically closed fields of characteristic not $2$ or $3$. Orientations are constructed in two steps. First, the ramification locus of the evaluation map is shown to be the divisor in the moduli space of stable maps where image curves have a cusp. Second, this divisor is related to the discriminant of a branched cover of the moduli space given generically by pairs of points on the universal curve with the same image.", "number": 13, "labels": [{"name": "del Pezzo", "color": "#9b59b6"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2307.01941" target="_blank">A relative orientation for the moduli space of stable maps to a del Pezzo surface</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #9b59b6;">del Pezzo</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jesse Leo Kass, Marc Levine, Jake P. Solomon, Kirsten Wickelgren</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 12 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2307.01941" target="_blank">https://arxiv.org/abs/2307.01941</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove orientation results for evaluation maps of moduli spaces of rational stable maps to del Pezzo surfaces over a field, both in characteristic $0$ and in positive characteristic. These results and the theory of degree developed in a sequel produce quadratically enriched counts of rational curves over non-algebraically closed fields of characteristic not $2$ or $3$. Orientations are constructed in two steps. First, the ramification locus of the evaluation map is shown to be the divisor in the moduli space of stable maps where image curves have a cusp. Second, this divisor is related to the discriminant of a branched cover of the moduli space given generically by pairs of points on the universal curve with the same image.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Self-intersection Number of Negative Curves on Fermat Surfaces", "author": "Zhenjian Wang", "published": "Mon, 12 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2501.00319", "summary": "arXiv:2501.00319v3 Announce Type: replace \nAbstract: We give an explicit formula for the self-intersection number of negative curves on Fermat surfaces. The formula offers us hints to either prove or disprove the Bounded Negativity Conjecture for the Fermat surfaces.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2501.00319" target="_blank">Self-intersection Number of Negative Curves on Fermat Surfaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Zhenjian Wang</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 12 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2501.00319" target="_blank">https://arxiv.org/abs/2501.00319</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We give an explicit formula for the self-intersection number of negative curves on Fermat surfaces. The formula offers us hints to either prove or disprove the Bounded Negativity Conjecture for the Fermat surfaces.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Modular Serre Correspondence via stable pairs", "author": "Marcos Jardim, Dapeng Mu", "published": "Mon, 12 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2501.08480", "summary": "arXiv:2501.08480v3 Announce Type: replace \nAbstract: A stable pair on a projective variety consists of a sheaf and a global section subject to stability conditions parameterized by rational polynomials. We will show that for a smooth projective threefold and a class of a rank 2 sheaf, there are two stability chambers (in the space of rational polynomials under the lexicographic order) for which the moduli spaces of semistable pairs admit morphisms to a Gieseker moduli space of rank 2 semistable sheaves and a Hilbert scheme, respectively. In the latter moduli space, every semistable pair corresponds to a closed sub-scheme of codimension 2 with an extension class, providing a generalization of the Serre correspondence. These two moduli spaces are related by finitely many wall-crossings. We provide explicit descriptions of those wall-crossings for certain fixed numerical classes. In particular, these wall-crossings preserve the connectedness of the moduli space of semistable pairs.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2501.08480" target="_blank">Modular Serre Correspondence via stable pairs</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Marcos Jardim, Dapeng Mu</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 12 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2501.08480" target="_blank">https://arxiv.org/abs/2501.08480</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                A stable pair on a projective variety consists of a sheaf and a global section subject to stability conditions parameterized by rational polynomials. We will show that for a smooth projective threefold and a class of a rank 2 sheaf, there are two stability chambers (in the space of rational polynomials under the lexicographic order) for which the moduli spaces of semistable pairs admit morphisms to a Gieseker moduli space of rank 2 semistable sheaves and a Hilbert scheme, respectively. In the latter moduli space, every semistable pair corresponds to a closed sub-scheme of codimension 2 with an extension class, providing a generalization of the Serre correspondence. These two moduli spaces are related by finitely many wall-crossings. We provide explicit descriptions of those wall-crossings for certain fixed numerical classes. In particular, these wall-crossings preserve the connectedness of the moduli space of semistable pairs.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "On the cohomological representations of finite automorphism groups of singular curves and compact complex spaces", "author": "Qing Liu, Wenfei Liu", "published": "Mon, 12 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2507.12290", "summary": "arXiv:2507.12290v2 Announce Type: replace \nAbstract: Let G be a finite group acting tamely on a proper reduced curve C over an algebraically closed field. We study the G-module structure on the cohomology groups of a G-equivariant locally free sheaf F on C, and give formulas of Chevalley--Weil type, with values in the Grothendieck ring R_k(G)_Q of finitely generated G-modules. We also give a similar formula for the singular cohomology of compact complex spaces.\n  The focus is on the case where C is nodal. Using the Chevalley--Weil formula, we compute the G-invariant part of the global sections of the pluricanonical bundle \\omega_C^{\\otimes m}. In turn, we use the formula for m=2 to compute the equivariant deformation space of a stable G-curve C. We also obtain numerical criteria for the presence of any given irreducible representation in space of the global sections of \\omega_C\\otimes F, where F is an ample locally free G-sheaf on C. Some new phenomena, pathological compared to the smooth curve case, are discussed.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2507.12290" target="_blank">On the cohomological representations of finite automorphism groups of singular curves and compact complex spaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Qing Liu, Wenfei Liu</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 12 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2507.12290" target="_blank">https://arxiv.org/abs/2507.12290</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let G be a finite group acting tamely on a proper reduced curve C over an algebraically closed field. We study the G-module structure on the cohomology groups of a G-equivariant locally free sheaf F on C, and give formulas of Chevalley--Weil type, with values in the Grothendieck ring R_k(G)_Q of finitely generated G-modules. We also give a similar formula for the singular cohomology of compact complex spaces.
+  The focus is on the case where C is nodal. Using the Chevalley--Weil formula, we compute the G-invariant part of the global sections of the pluricanonical bundle \omega_C^{\otimes m}. In turn, we use the formula for m=2 to compute the equivariant deformation space of a stable G-curve C. We also obtain numerical criteria for the presence of any given irreducible representation in space of the global sections of \omega_C\otimes F, where F is an ample locally free G-sheaf on C. Some new phenomena, pathological compared to the smooth curve case, are discussed.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "Quadratically enriched binomial coefficients over a finite field", "author": "Chongyao Chen, Kirsten Wickelgren", "published": "Mon, 12 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2412.14277", "summary": "arXiv:2412.14277v2 Announce Type: replace-cross \nAbstract: We compute an analogue of Pascal's triangle enriched in bilinear forms over a finite field. This gives an arithmetically meaningful count of the ways to choose $j$ ring homomorphisms into an algebraic closure from an \\'etale extension of degree $n$. We also compute a quadratic twist. These (twisted) enriched binomial coefficients are defined in joint work of Brugall\\'e and the second-named author, building on work of Serre. Such binomial coefficients support curve counting results over non-algebraically closed fields, using $\\mathbb{A}^1$-homotopy theory.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2412.14277" target="_blank">Quadratically enriched binomial coefficients over a finite field</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Chongyao Chen, Kirsten Wickelgren</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 12 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2412.14277" target="_blank">https://arxiv.org/abs/2412.14277</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We compute an analogue of Pascal's triangle enriched in bilinear forms over a finite field. This gives an arithmetically meaningful count of the ways to choose $j$ ring homomorphisms into an algebraic closure from an \'etale extension of degree $n$. We also compute a quadratic twist. These (twisted) enriched binomial coefficients are defined in joint work of Brugall\'e and the second-named author, building on work of Serre. Such binomial coefficients support curve counting results over non-algebraically closed fields, using $\mathbb{A}^1$-homotopy theory.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "Closed real plane curves of hyperelliptic solutions of focusing gauged modified KdV equation of genus $g$", "author": "Shigeki Matsutani", "published": "Mon, 12 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2504.18285", "summary": "arXiv:2504.18285v3 Announce Type: replace-cross \nAbstract: The real part of the focusing modified Korteweg-de Vries (MKdV) equation defined over the complex field $\\mathbb{C}$ is reduced to the focusing gauged MKdV (FGMKdV) equation. In this paper, we construct the real hyperelliptic solutions of FGMKdV equation in terms of data of the hyperelliptic curves of genus $g$ and demonstrate the closed hyperelliptic plane curves of genus $g=5$ whose curvature obeys the FGMKdV equation by extending the previous results of genus three (Matsutani, {\\it{J. Geom. Phys}} {\\bf{215}} (2025) 105540). These are a generalization of Euler's elasticae.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2504.18285" target="_blank">Closed real plane curves of hyperelliptic solutions of focusing gauged modified KdV equation of genus $g$</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Shigeki Matsutani</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 12 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2504.18285" target="_blank">https://arxiv.org/abs/2504.18285</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The real part of the focusing modified Korteweg-de Vries (MKdV) equation defined over the complex field $\mathbb{C}$ is reduced to the focusing gauged MKdV (FGMKdV) equation. In this paper, we construct the real hyperelliptic solutions of FGMKdV equation in terms of data of the hyperelliptic curves of genus $g$ and demonstrate the closed hyperelliptic plane curves of genus $g=5$ whose curvature obeys the FGMKdV equation by extending the previous results of genus three (Matsutani, {\it{J. Geom. Phys}} {\bf{215}} (2025) 105540). These are a generalization of Euler's elasticae.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Reconstrucion of oriented matroids from Varchenko-Gelfand algebras", "author": "Yukino Yagi, Masahiko Yoshinaga", "published": "Mon, 12 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2509.19905", "summary": "arXiv:2509.19905v2 Announce Type: replace-cross \nAbstract: The algebra of $R$-valued functions on the set of chambers of a real hyperplane arrangement is called the Varchenko-Gelfand (VG) algebra. This algebra carries a natural filtration by the degree with respect to Heaviside functions, giving rise to the associated graded VG algebra. When the coefficient ring $R$ is an integral domain of characteristic $2$, the graded VG algebra is known to be isomorphic to the Orlik-Solomon algebra.\n  In this paper, we study VG algebras over coefficient rings of characteristic different from $2$, and investigate to what extent VG algebras determine the underlying oriented matroid structures.\n  Our main results concern hyperplane arrangements that are generic in codimension $2$. For such arrangements, if $R$ is an integral domain of characteristic not equal to $2$, then the oriented matroid can be recovered from both the filtered and the graded VG algebras.\n  We also formulate an algorithm that is expected to reconstruct oriented matroids from VG algebras in the case of general arrangements.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2509.19905" target="_blank">Reconstrucion of oriented matroids from Varchenko-Gelfand algebras</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yukino Yagi, Masahiko Yoshinaga</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 12 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2509.19905" target="_blank">https://arxiv.org/abs/2509.19905</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The algebra of $R$-valued functions on the set of chambers of a real hyperplane arrangement is called the Varchenko-Gelfand (VG) algebra. This algebra carries a natural filtration by the degree with respect to Heaviside functions, giving rise to the associated graded VG algebra. When the coefficient ring $R$ is an integral domain of characteristic $2$, the graded VG algebra is known to be isomorphic to the Orlik-Solomon algebra.
+  In this paper, we study VG algebras over coefficient rings of characteristic different from $2$, and investigate to what extent VG algebras determine the underlying oriented matroid structures.
+  Our main results concern hyperplane arrangements that are generic in codimension $2$. For such arrangements, if $R$ is an integral domain of characteristic not equal to $2$, then the oriented matroid can be recovered from both the filtered and the graded VG algebras.
+  We also formulate an algorithm that is expected to reconstruct oriented matroids from VG algebras in the case of general arrangements.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-01-12 18:00:04
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>

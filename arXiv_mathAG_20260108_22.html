@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Thu, 08 Jan 2026 05:00:58 +0000<br>
+        <strong>論文数:</strong> 22件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Simple Cohomology bundles on multiprojective spaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">On the Ulrichness of twisted syzygies and dual syzygies bundles</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Surfaces of general type and sl_2-triples</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">Residue Balancing on Singular Curves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">Thomason condition for regular algebraic stacks</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">AKSZ construction for shifted Poisson structures</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Automorphisms of odd dimensional $(2,2)$-complete intersections in characteristic $2$</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Open $r$-spin theory in genus one, and the Gelfand-Dikii wave function</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">Quasi-$F^{\infty}$-split height versus quasi-$F$-regular height for rational double points and graded rings</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">Duality between Bott-Chern and Aeppli Cohomology on Non-Compact Complex Manifolds</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">Weight filtration of Hurwitz spaces and quantum shuffle algebras</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">Hyperbolic Embeddings in Toric Geometry: Effectivity and Deformation Stability</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">High Frobenius pushforwards generate the bounded derived category</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">On toric and toroidal foliations</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">The point insertion technique and open $r$-spin theories I: moduli and orientation</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">Degree two Gopakumar-Vafa invariants of local curves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">Joint deformations of manifolds, coherent sheaves and sections</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">On the universal curve with unordered marked points in positive characteristic</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Nondegeneracy and Sato-Tate Distributions of Two Families of Jacobian Varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">Algebraic and Algorithmic Methods for Computing Polynomial Loop Invariants</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-21" onchange="updateSelectedCount()">
+            <span class="title-number">21.</span>
+            <a href="#paper-21">Lattice points in polytope boundaries and formal geometric quantization of singular Calabi Yau hypersurfaces in toric varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-22" onchange="updateSelectedCount()">
+            <span class="title-number">22.</span>
+            <a href="#paper-22">Hall induction for cotangent representations and wheel conditions</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Simple Cohomology bundles on multiprojective spaces", "author": "Damian Maingi", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.03264", "summary": "arXiv:2601.03264v1 Announce Type: new \nAbstract: We prove stability of the kernel bundle and prove that the cohomology bundle is simple for vector bundles associated to monads on $X = (\\mathbb{P}^{n_1})^2\\times\\cdots\\times(\\mathbb{P}^{n_s})^2$ for an ample line bundle $\\mathscr{L}=\\mathcal{O}_X(\\alpha_1,\\alpha_1,\\cdots,\\alpha_s,\\alpha_s)$.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2601.03264" target="_blank">Simple Cohomology bundles on multiprojective spaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Damian Maingi</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.03264" target="_blank">https://arxiv.org/abs/2601.03264</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove stability of the kernel bundle and prove that the cohomology bundle is simple for vector bundles associated to monads on $X = (\mathbb{P}^{n_1})^2\times\cdots\times(\mathbb{P}^{n_s})^2$ for an ample line bundle $\mathscr{L}=\mathcal{O}_X(\alpha_1,\alpha_1,\cdots,\alpha_s,\alpha_s)$.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "On the Ulrichness of twisted syzygies and dual syzygies bundles", "author": "H. Torres L\\'opez, Alexis G. Zamora", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.03406", "summary": "arXiv:2601.03406v1 Announce Type: new \nAbstract: Given a projective variety $X$ and a very ample line bundle $\\mathcal{L}$ on $X$, we classify for which $X$ and $\\mathcal{L}$ the twisted syzygies and twisted dual syzygies bundles are Ulrich with respect to the polarizations $\\mathcal{L}^a$. We obtain some partial results when considering an arbitrary polarization $H$.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2601.03406" target="_blank">On the Ulrichness of twisted syzygies and dual syzygies bundles</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> H. Torres L\'opez, Alexis G. Zamora</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.03406" target="_blank">https://arxiv.org/abs/2601.03406</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Given a projective variety $X$ and a very ample line bundle $\mathcal{L}$ on $X$, we classify for which $X$ and $\mathcal{L}$ the twisted syzygies and twisted dual syzygies bundles are Ulrich with respect to the polarizations $\mathcal{L}^a$. We obtain some partial results when considering an arbitrary polarization $H$.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Surfaces of general type and sl_2-triples", "author": "Stefan Schr\\\"oer, Nikolaos Tziolas", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.03691", "summary": "arXiv:2601.03691v1 Announce Type: new \nAbstract: The sl_2-triples play a fundamental role for the structure theory of Lie algebras, and representation theory in general. Here we investigate sl_2-triples of global vector fields on schemes X in positive characteristics p&gt;0, and develop a general theory for actions of the corresponding height-one group scheme G=SL_2[F]. Sending a point to the Lie algebra of its stabilizer defines rational maps to various Grassmann varieties. For surfaces of general type, this yields fibrations in curves of genus g at least 2 over the projective line. Using properties of the corresponding moduli stack M_g, we prove that there are no smooth surfaces of general type with an sl_2-triple. On the other hand, employing Lefschetz pencils and Frobenius pullbacks we show that canonical surfaces of general type with such triples exist in abundance. In this connection, we classify the rational double points where the tangent sheaf is free or the evaluation pairing with K\\\"ahler differentials is surjetive, including characteristic two.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2601.03691" target="_blank">Surfaces of general type and sl_2-triples</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Stefan Schr\"oer, Nikolaos Tziolas</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.03691" target="_blank">https://arxiv.org/abs/2601.03691</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The sl_2-triples play a fundamental role for the structure theory of Lie algebras, and representation theory in general. Here we investigate sl_2-triples of global vector fields on schemes X in positive characteristics p&gt;0, and develop a general theory for actions of the corresponding height-one group scheme G=SL_2[F]. Sending a point to the Lie algebra of its stabilizer defines rational maps to various Grassmann varieties. For surfaces of general type, this yields fibrations in curves of genus g at least 2 over the projective line. Using properties of the corresponding moduli stack M_g, we prove that there are no smooth surfaces of general type with an sl_2-triple. On the other hand, employing Lefschetz pencils and Frobenius pullbacks we show that canonical surfaces of general type with such triples exist in abundance. In this connection, we classify the rational double points where the tangent sheaf is free or the evaluation pairing with K\"ahler differentials is surjetive, including characteristic two.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "Residue Balancing on Singular Curves", "author": "Mounir Nisse", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.03816", "summary": "arXiv:2601.03816v1 Announce Type: new \nAbstract: This paper investigates residue maps and their spanning properties for singular algebraic curves, with particular emphasis on three interconnected themes: the \\emph{scheme--theoretic residue span}, the \\emph{residue--balancing principle}, and \\emph{residue balancing in the presence of arbitrary singularities}. Starting from the theory of dualizing sheaves on nodal curves, we reinterpret canonical and higher--order differentials as meromorphic objects on the normalization whose local principal parts are constrained by explicit residue conditions. A key result is the scheme--theoretic residue span theorem, which asserts that %\nfor nodal curves of geometric genus $g$ with $\\delta$ nodes, when $\\delta \\ge g$ the residue functionals at the nodes span $H^0(C,\\omega_C)^\\vee$, so canonical differentials are completely determined by their residue data. This provides a concrete, linear description of $H^0(C,\\omega_C)$ and yields powerful applications to deformation theory, Severi varieties, and moduli problems.\n  \\vspace{0.1cm}\n  We then develop the residue--balancing principle, showing that global residue conditions on each irreducible component of a singular curve are equivalent to local balancing conditions at the singular points. This equivalence clarifies the local--to--global structure of dualizing sheaves and extends naturally to $k$--differentials. Finally, we address the case of arbitrary singularities, where nodes no longer suffice to describe local geometry. Using normalization and the conductor ideal, we formulate a refined balancing principle that replaces simple residue cancellation by higher--order and conductor--level constraints. Together, these results provide a unified framework for understanding how local singular behavior governs global differentials and their deformations.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2601.03816" target="_blank">Residue Balancing on Singular Curves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Mounir Nisse</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.03816" target="_blank">https://arxiv.org/abs/2601.03816</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This paper investigates residue maps and their spanning properties for singular algebraic curves, with particular emphasis on three interconnected themes: the \emph{scheme--theoretic residue span}, the \emph{residue--balancing principle}, and \emph{residue balancing in the presence of arbitrary singularities}. Starting from the theory of dualizing sheaves on nodal curves, we reinterpret canonical and higher--order differentials as meromorphic objects on the normalization whose local principal parts are constrained by explicit residue conditions. A key result is the scheme--theoretic residue span theorem, which asserts that %
+for nodal curves of geometric genus $g$ with $\delta$ nodes, when $\delta \ge g$ the residue functionals at the nodes span $H^0(C,\omega_C)^\vee$, so canonical differentials are completely determined by their residue data. This provides a concrete, linear description of $H^0(C,\omega_C)$ and yields powerful applications to deformation theory, Severi varieties, and moduli problems.
+  \vspace{0.1cm}
+  We then develop the residue--balancing principle, showing that global residue conditions on each irreducible component of a singular curve are equivalent to local balancing conditions at the singular points. This equivalence clarifies the local--to--global structure of dualizing sheaves and extends naturally to $k$--differentials. Finally, we address the case of arbitrary singularities, where nodes no longer suffice to describe local geometry. Using normalization and the conductor ideal, we formulate a refined balancing principle that replaces simple residue cancellation by higher--order and conductor--level constraints. Together, these results provide a unified framework for understanding how local singular behavior governs global differentials and their deformations.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "Thomason condition for regular algebraic stacks", "author": "Pat Lank", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.04053", "summary": "arXiv:2601.04053v1 Announce Type: new \nAbstract: We show that any immersion into a concentrated regular Noetherian algebraic stack with quasi-finite and locally separated diagonal satisfies the Thomason condition. In particular, the derived category of quasi-coherent sheaves on such an algebraic stack is singly compactly generated. This extends results of Hall--Rydh from separated to locally separated diagonal, under additional regularity hypotheses.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2601.04053" target="_blank">Thomason condition for regular algebraic stacks</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Pat Lank</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.04053" target="_blank">https://arxiv.org/abs/2601.04053</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We show that any immersion into a concentrated regular Noetherian algebraic stack with quasi-finite and locally separated diagonal satisfies the Thomason condition. In particular, the derived category of quasi-coherent sheaves on such an algebraic stack is singly compactly generated. This extends results of Hall--Rydh from separated to locally separated diagonal, under additional regularity hypotheses.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "AKSZ construction for shifted Poisson structures", "author": "Nikola Tomi\\'c", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.04064", "summary": "arXiv:2601.04064v1 Announce Type: new \nAbstract: We prove the AKSZ theorem for shifted Poisson structures: if $X$ is an $n$-shifted Poisson derived stack, and $Y$ a $d$-oriented derived stack, then the mapping stack\n  \\[\\underline{\\mathrm{Map}}(Y,X)\\]\n  is naturally endowed with an $(n-d)$-shifted Poisson structure. For this, we prove that the data of an $n$-shifted Poisson structure on a derived Artin stack is equivalent to the data of an $(n+1)$-shifted Lagrangian thickening of it. We also extend the definition of shifted Poisson structures to derived prestacks having a deformation theory and give two applications, one for mapping stacks with a non-proper source and one in BV formalism.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2601.04064" target="_blank">AKSZ construction for shifted Poisson structures</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Nikola Tomi\'c</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.04064" target="_blank">https://arxiv.org/abs/2601.04064</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove the AKSZ theorem for shifted Poisson structures: if $X$ is an $n$-shifted Poisson derived stack, and $Y$ a $d$-oriented derived stack, then the mapping stack
+  \[\underline{\mathrm{Map}}(Y,X)\]
+  is naturally endowed with an $(n-d)$-shifted Poisson structure. For this, we prove that the data of an $n$-shifted Poisson structure on a derived Artin stack is equivalent to the data of an $(n+1)$-shifted Lagrangian thickening of it. We also extend the definition of shifted Poisson structures to derived prestacks having a deformation theory and give two applications, one for mapping stacks with a non-proper source and one in BV formalism.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Automorphisms of odd dimensional $(2,2)$-complete intersections in characteristic $2$", "author": "Yang Zhang", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.04109", "summary": "arXiv:2601.04109v1 Announce Type: new \nAbstract: We compute the automorphism schemes of smooth odd dimensional $(2,2)$-complete intersections in characteristic $2$. This is the only case for complete intersections having a non-trivial identity component in automorphism schemes apart from quadric hypersurfaces and genus $1$ curves.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2601.04109" target="_blank">Automorphisms of odd dimensional $(2,2)$-complete intersections in characteristic $2$</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yang Zhang</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.04109" target="_blank">https://arxiv.org/abs/2601.04109</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We compute the automorphism schemes of smooth odd dimensional $(2,2)$-complete intersections in characteristic $2$. This is the only case for complete intersections having a non-trivial identity component in automorphism schemes apart from quadric hypersurfaces and genus $1$ curves.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Open $r$-spin theory in genus one, and the Gelfand-Dikii wave function", "author": "Ran J. Tessler, Yizhen Zhao", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.04114", "summary": "arXiv:2601.04114v1 Announce Type: new \nAbstract: We construct the $g=1$ sector of the open $r$-spin theory, that is, an open $r$-spin theory on the moduli space of cylinders. This is the second construction of a $g&gt;0$ open intersection theory, which includes descendents (the first is the all genus construction of the intersection theory on moduli of open Riemann surfaces with boundaries [23,30], whose $g=1$ case equals to the $r=2$ case of our construction). Unlike the construction of [30], in order to construct the $r$-spin cylinder theory we had to overcome the foundational problem of dimension jump loci, which in analogous closed theories has been treated using virtual fundamental class techniques, that are currently absent in the open setting. For this reason our construction is much more involved, and relies on the point insertion technique developed in [31,32].\n  We prove that the open $g=1$ potential equals, after a coordinate change, to the $g=1$ part of the Gelfand-Dikii wave function, thus confirming a conjecture of [7]. We also prove that our $g=1$ intersection numbers satisfy a $g=1$ recursion, also predicted in [7,15]. This recursion is the $g=1$ analogue of Solomon's famous $g=0$ Open WDVV equation [25], with descendents, and is also the universal $g=1$ recursion for $F$-Cohomological field theories [1]. Again, this is first geometric construction which is not the $g=1$ sector of [23,30], proven to satisfy this universal recursion.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2601.04114" target="_blank">Open $r$-spin theory in genus one, and the Gelfand-Dikii wave function</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ran J. Tessler, Yizhen Zhao</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.04114" target="_blank">https://arxiv.org/abs/2601.04114</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We construct the $g=1$ sector of the open $r$-spin theory, that is, an open $r$-spin theory on the moduli space of cylinders. This is the second construction of a $g&gt;0$ open intersection theory, which includes descendents (the first is the all genus construction of the intersection theory on moduli of open Riemann surfaces with boundaries [23,30], whose $g=1$ case equals to the $r=2$ case of our construction). Unlike the construction of [30], in order to construct the $r$-spin cylinder theory we had to overcome the foundational problem of dimension jump loci, which in analogous closed theories has been treated using virtual fundamental class techniques, that are currently absent in the open setting. For this reason our construction is much more involved, and relies on the point insertion technique developed in [31,32].
+  We prove that the open $g=1$ potential equals, after a coordinate change, to the $g=1$ part of the Gelfand-Dikii wave function, thus confirming a conjecture of [7]. We also prove that our $g=1$ intersection numbers satisfy a $g=1$ recursion, also predicted in [7,15]. This recursion is the $g=1$ analogue of Solomon's famous $g=0$ Open WDVV equation [25], with descendents, and is also the universal $g=1$ recursion for $F$-Cohomological field theories [1]. Again, this is first geometric construction which is not the $g=1$ sector of [23,30], proven to satisfy this universal recursion.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "Quasi-$F^{\\infty}$-split height versus quasi-$F$-regular height for rational double points and graded rings", "author": "Teppei Takamatsu, Shou Yoshikawa", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.03491", "summary": "arXiv:2601.03491v1 Announce Type: cross \nAbstract: In this paper, we study a phenomenon concerning quasi-$F$-singularities: under suitable hypotheses, the finiteness of the quasi-$F^{\\infty}$-split height ($\\mathrm{ht}^{\\infty}$) implies quasi-$F$-regularity, and moreover, $\\mathrm{ht}^{\\infty}$ coincides with the quasi-$F$-regular height ($\\mathrm{ht}^{\\mathrm{reg}}$). We establish this coincidence for two important classes of isolated Gorenstein singularities. First, we explicitly compute $\\mathrm{ht}^{\\infty}$ and $\\mathrm{ht}^{\\mathrm{reg}}$ for all rational double points, showing that every non-$F$-pure rational double point satisfies $\\mathrm{ht}^\\infty = \\mathrm{ht}^{\\mathrm{reg}}$. Second, for localizations of graded non-$F$-pure normal Gorenstein rings with $F$-rational punctured spectrum, we again obtain the equality $\\mathrm{ht}^\\infty = \\mathrm{ht}^{\\mathrm{reg}}$.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2601.03491" target="_blank">Quasi-$F^{\infty}$-split height versus quasi-$F$-regular height for rational double points and graded rings</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Teppei Takamatsu, Shou Yoshikawa</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.03491" target="_blank">https://arxiv.org/abs/2601.03491</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we study a phenomenon concerning quasi-$F$-singularities: under suitable hypotheses, the finiteness of the quasi-$F^{\infty}$-split height ($\mathrm{ht}^{\infty}$) implies quasi-$F$-regularity, and moreover, $\mathrm{ht}^{\infty}$ coincides with the quasi-$F$-regular height ($\mathrm{ht}^{\mathrm{reg}}$). We establish this coincidence for two important classes of isolated Gorenstein singularities. First, we explicitly compute $\mathrm{ht}^{\infty}$ and $\mathrm{ht}^{\mathrm{reg}}$ for all rational double points, showing that every non-$F$-pure rational double point satisfies $\mathrm{ht}^\infty = \mathrm{ht}^{\mathrm{reg}}$. Second, for localizations of graded non-$F$-pure normal Gorenstein rings with $F$-rational punctured spectrum, we again obtain the equality $\mathrm{ht}^\infty = \mathrm{ht}^{\mathrm{reg}}$.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "Duality between Bott-Chern and Aeppli Cohomology on Non-Compact Complex Manifolds", "author": "Xiaojun Wu", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.03529", "summary": "arXiv:2601.03529v1 Announce Type: cross \nAbstract: In this paper we establish duality theorems relating Bott-Chern and Aeppli cohomology, both with and without compact support, on non-compact complex manifolds under suitable pseudoconvexity assumptions. In particular, on Stein manifolds we obtain a full Bott-Chern-Aeppli duality extending Serre duality for Dolbeault cohomology. We also show that these results fail in general without pseudoconvexity assumptions by constructing explicit counterexamples on non-compact complex surfaces.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2601.03529" target="_blank">Duality between Bott-Chern and Aeppli Cohomology on Non-Compact Complex Manifolds</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Xiaojun Wu</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.03529" target="_blank">https://arxiv.org/abs/2601.03529</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper we establish duality theorems relating Bott-Chern and Aeppli cohomology, both with and without compact support, on non-compact complex manifolds under suitable pseudoconvexity assumptions. In particular, on Stein manifolds we obtain a full Bott-Chern-Aeppli duality extending Serre duality for Dolbeault cohomology. We also show that these results fail in general without pseudoconvexity assumptions by constructing explicit counterexamples on non-compact complex surfaces.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "Weight filtration of Hurwitz spaces and quantum shuffle algebras", "author": "Zhao Yu Ma", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.03871", "summary": "arXiv:2601.03871v1 Announce Type: cross \nAbstract: We prove an equivalence between filtrations of primitive bialgebras and filtrations of factorizable perverse sheaves, generalizing the results obtained by Kapranov-Schechtman. Under this equivalence, we find that the word length filtration of quantum shuffle algebras as defined in Ellenberg-Tran-Westerland corresponds to the codimension filtration of factorizable perverse sheaves. Furthermore, we find that the geometric weight filtration of factorizable perverse sheaves corresponds to a filtration on quantum shuffle algebras which has not been previously defined in the literature, and we call this the algebraic weight filtration. To apply this to Hurwitz spaces, we prove a comparison theorem between the weight filtrations for Hurwitz spaces over $\\mathbb F_p$ and $\\mathbb C$, generalizing the comparison theorem of Ellenberg-Venkatesh-Westerland. This allows us to determine the cohomological weights for Hurwitz spaces explicitly using the algebraic weight filtration of the corresponding quantum shuffle algebra. As a consequence, we find that most weights of Hurwitz spaces are smaller than expected from cohomological degree, and we prove explicit nontrivial upper bounds for weights in some cases, such as when $G=S_3$ and $c$ is the conjugacy class of transpositions.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2601.03871" target="_blank">Weight filtration of Hurwitz spaces and quantum shuffle algebras</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Zhao Yu Ma</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.03871" target="_blank">https://arxiv.org/abs/2601.03871</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove an equivalence between filtrations of primitive bialgebras and filtrations of factorizable perverse sheaves, generalizing the results obtained by Kapranov-Schechtman. Under this equivalence, we find that the word length filtration of quantum shuffle algebras as defined in Ellenberg-Tran-Westerland corresponds to the codimension filtration of factorizable perverse sheaves. Furthermore, we find that the geometric weight filtration of factorizable perverse sheaves corresponds to a filtration on quantum shuffle algebras which has not been previously defined in the literature, and we call this the algebraic weight filtration. To apply this to Hurwitz spaces, we prove a comparison theorem between the weight filtrations for Hurwitz spaces over $\mathbb F_p$ and $\mathbb C$, generalizing the comparison theorem of Ellenberg-Venkatesh-Westerland. This allows us to determine the cohomological weights for Hurwitz spaces explicitly using the algebraic weight filtration of the corresponding quantum shuffle algebra. As a consequence, we find that most weights of Hurwitz spaces are smaller than expected from cohomological degree, and we prove explicit nontrivial upper bounds for weights in some cases, such as when $G=S_3$ and $c$ is the conjugacy class of transpositions.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "Hyperbolic Embeddings in Toric Geometry: Effectivity and Deformation Stability", "author": "Jaewon Yoo, Gunhee Cho", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2111.02192", "summary": "arXiv:2111.02192v4 Announce Type: replace \nAbstract: We study the deformation behavior of Kobayashi hyperbolic embeddings for complements of divisors in projective toric varieties. In the toric setting, entire curves in divisor complements propagate along algebraic subtori, allowing hyperbolicity questions to be translated into combinatorial conditions on lattice-point configurations of Newton polytopes. Building on a theorem of Tiba, which guarantees hyperbolic embedding for a general divisor under suitable facewise lattice conditions, we develop an effective refinement of his argument. We construct an explicit Zariski closed exceptional locus in the coefficient parameter space, characterized by the presence of translated subtori in the support or complement of the divisor. This description makes the exceptional set amenable to explicit computation. Using this effectivity, we prove a deformation stability result: along any algebraic one--parameter family of divisors whose initial member avoids the exceptional locus, hyperbolic embedding fails for at most finitely many parameters. Under strengthened lattice-point hypotheses, we further exhibit distinguished one--parameter families for which hyperbolic embedding persists without any exceptional parameters. We also analyze deformations arising from diagonal torus reparametrizations, showing that the number of exceptional parameters in such similarity families is controlled by a simple multiplicative rank invariant of the scaling vector. Finally, we illustrate the theory through explicit examples in projective spaces and Hirzebruch surfaces, including a benchmark computation in $\\mathbb{P}^3$ where the exceptional locus contains a hypersurface component of degree $126$.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2111.02192" target="_blank">Hyperbolic Embeddings in Toric Geometry: Effectivity and Deformation Stability</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jaewon Yoo, Gunhee Cho</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2111.02192" target="_blank">https://arxiv.org/abs/2111.02192</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the deformation behavior of Kobayashi hyperbolic embeddings for complements of divisors in projective toric varieties. In the toric setting, entire curves in divisor complements propagate along algebraic subtori, allowing hyperbolicity questions to be translated into combinatorial conditions on lattice-point configurations of Newton polytopes. Building on a theorem of Tiba, which guarantees hyperbolic embedding for a general divisor under suitable facewise lattice conditions, we develop an effective refinement of his argument. We construct an explicit Zariski closed exceptional locus in the coefficient parameter space, characterized by the presence of translated subtori in the support or complement of the divisor. This description makes the exceptional set amenable to explicit computation. Using this effectivity, we prove a deformation stability result: along any algebraic one--parameter family of divisors whose initial member avoids the exceptional locus, hyperbolic embedding fails for at most finitely many parameters. Under strengthened lattice-point hypotheses, we further exhibit distinguished one--parameter families for which hyperbolic embedding persists without any exceptional parameters. We also analyze deformations arising from diagonal torus reparametrizations, showing that the number of exceptional parameters in such similarity families is controlled by a simple multiplicative rank invariant of the scaling vector. Finally, we illustrate the theory through explicit examples in projective spaces and Hirzebruch surfaces, including a benchmark computation in $\mathbb{P}^3$ where the exceptional locus contains a hypersurface component of degree $126$.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "High Frobenius pushforwards generate the bounded derived category", "author": "Matthew R. Ballard, Srikanth B. Iyengar, Pat Lank, Alapan Mukhopadhyay, Josh Pollitz", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2303.18085", "summary": "arXiv:2303.18085v3 Announce Type: replace \nAbstract: This work concerns generators for the bounded derived category of coherent sheaves over a noetherian scheme $X$ of prime characteristic. The main result is that when the Frobenius map on $X$ is finite, for any compact generator $G$ of $\\mathsf{D}(X)$ the Frobenius pushforward $F ^e_*G$ generates the bounded derived category whenever $p^e$ is larger than the codepth of $X$, an invariant that is a measure of the singularity of $X$. The conclusion holds for all positive integers $e$ when $X$ is locally complete intersection. The question of when one can take $G=\\mathcal{O}_X$ is also investigated. For smooth projective complete intersections it reduces to a question of generation of the Kuznetsov component.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2303.18085" target="_blank">High Frobenius pushforwards generate the bounded derived category</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Matthew R. Ballard, Srikanth B. Iyengar, Pat Lank, Alapan Mukhopadhyay, Josh Pollitz</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2303.18085" target="_blank">https://arxiv.org/abs/2303.18085</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This work concerns generators for the bounded derived category of coherent sheaves over a noetherian scheme $X$ of prime characteristic. The main result is that when the Frobenius map on $X$ is finite, for any compact generator $G$ of $\mathsf{D}(X)$ the Frobenius pushforward $F ^e_*G$ generates the bounded derived category whenever $p^e$ is larger than the codepth of $X$, an invariant that is a measure of the singularity of $X$. The conclusion holds for all positive integers $e$ when $X$ is locally complete intersection. The question of when one can take $G=\mathcal{O}_X$ is also investigated. For smooth projective complete intersections it reduces to a question of generation of the Kuznetsov component.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "On toric and toroidal foliations", "author": "Chih-Wei Chang, Yen-An Chen", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2308.05053", "summary": "arXiv:2308.05053v4 Announce Type: replace \nAbstract: In this paper, we provide toric descriptions for various foliation singularities on toric varieties, especially for non-dicritical singularities and F-dlt singularities. We then show that the toric foliated minimal model program works by demonstrating that non-dicritical singularities and F-dlt singularities are preserved.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2308.05053" target="_blank">On toric and toroidal foliations</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Chih-Wei Chang, Yen-An Chen</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2308.05053" target="_blank">https://arxiv.org/abs/2308.05053</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we provide toric descriptions for various foliation singularities on toric varieties, especially for non-dicritical singularities and F-dlt singularities. We then show that the toric foliated minimal model program works by demonstrating that non-dicritical singularities and F-dlt singularities are preserved.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "The point insertion technique and open $r$-spin theories I: moduli and orientation", "author": "Ran J. Tessler, Yizhen Zhao", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2310.13185", "summary": "arXiv:2310.13185v3 Announce Type: replace \nAbstract: The papers [3,1,4,10] constructed an intersection theory on the moduli space of $r$-spin disks, proving mirror symmetry and relations with integrable hierarchies. That theory considered only disks with a single boundary state.In this work, we initiate the study of more general $r$-spin surfaces. We define graded $r$-spin surfaces with multiple internal and boundary states, together with their moduli spaces.\n  In genus zero, the disk case, we define the associated open Witten bundle and prove that it is canonically oriented relative to the moduli space. We also describe a gluing construction for moduli spaces along boundaries, show that it lifts to the Witten bundle and relative cotangent line bundles, and that the result remains canonically relatively oriented.\n  We then study the genus-one cylinder case. Here foundational difficulties arise because the Witten \"bundle\" is no longer an orbifold vector bundle. We resolve this by removing strata with incorrect fibre dimension, obtaining an orbibundle on the complement. The gluing method extends to genus one, and we prove that the Witten bundle again admits a canonical relative orientation.\n  In the sequel [21], we construct a family of $\\lfloor r/2\\rfloor$ intersection theories in genus-zero indexed by $\\mathfrak h\\in\\{0,\\ldots,\\lfloor r/2\\rfloor-1\\}$, where the $\\mathfrak h$-th theory has $\\mathfrak h+1$ boundary states, and compute their intersection numbers. The case $\\mathfrak h=0$ recovers the theory of [3,1].\n  In the sequel [20], restricting to the $\\mathfrak h=0$ case, we construct an intersection theory on the moduli space of $r$-spin cylinders and show that its potential yields, after a change of variables, the genus-one part of the $r$th Gelfand-Dikii wave function, proving the genus-one case of the main conjecture of [4].", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2310.13185" target="_blank">The point insertion technique and open $r$-spin theories I: moduli and orientation</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ran J. Tessler, Yizhen Zhao</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2310.13185" target="_blank">https://arxiv.org/abs/2310.13185</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The papers [3,1,4,10] constructed an intersection theory on the moduli space of $r$-spin disks, proving mirror symmetry and relations with integrable hierarchies. That theory considered only disks with a single boundary state.In this work, we initiate the study of more general $r$-spin surfaces. We define graded $r$-spin surfaces with multiple internal and boundary states, together with their moduli spaces.
+  In genus zero, the disk case, we define the associated open Witten bundle and prove that it is canonically oriented relative to the moduli space. We also describe a gluing construction for moduli spaces along boundaries, show that it lifts to the Witten bundle and relative cotangent line bundles, and that the result remains canonically relatively oriented.
+  We then study the genus-one cylinder case. Here foundational difficulties arise because the Witten "bundle" is no longer an orbifold vector bundle. We resolve this by removing strata with incorrect fibre dimension, obtaining an orbibundle on the complement. The gluing method extends to genus one, and we prove that the Witten bundle again admits a canonical relative orientation.
+  In the sequel [21], we construct a family of $\lfloor r/2\rfloor$ intersection theories in genus-zero indexed by $\mathfrak h\in\{0,\ldots,\lfloor r/2\rfloor-1\}$, where the $\mathfrak h$-th theory has $\mathfrak h+1$ boundary states, and compute their intersection numbers. The case $\mathfrak h=0$ recovers the theory of [3,1].
+  In the sequel [20], restricting to the $\mathfrak h=0$ case, we construct an intersection theory on the moduli space of $r$-spin cylinders and show that its potential yields, after a change of variables, the genus-one part of the $r$th Gelfand-Dikii wave function, proving the genus-one case of the main conjecture of [4].
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "Degree two Gopakumar-Vafa invariants of local curves", "author": "Ben Davison, Naoki Koseki", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2408.11698", "summary": "arXiv:2408.11698v4 Announce Type: replace \nAbstract: We investigate the Gopakumar-Vafa (GV) theory of local curves, namely, the total spaces of rank two vector bundles with canonical determinant on smooth projective curves. Under a certain genericity condition on the rank two bundles, we propose a general mechanism to compute the degree two GV invariants of local curves. In particular, we determine all the degree two GV invariants when the base curve has genus two. Combined with previous work by Bryan and Pandharipande, we obtain the GV/GW correspondence in this case. When the base curve has genus greater than two, we calculate GV invariants for some extremal genera, providing evidence for the GV/GW conjecture for curves of higher genus.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2408.11698" target="_blank">Degree two Gopakumar-Vafa invariants of local curves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ben Davison, Naoki Koseki</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2408.11698" target="_blank">https://arxiv.org/abs/2408.11698</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We investigate the Gopakumar-Vafa (GV) theory of local curves, namely, the total spaces of rank two vector bundles with canonical determinant on smooth projective curves. Under a certain genericity condition on the rank two bundles, we propose a general mechanism to compute the degree two GV invariants of local curves. In particular, we determine all the degree two GV invariants when the base curve has genus two. Combined with previous work by Bryan and Pandharipande, we obtain the GV/GW correspondence in this case. When the base curve has genus greater than two, we calculate GV invariants for some extremal genera, providing evidence for the GV/GW conjecture for curves of higher genus.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "Joint deformations of manifolds, coherent sheaves and sections", "author": "Donatella Iacono, Marco Manetti", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2507.20276", "summary": "arXiv:2507.20276v3 Announce Type: replace \nAbstract: We describe a differential graded Lie algebra controlling infinitesimal deformations of triples $(X,\\mathcal{F},\\sigma)$, where $\\mathcal{F}$ is a coherent sheaf on a smooth variety $X$ over an algebraically closed field of characteristic 0 and $\\sigma\\in H^0(X,\\mathcal{F})$. Then, we apply this result to investigate deformations of pairs (variety, divisor).", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2507.20276" target="_blank">Joint deformations of manifolds, coherent sheaves and sections</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Donatella Iacono, Marco Manetti</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2507.20276" target="_blank">https://arxiv.org/abs/2507.20276</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We describe a differential graded Lie algebra controlling infinitesimal deformations of triples $(X,\mathcal{F},\sigma)$, where $\mathcal{F}$ is a coherent sheaf on a smooth variety $X$ over an algebraically closed field of characteristic 0 and $\sigma\in H^0(X,\mathcal{F})$. Then, we apply this result to investigate deformations of pairs (variety, divisor).
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "On the universal curve with unordered marked points in positive characteristic", "author": "Ma Luo, Tatsunari Watanabe", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.01336", "summary": "arXiv:2601.01336v3 Announce Type: replace \nAbstract: We study the relative pro-$\\ell$ and continuous relative completions of the algebraic fundamental groups of universal curves over the moduli stack of curves with unordered marked points in positive characteristic. Using specialization and homotopy exact sequences, we compare the ordered and unordered settings and prove that the natural projection from the relative completion of the universal curve over the unordered moduli stack admits no section in positive characteristic. This yields a non-splitting result for the corresponding projection on algebraic fundamental groups. The present paper is a sequel to our earlier work in characteristic zero.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2601.01336" target="_blank">On the universal curve with unordered marked points in positive characteristic</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ma Luo, Tatsunari Watanabe</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.01336" target="_blank">https://arxiv.org/abs/2601.01336</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the relative pro-$\ell$ and continuous relative completions of the algebraic fundamental groups of universal curves over the moduli stack of curves with unordered marked points in positive characteristic. Using specialization and homotopy exact sequences, we compare the ordered and unordered settings and prove that the natural projection from the relative completion of the universal curve over the unordered moduli stack admits no section in positive characteristic. This yields a non-splitting result for the corresponding projection on algebraic fundamental groups. The present paper is a sequel to our earlier work in characteristic zero.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Nondegeneracy and Sato-Tate Distributions of Two Families of Jacobian Varieties", "author": "Melissa Emory, Heidi Goodson", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2401.06208", "summary": "arXiv:2401.06208v2 Announce Type: replace-cross \nAbstract: We consider the curves $y^2=x^{2^m} -1$ and $y^2=x^{2^{d}+1}-x$ over the rationals. These curves are related via their associated Jacobian varieties in that the Jacobians of the latter appear as factors of the Jacobians of the former. One of the principal aims of this paper is to fully describe their Sato-Tate groups and distributions by determining generators of the component groups. In order to do this, we first prove the nondegeneracy of the two families of Jacobian varieties via their Hodge groups. We then use results relating Sato-Tate groups and twisted Lefschetz groups of nondegenerate abelian varieties to determine the generators of the associated Sato-Tate groups. The results of this paper add new examples to the literature of families of nondegenerate Jacobian varieties and of noncyclic component groups of Sato-Tate groups. Furthermore, we compute moment statistics associated to the Sato-Tate groups which can be used to verify the equidistribution statement of the generalized Sato-Tate conjecture by comparing them to moment statistics obtained for the traces in the normalized $L$-polynomials of the curves.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2401.06208" target="_blank">Nondegeneracy and Sato-Tate Distributions of Two Families of Jacobian Varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Melissa Emory, Heidi Goodson</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2401.06208" target="_blank">https://arxiv.org/abs/2401.06208</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We consider the curves $y^2=x^{2^m} -1$ and $y^2=x^{2^{d}+1}-x$ over the rationals. These curves are related via their associated Jacobian varieties in that the Jacobians of the latter appear as factors of the Jacobians of the former. One of the principal aims of this paper is to fully describe their Sato-Tate groups and distributions by determining generators of the component groups. In order to do this, we first prove the nondegeneracy of the two families of Jacobian varieties via their Hodge groups. We then use results relating Sato-Tate groups and twisted Lefschetz groups of nondegenerate abelian varieties to determine the generators of the associated Sato-Tate groups. The results of this paper add new examples to the literature of families of nondegenerate Jacobian varieties and of noncyclic component groups of Sato-Tate groups. Furthermore, we compute moment statistics associated to the Sato-Tate groups which can be used to verify the equidistribution statement of the generalized Sato-Tate conjecture by comparing them to moment statistics obtained for the traces in the normalized $L$-polynomials of the curves.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "Algebraic and Algorithmic Methods for Computing Polynomial Loop Invariants", "author": "Erdenebayar Bayarmagnai, Fatemeh Mohammadi, R\\'emi Pr\\'ebet", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2412.14043", "summary": "arXiv:2412.14043v2 Announce Type: replace-cross \nAbstract: Loop invariants are properties of a program loop that hold both before and after each iteration of the loop. They are often used to verify programs and ensure that algorithms consistently produce correct results during execution. Consequently, generating invariants becomes a crucial task for loops. We specifically focus on polynomial loops, where both the loop conditions and the assignments within the loop are expressed as polynomials. Although computing polynomial invariants for general loops is undecidable, efficient algorithms have been developed for certain classes of loops. For instance, when all assignments within a while loop involve linear polynomials, the loop becomes solvable. In this work, we study the more general case, where the polynomials can have arbitrary degrees.\n  Using tools from algebraic geometry, we present two algorithms designed to generate all polynomial invariants within a given vector subspace, for a branching loop with nondeterministic conditional statements. These algorithms combine linear algebraic subroutines with computations on polynomial ideals. They differ depending on whether the initial values of the loop variables are specified or treated as parameters. Additionally, we present a much more efficient algorithm for generating polynomial invariants of a specific form, applicable to all initial values. This algorithm avoids expensive ideal computations.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2412.14043" target="_blank">Algebraic and Algorithmic Methods for Computing Polynomial Loop Invariants</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Erdenebayar Bayarmagnai, Fatemeh Mohammadi, R\'emi Pr\'ebet</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2412.14043" target="_blank">https://arxiv.org/abs/2412.14043</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Loop invariants are properties of a program loop that hold both before and after each iteration of the loop. They are often used to verify programs and ensure that algorithms consistently produce correct results during execution. Consequently, generating invariants becomes a crucial task for loops. We specifically focus on polynomial loops, where both the loop conditions and the assignments within the loop are expressed as polynomials. Although computing polynomial invariants for general loops is undecidable, efficient algorithms have been developed for certain classes of loops. For instance, when all assignments within a while loop involve linear polynomials, the loop becomes solvable. In this work, we study the more general case, where the polynomials can have arbitrary degrees.
+  Using tools from algebraic geometry, we present two algorithms designed to generate all polynomial invariants within a given vector subspace, for a branching loop with nondeterministic conditional statements. These algorithms combine linear algebraic subroutines with computations on polynomial ideals. They differ depending on whether the initial values of the loop variables are specified or treated as parameters. Additionally, we present a much more efficient algorithm for generating polynomial invariants of a specific form, applicable to all initial values. This algorithm avoids expensive ideal computations.
+            </div>
+        </div>
+        <div class="paper" id="paper-21">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-21" data-paper-data='{"title": "Lattice points in polytope boundaries and formal geometric quantization of singular Calabi Yau hypersurfaces in toric varieties", "author": "Jonathan Weitsman", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2504.19775", "summary": "arXiv:2504.19775v3 Announce Type: replace-cross \nAbstract: We show that the number of lattice points in the boundary of a positive integer dilate of a Delzant integral polytope is a polynomial in the dilation parameter, analogous to the Ehrhart polynomial giving the number of lattice points in a lattice polytope. We give an explicit formula for this polynomial, analogous to the formula of Khovanskii-Pukhlikov for the Ehrhart polynomial. These counting polynomials satisfy a lacunarity principle, the vanishing of alternate coefficients, quite unlike the Ehrhart polynomial. We show that formal geometric quantization of singular Calabi Yau hypersurfaces in smooth toric varieties gives this polynomial, in analogy with the relation of the Khovanskii-Pukhlikov formula to the geometric quantization of toric varieties. The Atiyah-Singer theorem for the index of the Dirac operator gives a moral argument for the lacunarity of the counting polynomial. We conjecture that similar formulas should hold for arbitrary simple integral polytope boundaries.", "number": 21, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#21</span>
+                <a href="https://arxiv.org/abs/2504.19775" target="_blank">Lattice points in polytope boundaries and formal geometric quantization of singular Calabi Yau hypersurfaces in toric varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jonathan Weitsman</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2504.19775" target="_blank">https://arxiv.org/abs/2504.19775</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We show that the number of lattice points in the boundary of a positive integer dilate of a Delzant integral polytope is a polynomial in the dilation parameter, analogous to the Ehrhart polynomial giving the number of lattice points in a lattice polytope. We give an explicit formula for this polynomial, analogous to the formula of Khovanskii-Pukhlikov for the Ehrhart polynomial. These counting polynomials satisfy a lacunarity principle, the vanishing of alternate coefficients, quite unlike the Ehrhart polynomial. We show that formal geometric quantization of singular Calabi Yau hypersurfaces in smooth toric varieties gives this polynomial, in analogy with the relation of the Khovanskii-Pukhlikov formula to the geometric quantization of toric varieties. The Atiyah-Singer theorem for the index of the Dirac operator gives a moral argument for the lacunarity of the counting polynomial. We conjecture that similar formulas should hold for arbitrary simple integral polytope boundaries.
+            </div>
+        </div>
+        <div class="paper" id="paper-22">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-22" data-paper-data='{"title": "Hall induction for cotangent representations and wheel conditions", "author": "Danil Gubarevich", "published": "Thu, 08 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.00124", "summary": "arXiv:2601.00124v2 Announce Type: replace-cross \nAbstract: In this short note we study the Hall induction of cotangent representations of reductive groups. We prove its torsion freeness in Borel-Moore homology. In K-theory we find an analog of wheel conditions verified by the image of restriction map to the fixed point and consider examples.", "number": 22, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#22</span>
+                <a href="https://arxiv.org/abs/2601.00124" target="_blank">Hall induction for cotangent representations and wheel conditions</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Danil Gubarevich</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 08 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.00124" target="_blank">https://arxiv.org/abs/2601.00124</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this short note we study the Hall induction of cotangent representations of reductive groups. We prove its torsion freeness in Borel-Moore homology. In K-theory we find an analog of wheel conditions verified by the image of restriction map to the fixed point and consider examples.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-01-08 18:00:02
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>

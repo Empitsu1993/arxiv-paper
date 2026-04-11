@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - stat.ML updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>stat.ML updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Thu, 22 Jan 2026 05:00:15 +0000<br>
+        <strong>論文数:</strong> 27件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Meta Flow Maps enable scalable reward alignment</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Large Data Limits of Laplace Learning for Gaussian Measure Data in Infinite Dimensions</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Communication-Efficient Federated Risk Difference Estimation for Time-to-Event Clinical Outcomes</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">Semi-Supervised Mixture Models under the Concept of Missing at Radom with Margin Confidence and Aranda Ordaz Function</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">Efficient and Minimax-optimal In-context Nonparametric Regression with Transformers</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">Multi-context principal component analysis</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Many Experiments, Few Repetitions, Unpaired Data, and Sparse Effects: Is Causal Inference Possible?</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">engGNN: A Dual-Graph Neural Network for Omics-Based Disease Classification and Feature Selection</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">Optimality of Staircase Mechanisms for Vector Queries under Differential Privacy</a>
+            <span class="title-label-badge" style="background-color: #ff69b4;">privacy</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">Diffusion Epistemic Uncertainty with Asymmetric Learning for Diffusion-Generated Image Detection</a>
+            <span class="title-label-badge" style="background-color: #9b59b6;">diffusion</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">TRSVR: An Adaptive Stochastic Trust-Region Method with Variance Reduction</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">Finite-Sample Inference for Sparsely Permuted Linear Regression</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">Robust Machine Learning for Regulatory Sequence Modeling under Biological and Technical Distribution Shifts</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Consistency of Honest Decision Trees and Random Forests</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Factorizable joint shift revisited</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">Online Statistical Inference for Contextual Bandits via Stochastic Gradient Descent</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">Dynamic angular synchronization under smoothness constraints</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">Whitening Spherical Gaussian Mixtures in the Large-Dimensional Regime</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Cluster-Based Generalized Additive Models Informed by Random Fourier Features</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">On the Provable Suboptimality of Momentum SGD in Nonstationary Stochastic Optimization</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-21" onchange="updateSelectedCount()">
+            <span class="title-number">21.</span>
+            <a href="#paper-21">Nonnegative Low-rank Matrix Recovery Can Have Spurious Local Minima</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-22" onchange="updateSelectedCount()">
+            <span class="title-number">22.</span>
+            <a href="#paper-22">EVT-Based Rate-Preserving Distributional Robustness for Tail Risk Functionals</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-23" onchange="updateSelectedCount()">
+            <span class="title-number">23.</span>
+            <a href="#paper-23">AI-boosted rare event sampling to characterize extreme weather</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-24" onchange="updateSelectedCount()">
+            <span class="title-number">24.</span>
+            <a href="#paper-24">Registration-Free Monitoring of Unstructured Point Cloud Data via Intrinsic Geometrical Properties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-25" onchange="updateSelectedCount()">
+            <span class="title-number">25.</span>
+            <a href="#paper-25">Causal Judge Evaluation: Calibrated Surrogate Metrics for LLM Systems</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-26" onchange="updateSelectedCount()">
+            <span class="title-number">26.</span>
+            <a href="#paper-26">Physics-Informed Singular-Value Learning for Cross-Covariances Forecasting in Financial Markets</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-27" onchange="updateSelectedCount()">
+            <span class="title-number">27.</span>
+            <a href="#paper-27">When Are Two Scores Better Than One? Investigating Ensembles of Diffusion Models</a>
+            <span class="title-label-badge" style="background-color: #9b59b6;">diffusion</span>
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Meta Flow Maps enable scalable reward alignment", "author": "Peter Potaptchik, Adhi Saravanan, Abbas Mammadov, Alvaro Prat, Michael S. Albergo, Yee Whye Teh", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.14430", "summary": "arXiv:2601.14430v1 Announce Type: new \nAbstract: Controlling generative models is computationally expensive. This is because optimal alignment with a reward function--whether via inference-time steering or fine-tuning--requires estimating the value function. This task demands access to the conditional posterior $p_{1|t}(x_1|x_t)$, the distribution of clean data $x_1$ consistent with an intermediate state $x_t$, a requirement that typically compels methods to resort to costly trajectory simulations. To address this bottleneck, we introduce Meta Flow Maps (MFMs), a framework extending consistency models and flow maps into the stochastic regime. MFMs are trained to perform stochastic one-step posterior sampling, generating arbitrarily many i.i.d. draws of clean data $x_1$ from any intermediate state. Crucially, these samples provide a differentiable reparametrization that unlocks efficient value function estimation. We leverage this capability to solve bottlenecks in both paradigms: enabling inference-time steering without inner rollouts, and facilitating unbiased, off-policy fine-tuning to general rewards. Empirically, our single-particle steered-MFM sampler outperforms a Best-of-1000 baseline on ImageNet across multiple rewards at a fraction of the compute.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2601.14430" target="_blank">Meta Flow Maps enable scalable reward alignment</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Peter Potaptchik, Adhi Saravanan, Abbas Mammadov, Alvaro Prat, Michael S. Albergo, Yee Whye Teh</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.14430" target="_blank">https://arxiv.org/abs/2601.14430</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Controlling generative models is computationally expensive. This is because optimal alignment with a reward function--whether via inference-time steering or fine-tuning--requires estimating the value function. This task demands access to the conditional posterior $p_{1|t}(x_1|x_t)$, the distribution of clean data $x_1$ consistent with an intermediate state $x_t$, a requirement that typically compels methods to resort to costly trajectory simulations. To address this bottleneck, we introduce Meta Flow Maps (MFMs), a framework extending consistency models and flow maps into the stochastic regime. MFMs are trained to perform stochastic one-step posterior sampling, generating arbitrarily many i.i.d. draws of clean data $x_1$ from any intermediate state. Crucially, these samples provide a differentiable reparametrization that unlocks efficient value function estimation. We leverage this capability to solve bottlenecks in both paradigms: enabling inference-time steering without inner rollouts, and facilitating unbiased, off-policy fine-tuning to general rewards. Empirically, our single-particle steered-MFM sampler outperforms a Best-of-1000 baseline on ImageNet across multiple rewards at a fraction of the compute.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Large Data Limits of Laplace Learning for Gaussian Measure Data in Infinite Dimensions", "author": "Zhengang Zhong, Yury Korolev, Matthew Thorpe", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.14515", "summary": "arXiv:2601.14515v1 Announce Type: new \nAbstract: Laplace learning is a semi-supervised method, a solution for finding missing labels from a partially labeled dataset utilizing the geometry given by the unlabeled data points. The method minimizes a Dirichlet energy defined on a (discrete) graph constructed from the full dataset. In finite dimensions the asymptotics in the large (unlabeled) data limit are well understood with convergence from the graph setting to a continuum Sobolev semi-norm weighted by the Lebesgue density of the data-generating measure. The lack of the Lebesgue measure on infinite-dimensional spaces requires rethinking the analysis if the data aren't finite-dimensional. In this paper we make a first step in this direction by analyzing the setting when the data are generated by a Gaussian measure on a Hilbert space and proving pointwise convergence of the graph Dirichlet energy.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2601.14515" target="_blank">Large Data Limits of Laplace Learning for Gaussian Measure Data in Infinite Dimensions</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Zhengang Zhong, Yury Korolev, Matthew Thorpe</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.14515" target="_blank">https://arxiv.org/abs/2601.14515</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Laplace learning is a semi-supervised method, a solution for finding missing labels from a partially labeled dataset utilizing the geometry given by the unlabeled data points. The method minimizes a Dirichlet energy defined on a (discrete) graph constructed from the full dataset. In finite dimensions the asymptotics in the large (unlabeled) data limit are well understood with convergence from the graph setting to a continuum Sobolev semi-norm weighted by the Lebesgue density of the data-generating measure. The lack of the Lebesgue measure on infinite-dimensional spaces requires rethinking the analysis if the data aren't finite-dimensional. In this paper we make a first step in this direction by analyzing the setting when the data are generated by a Gaussian measure on a Hilbert space and proving pointwise convergence of the graph Dirichlet energy.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Communication-Efficient Federated Risk Difference Estimation for Time-to-Event Clinical Outcomes", "author": "Ziwen Wang, Siqi Li, Marcus Eng Hock Ong, Nan Liu", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.14609", "summary": "arXiv:2601.14609v1 Announce Type: new \nAbstract: Privacy-preserving model co-training in medical research is often hindered by server-dependent architectures incompatible with protected hospital data systems and by the predominant focus on relative effect measures (hazard ratios) which lack clinical interpretability for absolute survival risk assessment. We propose FedRD, a communication-efficient framework for federated risk difference estimation in distributed survival data. Unlike typical federated learning frameworks (e.g., FedAvg) that require persistent server connections and extensive iterative communication, FedRD is server-independent with minimal communication: one round of summary statistics exchange for the stratified model and three rounds for the unstratified model. Crucially, FedRD provides valid confidence intervals and hypothesis testing--capabilities absent in FedAvg-based frameworks. We provide theoretical guarantees by establishing the asymptotic properties of FedRD and prove that FedRD (unstratified) is asymptotically equivalent to pooled individual-level analysis. Simulation studies and real-world clinical applications across different countries demonstrate that FedRD outperforms local and federated baselines in both estimation accuracy and prediction performance, providing an architecturally feasible solution for absolute risk assessment in privacy-restricted, multi-site clinical studies.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2601.14609" target="_blank">Communication-Efficient Federated Risk Difference Estimation for Time-to-Event Clinical Outcomes</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ziwen Wang, Siqi Li, Marcus Eng Hock Ong, Nan Liu</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.14609" target="_blank">https://arxiv.org/abs/2601.14609</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Privacy-preserving model co-training in medical research is often hindered by server-dependent architectures incompatible with protected hospital data systems and by the predominant focus on relative effect measures (hazard ratios) which lack clinical interpretability for absolute survival risk assessment. We propose FedRD, a communication-efficient framework for federated risk difference estimation in distributed survival data. Unlike typical federated learning frameworks (e.g., FedAvg) that require persistent server connections and extensive iterative communication, FedRD is server-independent with minimal communication: one round of summary statistics exchange for the stratified model and three rounds for the unstratified model. Crucially, FedRD provides valid confidence intervals and hypothesis testing--capabilities absent in FedAvg-based frameworks. We provide theoretical guarantees by establishing the asymptotic properties of FedRD and prove that FedRD (unstratified) is asymptotically equivalent to pooled individual-level analysis. Simulation studies and real-world clinical applications across different countries demonstrate that FedRD outperforms local and federated baselines in both estimation accuracy and prediction performance, providing an architecturally feasible solution for absolute risk assessment in privacy-restricted, multi-site clinical studies.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "Semi-Supervised Mixture Models under the Concept of Missing at Radom with Margin Confidence and Aranda Ordaz Function", "author": "Jinyang Liao, Ziyang Lyu", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.14631", "summary": "arXiv:2601.14631v1 Announce Type: new \nAbstract: This paper presents a semi-supervised learning framework for Gaussian mixture modelling under a Missing at Random (MAR) mechanism. The method explicitly parameterizes the missingness mechanism by modelling the probability of missingness as a function of classification uncertainty. To quantify classification uncertainty, we introduce margin confidence and incorporate the Aranda Ordaz (AO) link function to flexibly capture the asymmetric relationships between uncertainty and missing probability. Based on this formulation, we develop an efficient Expectation Conditional Maximization (ECM) algorithm that jointly estimates all parameters appearing in both the Gaussian mixture model (GMM) and the missingness mechanism, and subsequently imputes the missing labels by a Bayesian classifier derived from the fitted mixture model. This method effectively alleviates the bias induced by ignoring the missingness mechanism while enhancing the robustness of semi-supervised learning. The resulting uncertainty-aware framework delivers reliable classification performance in realistic MAR scenarios with substantial proportions of missing labels.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2601.14631" target="_blank">Semi-Supervised Mixture Models under the Concept of Missing at Radom with Margin Confidence and Aranda Ordaz Function</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jinyang Liao, Ziyang Lyu</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.14631" target="_blank">https://arxiv.org/abs/2601.14631</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This paper presents a semi-supervised learning framework for Gaussian mixture modelling under a Missing at Random (MAR) mechanism. The method explicitly parameterizes the missingness mechanism by modelling the probability of missingness as a function of classification uncertainty. To quantify classification uncertainty, we introduce margin confidence and incorporate the Aranda Ordaz (AO) link function to flexibly capture the asymmetric relationships between uncertainty and missing probability. Based on this formulation, we develop an efficient Expectation Conditional Maximization (ECM) algorithm that jointly estimates all parameters appearing in both the Gaussian mixture model (GMM) and the missingness mechanism, and subsequently imputes the missing labels by a Bayesian classifier derived from the fitted mixture model. This method effectively alleviates the bias induced by ignoring the missingness mechanism while enhancing the robustness of semi-supervised learning. The resulting uncertainty-aware framework delivers reliable classification performance in realistic MAR scenarios with substantial proportions of missing labels.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "Efficient and Minimax-optimal In-context Nonparametric Regression with Transformers", "author": "Michelle Ching, Ioana Popescu, Nico Smith, Tianyi Ma, William G. Underwood, Richard J. Samworth", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.15014", "summary": "arXiv:2601.15014v1 Announce Type: new \nAbstract: We study in-context learning for nonparametric regression with $\\alpha$-H\\\"older smooth regression functions, for some $\\alpha&gt;0$. We prove that, with $n$ in-context examples and $d$-dimensional regression covariates, a pretrained transformer with $\\Theta(\\log n)$ parameters and $\\Omega\\bigl(n^{2\\alpha/(2\\alpha+d)}\\log^3 n\\bigr)$ pretraining sequences can achieve the minimax-optimal rate of convergence $O\\bigl(n^{-2\\alpha/(2\\alpha+d)}\\bigr)$ in mean squared error. Our result requires substantially fewer transformer parameters and pretraining sequences than previous results in the literature. This is achieved by showing that transformers are able to approximate local polynomial estimators efficiently by implementing a kernel-weighted polynomial basis and then running gradient descent.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2601.15014" target="_blank">Efficient and Minimax-optimal In-context Nonparametric Regression with Transformers</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Michelle Ching, Ioana Popescu, Nico Smith, Tianyi Ma, William G. Underwood, Richard J. Samworth</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.15014" target="_blank">https://arxiv.org/abs/2601.15014</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study in-context learning for nonparametric regression with $\alpha$-H\"older smooth regression functions, for some $\alpha&gt;0$. We prove that, with $n$ in-context examples and $d$-dimensional regression covariates, a pretrained transformer with $\Theta(\log n)$ parameters and $\Omega\bigl(n^{2\alpha/(2\alpha+d)}\log^3 n\bigr)$ pretraining sequences can achieve the minimax-optimal rate of convergence $O\bigl(n^{-2\alpha/(2\alpha+d)}\bigr)$ in mean squared error. Our result requires substantially fewer transformer parameters and pretraining sequences than previous results in the literature. This is achieved by showing that transformers are able to approximate local polynomial estimators efficiently by implementing a kernel-weighted polynomial basis and then running gradient descent.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "Multi-context principal component analysis", "author": "Kexin Wang, Salil Bhate, Jo\\~ao M. Pereira, Joe Kileel, Matylda Figlerowicz, Anna Seigal", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.15239", "summary": "arXiv:2601.15239v1 Announce Type: new \nAbstract: Principal component analysis (PCA) is a tool to capture factors that explain variation in data. Across domains, data are now collected across multiple contexts (for example, individuals with different diseases, cells of different types, or words across texts). While the factors explaining variation in data are undoubtedly shared across subsets of contexts, no tools currently exist to systematically recover such factors. We develop multi-context principal component analysis (MCPCA), a theoretical and algorithmic framework that decomposes data into factors shared across subsets of contexts. Applied to gene expression, MCPCA reveals axes of variation shared across subsets of cancer types and an axis whose variability in tumor cells, but not mean, is associated with lung cancer progression. Applied to contextualized word embeddings from language models, MCPCA maps stages of a debate on human nature, revealing a discussion between science and fiction over decades. These axes are not found by combining data across contexts or by restricting to individual contexts. MCPCA is a principled generalization of PCA to address the challenge of understanding factors underlying data across contexts.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2601.15239" target="_blank">Multi-context principal component analysis</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Kexin Wang, Salil Bhate, Jo\~ao M. Pereira, Joe Kileel, Matylda Figlerowicz, Anna Seigal</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.15239" target="_blank">https://arxiv.org/abs/2601.15239</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Principal component analysis (PCA) is a tool to capture factors that explain variation in data. Across domains, data are now collected across multiple contexts (for example, individuals with different diseases, cells of different types, or words across texts). While the factors explaining variation in data are undoubtedly shared across subsets of contexts, no tools currently exist to systematically recover such factors. We develop multi-context principal component analysis (MCPCA), a theoretical and algorithmic framework that decomposes data into factors shared across subsets of contexts. Applied to gene expression, MCPCA reveals axes of variation shared across subsets of cancer types and an axis whose variability in tumor cells, but not mean, is associated with lung cancer progression. Applied to contextualized word embeddings from language models, MCPCA maps stages of a debate on human nature, revealing a discussion between science and fiction over decades. These axes are not found by combining data across contexts or by restricting to individual contexts. MCPCA is a principled generalization of PCA to address the challenge of understanding factors underlying data across contexts.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Many Experiments, Few Repetitions, Unpaired Data, and Sparse Effects: Is Causal Inference Possible?", "author": "Felix Schur, Niklas Pfister, Peng Ding, Sach Mukherjee, Jonas Peters", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.15254", "summary": "arXiv:2601.15254v1 Announce Type: new \nAbstract: We study the problem of estimating causal effects under hidden confounding in the following unpaired data setting: we observe some covariates $X$ and an outcome $Y$ under different experimental conditions (environments) but do not observe them jointly; we either observe $X$ or $Y$. Under appropriate regularity conditions, the problem can be cast as an instrumental variable (IV) regression with the environment acting as a (possibly high-dimensional) instrument. When there are many environments but only a few observations per environment, standard two-sample IV estimators fail to be consistent. We propose a GMM-type estimator based on cross-fold sample splitting of the instrument-covariate sample and prove that it is consistent as the number of environments grows but the sample size per environment remains constant. We further extend the method to sparse causal effects via $\\ell_1$-regularized estimation and post-selection refitting.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2601.15254" target="_blank">Many Experiments, Few Repetitions, Unpaired Data, and Sparse Effects: Is Causal Inference Possible?</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Felix Schur, Niklas Pfister, Peng Ding, Sach Mukherjee, Jonas Peters</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.15254" target="_blank">https://arxiv.org/abs/2601.15254</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the problem of estimating causal effects under hidden confounding in the following unpaired data setting: we observe some covariates $X$ and an outcome $Y$ under different experimental conditions (environments) but do not observe them jointly; we either observe $X$ or $Y$. Under appropriate regularity conditions, the problem can be cast as an instrumental variable (IV) regression with the environment acting as a (possibly high-dimensional) instrument. When there are many environments but only a few observations per environment, standard two-sample IV estimators fail to be consistent. We propose a GMM-type estimator based on cross-fold sample splitting of the instrument-covariate sample and prove that it is consistent as the number of environments grows but the sample size per environment remains constant. We further extend the method to sparse causal effects via $\ell_1$-regularized estimation and post-selection refitting.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "engGNN: A Dual-Graph Neural Network for Omics-Based Disease Classification and Feature Selection", "author": "Tiantian Yang, Yuxuan Wang, Zhenwei Zhou, Ching-Ti Liu", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.14536", "summary": "arXiv:2601.14536v1 Announce Type: cross \nAbstract: Omics data, such as transcriptomics, proteomics, and metabolomics, provide critical insights into disease mechanisms and clinical outcomes. However, their high dimensionality, small sample sizes, and intricate biological networks pose major challenges for reliable prediction and meaningful interpretation. Graph Neural Networks (GNNs) offer a promising way to integrate prior knowledge by encoding feature relationships as graphs. Yet, existing methods typically rely solely on either an externally curated feature graph or a data-driven generated one, which limits their ability to capture complementary information. To address this, we propose the external and generated Graph Neural Network (engGNN), a dual-graph framework that jointly leverages both external known biological networks and data-driven generated graphs. Specifically, engGNN constructs a biologically informed undirected feature graph from established network databases and complements it with a directed feature graph derived from tree-ensemble models. This dual-graph design produces more comprehensive embeddings, thereby improving predictive performance and interpretability. Through extensive simulations and real-world applications to gene expression data, engGNN consistently outperforms state-of-the-art baselines. Beyond classification, engGNN provides interpretable feature importance scores that facilitate biologically meaningful discoveries, such as pathway enrichment analysis. Taken together, these results highlight engGNN as a robust, flexible, and interpretable framework for disease classification and biomarker discovery in high-dimensional omics contexts.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2601.14536" target="_blank">engGNN: A Dual-Graph Neural Network for Omics-Based Disease Classification and Feature Selection</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Tiantian Yang, Yuxuan Wang, Zhenwei Zhou, Ching-Ti Liu</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.14536" target="_blank">https://arxiv.org/abs/2601.14536</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Omics data, such as transcriptomics, proteomics, and metabolomics, provide critical insights into disease mechanisms and clinical outcomes. However, their high dimensionality, small sample sizes, and intricate biological networks pose major challenges for reliable prediction and meaningful interpretation. Graph Neural Networks (GNNs) offer a promising way to integrate prior knowledge by encoding feature relationships as graphs. Yet, existing methods typically rely solely on either an externally curated feature graph or a data-driven generated one, which limits their ability to capture complementary information. To address this, we propose the external and generated Graph Neural Network (engGNN), a dual-graph framework that jointly leverages both external known biological networks and data-driven generated graphs. Specifically, engGNN constructs a biologically informed undirected feature graph from established network databases and complements it with a directed feature graph derived from tree-ensemble models. This dual-graph design produces more comprehensive embeddings, thereby improving predictive performance and interpretability. Through extensive simulations and real-world applications to gene expression data, engGNN consistently outperforms state-of-the-art baselines. Beyond classification, engGNN provides interpretable feature importance scores that facilitate biologically meaningful discoveries, such as pathway enrichment analysis. Taken together, these results highlight engGNN as a robust, flexible, and interpretable framework for disease classification and biomarker discovery in high-dimensional omics contexts.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "Optimality of Staircase Mechanisms for Vector Queries under Differential Privacy", "author": "James Melbourne, Mario Diaz, Shahab Asoodeh", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.14597", "summary": "arXiv:2601.14597v1 Announce Type: cross \nAbstract: We study the optimal design of additive mechanisms for vector-valued queries under $\\epsilon$-differential privacy (DP). Given only the sensitivity of a query and a norm-monotone cost function measuring utility loss, we ask which noise distribution minimizes expected cost among all additive $\\epsilon$-DP mechanisms. Using convex rearrangement theory, we show that this infinite-dimensional optimization problem admits a reduction to a one-dimensional compact and convex family of radially symmetric distributions whose extreme points are the staircase distributions. As a consequence, we prove that for any dimension, any norm, and any norm-monotone cost function, there exists an $\\epsilon$-DP staircase mechanism that is optimal among all additive mechanisms. This result resolves a conjecture of Geng, Kairouz, Oh, and Viswanath, and provides a geometric explanation for the emergence of staircase mechanisms as extremal solutions in differential privacy.", "number": 9, "labels": [{"name": "privacy", "color": "#ff69b4"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2601.14597" target="_blank">Optimality of Staircase Mechanisms for Vector Queries under Differential Privacy</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #ff69b4;">privacy</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> James Melbourne, Mario Diaz, Shahab Asoodeh</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.14597" target="_blank">https://arxiv.org/abs/2601.14597</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the optimal design of additive mechanisms for vector-valued queries under $\epsilon$-differential privacy (DP). Given only the sensitivity of a query and a norm-monotone cost function measuring utility loss, we ask which noise distribution minimizes expected cost among all additive $\epsilon$-DP mechanisms. Using convex rearrangement theory, we show that this infinite-dimensional optimization problem admits a reduction to a one-dimensional compact and convex family of radially symmetric distributions whose extreme points are the staircase distributions. As a consequence, we prove that for any dimension, any norm, and any norm-monotone cost function, there exists an $\epsilon$-DP staircase mechanism that is optimal among all additive mechanisms. This result resolves a conjecture of Geng, Kairouz, Oh, and Viswanath, and provides a geometric explanation for the emergence of staircase mechanisms as extremal solutions in differential privacy.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "Diffusion Epistemic Uncertainty with Asymmetric Learning for Diffusion-Generated Image Detection", "author": "Yingsong Huang, Hui Guo, Jing Huang, Bing Bai, Qi Xiong", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.14625", "summary": "arXiv:2601.14625v1 Announce Type: cross \nAbstract: The rapid progress of diffusion models highlights the growing need for detecting generated images. Previous research demonstrates that incorporating diffusion-based measurements, such as reconstruction error, can enhance the generalizability of detectors. However, ignoring the differing impacts of aleatoric and epistemic uncertainty on reconstruction error can undermine detection performance. Aleatoric uncertainty, arising from inherent data noise, creates ambiguity that impedes accurate detection of generated images. As it reflects random variations within the data (e.g., noise in natural textures), it does not help distinguish generated images. In contrast, epistemic uncertainty, which represents the model's lack of knowledge about unfamiliar patterns, supports detection. In this paper, we propose a novel framework, Diffusion Epistemic Uncertainty with Asymmetric Learning~(DEUA), for detecting diffusion-generated images. We introduce Diffusion Epistemic Uncertainty~(DEU) estimation via the Laplace approximation to assess the proximity of data to the manifold of diffusion-generated samples. Additionally, an asymmetric loss function is introduced to train a balanced classifier with larger margins, further enhancing generalizability. Extensive experiments on large-scale benchmarks validate the state-of-the-art performance of our method.", "number": 10, "labels": [{"name": "diffusion", "color": "#9b59b6"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2601.14625" target="_blank">Diffusion Epistemic Uncertainty with Asymmetric Learning for Diffusion-Generated Image Detection</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #9b59b6;">diffusion</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yingsong Huang, Hui Guo, Jing Huang, Bing Bai, Qi Xiong</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.14625" target="_blank">https://arxiv.org/abs/2601.14625</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The rapid progress of diffusion models highlights the growing need for detecting generated images. Previous research demonstrates that incorporating diffusion-based measurements, such as reconstruction error, can enhance the generalizability of detectors. However, ignoring the differing impacts of aleatoric and epistemic uncertainty on reconstruction error can undermine detection performance. Aleatoric uncertainty, arising from inherent data noise, creates ambiguity that impedes accurate detection of generated images. As it reflects random variations within the data (e.g., noise in natural textures), it does not help distinguish generated images. In contrast, epistemic uncertainty, which represents the model's lack of knowledge about unfamiliar patterns, supports detection. In this paper, we propose a novel framework, Diffusion Epistemic Uncertainty with Asymmetric Learning~(DEUA), for detecting diffusion-generated images. We introduce Diffusion Epistemic Uncertainty~(DEU) estimation via the Laplace approximation to assess the proximity of data to the manifold of diffusion-generated samples. Additionally, an asymmetric loss function is introduced to train a balanced classifier with larger margins, further enhancing generalizability. Extensive experiments on large-scale benchmarks validate the state-of-the-art performance of our method.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "TRSVR: An Adaptive Stochastic Trust-Region Method with Variance Reduction", "author": "Yuchen Fang, Xinshou Zheng, Javad Lavaei", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.14647", "summary": "arXiv:2601.14647v1 Announce Type: cross \nAbstract: We propose a stochastic trust-region method for unconstrained nonconvex optimization that incorporates stochastic variance-reduced gradients (SVRG) to accelerate convergence. Unlike classical trust-region methods, the proposed algorithm relies solely on stochastic gradient information and does not require function value evaluations. The trust-region radius is adaptively adjusted based on a radius-control parameter and the stochastic gradient estimate. Under mild assumptions, we establish that the algorithm converges in expectation to a first-order stationary point. Moreover, the method achieves iteration and sample complexity bounds that match those of SVRG-based first-order methods, while allowing stochastic and potentially gradient-dependent second-order information. Extensive numerical experiments demonstrate that incorporating SVRG accelerates convergence, and that the use of trust-region methods and Hessian information further improves performance. We also highlight the impact of batch size and inner-loop length on efficiency, and show that the proposed method outperforms SGD and Adam on several machine learning tasks.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2601.14647" target="_blank">TRSVR: An Adaptive Stochastic Trust-Region Method with Variance Reduction</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yuchen Fang, Xinshou Zheng, Javad Lavaei</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.14647" target="_blank">https://arxiv.org/abs/2601.14647</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We propose a stochastic trust-region method for unconstrained nonconvex optimization that incorporates stochastic variance-reduced gradients (SVRG) to accelerate convergence. Unlike classical trust-region methods, the proposed algorithm relies solely on stochastic gradient information and does not require function value evaluations. The trust-region radius is adaptively adjusted based on a radius-control parameter and the stochastic gradient estimate. Under mild assumptions, we establish that the algorithm converges in expectation to a first-order stationary point. Moreover, the method achieves iteration and sample complexity bounds that match those of SVRG-based first-order methods, while allowing stochastic and potentially gradient-dependent second-order information. Extensive numerical experiments demonstrate that incorporating SVRG accelerates convergence, and that the use of trust-region methods and Hessian information further improves performance. We also highlight the impact of batch size and inner-loop length on efficiency, and show that the proposed method outperforms SGD and Adam on several machine learning tasks.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "Finite-Sample Inference for Sparsely Permuted Linear Regression", "author": "Hirofumi Ota, Masaaki Imaizumi", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.14872", "summary": "arXiv:2601.14872v1 Announce Type: cross \nAbstract: We study a noisy linear observation model with an unknown permutation called permuted/shuffled linear regression, where responses and covariates are mismatched and the permutation forms a discrete, factorial-size parameter. This unknown permutation is a key component of the data-generating process, yet its statistical investigation remains challenging due to its discrete nature. In this study, we develop a general statistical inference framework on the permutation and regression coefficients. First, we introduce a localization step that reduces the permutation space to a small candidate set building on recent advances in the repro samples method, whose miscoverage decays polynomially with the number of Monte Carlo samples. Then, based on this localized set, we provide statistical inference procedures: a conditional Monte Carlo test of permutation structures with valid finite-sample Type-I error control. We also develop coefficient inference that remains valid under alignment uncertainty of permutations. For computational purposes, we develop a linear assignment problem computable in polynomial time complexity and demonstrate that its solution asymptotically converges to that of the conventional least squares problem with large computational cost. Extensions to partially permuted designs and ridge regularization are also discussed. Extensive simulations and an application to Beijing air-quality data corroborate finite-sample validity, strong power to detect mismatches, and practical scalability.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2601.14872" target="_blank">Finite-Sample Inference for Sparsely Permuted Linear Regression</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Hirofumi Ota, Masaaki Imaizumi</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.14872" target="_blank">https://arxiv.org/abs/2601.14872</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study a noisy linear observation model with an unknown permutation called permuted/shuffled linear regression, where responses and covariates are mismatched and the permutation forms a discrete, factorial-size parameter. This unknown permutation is a key component of the data-generating process, yet its statistical investigation remains challenging due to its discrete nature. In this study, we develop a general statistical inference framework on the permutation and regression coefficients. First, we introduce a localization step that reduces the permutation space to a small candidate set building on recent advances in the repro samples method, whose miscoverage decays polynomially with the number of Monte Carlo samples. Then, based on this localized set, we provide statistical inference procedures: a conditional Monte Carlo test of permutation structures with valid finite-sample Type-I error control. We also develop coefficient inference that remains valid under alignment uncertainty of permutations. For computational purposes, we develop a linear assignment problem computable in polynomial time complexity and demonstrate that its solution asymptotically converges to that of the conventional least squares problem with large computational cost. Extensions to partially permuted designs and ridge regularization are also discussed. Extensive simulations and an application to Beijing air-quality data corroborate finite-sample validity, strong power to detect mismatches, and practical scalability.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "Robust Machine Learning for Regulatory Sequence Modeling under Biological and Technical Distribution Shifts", "author": "Yiyao Yang", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.14969", "summary": "arXiv:2601.14969v1 Announce Type: cross \nAbstract: Robust machine learning for regulatory genomics is studied under biologically and technically induced distribution shifts. Deep convolutional and attention based models achieve strong in distribution performance on DNA regulatory sequence prediction tasks but are usually evaluated under i.i.d. assumptions, even though real applications involve cell type specific programs, evolutionary turnover, assay protocol changes, and sequencing artifacts. We introduce a robustness framework that combines a mechanistic simulation benchmark with real data analysis on a massively parallel reporter assay (MPRA) dataset to quantify performance degradation, calibration failures, and uncertainty based reliability. In simulation, motif driven regulatory outputs are generated with cell type specific programs, PWM perturbations, GC bias, depth variation, batch effects, and heteroscedastic noise, and CNN, BiLSTM, and transformer models are evaluated. Models remain accurate and reasonably calibrated under mild GC content shifts but show higher error, severe variance miscalibration, and coverage collapse under motif effect rewiring and noise dominated regimes, revealing robustness gaps invisible to standard i.i.d. evaluation. Adding simple biological structural priors motif derived features in simulation and global GC content in MPRA improves in distribution error and yields consistent robustness gains under biologically meaningful genomic shifts, while providing only limited protection against strong assay noise. Uncertainty-aware selective prediction offers an additional safety layer that risk coverage analyses on simulated and MPRA data show that filtering low confidence inputs recovers low risk subsets, including under GC-based out-of-distribution conditions, although reliability gains diminish when noise dominates.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2601.14969" target="_blank">Robust Machine Learning for Regulatory Sequence Modeling under Biological and Technical Distribution Shifts</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yiyao Yang</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.14969" target="_blank">https://arxiv.org/abs/2601.14969</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Robust machine learning for regulatory genomics is studied under biologically and technically induced distribution shifts. Deep convolutional and attention based models achieve strong in distribution performance on DNA regulatory sequence prediction tasks but are usually evaluated under i.i.d. assumptions, even though real applications involve cell type specific programs, evolutionary turnover, assay protocol changes, and sequencing artifacts. We introduce a robustness framework that combines a mechanistic simulation benchmark with real data analysis on a massively parallel reporter assay (MPRA) dataset to quantify performance degradation, calibration failures, and uncertainty based reliability. In simulation, motif driven regulatory outputs are generated with cell type specific programs, PWM perturbations, GC bias, depth variation, batch effects, and heteroscedastic noise, and CNN, BiLSTM, and transformer models are evaluated. Models remain accurate and reasonably calibrated under mild GC content shifts but show higher error, severe variance miscalibration, and coverage collapse under motif effect rewiring and noise dominated regimes, revealing robustness gaps invisible to standard i.i.d. evaluation. Adding simple biological structural priors motif derived features in simulation and global GC content in MPRA improves in distribution error and yields consistent robustness gains under biologically meaningful genomic shifts, while providing only limited protection against strong assay noise. Uncertainty-aware selective prediction offers an additional safety layer that risk coverage analyses on simulated and MPRA data show that filtering low confidence inputs recovers low risk subsets, including under GC-based out-of-distribution conditions, although reliability gains diminish when noise dominates.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Consistency of Honest Decision Trees and Random Forests", "author": "Martin Bladt, Rasmus Frigaard Lemvig", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.14991", "summary": "arXiv:2601.14991v1 Announce Type: cross \nAbstract: We study various types of consistency of honest decision trees and random forests in the regression setting. In contrast to related literature, our proofs are elementary and follow the classical arguments used for smoothing methods. Under mild regularity conditions on the regression function and data distribution, we establish weak and almost sure convergence of honest trees and honest forest averages to the true regression function, and moreover we obtain uniform convergence over compact covariate domains. The framework naturally accommodates ensemble variants based on subsampling and also a two-stage bootstrap sampling scheme. Our treatment synthesizes and simplifies existing analyses, in particular recovering several results as special cases. The elementary nature of the arguments clarifies the close relationship between data-adaptive partitioning and kernel-type methods, providing an accessible approach to understanding the asymptotic behavior of tree-based methods.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2601.14991" target="_blank">Consistency of Honest Decision Trees and Random Forests</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Martin Bladt, Rasmus Frigaard Lemvig</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.14991" target="_blank">https://arxiv.org/abs/2601.14991</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study various types of consistency of honest decision trees and random forests in the regression setting. In contrast to related literature, our proofs are elementary and follow the classical arguments used for smoothing methods. Under mild regularity conditions on the regression function and data distribution, we establish weak and almost sure convergence of honest trees and honest forest averages to the true regression function, and moreover we obtain uniform convergence over compact covariate domains. The framework naturally accommodates ensemble variants based on subsampling and also a two-stage bootstrap sampling scheme. Our treatment synthesizes and simplifies existing analyses, in particular recovering several results as special cases. The elementary nature of the arguments clarifies the close relationship between data-adaptive partitioning and kernel-type methods, providing an accessible approach to understanding the asymptotic behavior of tree-based methods.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Factorizable joint shift revisited", "author": "Dirk Tasche", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.15036", "summary": "arXiv:2601.15036v1 Announce Type: cross \nAbstract: Factorizable joint shift (FJS) was proposed as a type of distribution shift (or dataset shift) that comprises both covariate and label shift. Recently, it has been observed that FJS actually arises from consecutive label and covariate (or vice versa) shifts. Research into FJS so far has been confined to the case of categorical label spaces. We propose a framework for analysing distribution shift in the case of general label spaces, thus covering both classification and regression models. Based on the framework, we generalise existing results on FJS to general label spaces and propose a related extension of the expectation maximisation (EM) algorithm for class prior probabilities. We also take a fresh look at generalized label shift (GLS) in the case of general label spaces.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2601.15036" target="_blank">Factorizable joint shift revisited</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Dirk Tasche</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.15036" target="_blank">https://arxiv.org/abs/2601.15036</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Factorizable joint shift (FJS) was proposed as a type of distribution shift (or dataset shift) that comprises both covariate and label shift. Recently, it has been observed that FJS actually arises from consecutive label and covariate (or vice versa) shifts. Research into FJS so far has been confined to the case of categorical label spaces. We propose a framework for analysing distribution shift in the case of general label spaces, thus covering both classification and regression models. Based on the framework, we generalise existing results on FJS to general label spaces and propose a related extension of the expectation maximisation (EM) algorithm for class prior probabilities. We also take a fresh look at generalized label shift (GLS) in the case of general label spaces.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "Online Statistical Inference for Contextual Bandits via Stochastic Gradient Descent", "author": "Xiangyu Chang, Xi Chen, Zehua Lai, He Li, Zhihong Liu, Yichen Zhang", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2212.14883", "summary": "arXiv:2212.14883v2 Announce Type: replace \nAbstract: With the fast development of big data, learning the optimal decision rule by recursively updating it and making online decisions has been easier than before. We study the online statistical inference of model parameters in a contextual bandit framework of sequential decision-making. We propose a general framework for an online and adaptive data collection environment that can update decision rules via weighted stochastic gradient descent. We allow different weighting schemes of the stochastic gradient and establish the asymptotic normality of the parameter estimator. Our proposed estimator significantly improves the asymptotic efficiency over the previous averaged SGD approach via inverse probability weights. We also conduct an optimality analysis on the weights in a linear regression setting. We provide a Bahadur representation of the proposed estimator and show that the remainder term in the Bahadur representation entails a slower convergence rate compared to classical SGD due to the adaptive data collection.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2212.14883" target="_blank">Online Statistical Inference for Contextual Bandits via Stochastic Gradient Descent</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Xiangyu Chang, Xi Chen, Zehua Lai, He Li, Zhihong Liu, Yichen Zhang</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2212.14883" target="_blank">https://arxiv.org/abs/2212.14883</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                With the fast development of big data, learning the optimal decision rule by recursively updating it and making online decisions has been easier than before. We study the online statistical inference of model parameters in a contextual bandit framework of sequential decision-making. We propose a general framework for an online and adaptive data collection environment that can update decision rules via weighted stochastic gradient descent. We allow different weighting schemes of the stochastic gradient and establish the asymptotic normality of the parameter estimator. Our proposed estimator significantly improves the asymptotic efficiency over the previous averaged SGD approach via inverse probability weights. We also conduct an optimality analysis on the weights in a linear regression setting. We provide a Bahadur representation of the proposed estimator and show that the remainder term in the Bahadur representation entails a slower convergence rate compared to classical SGD due to the adaptive data collection.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "Dynamic angular synchronization under smoothness constraints", "author": "Ernesto Araya, Mihai Cucuringu, Hemant Tyagi", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2406.04071", "summary": "arXiv:2406.04071v3 Announce Type: replace \nAbstract: Given an undirected measurement graph $\\mathcal{H} = ([n], \\mathcal{E})$, the classical angular synchronization problem consists of recovering unknown angles $\\theta_1^*,\\dots,\\theta_n^*$ from a collection of noisy pairwise measurements of the form $(\\theta_i^* - \\theta_j^*) \\mod 2\\pi$, for all $\\{i,j\\} \\in \\mathcal{E}$. This problem arises in a variety of applications, including computer vision, time synchronization of distributed networks, and ranking from pairwise comparisons. In this paper, we consider a dynamic version of this problem where the angles, and also the measurement graphs evolve over $T$ time points. Assuming a smoothness condition on the evolution of the latent angles, we derive three algorithms for joint estimation of the angles over all time points. Moreover, for one of the algorithms, we establish non-asymptotic recovery guarantees for the mean-squared error (MSE) under different statistical models. In particular, we show that the MSE converges to zero as $T$ increases under milder conditions than in the static setting. This includes the setting where the measurement graphs are highly sparse and disconnected, and also when the measurement noise is large and can potentially increase with $T$. We complement our theoretical results with experiments on synthetic data.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2406.04071" target="_blank">Dynamic angular synchronization under smoothness constraints</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ernesto Araya, Mihai Cucuringu, Hemant Tyagi</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2406.04071" target="_blank">https://arxiv.org/abs/2406.04071</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Given an undirected measurement graph $\mathcal{H} = ([n], \mathcal{E})$, the classical angular synchronization problem consists of recovering unknown angles $\theta_1^*,\dots,\theta_n^*$ from a collection of noisy pairwise measurements of the form $(\theta_i^* - \theta_j^*) \mod 2\pi$, for all $\{i,j\} \in \mathcal{E}$. This problem arises in a variety of applications, including computer vision, time synchronization of distributed networks, and ranking from pairwise comparisons. In this paper, we consider a dynamic version of this problem where the angles, and also the measurement graphs evolve over $T$ time points. Assuming a smoothness condition on the evolution of the latent angles, we derive three algorithms for joint estimation of the angles over all time points. Moreover, for one of the algorithms, we establish non-asymptotic recovery guarantees for the mean-squared error (MSE) under different statistical models. In particular, we show that the MSE converges to zero as $T$ increases under milder conditions than in the static setting. This includes the setting where the measurement graphs are highly sparse and disconnected, and also when the measurement noise is large and can potentially increase with $T$. We complement our theoretical results with experiments on synthetic data.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "Whitening Spherical Gaussian Mixtures in the Large-Dimensional Regime", "author": "Mohammed Racim Moussa Boudjemaa, Alper Kalle, Xiaoyi Mai, Jos\\'e Henrique de Morais Goulart, C\\'edric F\\'evotte", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2509.17636", "summary": "arXiv:2509.17636v2 Announce Type: replace \nAbstract: Whitening is a classical technique in unsupervised learning that can facilitate estimation tasks by standardizing data. An important application is the estimation of latent variable models via the decomposition of tensors built from high-order moments. In particular, whitening orthogonalizes the means of a spherical Gaussian mixture model (GMM), thereby making the corresponding moment tensor orthogonally decomposable, hence easier to decompose. However, in the large-dimensional regime (LDR) where data are high-dimensional and scarce, the standard whitening matrix built from the sample covariance becomes ineffective because the latter is spectrally distorted. Consequently, whitened means of a spherical GMM are no longer orthogonal. Using random matrix theory, we derive exact limits for their dot products, which are generally nonzero in the LDR. As our main contribution, we then construct a corrected whitening matrix that restores asymptotic orthogonality, allowing for performance gains in spherical GMM estimation.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2509.17636" target="_blank">Whitening Spherical Gaussian Mixtures in the Large-Dimensional Regime</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Mohammed Racim Moussa Boudjemaa, Alper Kalle, Xiaoyi Mai, Jos\'e Henrique de Morais Goulart, C\'edric F\'evotte</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2509.17636" target="_blank">https://arxiv.org/abs/2509.17636</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Whitening is a classical technique in unsupervised learning that can facilitate estimation tasks by standardizing data. An important application is the estimation of latent variable models via the decomposition of tensors built from high-order moments. In particular, whitening orthogonalizes the means of a spherical Gaussian mixture model (GMM), thereby making the corresponding moment tensor orthogonally decomposable, hence easier to decompose. However, in the large-dimensional regime (LDR) where data are high-dimensional and scarce, the standard whitening matrix built from the sample covariance becomes ineffective because the latter is spectrally distorted. Consequently, whitened means of a spherical GMM are no longer orthogonal. Using random matrix theory, we derive exact limits for their dot products, which are generally nonzero in the LDR. As our main contribution, we then construct a corrected whitening matrix that restores asymptotic orthogonality, allowing for performance gains in spherical GMM estimation.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Cluster-Based Generalized Additive Models Informed by Random Fourier Features", "author": "Xin Huang, Jia Li, Jun Yu", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.19373", "summary": "arXiv:2512.19373v2 Announce Type: replace \nAbstract: In the development of learning systems, there is an ongoing need to reconcile the strong predictive performance offered by opaque black-box models with the level of transparency required for critical applications. This work introduces a methodological framework that combines spectral representation learning with transparent statistical modeling to construct a mixture of generalized additive models (GAMs). The approach utilizes random Fourier feature embeddings to uncover locally adaptive structures within the data. High-dimensional random feature representations are compressed via principal component analysis to derive a latent space that informs a Gaussian mixture model, which performs soft clustering to partition the input space into distinct regimes. Within each cluster, a local GAM captures nonlinear univariate effects through interpretable spline-based smoothers. Numerical experiments across diverse regression benchmarks demonstrate that the proposed method consistently improves upon classical global interpretable models by effectively modeling data heterogeneity. Furthermore, the mixture-of-GAMs framework achieves performance comparable to explainable boosting machine, random forest, and multilayer perceptron on certain tasks. Overall, this construction provides a principled approach for integrating representation learning with transparent statistical modeling.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2512.19373" target="_blank">Cluster-Based Generalized Additive Models Informed by Random Fourier Features</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Xin Huang, Jia Li, Jun Yu</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.19373" target="_blank">https://arxiv.org/abs/2512.19373</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In the development of learning systems, there is an ongoing need to reconcile the strong predictive performance offered by opaque black-box models with the level of transparency required for critical applications. This work introduces a methodological framework that combines spectral representation learning with transparent statistical modeling to construct a mixture of generalized additive models (GAMs). The approach utilizes random Fourier feature embeddings to uncover locally adaptive structures within the data. High-dimensional random feature representations are compressed via principal component analysis to derive a latent space that informs a Gaussian mixture model, which performs soft clustering to partition the input space into distinct regimes. Within each cluster, a local GAM captures nonlinear univariate effects through interpretable spline-based smoothers. Numerical experiments across diverse regression benchmarks demonstrate that the proposed method consistently improves upon classical global interpretable models by effectively modeling data heterogeneity. Furthermore, the mixture-of-GAMs framework achieves performance comparable to explainable boosting machine, random forest, and multilayer perceptron on certain tasks. Overall, this construction provides a principled approach for integrating representation learning with transparent statistical modeling.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "On the Provable Suboptimality of Momentum SGD in Nonstationary Stochastic Optimization", "author": "Sharan Sahu, Cameron J. Hogan, Martin T. Wells", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.12238", "summary": "arXiv:2601.12238v2 Announce Type: replace \nAbstract: While momentum-based acceleration has been studied extensively in deterministic optimization problems, its behavior in nonstationary environments -- where the data distribution and optimal parameters drift over time -- remains underexplored. We analyze the tracking performance of Stochastic Gradient Descent (SGD) and its momentum variants (Polyak heavy-ball and Nesterov) under uniform strong convexity and smoothness in varying stepsize regimes. We derive finite-time bounds in expectation and with high probability for the tracking error, establishing a sharp decomposition into three components: a transient initialization term, a noise-induced variance term, and a drift-induced tracking lag. Crucially, our analysis uncovers a fundamental trade-off: while momentum can suppress gradient noise, it incurs an explicit penalty on the tracking capability. We show that momentum can substantially amplify drift-induced tracking error, with amplification that becomes unbounded as the momentum parameter approaches one, formalizing the intuition that using 'stale' gradients hinders adaptation to rapid regime shifts. Complementing these upper bounds, we establish minimax lower bounds for dynamic regret under gradient-variation constraints. These lower bounds prove that the inertia-induced penalty is not an artifact of analysis but an information-theoretic barrier: in drift-dominated regimes, momentum creates an unavoidable 'inertia window' that fundamentally degrades performance. Collectively, these results provide a definitive theoretical grounding for the empirical instability of momentum in dynamic environments and delineate the precise regime boundaries where SGD provably outperforms its accelerated counterparts.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2601.12238" target="_blank">On the Provable Suboptimality of Momentum SGD in Nonstationary Stochastic Optimization</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sharan Sahu, Cameron J. Hogan, Martin T. Wells</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.12238" target="_blank">https://arxiv.org/abs/2601.12238</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                While momentum-based acceleration has been studied extensively in deterministic optimization problems, its behavior in nonstationary environments -- where the data distribution and optimal parameters drift over time -- remains underexplored. We analyze the tracking performance of Stochastic Gradient Descent (SGD) and its momentum variants (Polyak heavy-ball and Nesterov) under uniform strong convexity and smoothness in varying stepsize regimes. We derive finite-time bounds in expectation and with high probability for the tracking error, establishing a sharp decomposition into three components: a transient initialization term, a noise-induced variance term, and a drift-induced tracking lag. Crucially, our analysis uncovers a fundamental trade-off: while momentum can suppress gradient noise, it incurs an explicit penalty on the tracking capability. We show that momentum can substantially amplify drift-induced tracking error, with amplification that becomes unbounded as the momentum parameter approaches one, formalizing the intuition that using 'stale' gradients hinders adaptation to rapid regime shifts. Complementing these upper bounds, we establish minimax lower bounds for dynamic regret under gradient-variation constraints. These lower bounds prove that the inertia-induced penalty is not an artifact of analysis but an information-theoretic barrier: in drift-dominated regimes, momentum creates an unavoidable 'inertia window' that fundamentally degrades performance. Collectively, these results provide a definitive theoretical grounding for the empirical instability of momentum in dynamic environments and delineate the precise regime boundaries where SGD provably outperforms its accelerated counterparts.
+            </div>
+        </div>
+        <div class="paper" id="paper-21">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-21" data-paper-data='{"title": "Nonnegative Low-rank Matrix Recovery Can Have Spurious Local Minima", "author": "Richard Y. Zhang", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2505.03717", "summary": "arXiv:2505.03717v2 Announce Type: replace-cross \nAbstract: Low-rank matrix recovery is well-known to exhibit benign nonconvexity under the restricted isometry property (RIP): every second-order critical point is globally optimal, so local methods provably recover the ground truth. Motivated by the strong empirical performance of projected gradient methods for nonnegative low-rank recovery problems, we investigate whether this benign geometry persists when the factor matrices are constrained to be elementwise nonnegative. In the simple setting of a rank-1 nonnegative ground truth, we confirm that benign nonconvexity holds in the fully-observed case with RIP constant $\\delta=0$. This benign nonconvexity, however, is unstable. It fails to extend to the partially-observed case with any arbitrarily small RIP constant $\\delta&gt;0$, and to higher-rank ground truths $r^{\\star}&gt;1$, regardless of how much the search rank $r\\ge r^{\\star}$ is overparameterized. Together, these results undermine the standard stability-based explanation for the empirical success of nonconvex methods and suggest that fundamentally different tools are needed to analyze nonnegative low-rank recovery.", "number": 21, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#21</span>
+                <a href="https://arxiv.org/abs/2505.03717" target="_blank">Nonnegative Low-rank Matrix Recovery Can Have Spurious Local Minima</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Richard Y. Zhang</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2505.03717" target="_blank">https://arxiv.org/abs/2505.03717</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Low-rank matrix recovery is well-known to exhibit benign nonconvexity under the restricted isometry property (RIP): every second-order critical point is globally optimal, so local methods provably recover the ground truth. Motivated by the strong empirical performance of projected gradient methods for nonnegative low-rank recovery problems, we investigate whether this benign geometry persists when the factor matrices are constrained to be elementwise nonnegative. In the simple setting of a rank-1 nonnegative ground truth, we confirm that benign nonconvexity holds in the fully-observed case with RIP constant $\delta=0$. This benign nonconvexity, however, is unstable. It fails to extend to the partially-observed case with any arbitrarily small RIP constant $\delta&gt;0$, and to higher-rank ground truths $r^{\star}&gt;1$, regardless of how much the search rank $r\ge r^{\star}$ is overparameterized. Together, these results undermine the standard stability-based explanation for the empirical success of nonconvex methods and suggest that fundamentally different tools are needed to analyze nonnegative low-rank recovery.
+            </div>
+        </div>
+        <div class="paper" id="paper-22">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-22" data-paper-data='{"title": "EVT-Based Rate-Preserving Distributional Robustness for Tail Risk Functionals", "author": "Anand Deo", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2506.16230", "summary": "arXiv:2506.16230v2 Announce Type: replace-cross \nAbstract: Risk measures such as Conditional Value-at-Risk (CVaR) focus on extreme losses, where scarce tail data makes model error unavoidable. To hedge misspecification, one evaluates worst-case tail risk over an ambiguity set. Using Extreme Value Theory (EVT), we derive first-order asymptotics for worst-case tail risk for a broad class of tail-risk measures under standard ambiguity sets, including Wasserstein balls and $\\phi$-divergence neighborhoods. We show that robustification can alter the nominal tail asymptotic scaling as the tail level $\\beta\\to0$, leading to excess risk inflation. Motivated by this diagnostic, we propose a tail-calibrated ambiguity design that preserves the nominal tail asymptotic scaling while still guarding against misspecification. Under standard domain of attraction assumptions, we prove that the resulting worst-case risk preserves the baseline first-order scaling as $\\beta\\to0$, uniformly over key tuning parameters, and that a plug-in implementation based on consistent tail-index estimation inherits these guarantees. Synthetic and real-data experiments show that the proposed design avoids the severe inflation often induced by standard ambiguity sets.", "number": 22, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#22</span>
+                <a href="https://arxiv.org/abs/2506.16230" target="_blank">EVT-Based Rate-Preserving Distributional Robustness for Tail Risk Functionals</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Anand Deo</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2506.16230" target="_blank">https://arxiv.org/abs/2506.16230</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Risk measures such as Conditional Value-at-Risk (CVaR) focus on extreme losses, where scarce tail data makes model error unavoidable. To hedge misspecification, one evaluates worst-case tail risk over an ambiguity set. Using Extreme Value Theory (EVT), we derive first-order asymptotics for worst-case tail risk for a broad class of tail-risk measures under standard ambiguity sets, including Wasserstein balls and $\phi$-divergence neighborhoods. We show that robustification can alter the nominal tail asymptotic scaling as the tail level $\beta\to0$, leading to excess risk inflation. Motivated by this diagnostic, we propose a tail-calibrated ambiguity design that preserves the nominal tail asymptotic scaling while still guarding against misspecification. Under standard domain of attraction assumptions, we prove that the resulting worst-case risk preserves the baseline first-order scaling as $\beta\to0$, uniformly over key tuning parameters, and that a plug-in implementation based on consistent tail-index estimation inherits these guarantees. Synthetic and real-data experiments show that the proposed design avoids the severe inflation often induced by standard ambiguity sets.
+            </div>
+        </div>
+        <div class="paper" id="paper-23">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-23" data-paper-data='{"title": "AI-boosted rare event sampling to characterize extreme weather", "author": "Amaury Lancelin, Alex Wikner, Laurent Dubus, Cl\\'ement Le Priol, Dorian S. Abbot, Freddy Bouchet, Pedram Hassanzadeh, Jonathan Weare", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2510.27066", "summary": "arXiv:2510.27066v2 Announce Type: replace-cross \nAbstract: Weather extremes pose major societal risks, especially in a changing climate, but due to their rarity, they are difficult to study using limited observations or complex climate models. We introduce AI+RES, a framework coupling fast AI weather forecasts with a high-fidelity physics model using a rare-event algorithm to efficiently characterize extremes. This approach enables the study of the statistics and physics of very rare events, such as once per millennium heatwaves at two orders-of-magnitude lower computational cost. AI+RES can be applied broadly across climate science and other fields concerned with rare events.", "number": 23, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#23</span>
+                <a href="https://arxiv.org/abs/2510.27066" target="_blank">AI-boosted rare event sampling to characterize extreme weather</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Amaury Lancelin, Alex Wikner, Laurent Dubus, Cl\'ement Le Priol, Dorian S. Abbot, Freddy Bouchet, Pedram Hassanzadeh, Jonathan Weare</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.27066" target="_blank">https://arxiv.org/abs/2510.27066</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Weather extremes pose major societal risks, especially in a changing climate, but due to their rarity, they are difficult to study using limited observations or complex climate models. We introduce AI+RES, a framework coupling fast AI weather forecasts with a high-fidelity physics model using a rare-event algorithm to efficiently characterize extremes. This approach enables the study of the statistics and physics of very rare events, such as once per millennium heatwaves at two orders-of-magnitude lower computational cost. AI+RES can be applied broadly across climate science and other fields concerned with rare events.
+            </div>
+        </div>
+        <div class="paper" id="paper-24">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-24" data-paper-data='{"title": "Registration-Free Monitoring of Unstructured Point Cloud Data via Intrinsic Geometrical Properties", "author": "Mariafrancesca Patalano, Giovanna Capizzi, Kamran Paynabar", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.05623", "summary": "arXiv:2511.05623v2 Announce Type: replace-cross \nAbstract: Modern sensing technologies have enabled the collection of unstructured point cloud data (PCD) of varying sizes, which are used to monitor the geometric accuracy of 3D objects. PCD are widely applied in advanced manufacturing processes, including additive, subtractive, and hybrid manufacturing. To ensure the consistency of analysis and avoid false alarms, preprocessing steps such as registration and mesh reconstruction are commonly applied prior to monitoring. However, these steps are error-prone, time-consuming and may introduce artifacts, potentially affecting monitoring outcomes. In this paper, we present a novel registration-free approach for monitoring PCD of complex shapes, eliminating the need for both registration and mesh reconstruction. Our proposal consists of two alternative feature learning methods and a common monitoring scheme designed to handle hundreds of features. Feature learning methods leverage intrinsic geometric properties of the shape, captured via the Laplacian and geodesic distances. In the monitoring scheme, thresholding techniques are used to further select intrinsic features most indicative of potential out-of-control conditions. Numerical experiments and case studies highlight the effectiveness of the proposed approach in identifying different types of defects.", "number": 24, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#24</span>
+                <a href="https://arxiv.org/abs/2511.05623" target="_blank">Registration-Free Monitoring of Unstructured Point Cloud Data via Intrinsic Geometrical Properties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Mariafrancesca Patalano, Giovanna Capizzi, Kamran Paynabar</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.05623" target="_blank">https://arxiv.org/abs/2511.05623</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Modern sensing technologies have enabled the collection of unstructured point cloud data (PCD) of varying sizes, which are used to monitor the geometric accuracy of 3D objects. PCD are widely applied in advanced manufacturing processes, including additive, subtractive, and hybrid manufacturing. To ensure the consistency of analysis and avoid false alarms, preprocessing steps such as registration and mesh reconstruction are commonly applied prior to monitoring. However, these steps are error-prone, time-consuming and may introduce artifacts, potentially affecting monitoring outcomes. In this paper, we present a novel registration-free approach for monitoring PCD of complex shapes, eliminating the need for both registration and mesh reconstruction. Our proposal consists of two alternative feature learning methods and a common monitoring scheme designed to handle hundreds of features. Feature learning methods leverage intrinsic geometric properties of the shape, captured via the Laplacian and geodesic distances. In the monitoring scheme, thresholding techniques are used to further select intrinsic features most indicative of potential out-of-control conditions. Numerical experiments and case studies highlight the effectiveness of the proposed approach in identifying different types of defects.
+            </div>
+        </div>
+        <div class="paper" id="paper-25">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-25" data-paper-data='{"title": "Causal Judge Evaluation: Calibrated Surrogate Metrics for LLM Systems", "author": "Eddie Landesberg, Manjari Narayan", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.11150", "summary": "arXiv:2512.11150v3 Announce Type: replace-cross \nAbstract: Measuring long-run LLM outcomes (user satisfaction, expert judgment, downstream KPIs) is expensive. Teams default to cheap LLM judges, but uncalibrated proxies can invert rankings entirely. Causal Judge Evaluation (CJE) makes it affordable to aim at the right target: calibrate cheap scores against a small oracle slice, then evaluate at scale with valid uncertainty. We treat surrogate validity as auditable: for each policy or deployment context, a small oracle audit tests whether the learned calibration remains mean-unbiased, turning an uncheckable identification condition into a falsifiable diagnostic. On 4,961 Chatbot Arena prompts comparing five policies with a 16x oracle/judge cost ratio, at a 5% oracle fraction CJE achieves 99% pairwise ranking accuracy at 14x lower cost; across all configurations (5-50% oracle, varying n), accuracy averages 94%. An adversarial policy fails the transport audit and is correctly flagged; in such cases CJE refuses level claims rather than reporting biased estimates. Key findings: naive confidence intervals on raw judge scores achieve 0% coverage (CJE: ~95%); importance-weighted estimators fail despite &gt;90% effective sample size; and the Coverage-Limited Efficiency (CLE) bound and its TTC diagnostic explain why.", "number": 25, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#25</span>
+                <a href="https://arxiv.org/abs/2512.11150" target="_blank">Causal Judge Evaluation: Calibrated Surrogate Metrics for LLM Systems</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Eddie Landesberg, Manjari Narayan</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.11150" target="_blank">https://arxiv.org/abs/2512.11150</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Measuring long-run LLM outcomes (user satisfaction, expert judgment, downstream KPIs) is expensive. Teams default to cheap LLM judges, but uncalibrated proxies can invert rankings entirely. Causal Judge Evaluation (CJE) makes it affordable to aim at the right target: calibrate cheap scores against a small oracle slice, then evaluate at scale with valid uncertainty. We treat surrogate validity as auditable: for each policy or deployment context, a small oracle audit tests whether the learned calibration remains mean-unbiased, turning an uncheckable identification condition into a falsifiable diagnostic. On 4,961 Chatbot Arena prompts comparing five policies with a 16x oracle/judge cost ratio, at a 5% oracle fraction CJE achieves 99% pairwise ranking accuracy at 14x lower cost; across all configurations (5-50% oracle, varying n), accuracy averages 94%. An adversarial policy fails the transport audit and is correctly flagged; in such cases CJE refuses level claims rather than reporting biased estimates. Key findings: naive confidence intervals on raw judge scores achieve 0% coverage (CJE: ~95%); importance-weighted estimators fail despite &gt;90% effective sample size; and the Coverage-Limited Efficiency (CLE) bound and its TTC diagnostic explain why.
+            </div>
+        </div>
+        <div class="paper" id="paper-26">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-26" data-paper-data='{"title": "Physics-Informed Singular-Value Learning for Cross-Covariances Forecasting in Financial Markets", "author": "Efstratios Manolakis, Christian Bongiorno, Rosario Nunzio Mantegna", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.07687", "summary": "arXiv:2601.07687v2 Announce Type: replace-cross \nAbstract: A new wave of work on covariance cleaning and nonlinear shrinkage has delivered asymptotically optimal analytical solutions for large covariance matrices. The same framework has been generalized to empirical cross-covariance matrices, whose singular value decomposition identifies canonical comovement modes between two asset sets, with singular values quantifying the strength of each mode and providing natural targets for shrinkage. Existing analytical cross-covariance cleaners are derived under strong stationarity and large-sample assumptions, and they typically rely on mesoscopic regularity conditions such as bounded spectra; macroscopic common modes (e.g., a global market factor) violate these conditions. When applied to real equity returns, where dependence structures drift over time and global modes are prominent, we find that these theoretically optimal formulas do not translate into robust out-of-sample performance. We address this gap by designing a random-matrix-inspired neural architecture that operates in the empirical singular-vector basis and learns a nonlinear mapping from empirical singular values to their corresponding cleaned values. By construction, the network can recover the analytical solution as a special case, yet it remains flexible enough to adapt to non-stationary dynamics and mode-driven distortions. Trained on a long history of equity returns, the proposed method achieves a more favorable bias-variance trade-off than purely analytical cleaners and delivers systematically lower out-of-sample cross-covariance prediction errors. Our results demonstrate that combining random-matrix theory with machine learning makes asymptotic theories practically effective in realistic time-varying markets.", "number": 26, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#26</span>
+                <a href="https://arxiv.org/abs/2601.07687" target="_blank">Physics-Informed Singular-Value Learning for Cross-Covariances Forecasting in Financial Markets</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Efstratios Manolakis, Christian Bongiorno, Rosario Nunzio Mantegna</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.07687" target="_blank">https://arxiv.org/abs/2601.07687</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                A new wave of work on covariance cleaning and nonlinear shrinkage has delivered asymptotically optimal analytical solutions for large covariance matrices. The same framework has been generalized to empirical cross-covariance matrices, whose singular value decomposition identifies canonical comovement modes between two asset sets, with singular values quantifying the strength of each mode and providing natural targets for shrinkage. Existing analytical cross-covariance cleaners are derived under strong stationarity and large-sample assumptions, and they typically rely on mesoscopic regularity conditions such as bounded spectra; macroscopic common modes (e.g., a global market factor) violate these conditions. When applied to real equity returns, where dependence structures drift over time and global modes are prominent, we find that these theoretically optimal formulas do not translate into robust out-of-sample performance. We address this gap by designing a random-matrix-inspired neural architecture that operates in the empirical singular-vector basis and learns a nonlinear mapping from empirical singular values to their corresponding cleaned values. By construction, the network can recover the analytical solution as a special case, yet it remains flexible enough to adapt to non-stationary dynamics and mode-driven distortions. Trained on a long history of equity returns, the proposed method achieves a more favorable bias-variance trade-off than purely analytical cleaners and delivers systematically lower out-of-sample cross-covariance prediction errors. Our results demonstrate that combining random-matrix theory with machine learning makes asymptotic theories practically effective in realistic time-varying markets.
+            </div>
+        </div>
+        <div class="paper" id="paper-27">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-27" data-paper-data='{"title": "When Are Two Scores Better Than One? Investigating Ensembles of Diffusion Models", "author": "Rapha\\\"el Razafindralambo, R\\'emy Sun, Fr\\'ed\\'eric Precioso, Damien Garreau, Pierre-Alexandre Mattei", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.11444", "summary": "arXiv:2601.11444v2 Announce Type: replace-cross \nAbstract: Diffusion models now generate high-quality, diverse samples, with an increasing focus on more powerful models. Although ensembling is a well-known way to improve supervised models, its application to unconditional score-based diffusion models remains largely unexplored. In this work we investigate whether it provides tangible benefits for generative modelling. We find that while ensembling the scores generally improves the score-matching loss and model likelihood, it fails to consistently enhance perceptual quality metrics such as FID on image datasets. We confirm this observation across a breadth of aggregation rules using Deep Ensembles, Monte Carlo Dropout, on CIFAR-10 and FFHQ. We attempt to explain this discrepancy by investigating possible explanations, such as the link between score estimation and image quality. We also look into tabular data through random forests, and find that one aggregation strategy outperforms the others. Finally, we provide theoretical insights into the summing of score models, which shed light not only on ensembling but also on several model composition techniques (e.g. guidance).", "number": 27, "labels": [{"name": "diffusion", "color": "#9b59b6"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#27</span>
+                <a href="https://arxiv.org/abs/2601.11444" target="_blank">When Are Two Scores Better Than One? Investigating Ensembles of Diffusion Models</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #9b59b6;">diffusion</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Rapha\"el Razafindralambo, R\'emy Sun, Fr\'ed\'eric Precioso, Damien Garreau, Pierre-Alexandre Mattei</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.11444" target="_blank">https://arxiv.org/abs/2601.11444</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Diffusion models now generate high-quality, diverse samples, with an increasing focus on more powerful models. Although ensembling is a well-known way to improve supervised models, its application to unconditional score-based diffusion models remains largely unexplored. In this work we investigate whether it provides tangible benefits for generative modelling. We find that while ensembling the scores generally improves the score-matching loss and model likelihood, it fails to consistently enhance perceptual quality metrics such as FID on image datasets. We confirm this observation across a breadth of aggregation rules using Deep Ensembles, Monte Carlo Dropout, on CIFAR-10 and FFHQ. We attempt to explain this discrepancy by investigating possible explanations, such as the link between score estimation and image quality. We also look into tabular data through random forests, and find that one aggregation strategy outperforms the others. Finally, we provide theoretical insights into the summing of score models, which shed light not only on ensembling but also on several model composition techniques (e.g. guidance).
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-01-22 18:00:04
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>

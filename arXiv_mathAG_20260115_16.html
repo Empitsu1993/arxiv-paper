@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Thu, 15 Jan 2026 05:00:17 +0000<br>
+        <strong>論文数:</strong> 16件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Geometric Manin's conjecture in characteristic $p$</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Birational morphisms in quantum toric geometry</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Inverse Eigenvalue Problems, Floquet Isospectrality and the Hilbert--Chow Morphism</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">Classification of real hyperplane singularities by real log canonical thresholds</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">On homological properties of some Cynk-Szemberg octic hyperplane arrangements</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">Real and bi-Lipschitz versions of the Theorem of Nobile</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Hochschild-Kostant-Rosenberg isomorphism for derived Deligne-Mumford stacks</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Stability Conditions and Moduli Spaces on Kuznetsov Component of Cubic Fivefolds</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">Proper moduli spaces of orthosymplectic complexes</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">On Strong Lefschetz Property of 0-dimensional complete intersections</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">Graded Betti numbers of the Jacobian algebra and total Tjurina numbers of plane curves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">Coleman-Gross Heights and $p$-adic N\'eron Functions on Jacobians of Genus $2$ Curves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">Rational torsion on hyperelliptic jacobian varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Perfectoid $C_i$ transfer</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Sign-reversing involutions in moduli spaces of curves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">Arithmetic dynamics and Generalized Fermat's conjecture</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Geometric Manin's conjecture in characteristic $p$", "author": "Brian Lehmann, Sho Tanimoto", "published": "Thu, 15 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.09227", "summary": "arXiv:2601.09227v1 Announce Type: new \nAbstract: Geometric Manin's conjecture for complex Fano varieties describes the structure of the moduli space of curves. We propose a version of this conjecture in characteristic $p$ and describe its connection to the Batyrev--Manin--Peyre--Tschinkel conjecture over global fields. This is a survey paper written for a volume of the Summer Research Institute in Algebraic Geometry held at Colorado State University in 2025.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2601.09227" target="_blank">Geometric Manin's conjecture in characteristic $p$</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Brian Lehmann, Sho Tanimoto</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 15 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.09227" target="_blank">https://arxiv.org/abs/2601.09227</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Geometric Manin's conjecture for complex Fano varieties describes the structure of the moduli space of curves. We propose a version of this conjecture in characteristic $p$ and describe its connection to the Batyrev--Manin--Peyre--Tschinkel conjecture over global fields. This is a survey paper written for a volume of the Summer Research Institute in Algebraic Geometry held at Colorado State University in 2025.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Birational morphisms in quantum toric geometry", "author": "Antoine Boivin", "published": "Thu, 15 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.09589", "summary": "arXiv:2601.09589v1 Announce Type: new \nAbstract: In this paper, we investigate birational toric morphisms between quantum toric stacks -- namely, toric (analytic) stacks associated with fans whose cones may be irrational -- focusing on two primary classes of examples: weighted blow-ups with arbitrary weights, and morphisms induced by cobordisms.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2601.09589" target="_blank">Birational morphisms in quantum toric geometry</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Antoine Boivin</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 15 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.09589" target="_blank">https://arxiv.org/abs/2601.09589</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we investigate birational toric morphisms between quantum toric stacks -- namely, toric (analytic) stacks associated with fans whose cones may be irrational -- focusing on two primary classes of examples: weighted blow-ups with arbitrary weights, and morphisms induced by cobordisms.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Inverse Eigenvalue Problems, Floquet Isospectrality and the Hilbert--Chow Morphism", "author": "John Cobb, Matthew Faust, Andreas Kretschmer", "published": "Thu, 15 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.09604", "summary": "arXiv:2601.09604v1 Announce Type: new \nAbstract: When can one change the diagonal of a matrix without changing its spectrum? We completely answer this question over an algebraically closed field of characteristic zero or larger than the size of the matrix: An $n \\times n$ matrix $A$ admits a nonzero diagonal matrix $D$ such that $A$ and $A+D$ have the same spectrum if and only if, for some size $k$, the $k \\times k$ principal minors of $A$ are not all equal. This relates to the classical additive inverse eigenvalue problem in numerical analysis and has implications for existence and rigidity results in the theory of Floquet isospectrality of discrete periodic operators in solid state physics. The proof employs new techniques involving Hilbert schemes of points and the infinitesimal structure of the Hilbert--Chow morphism.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2601.09604" target="_blank">Inverse Eigenvalue Problems, Floquet Isospectrality and the Hilbert--Chow Morphism</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> John Cobb, Matthew Faust, Andreas Kretschmer</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 15 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.09604" target="_blank">https://arxiv.org/abs/2601.09604</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                When can one change the diagonal of a matrix without changing its spectrum? We completely answer this question over an algebraically closed field of characteristic zero or larger than the size of the matrix: An $n \times n$ matrix $A$ admits a nonzero diagonal matrix $D$ such that $A$ and $A+D$ have the same spectrum if and only if, for some size $k$, the $k \times k$ principal minors of $A$ are not all equal. This relates to the classical additive inverse eigenvalue problem in numerical analysis and has implications for existence and rigidity results in the theory of Floquet isospectrality of discrete periodic operators in solid state physics. The proof employs new techniques involving Hilbert schemes of points and the infinitesimal structure of the Hilbert--Chow morphism.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "Classification of real hyperplane singularities by real log canonical thresholds", "author": "Dimitra Kosta, Daniel Windisch", "published": "Thu, 15 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2411.13392", "summary": "arXiv:2411.13392v2 Announce Type: replace \nAbstract: The log canonical threshold (lct) is a fundamental invariant in birational geometry, essential for understanding the complexity of singularities in algebraic varieties. Its real counterpart, the real log canonical threshold (rlct), also known as the learning coefficient, has become increasingly relevant in statistics and machine learning, where it plays a critical role in model selection and error estimation for singular statistical models. In this paper, we investigate the rlct and its multiplicity for real (not necessarily reduced) hyperplane arrangements. We derive explicit combinatorial formulas for these invariants, generalizing earlier results that were limited to specific examples. Moreover, we provide a general algebraic theory for real log canonical thresholds, and present a SageMath implementation for efficiently computing the rlct and its multiplicity in the case or real hyperplane arrangements. Applications to examples are given, illustrating how the formulas can also be used to analyze the asymptotic behavior of high-dimensional volume integrals.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2411.13392" target="_blank">Classification of real hyperplane singularities by real log canonical thresholds</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Dimitra Kosta, Daniel Windisch</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 15 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2411.13392" target="_blank">https://arxiv.org/abs/2411.13392</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The log canonical threshold (lct) is a fundamental invariant in birational geometry, essential for understanding the complexity of singularities in algebraic varieties. Its real counterpart, the real log canonical threshold (rlct), also known as the learning coefficient, has become increasingly relevant in statistics and machine learning, where it plays a critical role in model selection and error estimation for singular statistical models. In this paper, we investigate the rlct and its multiplicity for real (not necessarily reduced) hyperplane arrangements. We derive explicit combinatorial formulas for these invariants, generalizing earlier results that were limited to specific examples. Moreover, we provide a general algebraic theory for real log canonical thresholds, and present a SageMath implementation for efficiently computing the rlct and its multiplicity in the case or real hyperplane arrangements. Applications to examples are given, illustrating how the formulas can also be used to analyze the asymptotic behavior of high-dimensional volume integrals.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "On homological properties of some Cynk-Szemberg octic hyperplane arrangements", "author": "Marek Janasz, Piotr Pokora", "published": "Thu, 15 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2502.17031", "summary": "arXiv:2502.17031v4 Announce Type: replace \nAbstract: In this paper we study Cynk-Szemberg octic hyperplane arrangements from the perspective of homological properties of their derivation modules. In particular, we define the notion of the type of hyperplane arrangements that will be used in our characterization of rigid Cynk-Szemberg octic hyperplane arrangements. Moreover, we deliver a combinatorial non-freeness criterion for essential hyperplane arrangements in $\\mathbb{C}^{4}$.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2502.17031" target="_blank">On homological properties of some Cynk-Szemberg octic hyperplane arrangements</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Marek Janasz, Piotr Pokora</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 15 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2502.17031" target="_blank">https://arxiv.org/abs/2502.17031</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper we study Cynk-Szemberg octic hyperplane arrangements from the perspective of homological properties of their derivation modules. In particular, we define the notion of the type of hyperplane arrangements that will be used in our characterization of rigid Cynk-Szemberg octic hyperplane arrangements. Moreover, we deliver a combinatorial non-freeness criterion for essential hyperplane arrangements in $\mathbb{C}^{4}$.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "Real and bi-Lipschitz versions of the Theorem of Nobile", "author": "Jos\\'e Edson Sampaio", "published": "Thu, 15 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2502.20631", "summary": "arXiv:2502.20631v2 Announce Type: replace \nAbstract: The renowned Theorem of Nobile, proved by Nobile in 1975, states that a pure dimensional complex analytic set $X$ is analytically smooth if and only if its Nash transformation $\\eta: \\mathcal{N}(X) \\to X$ is an analytic isomorphism. While the Theorem of Nobile was fundamental in complex geometry, it remained an open question for 50 years whether the theorem held for real analytic sets, even more so for cases that demand only $C^{k}$ smoothness. This paper presents a proof for the real version of the Theorem of Nobile, even under $C^{k}$ smoothness conditions. Specifically, we prove that for a pure dimensional real analytic set $X$ the following statements are equivalent:\n  (1) $X$ is a real analytic (resp. $C^{k+1,1}$) submanifold;\n  (2) the mapping $\\eta\\colon\\mathcal{N}(X)\\to X$ is a real analytic (resp. $C^{k,1}$) diffeomorphism;\n  (3) the mapping $\\eta\\colon\\mathcal{N}(X)\\to X$ is a $C^{\\infty}$ (resp. $C^{k,1}$) diffeomorphism;\n  (4) $X$ is a $C^{\\infty}$ (resp. $C^{k+1,1}$) submanifold.\n  Consequently, we prove the bi-Lipschitz version of the Theorem of Nobile, demonstrating that a complex analytic set $X$ is analytically smooth if and only if its Nash transformation $\\eta\\colon \\mathcal{N}(X)\\to X$ is a homeomorphism that is locally bi-Lipschitz. A sharp version of this theorem, which holds in the much more general setting of locally definable sets in an o-minimal structure, is also presented here.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2502.20631" target="_blank">Real and bi-Lipschitz versions of the Theorem of Nobile</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jos\'e Edson Sampaio</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 15 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2502.20631" target="_blank">https://arxiv.org/abs/2502.20631</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The renowned Theorem of Nobile, proved by Nobile in 1975, states that a pure dimensional complex analytic set $X$ is analytically smooth if and only if its Nash transformation $\eta: \mathcal{N}(X) \to X$ is an analytic isomorphism. While the Theorem of Nobile was fundamental in complex geometry, it remained an open question for 50 years whether the theorem held for real analytic sets, even more so for cases that demand only $C^{k}$ smoothness. This paper presents a proof for the real version of the Theorem of Nobile, even under $C^{k}$ smoothness conditions. Specifically, we prove that for a pure dimensional real analytic set $X$ the following statements are equivalent:
+  (1) $X$ is a real analytic (resp. $C^{k+1,1}$) submanifold;
+  (2) the mapping $\eta\colon\mathcal{N}(X)\to X$ is a real analytic (resp. $C^{k,1}$) diffeomorphism;
+  (3) the mapping $\eta\colon\mathcal{N}(X)\to X$ is a $C^{\infty}$ (resp. $C^{k,1}$) diffeomorphism;
+  (4) $X$ is a $C^{\infty}$ (resp. $C^{k+1,1}$) submanifold.
+  Consequently, we prove the bi-Lipschitz version of the Theorem of Nobile, demonstrating that a complex analytic set $X$ is analytically smooth if and only if its Nash transformation $\eta\colon \mathcal{N}(X)\to X$ is a homeomorphism that is locally bi-Lipschitz. A sharp version of this theorem, which holds in the much more general setting of locally definable sets in an o-minimal structure, is also presented here.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Hochschild-Kostant-Rosenberg isomorphism for derived Deligne-Mumford stacks", "author": "Lie Fu, Mauro Porta, Sarah Scherotzke, Nicol\\`o Sibilla", "published": "Thu, 15 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2509.00501", "summary": "arXiv:2509.00501v2 Announce Type: replace \nAbstract: We prove a Hochschild--Konstant--Rosenberg (HKR) theorem for arbitrary derived Deligne--Mumford (DM) stacks, extending the results of Arinkin-C\\u{a}ld\\u{a}raru-Hablicsek in the smooth, global quotient case, although with different methods. To formulate our result, we introduce the notion of orbifold inertia stack of a derived DM stack; this supplies a finely tuned derived enhancement of the classical inertia stack, which does not always coincide with the classical truncation of the free loop space. We show that, in characteristic 0, given a derived DM stack, the shifted tangent bundle of its orbifold inertia stack is equivalent to its free loop space. This yields a canonical HKR isomorphism of algebras between the Hochschild homology of a derived DM stack and the cohomology of differential forms on its orbifold inertia stack. Moreover, this isomorphism intertwines the natural circle action and the de Rham differential. Similarly, HKR theorems for derived DM stacks are established for Hochschild cohomology, cyclic homology, negative cyclic homology, and periodic cyclic homology. As applications, we provide a rich supply of computations of Hochschild homology and Hochschild cohomology for interesting derived DM stacks, such as weighted projective lines, root stacks, quotients by algebraic groups, and mapping stacks, among others.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2509.00501" target="_blank">Hochschild-Kostant-Rosenberg isomorphism for derived Deligne-Mumford stacks</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Lie Fu, Mauro Porta, Sarah Scherotzke, Nicol\`o Sibilla</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 15 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2509.00501" target="_blank">https://arxiv.org/abs/2509.00501</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove a Hochschild--Konstant--Rosenberg (HKR) theorem for arbitrary derived Deligne--Mumford (DM) stacks, extending the results of Arinkin-C\u{a}ld\u{a}raru-Hablicsek in the smooth, global quotient case, although with different methods. To formulate our result, we introduce the notion of orbifold inertia stack of a derived DM stack; this supplies a finely tuned derived enhancement of the classical inertia stack, which does not always coincide with the classical truncation of the free loop space. We show that, in characteristic 0, given a derived DM stack, the shifted tangent bundle of its orbifold inertia stack is equivalent to its free loop space. This yields a canonical HKR isomorphism of algebras between the Hochschild homology of a derived DM stack and the cohomology of differential forms on its orbifold inertia stack. Moreover, this isomorphism intertwines the natural circle action and the de Rham differential. Similarly, HKR theorems for derived DM stacks are established for Hochschild cohomology, cyclic homology, negative cyclic homology, and periodic cyclic homology. As applications, we provide a rich supply of computations of Hochschild homology and Hochschild cohomology for interesting derived DM stacks, such as weighted projective lines, root stacks, quotients by algebraic groups, and mapping stacks, among others.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Stability Conditions and Moduli Spaces on Kuznetsov Component of Cubic Fivefolds", "author": "Peize Liu", "published": "Thu, 15 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2509.21454", "summary": "arXiv:2509.21454v3 Announce Type: replace \nAbstract: We study the Kuznetsov component of cubic fivefolds via their quadric fibration model, and construct a family of Serre-invariant Bridgeland stability conditions on it. For every primitive numerical class, we prove that the associated Bridgeland moduli space contains a non-empty smooth locus, on which the restriction to a general hyperplane section preserves stability. As a consequence, we obtain Lagrangian immersions into hyper-K\\\"ahler varieties arising as moduli spaces on the Kuznetsov component of cubic fourfolds, generalizing a geometric construction of Illiev-Manivel, which realizes the Fano surface of planes of the cubic fivefold as a Lagrangian subvariety in a hyper-K\\\"ahler fourfold.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2509.21454" target="_blank">Stability Conditions and Moduli Spaces on Kuznetsov Component of Cubic Fivefolds</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Peize Liu</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 15 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2509.21454" target="_blank">https://arxiv.org/abs/2509.21454</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the Kuznetsov component of cubic fivefolds via their quadric fibration model, and construct a family of Serre-invariant Bridgeland stability conditions on it. For every primitive numerical class, we prove that the associated Bridgeland moduli space contains a non-empty smooth locus, on which the restriction to a general hyperplane section preserves stability. As a consequence, we obtain Lagrangian immersions into hyper-K\"ahler varieties arising as moduli spaces on the Kuznetsov component of cubic fourfolds, generalizing a geometric construction of Illiev-Manivel, which realizes the Fano surface of planes of the cubic fivefold as a Lagrangian subvariety in a hyper-K\"ahler fourfold.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "Proper moduli spaces of orthosymplectic complexes", "author": "Chenjing Bu", "published": "Thu, 15 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.24275", "summary": "arXiv:2512.24275v3 Announce Type: replace \nAbstract: We construct proper good moduli spaces for moduli stacks of Bridgeland semistable orthosymplectic complexes on a complex smooth projective variety, which we propose as a candidate for compactifying moduli spaces of principal bundles for the orthogonal and symplectic groups. We also prove some results on good moduli spaces of fixed point stacks and mapping stacks from finite groupoids.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2512.24275" target="_blank">Proper moduli spaces of orthosymplectic complexes</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Chenjing Bu</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 15 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.24275" target="_blank">https://arxiv.org/abs/2512.24275</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We construct proper good moduli spaces for moduli stacks of Bridgeland semistable orthosymplectic complexes on a complex smooth projective variety, which we propose as a candidate for compactifying moduli spaces of principal bundles for the orthogonal and symplectic groups. We also prove some results on good moduli spaces of fixed point stacks and mapping stacks from finite groupoids.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "On Strong Lefschetz Property of 0-dimensional complete intersections", "author": "Zhenjian Wang", "published": "Thu, 15 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.07874", "summary": "arXiv:2601.07874v2 Announce Type: replace \nAbstract: We prove that a homogeneous 0-dimensional complete intersection satisfies the Strong Lefschetz Property (SLP) in degree 1 if and only if its associated form has nonzero Hessian.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2601.07874" target="_blank">On Strong Lefschetz Property of 0-dimensional complete intersections</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Zhenjian Wang</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 15 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.07874" target="_blank">https://arxiv.org/abs/2601.07874</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove that a homogeneous 0-dimensional complete intersection satisfies the Strong Lefschetz Property (SLP) in degree 1 if and only if its associated form has nonzero Hessian.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "Graded Betti numbers of the Jacobian algebra and total Tjurina numbers of plane curves", "author": "Alexandru Dimca, Gabriel Sticlaru", "published": "Thu, 15 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.08583", "summary": "arXiv:2601.08583v2 Announce Type: replace \nAbstract: In this paper we compute an explicit closed formula for the total Tjurina number $\\tau(C)$ of a reduced projective plane curve $C$ in terms of the graded Betti numbers of the corresponding Jacobian algebra. This formula allows a completely new view point on the classical upper bounds for the total Tjurina number $\\tau(C)$ of a plane curve $C$ given by A. du Plessis and C. T. C. Wall. This approach yields in particular a new necessary condition for a set of positive integers to be the graded Betti numbers of the Jacobian algebra of a reduced plane curve.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2601.08583" target="_blank">Graded Betti numbers of the Jacobian algebra and total Tjurina numbers of plane curves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Alexandru Dimca, Gabriel Sticlaru</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 15 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.08583" target="_blank">https://arxiv.org/abs/2601.08583</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper we compute an explicit closed formula for the total Tjurina number $\tau(C)$ of a reduced projective plane curve $C$ in terms of the graded Betti numbers of the corresponding Jacobian algebra. This formula allows a completely new view point on the classical upper bounds for the total Tjurina number $\tau(C)$ of a plane curve $C$ given by A. du Plessis and C. T. C. Wall. This approach yields in particular a new necessary condition for a set of positive integers to be the graded Betti numbers of the Jacobian algebra of a reduced plane curve.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "Coleman-Gross Heights and $p$-adic N\\'eron Functions on Jacobians of Genus $2$ Curves", "author": "Francesca Bianchi, Enis Kaya, J. Steffen M\\\"uller", "published": "Thu, 15 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2310.15049", "summary": "arXiv:2310.15049v2 Announce Type: replace-cross \nAbstract: We develop a theory of $p$-adic N\\'eron functions on abelian varieties, depending on various auxiliary choices, and show that the global $p$-adic height functions constructed by Mazur and Tate can be decomposed into a sum of $p$-adic N\\'eron functions if the same auxiliary choices are made. We also consider a decomposition of the $p$-adic height constructed by Coleman and Gross for good reduction, and extended to arbitrary reduction by Colmez and Besser, into a sum of certain local height functions for Jacobians of odd degree genus~$2$ curves. We show that this local height function is equal to the $p$-adic N\\'eron function with the same auxiliary choices, regardless of the reduction type of the curve. This extends work of Balakrishnan and Besser for elliptic curves. When the curve has semistable reduction and the reduction of the Jacobian is ordinary, we also describe the $p$-adic N\\'eron function that arises from the canonical Mazur--Tate splitting explicitly in terms of a generalisation of the $p$-adic sigma function constructed by Blakestad.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2310.15049" target="_blank">Coleman-Gross Heights and $p$-adic N\'eron Functions on Jacobians of Genus $2$ Curves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Francesca Bianchi, Enis Kaya, J. Steffen M\"uller</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 15 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2310.15049" target="_blank">https://arxiv.org/abs/2310.15049</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We develop a theory of $p$-adic N\'eron functions on abelian varieties, depending on various auxiliary choices, and show that the global $p$-adic height functions constructed by Mazur and Tate can be decomposed into a sum of $p$-adic N\'eron functions if the same auxiliary choices are made. We also consider a decomposition of the $p$-adic height constructed by Coleman and Gross for good reduction, and extended to arbitrary reduction by Colmez and Besser, into a sum of certain local height functions for Jacobians of odd degree genus~$2$ curves. We show that this local height function is equal to the $p$-adic N\'eron function with the same auxiliary choices, regardless of the reduction type of the curve. This extends work of Balakrishnan and Besser for elliptic curves. When the curve has semistable reduction and the reduction of the Jacobian is ordinary, we also describe the $p$-adic N\'eron function that arises from the canonical Mazur--Tate splitting explicitly in terms of a generalisation of the $p$-adic sigma function constructed by Blakestad.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "Rational torsion on hyperelliptic jacobian varieties", "author": "Hamide Kuru, Mohammad Sadek", "published": "Thu, 15 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2410.14454", "summary": "arXiv:2410.14454v2 Announce Type: replace-cross \nAbstract: It was conjectured by Flynn that there exists a constant $\\kappa$ such that, for any integer $g \\ge 2$, any $m \\le \\kappa g$, there exists a hyperelliptic curve of genus $g$ over $\\mathbb Q$ with a rational $m$-torsion point on its Jacobian. Lepr\\'{e}vost proved this conjecture with $\\kappa=3$. In this work we prove that given an integer $N$ in the interval $[3g,4g+1]$, $g\\ge 3$, satisfying certain partition conditions, there exist parametric families of hyperelliptic Jacobian varieties with a rational torsion point of order $N$. In particular, we establish the existence of such varieties for $N=4g+1$ when $g$ is odd and for $N=4g-1$ when $g$ is even. A few explicit applications of this result produce the first known infinite examples of torsion $13$ when $g=3$, torsion $15$ when $g=4$, and torsion $17,18,21$ when $g=5$. In fact, we show that infinitely many of the latter abelian varieties are absolutely simple.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2410.14454" target="_blank">Rational torsion on hyperelliptic jacobian varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Hamide Kuru, Mohammad Sadek</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 15 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2410.14454" target="_blank">https://arxiv.org/abs/2410.14454</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                It was conjectured by Flynn that there exists a constant $\kappa$ such that, for any integer $g \ge 2$, any $m \le \kappa g$, there exists a hyperelliptic curve of genus $g$ over $\mathbb Q$ with a rational $m$-torsion point on its Jacobian. Lepr\'{e}vost proved this conjecture with $\kappa=3$. In this work we prove that given an integer $N$ in the interval $[3g,4g+1]$, $g\ge 3$, satisfying certain partition conditions, there exist parametric families of hyperelliptic Jacobian varieties with a rational torsion point of order $N$. In particular, we establish the existence of such varieties for $N=4g+1$ when $g$ is odd and for $N=4g-1$ when $g$ is even. A few explicit applications of this result produce the first known infinite examples of torsion $13$ when $g=3$, torsion $15$ when $g=4$, and torsion $17,18,21$ when $g=5$. In fact, we show that infinitely many of the latter abelian varieties are absolutely simple.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Perfectoid $C_i$ transfer", "author": "Konstantinos Kartas", "published": "Thu, 15 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2504.14719", "summary": "arXiv:2504.14719v3 Announce Type: replace-cross \nAbstract: We prove a perfectoid analogue of the Ax-Kochen theorem on zeros of $p$-adic forms: Given $d\\in \\mathbb{N}$, there is a finite totally ramified extension $E/\\mathbb{Q}_p$ such that every untilt of $\\mathbb{F}_p(\\!(t^{1/p^{\\infty}})\\!)$ containing $E$ is $C_2(d)$. We also prove a similar result for the existence of rational points in rationally connected varieties over perfectoid field extensions of $\\mathbb{Q}_p^{ur}$.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2504.14719" target="_blank">Perfectoid $C_i$ transfer</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Konstantinos Kartas</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 15 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2504.14719" target="_blank">https://arxiv.org/abs/2504.14719</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove a perfectoid analogue of the Ax-Kochen theorem on zeros of $p$-adic forms: Given $d\in \mathbb{N}$, there is a finite totally ramified extension $E/\mathbb{Q}_p$ such that every untilt of $\mathbb{F}_p(\!(t^{1/p^{\infty}})\!)$ containing $E$ is $C_2(d)$. We also prove a similar result for the existence of rational points in rationally connected varieties over perfectoid field extensions of $\mathbb{Q}_p^{ur}$.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Sign-reversing involutions in moduli spaces of curves", "author": "Vance Blankers, Maria Gillespie, Jake Levinson", "published": "Thu, 15 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.20456", "summary": "arXiv:2512.20456v2 Announce Type: replace-cross \nAbstract: We use sign-reversing involutions to solve two computational problems that arise naturally in the geometry of moduli spaces of curves. In particular, we give an explicit combinatorial formula for arbitrary $\\psi$ class intersection products on the genus zero multicolored spaces $\\overline{M}_{0,[r_1,\\ldots,r_m]}$ using a novel sign reversing involution on decorated diagrams. As an application, we give a necessary and sufficient condition for when these intersection products are nonzero in terms of matchings on graphs.\n  We also calculate the analog of the tropical Euler characteristic for the graphical moduli spaces $\\overline{M}_{0,\\Gamma}$ for graphs with two dominant vertices $P, Q$, by constructing two new sign-reversing involutions to simplify the sum. We show that (up to sign) it is the number of acyclic orientations of $\\Gamma \\smallsetminus \\{P, Q\\}$.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2512.20456" target="_blank">Sign-reversing involutions in moduli spaces of curves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Vance Blankers, Maria Gillespie, Jake Levinson</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 15 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.20456" target="_blank">https://arxiv.org/abs/2512.20456</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We use sign-reversing involutions to solve two computational problems that arise naturally in the geometry of moduli spaces of curves. In particular, we give an explicit combinatorial formula for arbitrary $\psi$ class intersection products on the genus zero multicolored spaces $\overline{M}_{0,[r_1,\ldots,r_m]}$ using a novel sign reversing involution on decorated diagrams. As an application, we give a necessary and sufficient condition for when these intersection products are nonzero in terms of matchings on graphs.
+  We also calculate the analog of the tropical Euler characteristic for the graphical moduli spaces $\overline{M}_{0,\Gamma}$ for graphs with two dominant vertices $P, Q$, by constructing two new sign-reversing involutions to simplify the sum. We show that (up to sign) it is the number of acyclic orientations of $\Gamma \smallsetminus \{P, Q\}$.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "Arithmetic dynamics and Generalized Fermat's conjecture", "author": "Atsushi Moriwaki", "published": "Thu, 15 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.08207", "summary": "arXiv:2601.08207v2 Announce Type: replace-cross \nAbstract: We propose generalized Fermat's conjecture in the framework of arithmetic dynamics, and give evidences.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2601.08207" target="_blank">Arithmetic dynamics and Generalized Fermat's conjecture</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Atsushi Moriwaki</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 15 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.08207" target="_blank">https://arxiv.org/abs/2601.08207</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We propose generalized Fermat's conjecture in the framework of arithmetic dynamics, and give evidences.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-01-15 18:00:04
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>

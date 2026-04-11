@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Wed, 24 Dec 2025 05:00:20 +0000<br>
+        <strong>論文数:</strong> 26件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Finite subgroups of $\operatorname{PGL}_2(K)$ arising from configurations of skew lines in $\mathbb{P}^3_K$</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Equivariant Koszul Cohomology of Canonical Curves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Moduli of bundles and semiorthogonal decomposition</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">Rationality and cylindricity of $\Bbbk$-forms of singular del Pezzo surfaces</a>
+            <span class="title-label-badge" style="background-color: #9b59b6;">del Pezzo</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">Logarithmic Dieudonn\'e theory and overconvergent extensions</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">Weak Fano threefolds arising as the blowup of a hyperquadric in $\mathbb{P}^4$ along a curve</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Hyperbolicity and fundamental groups of complex quasi-projective varieties (III): applications</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">An Arithmetic Topology viewpoint on Descent theory and Equivariant Categories</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">On irreducible factors of polynomials over integers</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">Sign-reversing involutions in moduli spaces of curves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">Cuspidal character sheaves on graded Lie algebras II</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">Enumerative geometry via the moduli space of super Riemann surfaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">Motivic Steenrod problem away from the characteristic</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Del Pezzo surfaces with four log terminal singularities</a>
+            <span class="title-label-badge" style="background-color: #9b59b6;">del Pezzo</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">The automorphism groups of Kummer surfaces in characteristic two and their complex analogues</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">On higher Du Bois singularities and $K$-regularity</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">On plus-one generated arrangements of plane conics</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">Hanlon-Hicks-Lazarev resolution revisited</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">${\mathbb Z}_{p}^{m}$-actions of type $(d;p,n)$</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">Intermediate Jacobians and Burnside invariants</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-21" onchange="updateSelectedCount()">
+            <span class="title-number">21.</span>
+            <a href="#paper-21">Transfers on $\mathbb A^1$-connected components of quasi-split groups and the norm principle</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-22" onchange="updateSelectedCount()">
+            <span class="title-number">22.</span>
+            <a href="#paper-22">On the equation $N_{p_1}(E)\cdot N_{p_2}(E)\cdots N_{p_k}(E)=n$</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-23" onchange="updateSelectedCount()">
+            <span class="title-number">23.</span>
+            <a href="#paper-23">Single-element extensions of matroids over skew tracts</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-24" onchange="updateSelectedCount()">
+            <span class="title-number">24.</span>
+            <a href="#paper-24">Geometric interactions between bricks and $\tau$-rigidity</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-25" onchange="updateSelectedCount()">
+            <span class="title-number">25.</span>
+            <a href="#paper-25">On Hopkins' Picard group</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-26" onchange="updateSelectedCount()">
+            <span class="title-number">26.</span>
+            <a href="#paper-26">Descent Theory for Vertex Algebras</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Finite subgroups of $\\operatorname{PGL}_2(K)$ arising from configurations of skew lines in $\\mathbb{P}^3_K$", "author": "Giuseppe Favacchio", "published": "Wed, 24 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.19811", "summary": "arXiv:2512.19811v1 Announce Type: new \nAbstract: We study finite groups arising from configurations of skew lines in $\\mathbb{P}^3_K$. Given a finite set ${L}$ of pairwise skew lines in $\\mathbb{P}^3_K$ and the associated groupoid $C_{L}$, we consider the endomorphism group $G_{L} \\subset \\operatorname{Aut}(L_i) \\cong \\operatorname{PGL}_2(K)$ for any line $L_i \\in {L}$, and we ask which finite subgroups of $\\operatorname{PGL}_2(K)$ can occur in this way.\n  Using a matrix description of skew lines, we express the generators of $G_{L}$ in terms of a family of matrices $M_i \\in \\operatorname{GL}_2(K)$ and analyze $G_{L}$ in the abelian and non-abelian cases. In the abelian situation we show that, after a change of basis, the matrices $M_i$ are simultaneously upper triangular and we obtain explicit families realizing cyclic groups and $p$-semi-elementary groups of the form $C_p^m \\rtimes C_n$. In the non-abelian case we prove that no dihedral group $D_n$ with $n \\ge 3$ can occur, while we construct configurations with $G_{L} \\cong A_4, S_4, A_5$ and describe their orbit structure.\n  Viewed through the lens of $(a,b)$-geproci sets, these results provide a group-theoretic description of collinearly complete point sets and yield new examples of half-grid geproci sets.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2512.19811" target="_blank">Finite subgroups of $\operatorname{PGL}_2(K)$ arising from configurations of skew lines in $\mathbb{P}^3_K$</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Giuseppe Favacchio</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 24 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.19811" target="_blank">https://arxiv.org/abs/2512.19811</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study finite groups arising from configurations of skew lines in $\mathbb{P}^3_K$. Given a finite set ${L}$ of pairwise skew lines in $\mathbb{P}^3_K$ and the associated groupoid $C_{L}$, we consider the endomorphism group $G_{L} \subset \operatorname{Aut}(L_i) \cong \operatorname{PGL}_2(K)$ for any line $L_i \in {L}$, and we ask which finite subgroups of $\operatorname{PGL}_2(K)$ can occur in this way.
+  Using a matrix description of skew lines, we express the generators of $G_{L}$ in terms of a family of matrices $M_i \in \operatorname{GL}_2(K)$ and analyze $G_{L}$ in the abelian and non-abelian cases. In the abelian situation we show that, after a change of basis, the matrices $M_i$ are simultaneously upper triangular and we obtain explicit families realizing cyclic groups and $p$-semi-elementary groups of the form $C_p^m \rtimes C_n$. In the non-abelian case we prove that no dihedral group $D_n$ with $n \ge 3$ can occur, while we construct configurations with $G_{L} \cong A_4, S_4, A_5$ and describe their orbit structure.
+  Viewed through the lens of $(a,b)$-geproci sets, these results provide a group-theoretic description of collinearly complete point sets and yield new examples of half-grid geproci sets.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Equivariant Koszul Cohomology of Canonical Curves", "author": "Kostas Karagiannis, Aristides Kontogeorgis, Konstantia Manousou Sotiropoulou", "published": "Wed, 24 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.19894", "summary": "arXiv:2512.19894v1 Announce Type: new \nAbstract: This paper investigates the representation-theoretic structure of the Koszul cohomology of a smooth projective variety $X$ over an algebraically closed field $k$, admitting an action of a finite group $G$ of order coprime to ${\\rm char}(k)$. Properties of $G$-equivariant functors are employed to show that the associated Koszul complex is a complex of $kG$-modules, and to generalize known dimension formulas to identities between virtual representations. In the case of canonical curves, explicit formulas are obtained by combining the theory of equivariant Euler characteristics and equivariant Riemann-Roch theorems with that of generating functions for Schur functors.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2512.19894" target="_blank">Equivariant Koszul Cohomology of Canonical Curves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Kostas Karagiannis, Aristides Kontogeorgis, Konstantia Manousou Sotiropoulou</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 24 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.19894" target="_blank">https://arxiv.org/abs/2512.19894</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This paper investigates the representation-theoretic structure of the Koszul cohomology of a smooth projective variety $X$ over an algebraically closed field $k$, admitting an action of a finite group $G$ of order coprime to ${\rm char}(k)$. Properties of $G$-equivariant functors are employed to show that the associated Koszul complex is a complex of $kG$-modules, and to generalize known dimension formulas to identities between virtual representations. In the case of canonical curves, explicit formulas are obtained by combining the theory of equivariant Euler characteristics and equivariant Riemann-Roch theorems with that of generating functions for Schur functors.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Moduli of bundles and semiorthogonal decomposition", "author": "Kai Xu", "published": "Wed, 24 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.19948", "summary": "arXiv:2512.19948v1 Announce Type: new \nAbstract: In this paper we construct semiorthogonal decompositions of moduli of principal bundles on a curve into its symmetric powers, for both the moduli stack of all $G$-bundles and the coarse moduli space of semistable $G$-bundles. The essential ingredients in the proof include Borel-Weil-Bott theory for loop groups, highest weight structure of current group representation, derived $\\Theta$-stratification and local-global compatibility of Kac-Moody localization.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2512.19948" target="_blank">Moduli of bundles and semiorthogonal decomposition</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Kai Xu</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 24 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.19948" target="_blank">https://arxiv.org/abs/2512.19948</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper we construct semiorthogonal decompositions of moduli of principal bundles on a curve into its symmetric powers, for both the moduli stack of all $G$-bundles and the coarse moduli space of semistable $G$-bundles. The essential ingredients in the proof include Borel-Weil-Bott theory for loop groups, highest weight structure of current group representation, derived $\Theta$-stratification and local-global compatibility of Kac-Moody localization.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "Rationality and cylindricity of $\\Bbbk$-forms of singular del Pezzo surfaces", "author": "In-Kyun Kim, Dae-Won Lee, Masatomo Sawahara", "published": "Wed, 24 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.20134", "summary": "arXiv:2512.20134v1 Announce Type: new \nAbstract: In this paper, we study the rationality and cylindricity of $\\Bbbk$-forms of singular del Pezzo surfaces which are blow-ups of the weighted projective planes, where $\\Bbbk$ is an arbitrary field of characteristic zero.", "number": 4, "labels": [{"name": "del Pezzo", "color": "#9b59b6"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2512.20134" target="_blank">Rationality and cylindricity of $\Bbbk$-forms of singular del Pezzo surfaces</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #9b59b6;">del Pezzo</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> In-Kyun Kim, Dae-Won Lee, Masatomo Sawahara</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 24 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.20134" target="_blank">https://arxiv.org/abs/2512.20134</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we study the rationality and cylindricity of $\Bbbk$-forms of singular del Pezzo surfaces which are blow-ups of the weighted projective planes, where $\Bbbk$ is an arbitrary field of characteristic zero.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "Logarithmic Dieudonn\\'e theory and overconvergent extensions", "author": "Marco D'Addezio", "published": "Wed, 24 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.20143", "summary": "arXiv:2512.20143v1 Announce Type: new \nAbstract: In the proof of Crew's parabolicity conjecture, we established a key property concerning the slopes of $\\dagger$-hulls of $F$-isocrystals, extending a result of Tsuzuki. This article presents an alternative proof of this theorem for a specific class of $F$-isocrystals. The central ingredient is a local extension property for \\'etale $p$-divisible subgroups. To relate $p$-divisible groups and overconvergent $F$-isocrystals, we employ logarithmic Dieudonn\\'e theory, as introduced by Kato and further developed by Inoue. Over curves, this leads to an equivalence between the category of potentially semi-stable $p$-divisible groups and overconvergent $F$-isocrystals with slopes in the interval $[0,1]$.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2512.20143" target="_blank">Logarithmic Dieudonn\'e theory and overconvergent extensions</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Marco D'Addezio</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 24 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.20143" target="_blank">https://arxiv.org/abs/2512.20143</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In the proof of Crew's parabolicity conjecture, we established a key property concerning the slopes of $\dagger$-hulls of $F$-isocrystals, extending a result of Tsuzuki. This article presents an alternative proof of this theorem for a specific class of $F$-isocrystals. The central ingredient is a local extension property for \'etale $p$-divisible subgroups. To relate $p$-divisible groups and overconvergent $F$-isocrystals, we employ logarithmic Dieudonn\'e theory, as introduced by Kato and further developed by Inoue. Over curves, this leads to an equivalence between the category of potentially semi-stable $p$-divisible groups and overconvergent $F$-isocrystals with slopes in the interval $[0,1]$.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "Weak Fano threefolds arising as the blowup of a hyperquadric in $\\mathbb{P}^4$ along a curve", "author": "Anne Schnattinger", "published": "Wed, 24 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.20315", "summary": "arXiv:2512.20315v1 Announce Type: new \nAbstract: We characterize smooth irreducible curves $C$ on a smooth hyperquadric $Y$ of $\\mathbb{P}^4$ such that the blowup of $Y$ along $C$ is a weak Fano threefold. These are precisely the smooth irreducible curves $C$ of degree $d$ and genus $g$ lying on a smooth hypercubic section of $Y$ such that (i) $C$ has no 4-secant line and no 7-secant conic; (ii) $d&lt; 18$ and $(g,d)\\not \\in \\{(4,7),\\:(10, 11)\\}$; (iii) either $3d-26&lt;g\\leq\\frac{d^2-1}{12}$ or $(g,d)\\in \\{(4,6),\\:(13,12)\\}$. We prove the geometric realizability of each case, thereby proving the existence of weak Fano threefolds and Sarkisov links constructed from them, which were previously known only as numerical possibilities.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2512.20315" target="_blank">Weak Fano threefolds arising as the blowup of a hyperquadric in $\mathbb{P}^4$ along a curve</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Anne Schnattinger</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 24 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.20315" target="_blank">https://arxiv.org/abs/2512.20315</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We characterize smooth irreducible curves $C$ on a smooth hyperquadric $Y$ of $\mathbb{P}^4$ such that the blowup of $Y$ along $C$ is a weak Fano threefold. These are precisely the smooth irreducible curves $C$ of degree $d$ and genus $g$ lying on a smooth hypercubic section of $Y$ such that (i) $C$ has no 4-secant line and no 7-secant conic; (ii) $d&lt; 18$ and $(g,d)\not \in \{(4,7),\:(10, 11)\}$; (iii) either $3d-26&lt;g\leq\frac{d^2-1}{12}$ or $(g,d)\in \{(4,6),\:(13,12)\}$. We prove the geometric realizability of each case, thereby proving the existence of weak Fano threefolds and Sarkisov links constructed from them, which were previously known only as numerical possibilities.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Hyperbolicity and fundamental groups of complex quasi-projective varieties (III): applications", "author": "Benoit Cadorel, Ya Deng, Katsutoshi Yamanoi", "published": "Wed, 24 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.20360", "summary": "arXiv:2512.20360v1 Announce Type: new \nAbstract: This paper is Part III of a series of three. We begin by introducing the notion of $h$-special varieties, which can be seen as varieties \"chain-connected by the Zariski closures of entire curves.\" We prove that if $X$ is either a special complex quasi-projective variety in the sense of Campana or an $h$-special variety, then for any linear representation $\\varrho:\\pi_1(X)\\to \\mathrm{GL}_N(\\mathbb{C})$, the image $\\varrho(\\pi_1(X))$ is virtually nilpotent. We also provide examples showing that this result is sharp, leading to a revised form of Campana's abelianity conjecture for smooth quasi-projective varieties. In addition, we prove a structure theorem for quasi-projective varieties with big and semisimple representations of the fundamental groups, thereby addressing a conjecture by Koll\\'ar in 1995. We also construct several examples of quasi-projective varieties that are special and $h$-special, highlighting certain atypical properties of the non-compact case in contrast with the projective setting.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2512.20360" target="_blank">Hyperbolicity and fundamental groups of complex quasi-projective varieties (III): applications</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Benoit Cadorel, Ya Deng, Katsutoshi Yamanoi</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 24 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.20360" target="_blank">https://arxiv.org/abs/2512.20360</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This paper is Part III of a series of three. We begin by introducing the notion of $h$-special varieties, which can be seen as varieties "chain-connected by the Zariski closures of entire curves." We prove that if $X$ is either a special complex quasi-projective variety in the sense of Campana or an $h$-special variety, then for any linear representation $\varrho:\pi_1(X)\to \mathrm{GL}_N(\mathbb{C})$, the image $\varrho(\pi_1(X))$ is virtually nilpotent. We also provide examples showing that this result is sharp, leading to a revised form of Campana's abelianity conjecture for smooth quasi-projective varieties. In addition, we prove a structure theorem for quasi-projective varieties with big and semisimple representations of the fundamental groups, thereby addressing a conjecture by Koll\'ar in 1995. We also construct several examples of quasi-projective varieties that are special and $h$-special, highlighting certain atypical properties of the non-compact case in contrast with the projective setting.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "An Arithmetic Topology viewpoint on Descent theory and Equivariant Categories", "author": "Miltiadis Karakikes, Sotiris Karanikolopoulos, Aristides Kontogeorgis, Dimitrios Noulas", "published": "Wed, 24 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.20551", "summary": "arXiv:2512.20551v1 Announce Type: new \nAbstract: We establish a unified group-theoretic framework bridging the arithmetic homotopy exact sequence of a variety and the Birman exact sequence of a surface. Within this framework, we reinterpret classical arithmetic notions - such as the descent of varieties and of covers - and construct their topological analogues. We formalize the parallel setting between closed subgroups of the absolute Galois group and subgroups of the Mapping Class Group of a base space and their actions on fundamental groups. This provides an analogy between arithmetic and topological invariants, allowing us to define the groups of moduli, definition, and invariance in both settings.\n  Using this unified perspective, some purely group-theoretic proofs provide results in both settings simultaneously. Applications include a topological analogue of Weil's Descent Theorem for mapping class groups and an adaptation of D\\'ebes and Douai's cohomological obstructions regarding descent of algebraic covers to the topological setting.\n  Finally, we elevate these results to the categorical level. We demonstrate that the classical Weil cocycle condition is equivalent to the existence of a linearization in the language of equivariant categories. Applying this perspective to the bounded derived category of coherent sheaves $\\mathsf{D^b}(X)$, we show that the equivariant derived category $\\mathsf{D^b}(X)^G$, under the action induced by a Weil descent datum, recovers the derived category of the descended variety.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2512.20551" target="_blank">An Arithmetic Topology viewpoint on Descent theory and Equivariant Categories</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Miltiadis Karakikes, Sotiris Karanikolopoulos, Aristides Kontogeorgis, Dimitrios Noulas</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 24 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.20551" target="_blank">https://arxiv.org/abs/2512.20551</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We establish a unified group-theoretic framework bridging the arithmetic homotopy exact sequence of a variety and the Birman exact sequence of a surface. Within this framework, we reinterpret classical arithmetic notions - such as the descent of varieties and of covers - and construct their topological analogues. We formalize the parallel setting between closed subgroups of the absolute Galois group and subgroups of the Mapping Class Group of a base space and their actions on fundamental groups. This provides an analogy between arithmetic and topological invariants, allowing us to define the groups of moduli, definition, and invariance in both settings.
+  Using this unified perspective, some purely group-theoretic proofs provide results in both settings simultaneously. Applications include a topological analogue of Weil's Descent Theorem for mapping class groups and an adaptation of D\'ebes and Douai's cohomological obstructions regarding descent of algebraic covers to the topological setting.
+  Finally, we elevate these results to the categorical level. We demonstrate that the classical Weil cocycle condition is equivalent to the existence of a linearization in the language of equivariant categories. Applying this perspective to the bounded derived category of coherent sheaves $\mathsf{D^b}(X)$, we show that the equivariant derived category $\mathsf{D^b}(X)^G$, under the action induced by a Weil descent datum, recovers the derived category of the descended variety.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "On irreducible factors of polynomials over integers", "author": "Rishu Garg, Jitender Singh", "published": "Wed, 24 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.20262", "summary": "arXiv:2512.20262v1 Announce Type: cross \nAbstract: In this paper, we obtain several new factorization results for certain classes of polynomials having integer coefficients. In doing so, we use the information about prime factorization of the value taken up by such polynomials and their higher order formal derivatives at sufficiently large integer arguments. If a lower bound for the minimum possible degree of a factor of such a polynomial is known a priori, then the integer argument becomes significantly smaller, which makes the underlying factorization result easier to apply. A result on explicit lower degree factor bound for the classes of polynomials considered in this paper is also proved via Newton polygons.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2512.20262" target="_blank">On irreducible factors of polynomials over integers</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Rishu Garg, Jitender Singh</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 24 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.20262" target="_blank">https://arxiv.org/abs/2512.20262</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we obtain several new factorization results for certain classes of polynomials having integer coefficients. In doing so, we use the information about prime factorization of the value taken up by such polynomials and their higher order formal derivatives at sufficiently large integer arguments. If a lower bound for the minimum possible degree of a factor of such a polynomial is known a priori, then the integer argument becomes significantly smaller, which makes the underlying factorization result easier to apply. A result on explicit lower degree factor bound for the classes of polynomials considered in this paper is also proved via Newton polygons.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "Sign-reversing involutions in moduli spaces of curves", "author": "Vance Blankers, Maria Gillespie, Jake Levinson", "published": "Wed, 24 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.20456", "summary": "arXiv:2512.20456v1 Announce Type: cross \nAbstract: We use sign-reversing involutions to solve two computational problems that arise naturally in the geometry of moduli spaces of curves. In particular, we give an explicit combinatorial formula for arbitrary $\\psi$ class intersection products on the genus zero multicolored spaces $\\overline{M}_{0,[r_1,\\ldots,r_m]}$ using a novel sign reversing involution on decorated diagrams. As an application, we give a necessary and sufficient condition for when these intersection products are nonzero in terms of matchings on graphs.\n  We also calculate the analog of the tropical Euler characteristic for the graphical moduli spaces $\\overline{M}_{0,\\Gamma}$ for graphs with two dominant vertices $P, Q$, by constructing two new sign-reversing involutions to simplify the sum. We show that (up to sign) it is the number of acyclic orientations of $\\Gamma \\smallsetminus \\{P, Q\\}$.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2512.20456" target="_blank">Sign-reversing involutions in moduli spaces of curves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Vance Blankers, Maria Gillespie, Jake Levinson</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 24 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.20456" target="_blank">https://arxiv.org/abs/2512.20456</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We use sign-reversing involutions to solve two computational problems that arise naturally in the geometry of moduli spaces of curves. In particular, we give an explicit combinatorial formula for arbitrary $\psi$ class intersection products on the genus zero multicolored spaces $\overline{M}_{0,[r_1,\ldots,r_m]}$ using a novel sign reversing involution on decorated diagrams. As an application, we give a necessary and sufficient condition for when these intersection products are nonzero in terms of matchings on graphs.
+  We also calculate the analog of the tropical Euler characteristic for the graphical moduli spaces $\overline{M}_{0,\Gamma}$ for graphs with two dominant vertices $P, Q$, by constructing two new sign-reversing involutions to simplify the sum. We show that (up to sign) it is the number of acyclic orientations of $\Gamma \smallsetminus \{P, Q\}$.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "Cuspidal character sheaves on graded Lie algebras II", "author": "Wille Liu, Kari Vilonen, Ting Xue", "published": "Wed, 24 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.20472", "summary": "arXiv:2512.20472v1 Announce Type: cross \nAbstract: In this paper we give a complete classification of cyclically graded semisimple Lie algebras that afford cuspidal character sheaves and determine the support of the cuspidal character sheaves. This constitutes a major step towards the explicit classification of cuspidal character sheaves for graded Lie algebras.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2512.20472" target="_blank">Cuspidal character sheaves on graded Lie algebras II</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Wille Liu, Kari Vilonen, Ting Xue</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 24 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.20472" target="_blank">https://arxiv.org/abs/2512.20472</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper we give a complete classification of cyclically graded semisimple Lie algebras that afford cuspidal character sheaves and determine the support of the cuspidal character sheaves. This constitutes a major step towards the explicit classification of cuspidal character sheaves for graded Lie algebras.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "Enumerative geometry via the moduli space of super Riemann surfaces", "author": "Paul Norbury", "published": "Wed, 24 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2005.04378", "summary": "arXiv:2005.04378v4 Announce Type: replace \nAbstract: In this paper we relate volumes of moduli spaces of super Riemann surfaces to integrals over the moduli space of stable Riemann surfaces $\\overline{\\cal M}_{g,n}$. This allows us to prove via algebraic geometry a recursion between the volumes of moduli spaces of super hyperbolic surfaces previously proven via super geometry techniques by Stanford and Witten. The recursion between the volumes of moduli spaces of super hyperbolic surfaces is proven to be equivalent to the fact that a generating function for the intersection numbers of a natural collection of cohomology classes $\\Theta_{g,n}$ with tautological classes on $\\overline{\\cal M}_{g,n}$ is a KdV tau function. This is analogous to Mirzakhani's proof of the Kontsevich-Witten theorem regarding a generating function for the intersection numbers of tautological classes on $\\overline{\\cal M}_{g,n}$ using volumes of moduli spaces of hyperbolic surfaces.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2005.04378" target="_blank">Enumerative geometry via the moduli space of super Riemann surfaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Paul Norbury</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 24 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2005.04378" target="_blank">https://arxiv.org/abs/2005.04378</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper we relate volumes of moduli spaces of super Riemann surfaces to integrals over the moduli space of stable Riemann surfaces $\overline{\cal M}_{g,n}$. This allows us to prove via algebraic geometry a recursion between the volumes of moduli spaces of super hyperbolic surfaces previously proven via super geometry techniques by Stanford and Witten. The recursion between the volumes of moduli spaces of super hyperbolic surfaces is proven to be equivalent to the fact that a generating function for the intersection numbers of a natural collection of cohomology classes $\Theta_{g,n}$ with tautological classes on $\overline{\cal M}_{g,n}$ is a KdV tau function. This is analogous to Mirzakhani's proof of the Kontsevich-Witten theorem regarding a generating function for the intersection numbers of tautological classes on $\overline{\cal M}_{g,n}$ using volumes of moduli spaces of hyperbolic surfaces.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "Motivic Steenrod problem away from the characteristic", "author": "Toni Annala, Tobias Shin", "published": "Wed, 24 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2407.07194", "summary": "arXiv:2407.07194v4 Announce Type: replace \nAbstract: In topology, the Steenrod problem asks whether every singular homology class is the pushforward of the fundamental class of a closed oriented manifold. Here, we introduce an analogous question in algebraic geometry: is every element on the Chow line of the motivic cohomology of $X$ the pushforward of a fundamental class along a projective derived-lci morphism? If $X$ is a smooth variety over a field of characteristic $p \\geq 0$, then a positive answer to this question follows up to $p$-torsion from resolution of singularities by alterations. However, if $X$ is singular, then this is no longer necessarily so: we give examples of motivic cohomology classes of a singular scheme $X$ that are not $p$-torsion and are not expressible as such pushforwards. A consequence of our result is that the Chow ring of a singular variety cannot be expressed as a quotient of its algebraic cobordism ring, as suggested by the first-named-author in his thesis.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2407.07194" target="_blank">Motivic Steenrod problem away from the characteristic</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Toni Annala, Tobias Shin</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 24 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2407.07194" target="_blank">https://arxiv.org/abs/2407.07194</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In topology, the Steenrod problem asks whether every singular homology class is the pushforward of the fundamental class of a closed oriented manifold. Here, we introduce an analogous question in algebraic geometry: is every element on the Chow line of the motivic cohomology of $X$ the pushforward of a fundamental class along a projective derived-lci morphism? If $X$ is a smooth variety over a field of characteristic $p \geq 0$, then a positive answer to this question follows up to $p$-torsion from resolution of singularities by alterations. However, if $X$ is singular, then this is no longer necessarily so: we give examples of motivic cohomology classes of a singular scheme $X$ that are not $p$-torsion and are not expressible as such pushforwards. A consequence of our result is that the Chow ring of a singular variety cannot be expressed as a quotient of its algebraic cobordism ring, as suggested by the first-named-author in his thesis.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Del Pezzo surfaces with four log terminal singularities", "author": "Grigory Belousov, DongSeon Hwang", "published": "Wed, 24 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2411.01957", "summary": "arXiv:2411.01957v2 Announce Type: replace \nAbstract: We classify del Pezzo surfaces with Picard number is equal to one and with four log terminal singular points.", "number": 14, "labels": [{"name": "del Pezzo", "color": "#9b59b6"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2411.01957" target="_blank">Del Pezzo surfaces with four log terminal singularities</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #9b59b6;">del Pezzo</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Grigory Belousov, DongSeon Hwang</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 24 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2411.01957" target="_blank">https://arxiv.org/abs/2411.01957</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We classify del Pezzo surfaces with Picard number is equal to one and with four log terminal singular points.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "The automorphism groups of Kummer surfaces in characteristic two and their complex analogues", "author": "Shigeyuki Kondo, Shigeru Mukai", "published": "Wed, 24 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2412.18902", "summary": "arXiv:2412.18902v2 Announce Type: replace \nAbstract: We calculate the automorphism group of the Kummer surface associated with a curve of genus 2 or the product of two elliptic curves in characteristic two under the assumption that the Kummer surface is a $K3$ surface. Moreover we discuss the complex $K3$ surfaces with the same Picard lattice as these Kummer surfaces. The paper has two appendices.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2412.18902" target="_blank">The automorphism groups of Kummer surfaces in characteristic two and their complex analogues</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Shigeyuki Kondo, Shigeru Mukai</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 24 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2412.18902" target="_blank">https://arxiv.org/abs/2412.18902</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We calculate the automorphism group of the Kummer surface associated with a curve of genus 2 or the product of two elliptic curves in characteristic two under the assumption that the Kummer surface is a $K3$ surface. Moreover we discuss the complex $K3$ surfaces with the same Picard lattice as these Kummer surfaces. The paper has two appendices.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "On higher Du Bois singularities and $K$-regularity", "author": "Wanchun Shen", "published": "Wed, 24 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2504.12402", "summary": "arXiv:2504.12402v2 Announce Type: replace \nAbstract: We study the relationship between higher Du Bois singularities and $K$-regularity, a notion that measures the $\\mathbb{A}^1$-invariance of the algebraic $K$-groups. Building on this relationship, we establish a strengthened form of Vorst's conjecture for local complete intersections in characteristic zero. Our work also provides tools to construct new examples that illustrate various phenomena in the study of $K$-regularity. The main inputs for our results are vanishing theorems for the Du Bois complexes.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2504.12402" target="_blank">On higher Du Bois singularities and $K$-regularity</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Wanchun Shen</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 24 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2504.12402" target="_blank">https://arxiv.org/abs/2504.12402</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the relationship between higher Du Bois singularities and $K$-regularity, a notion that measures the $\mathbb{A}^1$-invariance of the algebraic $K$-groups. Building on this relationship, we establish a strengthened form of Vorst's conjecture for local complete intersections in characteristic zero. Our work also provides tools to construct new examples that illustrate various phenomena in the study of $K$-regularity. The main inputs for our results are vanishing theorems for the Du Bois complexes.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "On plus-one generated arrangements of plane conics", "author": "Artur Bromboszcz, Bartosz Jaros{\\l}awski, Piotr Pokora", "published": "Wed, 24 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2507.23024", "summary": "arXiv:2507.23024v4 Announce Type: replace \nAbstract: In this paper, we examine the combinatorial properties of conic arrangements in the complex projective plane that possess certain quasi-homogeneous singularities. First, we introduce a new tool that enables us to characterize the property of being plus-one generated within the class of conic arrangements with some naturally chosen quasi-homogeneous singularities. Next, we present a classification result on plus-one generated conic arrangements admitting only nodes and tacnodes as singularities. Building on results regarding conic arrangements with nodes and tacnodes, we present new examples of strong Ziegler pairs of conic-line arrangements -- that is, arrangements having the same strong combinatorics but distinct derivation modules.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2507.23024" target="_blank">On plus-one generated arrangements of plane conics</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Artur Bromboszcz, Bartosz Jaros{\l}awski, Piotr Pokora</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 24 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2507.23024" target="_blank">https://arxiv.org/abs/2507.23024</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we examine the combinatorial properties of conic arrangements in the complex projective plane that possess certain quasi-homogeneous singularities. First, we introduce a new tool that enables us to characterize the property of being plus-one generated within the class of conic arrangements with some naturally chosen quasi-homogeneous singularities. Next, we present a classification result on plus-one generated conic arrangements admitting only nodes and tacnodes as singularities. Building on results regarding conic arrangements with nodes and tacnodes, we present new examples of strong Ziegler pairs of conic-line arrangements -- that is, arrangements having the same strong combinatorics but distinct derivation modules.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "Hanlon-Hicks-Lazarev resolution revisited", "author": "Lev Borisov, Zengrui Han", "published": "Wed, 24 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2509.11077", "summary": "arXiv:2509.11077v2 Announce Type: replace \nAbstract: Hanlon, Hicks and Lazarev constructed resolutions of structure sheaves of toric substacks by certain line bundles on the ambient toric stacks. In this paper, we give a new and substantially simpler proof of their result.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2509.11077" target="_blank">Hanlon-Hicks-Lazarev resolution revisited</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Lev Borisov, Zengrui Han</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 24 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2509.11077" target="_blank">https://arxiv.org/abs/2509.11077</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Hanlon, Hicks and Lazarev constructed resolutions of structure sheaves of toric substacks by certain line bundles on the ambient toric stacks. In this paper, we give a new and substantially simpler proof of their result.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "${\\mathbb Z}_{p}^{m}$-actions of type $(d;p,n)$", "author": "Ruben A. HIdalgo, Maximiliano Leyton-Alvarez", "published": "Wed, 24 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.04462", "summary": "arXiv:2511.04462v2 Announce Type: replace \nAbstract: A ${\\mathbb Z}_{p}^{m}$-action of type $(d;p,n)$, where $2 \\leq d \\leq m \\leq n$ are integers, is a pair $(S,N)$ where $S$ is a $d$-dimensional compact complex manifold, $N \\cong {\\mathbb Z}_{p}^{m}$ is a group of holomorphic automorphisms of $S$ such that the quotient orbifold $S/N$ is the $d$-dimensional projective space ${\\mathbb P}^{d}$ whose branch locus consists of $n+1$ hyperplanes in general position, each one of branch order $p$.\n  If $(d;p,n) \\notin \\{(2;2,5),(2;4,3)\\}$ and $d+1 \\leq n$, then we prove that: (i) $N$ is a normal subgroup of ${\\rm Aut}(S)$ and (ii) if $(S,M)$ is a ${\\mathbb Z}_{\\hat{p}}^{\\hat{m}}$-action of type $(d;\\hat{p},\\hat{n})$, then $M=N$. If, moreover, $d+1 \\leq n \\leq 2d-1$, then we observe that $S$ is not algebraically hyperbolic", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2511.04462" target="_blank">${\mathbb Z}_{p}^{m}$-actions of type $(d;p,n)$</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ruben A. HIdalgo, Maximiliano Leyton-Alvarez</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 24 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.04462" target="_blank">https://arxiv.org/abs/2511.04462</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                A ${\mathbb Z}_{p}^{m}$-action of type $(d;p,n)$, where $2 \leq d \leq m \leq n$ are integers, is a pair $(S,N)$ where $S$ is a $d$-dimensional compact complex manifold, $N \cong {\mathbb Z}_{p}^{m}$ is a group of holomorphic automorphisms of $S$ such that the quotient orbifold $S/N$ is the $d$-dimensional projective space ${\mathbb P}^{d}$ whose branch locus consists of $n+1$ hyperplanes in general position, each one of branch order $p$.
+  If $(d;p,n) \notin \{(2;2,5),(2;4,3)\}$ and $d+1 \leq n$, then we prove that: (i) $N$ is a normal subgroup of ${\rm Aut}(S)$ and (ii) if $(S,M)$ is a ${\mathbb Z}_{\hat{p}}^{\hat{m}}$-action of type $(d;\hat{p},\hat{n})$, then $M=N$. If, moreover, $d+1 \leq n \leq 2d-1$, then we observe that $S$ is not algebraically hyperbolic
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "Intermediate Jacobians and Burnside invariants", "author": "Andrew Kresch, Sho Tanimoto, Yuri Tschinkel", "published": "Wed, 24 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.07101", "summary": "arXiv:2511.07101v2 Announce Type: replace \nAbstract: We propose new invariants in equivariant birational geometry, combining equivariant intermediate Jacobians and the Burnside formalism, for smooth rationally connected threefolds with actions of finite groups.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2511.07101" target="_blank">Intermediate Jacobians and Burnside invariants</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Andrew Kresch, Sho Tanimoto, Yuri Tschinkel</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 24 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.07101" target="_blank">https://arxiv.org/abs/2511.07101</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We propose new invariants in equivariant birational geometry, combining equivariant intermediate Jacobians and the Burnside formalism, for smooth rationally connected threefolds with actions of finite groups.
+            </div>
+        </div>
+        <div class="paper" id="paper-21">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-21" data-paper-data='{"title": "Transfers on $\\mathbb A^1$-connected components of quasi-split groups and the norm principle", "author": "Amit Hogadi, Anand Sawant", "published": "Wed, 24 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.15324", "summary": "arXiv:2512.15324v2 Announce Type: replace \nAbstract: We show that the sheaf of $\\mathbb A^1$-connected components of a quasi-split group over a perfect field is a strictly $\\mathbb A^1$-invariant sheaf with (Voevodsky) transfers. As a consequence, we show that the norm principle holds for any quasi-split group over a perfect field.", "number": 21, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#21</span>
+                <a href="https://arxiv.org/abs/2512.15324" target="_blank">Transfers on $\mathbb A^1$-connected components of quasi-split groups and the norm principle</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Amit Hogadi, Anand Sawant</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 24 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.15324" target="_blank">https://arxiv.org/abs/2512.15324</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We show that the sheaf of $\mathbb A^1$-connected components of a quasi-split group over a perfect field is a strictly $\mathbb A^1$-invariant sheaf with (Voevodsky) transfers. As a consequence, we show that the norm principle holds for any quasi-split group over a perfect field.
+            </div>
+        </div>
+        <div class="paper" id="paper-22">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-22" data-paper-data='{"title": "On the equation $N_{p_1}(E)\\cdot N_{p_2}(E)\\cdots N_{p_k}(E)=n$", "author": "Kirti Joshi", "published": "Wed, 24 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/1711.06283", "summary": "arXiv:1711.06283v2 Announce Type: replace-cross \nAbstract: For a given elliptic curve $E/\\mathbb{Q}$, let $N_p(E)$ be the number of points on $E$ modulo $p$ for a prime of good reduction for $E$. Given integer $n$, let $G_k(E,n)$ be the number of $k$-tuples of $p_1&lt;\\ldots &lt;\\cdots &lt;p_m$ of arbitrary lengths $m$ such that $N_{p_1}(E)=N_{p_2}(E)=\\cdots =N_{p_m}(E)$.", "number": 22, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#22</span>
+                <a href="https://arxiv.org/abs/1711.06283" target="_blank">On the equation $N_{p_1}(E)\cdot N_{p_2}(E)\cdots N_{p_k}(E)=n$</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Kirti Joshi</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 24 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/1711.06283" target="_blank">https://arxiv.org/abs/1711.06283</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                For a given elliptic curve $E/\mathbb{Q}$, let $N_p(E)$ be the number of points on $E$ modulo $p$ for a prime of good reduction for $E$. Given integer $n$, let $G_k(E,n)$ be the number of $k$-tuples of $p_1&lt;\ldots &lt;\cdots &lt;p_m$ of arbitrary lengths $m$ such that $N_{p_1}(E)=N_{p_2}(E)=\cdots =N_{p_m}(E)$.
+            </div>
+        </div>
+        <div class="paper" id="paper-23">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-23" data-paper-data='{"title": "Single-element extensions of matroids over skew tracts", "author": "Ting Su", "published": "Wed, 24 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2012.05683", "summary": "arXiv:2012.05683v3 Announce Type: replace-cross \nAbstract: Matroids over skew tracts provide an algebraic framework simultaneously generalizing the notions of linear subspaces, matroids, oriented matroids, phased matroids, and some other ``matroids with extra structure\". A single-element extension of a matroid $\\mathcal{M}$ over a skew tract $T$ is a matroid $\\widetilde{\\mathcal{M}}$ over $T$ obtained from $\\mathcal{M}$ by adding one more element. Crapo characterized single-element extensions of ordinary matroids, and Las Vergnas characterized single-element extensions of oriented matroids, in terms of single-element extensions of their rank 2 contractions. The results of Crapo and Las Vergnas do not generalize to matroids over skew tracts, but we will show a necessary and sufficient condition on skew tracts, called Pathetic Cancellation, such that the result can generalize to weak matroids over skew tracts.\n  Stringent skew hyperfields are a special case of skew tracts which behave in many ways like skew fields. We find a characterization of single-element extensions of strong matroids over stringent skew hyperfields.", "number": 23, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#23</span>
+                <a href="https://arxiv.org/abs/2012.05683" target="_blank">Single-element extensions of matroids over skew tracts</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ting Su</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 24 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2012.05683" target="_blank">https://arxiv.org/abs/2012.05683</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Matroids over skew tracts provide an algebraic framework simultaneously generalizing the notions of linear subspaces, matroids, oriented matroids, phased matroids, and some other ``matroids with extra structure". A single-element extension of a matroid $\mathcal{M}$ over a skew tract $T$ is a matroid $\widetilde{\mathcal{M}}$ over $T$ obtained from $\mathcal{M}$ by adding one more element. Crapo characterized single-element extensions of ordinary matroids, and Las Vergnas characterized single-element extensions of oriented matroids, in terms of single-element extensions of their rank 2 contractions. The results of Crapo and Las Vergnas do not generalize to matroids over skew tracts, but we will show a necessary and sufficient condition on skew tracts, called Pathetic Cancellation, such that the result can generalize to weak matroids over skew tracts.
+  Stringent skew hyperfields are a special case of skew tracts which behave in many ways like skew fields. We find a characterization of single-element extensions of strong matroids over stringent skew hyperfields.
+            </div>
+        </div>
+        <div class="paper" id="paper-24">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-24" data-paper-data='{"title": "Geometric interactions between bricks and $\\tau$-rigidity", "author": "Kaveh Mousavand, Charles Paquette", "published": "Wed, 24 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2311.14863", "summary": "arXiv:2311.14863v3 Announce Type: replace-cross \nAbstract: For finite-dimensional algebras over algebraically closed fields, we consider two fundamental classes of modules and their geometric counterparts: bricks and $\\tau$-rigid modules, as well as brick components and $\\tau$-regular components. We then apply our results in the study of some open conjectures.\n  First, we investigate the situation where every brick is $\\tau$-rigid. We prove that this occurs exactly when the algebra is locally representation-directed; a family of algebras introduced by Dr\\\"axler in the 1990s, which are always representation-finite. Then, we adopt a geometric perspective and analyze the brick and $\\tau$-regular components of module varieties. In this greater generality, we establish new properties of such components. Inspired by some recent conjectures, we apply our results to the study of minimal brick-infinite algebras. Along the way, we construct some limits of rigid $g$-vectors, under a condition that we call the $\\tau$-convergence property. This construction is novel and, in certain cases, yields an integral $g$-vector lying outside the $\\tau$-tilting fan (a.k.a. $g$-vector fan). We show how our results provide new tools to the study of some open conjectures and particularly illustrate that for $E$-tame algebras.", "number": 24, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#24</span>
+                <a href="https://arxiv.org/abs/2311.14863" target="_blank">Geometric interactions between bricks and $\tau$-rigidity</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Kaveh Mousavand, Charles Paquette</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 24 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2311.14863" target="_blank">https://arxiv.org/abs/2311.14863</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                For finite-dimensional algebras over algebraically closed fields, we consider two fundamental classes of modules and their geometric counterparts: bricks and $\tau$-rigid modules, as well as brick components and $\tau$-regular components. We then apply our results in the study of some open conjectures.
+  First, we investigate the situation where every brick is $\tau$-rigid. We prove that this occurs exactly when the algebra is locally representation-directed; a family of algebras introduced by Dr\"axler in the 1990s, which are always representation-finite. Then, we adopt a geometric perspective and analyze the brick and $\tau$-regular components of module varieties. In this greater generality, we establish new properties of such components. Inspired by some recent conjectures, we apply our results to the study of minimal brick-infinite algebras. Along the way, we construct some limits of rigid $g$-vectors, under a condition that we call the $\tau$-convergence property. This construction is novel and, in certain cases, yields an integral $g$-vector lying outside the $\tau$-tilting fan (a.k.a. $g$-vector fan). We show how our results provide new tools to the study of some open conjectures and particularly illustrate that for $E$-tame algebras.
+            </div>
+        </div>
+        <div class="paper" id="paper-25">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-25" data-paper-data='{"title": "On Hopkins' Picard group", "author": "Tobias Barthel, Tomer M. Schlank, Nathaniel Stapleton, Jared Weinstein", "published": "Wed, 24 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2407.20958", "summary": "arXiv:2407.20958v2 Announce Type: replace-cross \nAbstract: We compute the algebraic Picard group of the category of $K(n)$-local spectra, for all heights $n$ and all primes $p$. In particular, we show that it is always finitely generated over $\\mathbb{Z}_p$ and, whenever $n \\geq 2$, is of rank $2$, thereby confirming a prediction made by Hopkins in the early 1990s. In fact, with the exception of the anomalous case $n=p=2$, we provide a full set of topological generators for these groups. Our arguments rely on recent advances in $p$-adic geometry to translate the problem to a computation on Drinfeld's symmetric space, which can then be solved using results of Colmez--Dospinescu--Niziol.", "number": 25, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#25</span>
+                <a href="https://arxiv.org/abs/2407.20958" target="_blank">On Hopkins' Picard group</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Tobias Barthel, Tomer M. Schlank, Nathaniel Stapleton, Jared Weinstein</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 24 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2407.20958" target="_blank">https://arxiv.org/abs/2407.20958</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We compute the algebraic Picard group of the category of $K(n)$-local spectra, for all heights $n$ and all primes $p$. In particular, we show that it is always finitely generated over $\mathbb{Z}_p$ and, whenever $n \geq 2$, is of rank $2$, thereby confirming a prediction made by Hopkins in the early 1990s. In fact, with the exception of the anomalous case $n=p=2$, we provide a full set of topological generators for these groups. Our arguments rely on recent advances in $p$-adic geometry to translate the problem to a computation on Drinfeld's symmetric space, which can then be solved using results of Colmez--Dospinescu--Niziol.
+            </div>
+        </div>
+        <div class="paper" id="paper-26">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-26" data-paper-data='{"title": "Descent Theory for Vertex Algebras", "author": "Robin Mader, Terry Gannon, Arturo Pianzola", "published": "Wed, 24 Dec 2025 00:00:00 -0500", "link": "https://arxiv.org/abs/2511.02251", "summary": "arXiv:2511.02251v2 Announce Type: replace-cross \nAbstract: Vertex algebras can be defined over any differential commutative ring. We develop the general descent theory for vertex algebras over such bases. We apply this to the classification of twisted forms of affine and Heisenberg vertex algebras, and to reinterpret and generalize a correspondence of Li.", "number": 26, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#26</span>
+                <a href="https://arxiv.org/abs/2511.02251" target="_blank">Descent Theory for Vertex Algebras</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Robin Mader, Terry Gannon, Arturo Pianzola</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 24 Dec 2025 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.02251" target="_blank">https://arxiv.org/abs/2511.02251</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Vertex algebras can be defined over any differential commutative ring. We develop the general descent theory for vertex algebras over such bases. We apply this to the classification of twisted forms of affine and Heisenberg vertex algebras, and to reinterpret and generalize a correspondence of Li.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2025-12-24 18:00:02
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>

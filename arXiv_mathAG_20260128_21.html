@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Wed, 28 Jan 2026 05:00:11 +0000<br>
+        <strong>論文数:</strong> 21件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Apolarity for border cactus decompositions</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Almost Vector Bundles over Perfectoid Spaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Iwahori-Coulomb branches, stable envelopes, and quantum cohomology of cotangent bundles of flag varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">Curves of genus two with maps of every degree to a fixed elliptic curve</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">Derived graded modules</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">Stability properties of adapted tangent sheaves on K\"ahler--Einstein log Fano pairs</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Some examples of DG-Lie formality transfer</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Integral torsion points on abelian varieties over function fields</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">Containments of Tensor Network Varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">A polyhedral approach to the invariant of Bierstone and Milman</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">Derived symmetries for crepant contractions to hypersurfaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">Algorithm for motivic Hilbert zeta function of some curve singularities</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">The affine closure of cotangent bundles of horospherical spaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Quadratic Segre indices</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Genus stabilization for the homology of moduli spaces of orbit-framed curves with symmetries-I</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">Hamiltonian reductions as affine closures of cotangent bundles</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">Prismatic Kunz's theorem</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">The sign of scalar curvature on K\"ahler blowups</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">On the Beilinson-Bloch conjecture over function fields</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">Non-negative polynomials on generalized elliptic curves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-21" onchange="updateSelectedCount()">
+            <span class="title-number">21.</span>
+            <a href="#paper-21">Mixed motives and linear forms in the Catalan constant</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Apolarity for border cactus decompositions", "author": "Weronika Buczy\\'nska, Jaros{\\l}aw Buczy\\'nski", "published": "Wed, 28 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.19558", "summary": "arXiv:2601.19558v1 Announce Type: new \nAbstract: The border apolarity technique was introduced in our earlier work for secant varieties over complex numbers. We extend the theory to cactus varieties of toric varieties over any algebraically closed field. A border cactus decomposition is a mulithomogeneous ideal in the Cox ring (also called the total coordinate ring) of the toric variety that witnesses that a given point is in a specific cactus variety. The definition of such witness uses apolarity and we describe the set of ideals that are credible witnesses for this purpose in terms of a correspondence between the usual Hilbert scheme (parametrising all closed subschemes of the toric variety) and the multigraded Hilbert scheme (parametrising all multihomogeneous ideals in the Cox ring). We also take this opportunity to extend the border apolarity to linear subspaces (in non-border setting, this is equivalent to simultaneous decompositions).", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2601.19558" target="_blank">Apolarity for border cactus decompositions</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Weronika Buczy\'nska, Jaros{\l}aw Buczy\'nski</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 28 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.19558" target="_blank">https://arxiv.org/abs/2601.19558</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The border apolarity technique was introduced in our earlier work for secant varieties over complex numbers. We extend the theory to cactus varieties of toric varieties over any algebraically closed field. A border cactus decomposition is a mulithomogeneous ideal in the Cox ring (also called the total coordinate ring) of the toric variety that witnesses that a given point is in a specific cactus variety. The definition of such witness uses apolarity and we describe the set of ideals that are credible witnesses for this purpose in terms of a correspondence between the usual Hilbert scheme (parametrising all closed subschemes of the toric variety) and the multigraded Hilbert scheme (parametrising all multihomogeneous ideals in the Cox ring). We also take this opportunity to extend the border apolarity to linear subspaces (in non-border setting, this is equivalent to simultaneous decompositions).
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Almost Vector Bundles over Perfectoid Spaces", "author": "Yuntong Cui, Guo Li, Shuhan Jiang, Jiahong Yu", "published": "Wed, 28 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.19655", "summary": "arXiv:2601.19655v1 Announce Type: new \nAbstract: In this paper, we define vector bundles within the framework of almost mathematics (referred to as almost vector bundles) and establish the $v$-descent theorem together with a structure theorem for these bundles over perfectoid spaces. The proof yields several interesting intermediate results.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2601.19655" target="_blank">Almost Vector Bundles over Perfectoid Spaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yuntong Cui, Guo Li, Shuhan Jiang, Jiahong Yu</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 28 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.19655" target="_blank">https://arxiv.org/abs/2601.19655</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we define vector bundles within the framework of almost mathematics (referred to as almost vector bundles) and establish the $v$-descent theorem together with a structure theorem for these bundles over perfectoid spaces. The proof yields several interesting intermediate results.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Iwahori-Coulomb branches, stable envelopes, and quantum cohomology of cotangent bundles of flag varieties", "author": "Ki Fung Chan, Kwokwai Chan, Chi Hong Chow, Chin Hang Eddie Lam", "published": "Wed, 28 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.19691", "summary": "arXiv:2601.19691v1 Announce Type: new \nAbstract: We consider Iwahori-Coulomb branches $\\mathcal{A}_{G,\\mathbf{N},\\mathbf{V}}^{\\mathrm{Fl}}$, which are the affine flag analogs of the original Coulomb branches $\\mathcal{A}_{G,\\mathbf{N}}^{\\mathrm{Gr}}$ defined by Braverman, Finkelberg, and Nakajima. For any conical symplectic resolution $X$, we prove that the $\\mathcal{A}_{G,\\mathbf{N},\\mathbf{V}}^{\\mathrm{Fl}}$-action on the localized equivariant quantum cohomology of $X$, induced by shift operators, satisfies a polynomiality property in terms of stable envelopes.\n  We then study the case $X = T^*(G/P)$, the cotangent bundle of a flag variety, for which the Iwahori-Coulomb branch is isomorphic to the trigonometric double affine Hecke algebra $\\mathcal{H}_{G,\\hbar,k}$. The polynomiality property enables us to compute explicitly the above action in terms of the Demazure-Lusztig elements and stable envelopes. Applications include:\n  (1) Computation of the Iwarhori-Coulomb branch action for $G/P$ by taking the confluent limit, recovering Peterson-Lam-Shimozono's theorem.\n  (2) Construction of an explicit Namikawa-Weyl group action on the equivariant quantum cohomology of $T^*(G/P)$ that preserves the quantum product, extending a result of Li-Su-Xiong.\n  (3) Proof of a conjecture of Braverman-Finkelberg-Nakajima stating that, up to a shift of the dilation parameter, $\\mathcal{A}_{G,\\mathfrak{g}^*}^{\\mathrm{Gr}}$ is isomorphic to the spherical subalgebra of $\\mathcal{H}_{G,\\hbar,k}$.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2601.19691" target="_blank">Iwahori-Coulomb branches, stable envelopes, and quantum cohomology of cotangent bundles of flag varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ki Fung Chan, Kwokwai Chan, Chi Hong Chow, Chin Hang Eddie Lam</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 28 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.19691" target="_blank">https://arxiv.org/abs/2601.19691</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We consider Iwahori-Coulomb branches $\mathcal{A}_{G,\mathbf{N},\mathbf{V}}^{\mathrm{Fl}}$, which are the affine flag analogs of the original Coulomb branches $\mathcal{A}_{G,\mathbf{N}}^{\mathrm{Gr}}$ defined by Braverman, Finkelberg, and Nakajima. For any conical symplectic resolution $X$, we prove that the $\mathcal{A}_{G,\mathbf{N},\mathbf{V}}^{\mathrm{Fl}}$-action on the localized equivariant quantum cohomology of $X$, induced by shift operators, satisfies a polynomiality property in terms of stable envelopes.
+  We then study the case $X = T^*(G/P)$, the cotangent bundle of a flag variety, for which the Iwahori-Coulomb branch is isomorphic to the trigonometric double affine Hecke algebra $\mathcal{H}_{G,\hbar,k}$. The polynomiality property enables us to compute explicitly the above action in terms of the Demazure-Lusztig elements and stable envelopes. Applications include:
+  (1) Computation of the Iwarhori-Coulomb branch action for $G/P$ by taking the confluent limit, recovering Peterson-Lam-Shimozono's theorem.
+  (2) Construction of an explicit Namikawa-Weyl group action on the equivariant quantum cohomology of $T^*(G/P)$ that preserves the quantum product, extending a result of Li-Su-Xiong.
+  (3) Proof of a conjecture of Braverman-Finkelberg-Nakajima stating that, up to a shift of the dilation parameter, $\mathcal{A}_{G,\mathfrak{g}^*}^{\mathrm{Gr}}$ is isomorphic to the spherical subalgebra of $\mathcal{H}_{G,\hbar,k}$.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "Curves of genus two with maps of every degree to a fixed elliptic curve", "author": "Everett W. Howe", "published": "Wed, 28 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.19050", "summary": "arXiv:2601.19050v1 Announce Type: cross \nAbstract: We show that up to isomorphism there are exactly twenty pairs $(C,E)$, where $C$ is a genus-$2$ curve over ${\\mathbf C}$, where $E$ is an elliptic curve over ${\\mathbf C}$, and where for every integer $n&gt;1$ there is a map of degree $n$ from $C$ to $E$.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2601.19050" target="_blank">Curves of genus two with maps of every degree to a fixed elliptic curve</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Everett W. Howe</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 28 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.19050" target="_blank">https://arxiv.org/abs/2601.19050</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We show that up to isomorphism there are exactly twenty pairs $(C,E)$, where $C$ is a genus-$2$ curve over ${\mathbf C}$, where $E$ is an elliptic curve over ${\mathbf C}$, and where for every integer $n&gt;1$ there is a map of degree $n$ from $C$ to $E$.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "Derived graded modules", "author": "Ryo Ishizuka, Shou Yoshikawa", "published": "Wed, 28 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.19164", "summary": "arXiv:2601.19164v1 Announce Type: cross \nAbstract: We introduce the notion of the $\\infty$-category of (complete) derived $G$-graded modules over a $G$-graded ring $R$ for a torsion-free abelian group $G$, and we study its foundational properties. Moreover, we prove a categorical equivalence between (complete) derived $G$-graded modules over $R$ and derived (formal) comodules over a certain comonad constructed from the group ring $R[G]$ of $G$ over $R$.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2601.19164" target="_blank">Derived graded modules</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ryo Ishizuka, Shou Yoshikawa</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 28 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.19164" target="_blank">https://arxiv.org/abs/2601.19164</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We introduce the notion of the $\infty$-category of (complete) derived $G$-graded modules over a $G$-graded ring $R$ for a torsion-free abelian group $G$, and we study its foundational properties. Moreover, we prove a categorical equivalence between (complete) derived $G$-graded modules over $R$ and derived (formal) comodules over a certain comonad constructed from the group ring $R[G]$ of $G$ over $R$.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "Stability properties of adapted tangent sheaves on K\\\"ahler--Einstein log Fano pairs", "author": "Louis Dailly", "published": "Wed, 28 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.19608", "summary": "arXiv:2601.19608v1 Announce Type: cross \nAbstract: Let $(X, \\Delta)$ be a log Fano pair with standard coefficients endowed with a singular K\\\"ahler--Einstein metric. We show that the adapted tangent sheaf $\\mathcal{T}_{X, \\Delta, f}$ and the adapted canonical extension $\\mathcal{E}_{X, \\Delta, f}$ are polystable with respect to $f^*c_1(X, \\Delta)$ for any strictly $\\Delta$-adapted morphism $f: Y \\to X$.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2601.19608" target="_blank">Stability properties of adapted tangent sheaves on K\"ahler--Einstein log Fano pairs</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Louis Dailly</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 28 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.19608" target="_blank">https://arxiv.org/abs/2601.19608</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $(X, \Delta)$ be a log Fano pair with standard coefficients endowed with a singular K\"ahler--Einstein metric. We show that the adapted tangent sheaf $\mathcal{T}_{X, \Delta, f}$ and the adapted canonical extension $\mathcal{E}_{X, \Delta, f}$ are polystable with respect to $f^*c_1(X, \Delta)$ for any strictly $\Delta$-adapted morphism $f: Y \to X$.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Some examples of DG-Lie formality transfer", "author": "Marco Manetti, Gabriele Rossetti", "published": "Wed, 28 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.19698", "summary": "arXiv:2601.19698v1 Announce Type: cross \nAbstract: We give a convenient reformulation, a slight generalization and some applications of the formality transfer theorem for DG-Lie algebras.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2601.19698" target="_blank">Some examples of DG-Lie formality transfer</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Marco Manetti, Gabriele Rossetti</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 28 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.19698" target="_blank">https://arxiv.org/abs/2601.19698</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We give a convenient reformulation, a slight generalization and some applications of the formality transfer theorem for DG-Lie algebras.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Integral torsion points on abelian varieties over function fields", "author": "Robin de Jong, Nicole Looper, Farbod Shokrieh", "published": "Wed, 28 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.19757", "summary": "arXiv:2601.19757v1 Announce Type: cross \nAbstract: We prove an analogue, over global function fields, of a conjecture due to Su-Ion Ih concerning the non-Zariski density of torsion points on abelian varieties that are integral with respect to a given non-special divisor. Along the way, we establish a Tate--Voloch type theorem for abelian varieties over completions of global function fields, which allows us to obtain a logarithmic equidistribution result for Galois orbits of torsion points.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2601.19757" target="_blank">Integral torsion points on abelian varieties over function fields</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Robin de Jong, Nicole Looper, Farbod Shokrieh</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 28 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.19757" target="_blank">https://arxiv.org/abs/2601.19757</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove an analogue, over global function fields, of a conjecture due to Su-Ion Ih concerning the non-Zariski density of torsion points on abelian varieties that are integral with respect to a given non-special divisor. Along the way, we establish a Tate--Voloch type theorem for abelian varieties over completions of global function fields, which allows us to obtain a logarithmic equidistribution result for Galois orbits of torsion points.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "Containments of Tensor Network Varieties", "author": "Sof\\'ia Garz\\'on Mora, Christian Haase", "published": "Wed, 28 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.19805", "summary": "arXiv:2601.19805v1 Announce Type: cross \nAbstract: Building upon the work of Buczy\\'nska et al., we study here tensor formats and their corresponding encoding of tensors via two-fold tensor products determined by the combinatorics of a binary tree. The set of all tensors representable by a given network forms the corresponding tensor network variety. A very basic question asks whether every tensor representable by one network is representable by another network, namely, when one tensor network variety is contained in another. Specific instances of this question became known as the Hackbusch Conjecture. Here, we propose a general framework for this question and take first steps, theoretical as well as experimental, towards a better understanding. In particular, given any two binary trees on $n$ leaves, we define (and prove existence of) a new measure, the containment exponent, which gauges how much one has to boost the parameters of one network for the containment to hold. We present an algorithm for bounding these containment exponents of tensor network varieties and report on an exhaustive search among trees on up to $n=8$ leaves.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2601.19805" target="_blank">Containments of Tensor Network Varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sof\'ia Garz\'on Mora, Christian Haase</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 28 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.19805" target="_blank">https://arxiv.org/abs/2601.19805</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Building upon the work of Buczy\'nska et al., we study here tensor formats and their corresponding encoding of tensors via two-fold tensor products determined by the combinatorics of a binary tree. The set of all tensors representable by a given network forms the corresponding tensor network variety. A very basic question asks whether every tensor representable by one network is representable by another network, namely, when one tensor network variety is contained in another. Specific instances of this question became known as the Hackbusch Conjecture. Here, we propose a general framework for this question and take first steps, theoretical as well as experimental, towards a better understanding. In particular, given any two binary trees on $n$ leaves, we define (and prove existence of) a new measure, the containment exponent, which gauges how much one has to boost the parameters of one network for the containment to hold. We present an algorithm for bounding these containment exponents of tensor network varieties and report on an exhaustive search among trees on up to $n=8$ leaves.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "A polyhedral approach to the invariant of Bierstone and Milman", "author": "Bernd Schober", "published": "Wed, 28 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/1410.6543", "summary": "arXiv:1410.6543v2 Announce Type: replace \nAbstract: Based on previous work by the author we deduce that the invariant introduced by Bierstone and Milman in order to give a proof for constructive resolution of singularities in characteristic zero can be determined purely by considering certain polyhedra and their projections.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/1410.6543" target="_blank">A polyhedral approach to the invariant of Bierstone and Milman</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Bernd Schober</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 28 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/1410.6543" target="_blank">https://arxiv.org/abs/1410.6543</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Based on previous work by the author we deduce that the invariant introduced by Bierstone and Milman in order to give a proof for constructive resolution of singularities in characteristic zero can be determined purely by considering certain polyhedra and their projections.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "Derived symmetries for crepant contractions to hypersurfaces", "author": "W. Donovan", "published": "Wed, 28 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2409.19555", "summary": "arXiv:2409.19555v4 Announce Type: replace \nAbstract: Given a crepant contraction f to a singularity X, we may expect a derived symmetry of the source of f. Under easily-checked geometric assumptions, I construct such a symmetry when X is a hypersurface in a smooth ambient S, using a spherical functor from the derived category of S. I describe this symmetry, relate it to other symmetries, and establish its compatibility with base change.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2409.19555" target="_blank">Derived symmetries for crepant contractions to hypersurfaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> W. Donovan</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 28 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2409.19555" target="_blank">https://arxiv.org/abs/2409.19555</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Given a crepant contraction f to a singularity X, we may expect a derived symmetry of the source of f. Under easily-checked geometric assumptions, I construct such a symmetry when X is a hypersurface in a smooth ambient S, using a spherical functor from the derived category of S. I describe this symmetry, relate it to other symmetries, and establish its compatibility with base change.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "Algorithm for motivic Hilbert zeta function of some curve singularities", "author": "Yizi Chen, Hussein Mourtada, Wenhao Zhu", "published": "Wed, 28 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2411.03283", "summary": "arXiv:2411.03283v3 Announce Type: replace \nAbstract: We develop algorithms to compute two versions of the motivic Hilbert zeta function for curve singularities: the classical version, applicable to singularities with a monomial valuation semigroup or to singular curves defined by \\(y^{k}=x^{n}\\) with \\(\\gcd(k,n)=1\\), and a finer version introduced by the first and third authors together with Mounir Hajli, which currently applies to the specific family \\(y^{k}=x^{n}\\) where \\(\\gcd(k,n)=1\\).\n  It is well known that the Hilbert scheme of points on a smooth curve is isomorphic to the symmetric product of the curve. However, the geometry of the Hilbert scheme of points on singular curves remains much less understood. Our algorithms compute the motivic Hilbert zeta functions \\[ Z_{(C,O)}^{\\mathrm{Hilb}}(q) \\in K_{0}(\\mathrm{Var}_{\\mathbb{C}})[[q]], \\qquad Zm_{(C,O)}^{\\mathrm{Hilb}}(a^{2},q^{2}) \\in K_{0}(\\mathrm{Var}_{\\mathbb{C}})[[a^{2}, q^{2}]], \\] for such curve singularities, expressed as formal power series with coefficients in the Grothendieck ring of complex varieties.\n  The main computational difficulty arises from the fact that \\(\\Gamma\\) is infinite. To overcome this, we approximate \\(\\Gamma\\) by truncating it to a suitable finite subset, which allows the algorithms to run effectively. We analyze the time complexity of the method and provide an estimate for the effective finite length of \\(\\Gamma\\) required to obtain reliable results. A Python implementation of the algorithms is available at https://github.com/whaozhu/motivic_hilbert.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2411.03283" target="_blank">Algorithm for motivic Hilbert zeta function of some curve singularities</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yizi Chen, Hussein Mourtada, Wenhao Zhu</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 28 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2411.03283" target="_blank">https://arxiv.org/abs/2411.03283</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We develop algorithms to compute two versions of the motivic Hilbert zeta function for curve singularities: the classical version, applicable to singularities with a monomial valuation semigroup or to singular curves defined by \(y^{k}=x^{n}\) with \(\gcd(k,n)=1\), and a finer version introduced by the first and third authors together with Mounir Hajli, which currently applies to the specific family \(y^{k}=x^{n}\) where \(\gcd(k,n)=1\).
+  It is well known that the Hilbert scheme of points on a smooth curve is isomorphic to the symmetric product of the curve. However, the geometry of the Hilbert scheme of points on singular curves remains much less understood. Our algorithms compute the motivic Hilbert zeta functions \[ Z_{(C,O)}^{\mathrm{Hilb}}(q) \in K_{0}(\mathrm{Var}_{\mathbb{C}})[[q]], \qquad Zm_{(C,O)}^{\mathrm{Hilb}}(a^{2},q^{2}) \in K_{0}(\mathrm{Var}_{\mathbb{C}})[[a^{2}, q^{2}]], \] for such curve singularities, expressed as formal power series with coefficients in the Grothendieck ring of complex varieties.
+  The main computational difficulty arises from the fact that \(\Gamma\) is infinite. To overcome this, we approximate \(\Gamma\) by truncating it to a suitable finite subset, which allows the algorithms to run effectively. We analyze the time complexity of the method and provide an estimate for the effective finite length of \(\Gamma\) required to obtain reliable results. A Python implementation of the algorithms is available at https://github.com/whaozhu/motivic_hilbert.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "The affine closure of cotangent bundles of horospherical spaces", "author": "Baohua Fu, Jie Liu", "published": "Wed, 28 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2502.06383", "summary": "arXiv:2502.06383v3 Announce Type: replace \nAbstract: For a smooth quasi-affine variety $X$, the affine closure $\\overline{T^*X} := \\text{Spec}(\\mathbb{K}[T^*X])$ contains $T^*X$ as an open subset, and its smooth locus carries a symplectic structure. A natural question is whether $\\overline{T^*X}$ itself is a symplectic variety. A notable example is the conjecture of Ginzburg and Kazhdan, which predicts that $\\overline{T^*(G/U)}$ is symplectic for a maximal unipotent subgroup $U$ in a reductive linear algebraic group $G$. This conjecture was recently proved by Gannon using representation-theoretic methods.\n  In this paper, we provide a new geometric approach to this conjecture. Our method allows us to prove a more general result: $\\overline{T^*(G/H)}$ is symplectic for any horospherical subgroup $H$ in $G$ such that $G/H$ is quasi-affine. In particular, this implies that the affine closure $\\overline{T^*(G/[P,P])}$ is a symplectic variety for any parabolic subgroup $P$ in $G$.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2502.06383" target="_blank">The affine closure of cotangent bundles of horospherical spaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Baohua Fu, Jie Liu</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 28 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2502.06383" target="_blank">https://arxiv.org/abs/2502.06383</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                For a smooth quasi-affine variety $X$, the affine closure $\overline{T^*X} := \text{Spec}(\mathbb{K}[T^*X])$ contains $T^*X$ as an open subset, and its smooth locus carries a symplectic structure. A natural question is whether $\overline{T^*X}$ itself is a symplectic variety. A notable example is the conjecture of Ginzburg and Kazhdan, which predicts that $\overline{T^*(G/U)}$ is symplectic for a maximal unipotent subgroup $U$ in a reductive linear algebraic group $G$. This conjecture was recently proved by Gannon using representation-theoretic methods.
+  In this paper, we provide a new geometric approach to this conjecture. Our method allows us to prove a more general result: $\overline{T^*(G/H)}$ is symplectic for any horospherical subgroup $H$ in $G$ such that $G/H$ is quasi-affine. In particular, this implies that the affine closure $\overline{T^*(G/[P,P])}$ is a symplectic variety for any parabolic subgroup $P$ in $G$.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Quadratic Segre indices", "author": "Felipe Espreafico, Stephen McKean, Sabrina Pauli", "published": "Wed, 28 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2506.01547", "summary": "arXiv:2506.01547v2 Announce Type: replace \nAbstract: We prove that the local Euler class of a line on a degree $2n-1$ hypersurface in projective $n+1$ space is given by a product of indices of Segre involutions. Segre involutions and their associated indices were first defined by Finashin and Kharlamov over the reals. Our result is valid over any perfect field of characteristic not 2 and gives an infinite family of problems in enriched enumerative geometry with a shared geometric interpretation for the local type.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2506.01547" target="_blank">Quadratic Segre indices</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Felipe Espreafico, Stephen McKean, Sabrina Pauli</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 28 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2506.01547" target="_blank">https://arxiv.org/abs/2506.01547</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove that the local Euler class of a line on a degree $2n-1$ hypersurface in projective $n+1$ space is given by a product of indices of Segre involutions. Segre involutions and their associated indices were first defined by Finashin and Kharlamov over the reals. Our result is valid over any perfect field of characteristic not 2 and gives an infinite family of problems in enriched enumerative geometry with a shared geometric interpretation for the local type.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Genus stabilization for the homology of moduli spaces of orbit-framed curves with symmetries-I", "author": "Fabrizio Catanese, Michael Loenne, Fabio Perroni", "published": "Wed, 28 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2508.10199", "summary": "arXiv:2508.10199v2 Announce Type: replace \nAbstract: In a previous paper, arXiv:1301.4409, we showed that the moduli space of curves C with a G-symmetry (that is, with a faithful action of a finite group G), having a fixed generalized homological invariant, is irreducible if the genus g' of the quotient curve C' : = C/G satisfies g'&gt;&gt;0.\n  Interpreting this result as stabilization for the 0-th homology group of the moduli space of curves with G-symmetry, we begin here a program for showing genus stabilization for all the homology groups of these spaces, in similarity to the results of Harer for the moduli space of curves.\n  In this first paper we prove homology stabilization for a variant of the moduli space where one G-orbit is tangentially framed.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2508.10199" target="_blank">Genus stabilization for the homology of moduli spaces of orbit-framed curves with symmetries-I</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Fabrizio Catanese, Michael Loenne, Fabio Perroni</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 28 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2508.10199" target="_blank">https://arxiv.org/abs/2508.10199</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In a previous paper, arXiv:1301.4409, we showed that the moduli space of curves C with a G-symmetry (that is, with a faithful action of a finite group G), having a fixed generalized homological invariant, is irreducible if the genus g' of the quotient curve C' : = C/G satisfies g'&gt;&gt;0.
+  Interpreting this result as stabilization for the 0-th homology group of the moduli space of curves with G-symmetry, we begin here a program for showing genus stabilization for all the homology groups of these spaces, in similarity to the results of Harer for the moduli space of curves.
+  In this first paper we prove homology stabilization for a variant of the moduli space where one G-orbit is tangentially framed.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "Hamiltonian reductions as affine closures of cotangent bundles", "author": "Baohua Fu, Jie Liu", "published": "Wed, 28 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.03068", "summary": "arXiv:2601.03068v2 Announce Type: replace \nAbstract: Let $Y$ be an irreducible non-singular affine $G$-variety with a $2$-large action. We show that the Hamiltonian reduction $T^*Y/\\!\\!/\\!\\!/G$ is a symplectic variety with terminal singularities, isomorphic to the affine closure of $T^*Z_{\\text{reg}}$ where $Z:=Y/\\!/G$. Furthermore, we provide sufficient conditions for the non-existence of a symplectic resolution for such varieties. These results yield three main applications: (i) providing a short proof of G. Schwarz's theorem on the graded surjectivity of the push-forward map $\\mathcal{D}(Y)^G \\to \\mathcal{D}(Z)$; (ii) establishing the surjectivity of the symbol map on $Z$; and (iii) confirming the non-linear analog of a conjecture of Kaledin--Lehn--Sorger for $2$-large actions.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2601.03068" target="_blank">Hamiltonian reductions as affine closures of cotangent bundles</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Baohua Fu, Jie Liu</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 28 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.03068" target="_blank">https://arxiv.org/abs/2601.03068</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $Y$ be an irreducible non-singular affine $G$-variety with a $2$-large action. We show that the Hamiltonian reduction $T^*Y/\!\!/\!\!/G$ is a symplectic variety with terminal singularities, isomorphic to the affine closure of $T^*Z_{\text{reg}}$ where $Z:=Y/\!/G$. Furthermore, we provide sufficient conditions for the non-existence of a symplectic resolution for such varieties. These results yield three main applications: (i) providing a short proof of G. Schwarz's theorem on the graded surjectivity of the push-forward map $\mathcal{D}(Y)^G \to \mathcal{D}(Z)$; (ii) establishing the surjectivity of the symbol map on $Z$; and (iii) confirming the non-linear analog of a conjecture of Kaledin--Lehn--Sorger for $2$-large actions.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "Prismatic Kunz's theorem", "author": "Ryo Ishizuka, Kei Nakazato", "published": "Wed, 28 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2402.06207", "summary": "arXiv:2402.06207v3 Announce Type: replace-cross \nAbstract: In this paper, we prove \"prismatic Kunz's theorem\" which states that a complete Noetherian local ring $R$ of residue characteristic $p$ is a regular local ring if and only if the Frobenius lift on a prismatic complex of (a derived enhancement of) $R$ over a specific prism $(A, I)$ is faithfully flat. This generalizes classical Kunz's theorem from the perspective of extending the \"Frobenius map\" to mixed characteristic rings. Our approach involves studying the deformation problem of the \"regularity\" of prisms and demonstrating the faithful flatness of the structure map of the prismatic complex.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2402.06207" target="_blank">Prismatic Kunz's theorem</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ryo Ishizuka, Kei Nakazato</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 28 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2402.06207" target="_blank">https://arxiv.org/abs/2402.06207</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we prove "prismatic Kunz's theorem" which states that a complete Noetherian local ring $R$ of residue characteristic $p$ is a regular local ring if and only if the Frobenius lift on a prismatic complex of (a derived enhancement of) $R$ over a specific prism $(A, I)$ is faithfully flat. This generalizes classical Kunz's theorem from the perspective of extending the "Frobenius map" to mixed characteristic rings. Our approach involves studying the deformation problem of the "regularity" of prisms and demonstrating the faithful flatness of the structure map of the prismatic complex.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "The sign of scalar curvature on K\\\"ahler blowups", "author": "Garrett M. Brown", "published": "Wed, 28 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2405.12189", "summary": "arXiv:2405.12189v2 Announce Type: replace-cross \nAbstract: We show that if $(M,\\omega)$ is any compact K\\\"ahler manifold, then the blowup of $M$ at any point furnishes a K\\\"ahler metric with scalar curvature globally and arbitrarily $C^0$-close to the scalar curvature of $\\omega$. It follows that if $M$ admits a positive scalar curvature K\\\"ahler metric, then so do all of its blowups. This special case extends a result of N. Hitchin to surfaces and answers a conjecture of C. LeBrun in the affirmative, consequently completing the classification of positive scalar curvature K\\\"ahler surfaces as being precisely those of negative Kodaira dimension (i.e. blowups of either the projective plane or a holomorphic bundle of projective lines over a Riemann surface).", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2405.12189" target="_blank">The sign of scalar curvature on K\"ahler blowups</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Garrett M. Brown</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 28 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2405.12189" target="_blank">https://arxiv.org/abs/2405.12189</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We show that if $(M,\omega)$ is any compact K\"ahler manifold, then the blowup of $M$ at any point furnishes a K\"ahler metric with scalar curvature globally and arbitrarily $C^0$-close to the scalar curvature of $\omega$. It follows that if $M$ admits a positive scalar curvature K\"ahler metric, then so do all of its blowups. This special case extends a result of N. Hitchin to surfaces and answers a conjecture of C. LeBrun in the affirmative, consequently completing the classification of positive scalar curvature K\"ahler surfaces as being precisely those of negative Kodaira dimension (i.e. blowups of either the projective plane or a holomorphic bundle of projective lines over a Riemann surface).
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "On the Beilinson-Bloch conjecture over function fields", "author": "Matt Broe", "published": "Wed, 28 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2505.00696", "summary": "arXiv:2505.00696v2 Announce Type: replace-cross \nAbstract: Let $k$ be a field and $X$ a smooth projective variety over $k$. When $k$ is a number field, the Beilinson-Bloch conjecture relates the ranks of the Chow groups of $X$ to the order of vanishing of certain $L$-functions. We consider the same conjecture when $k$ is a global function field, and give a criterion for the conjecture to hold for $X$, extending an earlier result of Jannsen. As an application, we provide a new proof of a theorem of Geisser connecting the Tate conjecture over finite fields and the Birch and Swinnerton-Dyer conjecture over function fields. We then prove the Tate conjecture for a product of a smooth projective curve with a power of a CM elliptic curve over any finitely generated field, and thus deduce special cases of the Beilinson--Bloch conjecture. In the process we obtain a conditional answer to a question of Moonen on the Chow groups of powers of ordinary CM elliptic curves over arbitrary fields.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2505.00696" target="_blank">On the Beilinson-Bloch conjecture over function fields</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Matt Broe</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 28 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2505.00696" target="_blank">https://arxiv.org/abs/2505.00696</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $k$ be a field and $X$ a smooth projective variety over $k$. When $k$ is a number field, the Beilinson-Bloch conjecture relates the ranks of the Chow groups of $X$ to the order of vanishing of certain $L$-functions. We consider the same conjecture when $k$ is a global function field, and give a criterion for the conjecture to hold for $X$, extending an earlier result of Jannsen. As an application, we provide a new proof of a theorem of Geisser connecting the Tate conjecture over finite fields and the Birch and Swinnerton-Dyer conjecture over function fields. We then prove the Tate conjecture for a product of a smooth projective curve with a power of a CM elliptic curve over any finitely generated field, and thus deduce special cases of the Beilinson--Bloch conjecture. In the process we obtain a conditional answer to a question of Moonen on the Chow groups of powers of ordinary CM elliptic curves over arbitrary fields.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "Non-negative polynomials on generalized elliptic curves", "author": "Mario Kummer, Alja\\v{z} Zalar", "published": "Wed, 28 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2508.13850", "summary": "arXiv:2508.13850v3 Announce Type: replace-cross \nAbstract: We study the cone of non-negative polynomials on generalized elliptic curves. We show that the zero set of every extreme ray has dense real points. If a generalized elliptic curve is embedded via a complete linear system, then we show that the convex hull of its real points (taken inside any affine chart containing all real points) is a spectrahedron. On the way, we generalize a result by Geyer--Martens on 2-torsion points in the Picard group of smooth real curves (of arbitrary genus) to possibly singular and reducible ones.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2508.13850" target="_blank">Non-negative polynomials on generalized elliptic curves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Mario Kummer, Alja\v{z} Zalar</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 28 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2508.13850" target="_blank">https://arxiv.org/abs/2508.13850</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the cone of non-negative polynomials on generalized elliptic curves. We show that the zero set of every extreme ray has dense real points. If a generalized elliptic curve is embedded via a complete linear system, then we show that the convex hull of its real points (taken inside any affine chart containing all real points) is a spectrahedron. On the way, we generalize a result by Geyer--Martens on 2-torsion points in the Picard group of smooth real curves (of arbitrary genus) to possibly singular and reducible ones.
+            </div>
+        </div>
+        <div class="paper" id="paper-21">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-21" data-paper-data='{"title": "Mixed motives and linear forms in the Catalan constant", "author": "Payman Eskandari, Kumar Murty, Yusuke Nemoto", "published": "Wed, 28 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2510.20648", "summary": "arXiv:2510.20648v2 Announce Type: replace-cross \nAbstract: We first give a geometric construction of a 2-dimensional mixed motive over $\\mathbb{Q}$ with the Catalan constant $\\mathbf{G}=1-1/3^2+1/5^2-1/7^2+\\cdots$ as a period. We then use this motive to obtain a supply of linear forms in 1 and $\\mathbf{G}$. We also explicitly compute the coefficients of 1 and $\\mathbf{G}$ in these linear forms.", "number": 21, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#21</span>
+                <a href="https://arxiv.org/abs/2510.20648" target="_blank">Mixed motives and linear forms in the Catalan constant</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Payman Eskandari, Kumar Murty, Yusuke Nemoto</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 28 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.20648" target="_blank">https://arxiv.org/abs/2510.20648</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We first give a geometric construction of a 2-dimensional mixed motive over $\mathbb{Q}$ with the Catalan constant $\mathbf{G}=1-1/3^2+1/5^2-1/7^2+\cdots$ as a period. We then use this motive to obtain a supply of linear forms in 1 and $\mathbf{G}$. We also explicitly compute the coefficients of 1 and $\mathbf{G}$ in these linear forms.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-01-28 18:00:03
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>

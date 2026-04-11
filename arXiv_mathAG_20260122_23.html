@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Thu, 22 Jan 2026 05:00:47 +0000<br>
+        <strong>論文数:</strong> 23件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">$L^2$-property for algebraic stacks over local non-archimedean fields</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Brill--Noether Generality of Curves and K3 Surfaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Inequalities of Miyaoka-Yau type $\&amp;$ Uniformisation of varieties of intermediate Kodaira Dimension</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">The Wahl map of the normalization of nodal curves on Hirzebruch surfaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">Derived logarithmic deformation theory and moduli stacks of derived logarithmic structures</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">Global $+$-regularity of regular del Pezzo surfaces in mixed characteristic</a>
+            <span class="title-label-badge" style="background-color: #9b59b6;">del Pezzo</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Non-abelian Hodge correspondence over singular K\"ahler spaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Certified Real Eigenvalue Location</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">A geometric approach to the uniform boundedness of $\ell$-primary torsion points</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">Decomposing Determinantal Varieties from Statistics via Matroid Theory</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">On the Faltings height of the curve $y^2=x^n-1$</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">Positroid Links and Braid varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">De Rham-Betti classes with coefficients</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Canonical extensions of manifolds with nef tangent bundle</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Tropical methods for stable octic double planes</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">From affine algebraic racks to Leibniz algebras and Yang-Baxter operators</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">Factoriality of normal projective varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">Logarithmic geometry and Infinitesimal Hodge Theory</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Proof of geometric Borg's Theorem in arbitrary dimensions</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">On orthogonal decompositions of hermitian Higgs bundles</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-21" onchange="updateSelectedCount()">
+            <span class="title-number">21.</span>
+            <a href="#paper-21">Analytic Langlands correspondence from SoV</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-22" onchange="updateSelectedCount()">
+            <span class="title-number">22.</span>
+            <a href="#paper-22">Holomorphic Deformations of Hyperbolicity Notions on Compact Complex Manifolds</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-23" onchange="updateSelectedCount()">
+            <span class="title-number">23.</span>
+            <a href="#paper-23">Weyl Mutations in Quiver Yangians</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "$L^2$-property for algebraic stacks over local non-archimedean fields", "author": "David Kazhdan, Alexander Polishchuk", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.14557", "summary": "arXiv:2601.14557v1 Announce Type: new \nAbstract: We introduce an $L^2$-norm on the space of Schwartz half-densities over algebraic stacks over local non-archimedean fields. We show that these $L^2$-norms are finite for the stacks of $PGL_2$-bundles on $\\mathbb{P}^1$ with parabolic structures at $\\ge 3$ points. The latter property was conjectured in the context of the analytic Langlands correspondence of arXiv:2103.01509.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2601.14557" target="_blank">$L^2$-property for algebraic stacks over local non-archimedean fields</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> David Kazhdan, Alexander Polishchuk</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.14557" target="_blank">https://arxiv.org/abs/2601.14557</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We introduce an $L^2$-norm on the space of Schwartz half-densities over algebraic stacks over local non-archimedean fields. We show that these $L^2$-norms are finite for the stacks of $PGL_2$-bundles on $\mathbb{P}^1$ with parabolic structures at $\ge 3$ points. The latter property was conjectured in the context of the analytic Langlands correspondence of arXiv:2103.01509.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Brill--Noether Generality of Curves and K3 Surfaces", "author": "Irina Shatova", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.14709", "summary": "arXiv:2601.14709v1 Announce Type: new \nAbstract: Lazarsfeld proved Brill--Noether generality of any smooth curve in the linear system $|H|$ where $(X,H)$ is a polarized K3 surface with $\\mathrm{Pic}(X) = \\mathbb{Z}\\cdot H$. Mukai introduced the notion of Brill--Noether generality for quasi-polarized K3 surfaces. We prove Brill--Noether generality of any smooth curve in the linear system $|H|$ where $(X,H)$ is a Brill--Noether general quasi-polarized K3 surface.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2601.14709" target="_blank">Brill--Noether Generality of Curves and K3 Surfaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Irina Shatova</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.14709" target="_blank">https://arxiv.org/abs/2601.14709</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Lazarsfeld proved Brill--Noether generality of any smooth curve in the linear system $|H|$ where $(X,H)$ is a polarized K3 surface with $\mathrm{Pic}(X) = \mathbb{Z}\cdot H$. Mukai introduced the notion of Brill--Noether generality for quasi-polarized K3 surfaces. We prove Brill--Noether generality of any smooth curve in the linear system $|H|$ where $(X,H)$ is a Brill--Noether general quasi-polarized K3 surface.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Inequalities of Miyaoka-Yau type $\\&amp;$ Uniformisation of varieties of intermediate Kodaira Dimension", "author": "Niklas M\\\"uller", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.15138", "summary": "arXiv:2601.15138v1 Announce Type: new \nAbstract: In this paper we present, for any integers $0\\leq \\nu \\leq n$, a set of inequalities satisfied by the Chern classes of any minimal complex projective variety of dimension $n$ and numerical dimension $\\nu$. In the cases where $\\nu$ is either very small or very large compared with $n$, this recovers many previously known results. We demonstrate that our inequalities are sharp by providing an explicit characterisation of those varieties achieving the equality; our proof, in particular, resolves the Abundance conjecture in this situation. Additionally, we provide some new examples of varieties with extremal Chern classes that demonstrate the optimality of our results.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2601.15138" target="_blank">Inequalities of Miyaoka-Yau type $\&amp;$ Uniformisation of varieties of intermediate Kodaira Dimension</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Niklas M\"uller</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.15138" target="_blank">https://arxiv.org/abs/2601.15138</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper we present, for any integers $0\leq \nu \leq n$, a set of inequalities satisfied by the Chern classes of any minimal complex projective variety of dimension $n$ and numerical dimension $\nu$. In the cases where $\nu$ is either very small or very large compared with $n$, this recovers many previously known results. We demonstrate that our inequalities are sharp by providing an explicit characterisation of those varieties achieving the equality; our proof, in particular, resolves the Abundance conjecture in this situation. Additionally, we provide some new examples of varieties with extremal Chern classes that demonstrate the optimality of our results.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "The Wahl map of the normalization of nodal curves on Hirzebruch surfaces", "author": "Miguel Guerrero-Castillo", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.15244", "summary": "arXiv:2601.15244v1 Announce Type: new \nAbstract: In this paper we study the Wahl map for the normalization of a $\\delta$-nodal curve $C$ on a Hirzebruch surface $\\mathbb{F}_{n}$ for $n\\geq 0$. Let $\\sigma:X\\rightarrow \\mathbb{F}_{n}$ be the blow up of $\\mathbb{F}_{n}$ along the $\\delta$ nodes of $C$ and let $\\widetilde{C}$ be the normalization of $C$ under $\\sigma$. Let $K_{X}$ be the canonical bundle of $X$ and let $\\Omega^{1}_{X}$ be the sheaf of $1$-holomorphic forms on $X$. We give conditions for the surjectivity of the map $\\Phi_{X,\\mathcal{O}_{X}(K_{X}+\\widetilde{C})}: \\bigwedge^{2}H^{0}(X,\\mathcal{O}_{X}(K_{X}+\\widetilde{C}))\\rightarrow H^{0}(X,\\Omega^{1}_{X}(2K_{X}+2\\widetilde{C}))$. Using this surjectivity, we analyze the Wahl map $\\Phi_{\\widetilde{C}}:\\bigwedge^{2}H^{0}(\\widetilde{C},\\Omega^{1}_{\\widetilde{C}})\\rightarrow H^{0}(\\widetilde{C},(\\Omega^{1}_{\\widetilde{C}})^{\\otimes 3})$ and compute the corank of $\\Phi_{\\widetilde{C}}$ in various cases. We prove that the corank of the Wahl map for the normalization of a $\\delta$-nodal curve on $\\mathbb{F}_{n}$ is $h^{0}(\\mathbb{F}_{n},\\mathcal{O}_{\\mathbb{F}_{n}}(-K_{\\mathbb{F}_{n}}))$, that verifies a conjecture by Wahl. Furthermore, as an application of our results, we demonstrate that, under certain conditions, a $\\delta$-nodal curve on a Hirzebruch surface $\\mathbb{F}_{n}$ cannot be embedded as $\\delta-$nodal curve on a different Hirzebruch surface $\\mathbb{F}_{m}$, for $n\\neq m$.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2601.15244" target="_blank">The Wahl map of the normalization of nodal curves on Hirzebruch surfaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Miguel Guerrero-Castillo</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.15244" target="_blank">https://arxiv.org/abs/2601.15244</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper we study the Wahl map for the normalization of a $\delta$-nodal curve $C$ on a Hirzebruch surface $\mathbb{F}_{n}$ for $n\geq 0$. Let $\sigma:X\rightarrow \mathbb{F}_{n}$ be the blow up of $\mathbb{F}_{n}$ along the $\delta$ nodes of $C$ and let $\widetilde{C}$ be the normalization of $C$ under $\sigma$. Let $K_{X}$ be the canonical bundle of $X$ and let $\Omega^{1}_{X}$ be the sheaf of $1$-holomorphic forms on $X$. We give conditions for the surjectivity of the map $\Phi_{X,\mathcal{O}_{X}(K_{X}+\widetilde{C})}: \bigwedge^{2}H^{0}(X,\mathcal{O}_{X}(K_{X}+\widetilde{C}))\rightarrow H^{0}(X,\Omega^{1}_{X}(2K_{X}+2\widetilde{C}))$. Using this surjectivity, we analyze the Wahl map $\Phi_{\widetilde{C}}:\bigwedge^{2}H^{0}(\widetilde{C},\Omega^{1}_{\widetilde{C}})\rightarrow H^{0}(\widetilde{C},(\Omega^{1}_{\widetilde{C}})^{\otimes 3})$ and compute the corank of $\Phi_{\widetilde{C}}$ in various cases. We prove that the corank of the Wahl map for the normalization of a $\delta$-nodal curve on $\mathbb{F}_{n}$ is $h^{0}(\mathbb{F}_{n},\mathcal{O}_{\mathbb{F}_{n}}(-K_{\mathbb{F}_{n}}))$, that verifies a conjecture by Wahl. Furthermore, as an application of our results, we demonstrate that, under certain conditions, a $\delta$-nodal curve on a Hirzebruch surface $\mathbb{F}_{n}$ cannot be embedded as $\delta-$nodal curve on a different Hirzebruch surface $\mathbb{F}_{m}$, for $n\neq m$.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "Derived logarithmic deformation theory and moduli stacks of derived logarithmic structures", "author": "Ruichuan Zhang", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.15256", "summary": "arXiv:2601.15256v1 Announce Type: new \nAbstract: This paper investigates the derived and spectral analogs of logarithmic geometry. We develop the deformation theory for animated log rings and $\\mathbb{E}_\\infty$-log rings and examine the corresponding theories of derived and spectral log stacks. Furthermore, we define moduli stacks for derived and spectral log structures and establish their representability. As an application, we will construct $\\infty$-root stacks in the derived and spectral settings and study the associated geometric properties.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2601.15256" target="_blank">Derived logarithmic deformation theory and moduli stacks of derived logarithmic structures</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ruichuan Zhang</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.15256" target="_blank">https://arxiv.org/abs/2601.15256</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This paper investigates the derived and spectral analogs of logarithmic geometry. We develop the deformation theory for animated log rings and $\mathbb{E}_\infty$-log rings and examine the corresponding theories of derived and spectral log stacks. Furthermore, we define moduli stacks for derived and spectral log structures and establish their representability. As an application, we will construct $\infty$-root stacks in the derived and spectral settings and study the associated geometric properties.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "Global $+$-regularity of regular del Pezzo surfaces in mixed characteristic", "author": "Hirotaka Onuki", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.15270", "summary": "arXiv:2601.15270v1 Announce Type: new \nAbstract: Let $R = W(k)$ be the ring of Witt vectors over an algebraically closed field $k$ of characteristic $p &gt; 2$. Let $M$ be a three-dimensional regular integral flat projective $R$-scheme such that $H^0(M,\\mathcal{O}_M) = R$ and the anticanonical sheaf $\\omega_M^{-1}$ is ample. We show that $M$ is globally $+$-regular if the closed fiber $M_k$ is reduced.", "number": 6, "labels": [{"name": "del Pezzo", "color": "#9b59b6"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2601.15270" target="_blank">Global $+$-regularity of regular del Pezzo surfaces in mixed characteristic</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #9b59b6;">del Pezzo</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Hirotaka Onuki</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.15270" target="_blank">https://arxiv.org/abs/2601.15270</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $R = W(k)$ be the ring of Witt vectors over an algebraically closed field $k$ of characteristic $p &gt; 2$. Let $M$ be a three-dimensional regular integral flat projective $R$-scheme such that $H^0(M,\mathcal{O}_M) = R$ and the anticanonical sheaf $\omega_M^{-1}$ is ample. We show that $M$ is globally $+$-regular if the closed fiber $M_k$ is reduced.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Non-abelian Hodge correspondence over singular K\\\"ahler spaces", "author": "Chuanjing Zhang, Shiyu Zhang, Xi Zhang", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.13071", "summary": "arXiv:2601.13071v1 Announce Type: cross \nAbstract: In this paper, we establish the non-abelian Hodge correspondence over compact K\\\"ahler spaces with Kawamata log terminal (klt) singularities as well as over their regular loci, thereby extending the result of Greb-Kebekus-Peternell-Taji for projective klt varieties to the context of compact K\\\"ahler klt spaces. The proof relies on two key ingredients: first, we establish an equivalence over the regular loci-via harmonic bundles-between polystable Higgs bundles with vanishing orbifold Chern numbers and semi-simple flat bundles; second, we prove a descent theorem for semistable Higgs bundles with vanishing Chern classes along resolutions of singularities. As an application of our framework, we obtain a quasi-uniformization theorem for projective klt varieties with big canonical divisor that satisfy the orbifold Miyaoka-Yau equality.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2601.13071" target="_blank">Non-abelian Hodge correspondence over singular K\"ahler spaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Chuanjing Zhang, Shiyu Zhang, Xi Zhang</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.13071" target="_blank">https://arxiv.org/abs/2601.13071</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we establish the non-abelian Hodge correspondence over compact K\"ahler spaces with Kawamata log terminal (klt) singularities as well as over their regular loci, thereby extending the result of Greb-Kebekus-Peternell-Taji for projective klt varieties to the context of compact K\"ahler klt spaces. The proof relies on two key ingredients: first, we establish an equivalence over the regular loci-via harmonic bundles-between polystable Higgs bundles with vanishing orbifold Chern numbers and semi-simple flat bundles; second, we prove a descent theorem for semistable Higgs bundles with vanishing Chern classes along resolutions of singularities. As an application of our framework, we obtain a quasi-uniformization theorem for projective klt varieties with big canonical divisor that satisfy the orbifold Miyaoka-Yau equality.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Certified Real Eigenvalue Location", "author": "Baran Solmaz, Tulay Ayyildiz", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.14491", "summary": "arXiv:2601.14491v1 Announce Type: cross \nAbstract: The location of real eigenvalues provides critical insights into the stability and resonance properties of physical systems. This paper presents a hybrid symbolic numeric approach for certified real eigenvalue localization. Our method combines Gershgorin disk analysis with Hermite matrix certification to compute certified intervals that enclose the real eigenvalues. These intervals can be further refined through bisectionlike procedures to achieve the desired precision. The proposed approach delivers reliable interval certifications while preserving computational efficiency. The effectiveness of the framework is demonstrated through a concise, fully worked computational example.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2601.14491" target="_blank">Certified Real Eigenvalue Location</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Baran Solmaz, Tulay Ayyildiz</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.14491" target="_blank">https://arxiv.org/abs/2601.14491</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The location of real eigenvalues provides critical insights into the stability and resonance properties of physical systems. This paper presents a hybrid symbolic numeric approach for certified real eigenvalue localization. Our method combines Gershgorin disk analysis with Hermite matrix certification to compute certified intervals that enclose the real eigenvalues. These intervals can be further refined through bisectionlike procedures to achieve the desired precision. The proposed approach delivers reliable interval certifications while preserving computational efficiency. The effectiveness of the framework is demonstrated through a concise, fully worked computational example.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "A geometric approach to the uniform boundedness of $\\ell$-primary torsion points", "author": "Zhuchao Ji, Jiarui Song, Junyi Xie", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.15089", "summary": "arXiv:2601.15089v1 Announce Type: cross \nAbstract: We prove that for a non-isotrivial abelian scheme over a smooth curve, the genus of a generic sequence of multi-sections with small heights tends to infinity.\n  As an application, we give a new proof of the uniform boundedness of $\\ell$-primary torsion points on fibers of an abelian scheme over a smooth curve, a result originally proved by Cadoret and Tamagawa. Furthermore, our approach allows us to resolve a conjecture of Cadoret and Tamagawa without additional assumptions.\n  Our approach is based on the theory of Betti foliations and the arithmetic equidistribution theorem.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2601.15089" target="_blank">A geometric approach to the uniform boundedness of $\ell$-primary torsion points</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Zhuchao Ji, Jiarui Song, Junyi Xie</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.15089" target="_blank">https://arxiv.org/abs/2601.15089</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove that for a non-isotrivial abelian scheme over a smooth curve, the genus of a generic sequence of multi-sections with small heights tends to infinity.
+  As an application, we give a new proof of the uniform boundedness of $\ell$-primary torsion points on fibers of an abelian scheme over a smooth curve, a result originally proved by Cadoret and Tamagawa. Furthermore, our approach allows us to resolve a conjecture of Cadoret and Tamagawa without additional assumptions.
+  Our approach is based on the theory of Betti foliations and the arithmetic equidistribution theorem.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "Decomposing Determinantal Varieties from Statistics via Matroid Theory", "author": "Per Alexandersson, Yulia Alexandr, Emiliano Liwski, Fatemeh Mohammadi, Pardis Semnani", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.15128", "summary": "arXiv:2601.15128v1 Announce Type: cross \nAbstract: We study determinantal varieties from conditional independence models with hidden variables, focusing on their irreducible decompositions, dimensions, degrees, and Gr\\\"obner bases. Each variety encodes a collection of matroids, whose flats capture algebraic dependencies among variables. Using this approach, we provide a systematic description of the components, their dimensions, and defining equations, and introduce a combinatorial framework for computing the degree of the determinantal variety. Our approach highlights the central role of matroidal structures in the study of determinantal varieties and extends beyond the reach of current computational techniques.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2601.15128" target="_blank">Decomposing Determinantal Varieties from Statistics via Matroid Theory</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Per Alexandersson, Yulia Alexandr, Emiliano Liwski, Fatemeh Mohammadi, Pardis Semnani</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.15128" target="_blank">https://arxiv.org/abs/2601.15128</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study determinantal varieties from conditional independence models with hidden variables, focusing on their irreducible decompositions, dimensions, degrees, and Gr\"obner bases. Each variety encodes a collection of matroids, whose flats capture algebraic dependencies among variables. Using this approach, we provide a systematic description of the components, their dimensions, and defining equations, and introduce a combinatorial framework for computing the degree of the determinantal variety. Our approach highlights the central role of matroidal structures in the study of determinantal varieties and extends beyond the reach of current computational techniques.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "On the Faltings height of the curve $y^2=x^n-1$", "author": "Robert Wilms", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.15271", "summary": "arXiv:2601.15271v1 Announce Type: cross \nAbstract: We compute the stable Faltings height of the hyperelliptic curve $X_n\\colon y^2=x^{n}-1$ for every odd integer $n\\ge 3$ in terms of special values of Euler's gamma function. In particular, we prove the bounds $$-0.975n&lt; h_{\\mathrm{Fal}}(X_n)-\\tfrac{n}{8}\\log n&lt;\\tfrac{9}{64}n\\log\\log n-0.263n.$$ As an application, we bound the Faltings height of any abelian variety with complex multiplication by the canonical CM-type of the $n$-th cyclotomic field by $\\frac{n}{8}\\log n+\\frac{9}{64}n\\log\\log n-0.136n$.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2601.15271" target="_blank">On the Faltings height of the curve $y^2=x^n-1$</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Robert Wilms</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.15271" target="_blank">https://arxiv.org/abs/2601.15271</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We compute the stable Faltings height of the hyperelliptic curve $X_n\colon y^2=x^{n}-1$ for every odd integer $n\ge 3$ in terms of special values of Euler's gamma function. In particular, we prove the bounds $$-0.975n&lt; h_{\mathrm{Fal}}(X_n)-\tfrac{n}{8}\log n&lt;\tfrac{9}{64}n\log\log n-0.263n.$$ As an application, we bound the Faltings height of any abelian variety with complex multiplication by the canonical CM-type of the $n$-th cyclotomic field by $\frac{n}{8}\log n+\frac{9}{64}n\log\log n-0.136n$.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "Positroid Links and Braid varieties", "author": "Roger Casals, Eugene Gorsky, Mikhail Gorsky, Jos\\'e Simental", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2105.13948", "summary": "arXiv:2105.13948v4 Announce Type: replace \nAbstract: We study braid varieties and their relation to open positroid varieties. We discuss four different types of braids associated to open positroid strata and show that their associated Legendrian links are all Legendrian isotopic. In particular, we prove that each open positroid stratum can be presented as the augmentation variety for four different Legendrian fronts described in terms of either permutations, juggling patterns, cyclic rank matrices or Le diagrams. We also relate braid varieties to open Richardson varieties and brick manifolds, showing that the latter provide projective compactifications of braid varieties, with normal crossing divisors at infinity.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2105.13948" target="_blank">Positroid Links and Braid varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Roger Casals, Eugene Gorsky, Mikhail Gorsky, Jos\'e Simental</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2105.13948" target="_blank">https://arxiv.org/abs/2105.13948</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study braid varieties and their relation to open positroid varieties. We discuss four different types of braids associated to open positroid strata and show that their associated Legendrian links are all Legendrian isotopic. In particular, we prove that each open positroid stratum can be presented as the augmentation variety for four different Legendrian fronts described in terms of either permutations, juggling patterns, cyclic rank matrices or Le diagrams. We also relate braid varieties to open Richardson varieties and brick manifolds, showing that the latter provide projective compactifications of braid varieties, with normal crossing divisors at infinity.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "De Rham-Betti classes with coefficients", "author": "Tobias Kreutz, Mingmin Shen, Charles Vial", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2206.08618", "summary": "arXiv:2206.08618v3 Announce Type: replace \nAbstract: Let $K$ and $L$ be algebraic extensions of the rational numbers inside the field of complex numbers. An $L$-de Rham-Betti class on a smooth projective variety $X$ over $K$ is a class in the Betti cohomology with $L$-coefficients of the analytification of $X$ that descends to a class in the algebraic de Rham cohomology of $X$ via the period comparison isomorphism. The period conjecture of Grothendieck implies that $L$-de Rham-Betti classes should be $L$-linear combinations of algebraic cycle classes. We prove that $L$-de Rham-Betti classes on products of elliptic curves are $L$-linear combinations of algebraic classes, provided $L$ contains at most one of the CM fields associated with the CM elliptic curves involved in the product. A key step consists in establishing a version of the analytic subgroup theorem with $L$-coefficients. Moreover, building on results of Deligne and Andr\\'e regarding the Kuga-Satake correspondence, we show that codimension-2 $L$-de Rham-Betti classes on hyper-K\\\"ahler varieties of known deformation type are $L$-linear combinations of motivated cycles, and we obtain a global de Rham-Betti Torelli theorem for K3 surfaces defined over the algebraic numbers.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2206.08618" target="_blank">De Rham-Betti classes with coefficients</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Tobias Kreutz, Mingmin Shen, Charles Vial</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2206.08618" target="_blank">https://arxiv.org/abs/2206.08618</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $K$ and $L$ be algebraic extensions of the rational numbers inside the field of complex numbers. An $L$-de Rham-Betti class on a smooth projective variety $X$ over $K$ is a class in the Betti cohomology with $L$-coefficients of the analytification of $X$ that descends to a class in the algebraic de Rham cohomology of $X$ via the period comparison isomorphism. The period conjecture of Grothendieck implies that $L$-de Rham-Betti classes should be $L$-linear combinations of algebraic cycle classes. We prove that $L$-de Rham-Betti classes on products of elliptic curves are $L$-linear combinations of algebraic classes, provided $L$ contains at most one of the CM fields associated with the CM elliptic curves involved in the product. A key step consists in establishing a version of the analytic subgroup theorem with $L$-coefficients. Moreover, building on results of Deligne and Andr\'e regarding the Kuga-Satake correspondence, we show that codimension-2 $L$-de Rham-Betti classes on hyper-K\"ahler varieties of known deformation type are $L$-linear combinations of motivated cycles, and we obtain a global de Rham-Betti Torelli theorem for K3 surfaces defined over the algebraic numbers.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Canonical extensions of manifolds with nef tangent bundle", "author": "Niklas M\\\"uller", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2211.03469", "summary": "arXiv:2211.03469v2 Announce Type: replace \nAbstract: To any compact K\\\"ahler manifold $(X, \\omega)$ one may associate a bundle of affine spaces $Z_X\\rightarrow X$ called a \\emph{canonical extension} of $X$. In this paper we prove that if the tangent bundle of $X$ is nef, then the total space $Z_X$ is a Stein manifold. This partially answers a question raised by Greb-Wong of whether these two properties are actually equivalent. We also complement some known results for surfaces in the converse direction.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2211.03469" target="_blank">Canonical extensions of manifolds with nef tangent bundle</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Niklas M\"uller</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2211.03469" target="_blank">https://arxiv.org/abs/2211.03469</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                To any compact K\"ahler manifold $(X, \omega)$ one may associate a bundle of affine spaces $Z_X\rightarrow X$ called a \emph{canonical extension} of $X$. In this paper we prove that if the tangent bundle of $X$ is nef, then the total space $Z_X$ is a Stein manifold. This partially answers a question raised by Greb-Wong of whether these two properties are actually equivalent. We also complement some known results for surfaces in the converse direction.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Tropical methods for stable octic double planes", "author": "Jonathan David Evans, Angelica Simonetti, Giancarlo Urz\\'ua", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2405.02735", "summary": "arXiv:2405.02735v4 Announce Type: replace \nAbstract: This paper has been written to illustrate the power of techniques from tropical geometry and mirror symmetry for studying the KSBA moduli space of surfaces on or near the Noether line. We focus on the moduli space of octic double planes ($K^2 = 2$, $p_g = 3$) and use methods from tropical and toric geometry to classify the strata corresponding to normal KSBA-stable surfaces, focusing on the non-Gorenstein case.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2405.02735" target="_blank">Tropical methods for stable octic double planes</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jonathan David Evans, Angelica Simonetti, Giancarlo Urz\'ua</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2405.02735" target="_blank">https://arxiv.org/abs/2405.02735</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This paper has been written to illustrate the power of techniques from tropical geometry and mirror symmetry for studying the KSBA moduli space of surfaces on or near the Noether line. We focus on the moduli space of octic double planes ($K^2 = 2$, $p_g = 3$) and use methods from tropical and toric geometry to classify the strata corresponding to normal KSBA-stable surfaces, focusing on the non-Gorenstein case.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "From affine algebraic racks to Leibniz algebras and Yang-Baxter operators", "author": "Luc Ta", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.15909", "summary": "arXiv:2512.15909v2 Announce Type: replace \nAbstract: We introduce analogues of algebraic groups called algebraic racks, which are pointed rack objects in the category of schemes over a ground field. Addressing a problem of Loday, we construct functors assigning left and right Leibniz algebras to affine algebraic racks. These functors are compatible with closed subracks and ideals, and they recover the Lie algebras of linear algebraic groups (via conjugation quandles) and the Leibniz algebras of algebraic Lie racks. We also study properties of coordinate algebras and Leibniz algebras of affine algebraic racks. Finally, we use rack schemes to functorially construct (co-)nondegenerate Yang-Baxter operators in various categories.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2512.15909" target="_blank">From affine algebraic racks to Leibniz algebras and Yang-Baxter operators</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Luc Ta</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.15909" target="_blank">https://arxiv.org/abs/2512.15909</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We introduce analogues of algebraic groups called algebraic racks, which are pointed rack objects in the category of schemes over a ground field. Addressing a problem of Loday, we construct functors assigning left and right Leibniz algebras to affine algebraic racks. These functors are compatible with closed subracks and ideals, and they recover the Lie algebras of linear algebraic groups (via conjugation quandles) and the Leibniz algebras of algebraic Lie racks. We also study properties of coordinate algebras and Leibniz algebras of affine algebraic racks. Finally, we use rack schemes to functorially construct (co-)nondegenerate Yang-Baxter operators in various categories.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "Factoriality of normal projective varieties", "author": "Seung-Jo Jung, Morihiko Saito", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.13151", "summary": "arXiv:2601.13151v2 Announce Type: replace \nAbstract: For a normal projective variety $X$, the $\\bf Q$-factoriality defect $\\sigma(X)$ is defined to be the rank of the quotient of the group of Weil divisors by the subgroup of Cartier ones. We prove a slight improvement of a topological formula of S.G. Park and M. Popa asserting that $\\sigma(X)=h^{2n-2}(X)-h^2(X)$ by assuming only 2-semi-rationality, that is, $R^k\\pi_*{\\mathcal O}_{\\widetilde{X}}=0$ for $k=1,2$, instead of rational singularities for $X$, where $\\pi:\\widetilde{X}\\to X$ is a desingularization with $h^k(X):=\\dim H^k(X,{\\bf Q})$ and $n:=\\dim X&gt;2$. Our proof generalizes the one by Y. Namikawa and J.H.M. Steenbrink for the case $n=3$ with isolated hypersurface singularities. We also give a proof of the assertion that $\\bf Q$-factoriality implies factoriality if $X$ is a local complete intersection whose singular locus has at least codimension three. (This seems to be known to specialists in the case $X$ has only isolated hypersurface singularities with $n=3$ using Milnor's Bouquet theorem.) These imply a slight improvement of Grothendieck's theorem in the projective case saying that $X$ is factorial if $X$ is a local complete intersection and its non-rational singularity locus has at least codimension four.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2601.13151" target="_blank">Factoriality of normal projective varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Seung-Jo Jung, Morihiko Saito</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.13151" target="_blank">https://arxiv.org/abs/2601.13151</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                For a normal projective variety $X$, the $\bf Q$-factoriality defect $\sigma(X)$ is defined to be the rank of the quotient of the group of Weil divisors by the subgroup of Cartier ones. We prove a slight improvement of a topological formula of S.G. Park and M. Popa asserting that $\sigma(X)=h^{2n-2}(X)-h^2(X)$ by assuming only 2-semi-rationality, that is, $R^k\pi_*{\mathcal O}_{\widetilde{X}}=0$ for $k=1,2$, instead of rational singularities for $X$, where $\pi:\widetilde{X}\to X$ is a desingularization with $h^k(X):=\dim H^k(X,{\bf Q})$ and $n:=\dim X&gt;2$. Our proof generalizes the one by Y. Namikawa and J.H.M. Steenbrink for the case $n=3$ with isolated hypersurface singularities. We also give a proof of the assertion that $\bf Q$-factoriality implies factoriality if $X$ is a local complete intersection whose singular locus has at least codimension three. (This seems to be known to specialists in the case $X$ has only isolated hypersurface singularities with $n=3$ using Milnor's Bouquet theorem.) These imply a slight improvement of Grothendieck's theorem in the projective case saying that $X$ is factorial if $X$ is a local complete intersection and its non-rational singularity locus has at least codimension four.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "Logarithmic geometry and Infinitesimal Hodge Theory", "author": "Mounir Nisse", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.13568", "summary": "arXiv:2601.13568v2 Announce Type: replace \nAbstract: This paper develops a systematic approach to infinitesimal variations of Hodge structure for singular and equisingular families by means of logarithmic geometry and residue theory. The central idea is that logarithmic vector fields encode precisely those deformation directions that preserve singularities and act trivially on Hodge structures, while the effective variation is entirely governed by residue calculus. This viewpoint provides a conceptual reinterpretation of classical results of Griffiths, Green, and Voisin, and extends them to settings involving singular varieties and equisingular deformations. The resulting framework yields a geometric explanation for the appearance of Jacobian rings in infinitesimal Hodge theory and clarifies the structure of deformation spaces underlying Severi varieties and related moduli problems.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2601.13568" target="_blank">Logarithmic geometry and Infinitesimal Hodge Theory</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Mounir Nisse</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.13568" target="_blank">https://arxiv.org/abs/2601.13568</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This paper develops a systematic approach to infinitesimal variations of Hodge structure for singular and equisingular families by means of logarithmic geometry and residue theory. The central idea is that logarithmic vector fields encode precisely those deformation directions that preserve singularities and act trivially on Hodge structures, while the effective variation is entirely governed by residue calculus. This viewpoint provides a conceptual reinterpretation of classical results of Griffiths, Green, and Voisin, and extends them to settings involving singular varieties and equisingular deformations. The resulting framework yields a geometric explanation for the appearance of Jacobian rings in infinitesimal Hodge theory and clarifies the structure of deformation spaces underlying Severi varieties and related moduli problems.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Proof of geometric Borg's Theorem in arbitrary dimensions", "author": "Wencai Liu", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2306.16412", "summary": "arXiv:2306.16412v2 Announce Type: replace-cross \nAbstract: Let $\\Delta+V$ be the discrete Schr\\\"odinger operator, where $\\Delta$ is the discrete Laplacian on $\\mathbb{Z}^d$ and potential $V:\\mathbb{Z}^d\\to \\mathbb{C}$ is $\\Gamma$-periodic with $\\Gamma=q_1\\mathbb{Z}\\oplus q_2 \\mathbb{Z}\\oplus\\cdots\\oplus q_d\\mathbb{Z}$. In this study, we establish a comprehensive characterization of complex-valued $\\Gamma$-periodic functions such that the Bloch variety of $\\Delta+V$ contains a graph of an entire function, in particular, we show that there are exactly $q_1q_2\\cdots q_d$ such functions (up to Floquet isospectrality and translation). Moreover, by applying this understanding to real-valued functions $V$, we prove that $V$ is constant if and only if the Bloch variety of $\\Delta+V$ contains a graph of an entire function, which confirms the conjecture concerning the geometric version of Borg's theorem in arbitrary dimensions.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2306.16412" target="_blank">Proof of geometric Borg's Theorem in arbitrary dimensions</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Wencai Liu</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2306.16412" target="_blank">https://arxiv.org/abs/2306.16412</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $\Delta+V$ be the discrete Schr\"odinger operator, where $\Delta$ is the discrete Laplacian on $\mathbb{Z}^d$ and potential $V:\mathbb{Z}^d\to \mathbb{C}$ is $\Gamma$-periodic with $\Gamma=q_1\mathbb{Z}\oplus q_2 \mathbb{Z}\oplus\cdots\oplus q_d\mathbb{Z}$. In this study, we establish a comprehensive characterization of complex-valued $\Gamma$-periodic functions such that the Bloch variety of $\Delta+V$ contains a graph of an entire function, in particular, we show that there are exactly $q_1q_2\cdots q_d$ such functions (up to Floquet isospectrality and translation). Moreover, by applying this understanding to real-valued functions $V$, we prove that $V$ is constant if and only if the Bloch variety of $\Delta+V$ contains a graph of an entire function, which confirms the conjecture concerning the geometric version of Borg's theorem in arbitrary dimensions.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "On orthogonal decompositions of hermitian Higgs bundles", "author": "Sergio A. H. Cardona, Kenett Mart\\'inez-Ruiz", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2407.19062", "summary": "arXiv:2407.19062v2 Announce Type: replace-cross \nAbstract: A hermitian Higgs bundle is a triple $({\\mathfrak E},h) = (E,\\Phi, h)$, where ${\\mathfrak E}=(E,\\Phi)$ is a Higgs bundle and $(E,h)$ is a holomorphic hermitian vector bundle. It is well-known that several results on holomorphic vector bundles extend to the Higgs bundles setting, although this is not always the case. In this article we show that some classical propositions, involving orthogonal decompositions of holomorphic hermitian vector bundles and the second fundamental form of its holomorphic subbundles, can be extended to hermitian Higgs bundles. The extended propositions concerning orthogonal decompositions have immediate applications in Higgs bundles, and we mention some of these throughout the article. Moreover, the extended propositions concerning the second fundamental form are generalizations of previously known results on Higgs bundles. In particular, here we include alternative proofs of these extended propositions without using local computations. Finally, as an application of the above results and due to the lack of a certain parallelism condition, we show that a classical theorem concerning the Kobayashi functional for holomorphic vector bundles does not admit a straightforward extension to Higgs bundles.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2407.19062" target="_blank">On orthogonal decompositions of hermitian Higgs bundles</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sergio A. H. Cardona, Kenett Mart\'inez-Ruiz</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2407.19062" target="_blank">https://arxiv.org/abs/2407.19062</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                A hermitian Higgs bundle is a triple $({\mathfrak E},h) = (E,\Phi, h)$, where ${\mathfrak E}=(E,\Phi)$ is a Higgs bundle and $(E,h)$ is a holomorphic hermitian vector bundle. It is well-known that several results on holomorphic vector bundles extend to the Higgs bundles setting, although this is not always the case. In this article we show that some classical propositions, involving orthogonal decompositions of holomorphic hermitian vector bundles and the second fundamental form of its holomorphic subbundles, can be extended to hermitian Higgs bundles. The extended propositions concerning orthogonal decompositions have immediate applications in Higgs bundles, and we mention some of these throughout the article. Moreover, the extended propositions concerning the second fundamental form are generalizations of previously known results on Higgs bundles. In particular, here we include alternative proofs of these extended propositions without using local computations. Finally, as an application of the above results and due to the lack of a certain parallelism condition, we show that a classical theorem concerning the Kobayashi functional for holomorphic vector bundles does not admit a straightforward extension to Higgs bundles.
+            </div>
+        </div>
+        <div class="paper" id="paper-21">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-21" data-paper-data='{"title": "Analytic Langlands correspondence from SoV", "author": "Federico Ambrosino, J\\\"org Teschner", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2510.06991", "summary": "arXiv:2510.06991v2 Announce Type: replace-cross \nAbstract: The analytic Langlands correspondence proposed by Etingof, Frenkel and Kazhdan describes the solution to the spectral problems naturally arising in the quantisation of the Hitchin integrable systems in terms of real opers, certain second order differential operators on a Riemann surface having real monodromy. We prove this correspondence in the cases associated to the group $\\mathrm{PSL}(2,\\mathbb{C})$, and Riemann surfaces of genus zero with a number of punctures larger than three. A crucial ingredient is a unitary integral transformation mapping products of solutions to the ordinary differential equation associated to a real oper to eigenfunctions of the quantised Hitchin Hamiltonians. This allows us to construct joint eigenfunctions of Hecke operators and Hitchin Hamiltonians from real opers.", "number": 21, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#21</span>
+                <a href="https://arxiv.org/abs/2510.06991" target="_blank">Analytic Langlands correspondence from SoV</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Federico Ambrosino, J\"org Teschner</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.06991" target="_blank">https://arxiv.org/abs/2510.06991</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The analytic Langlands correspondence proposed by Etingof, Frenkel and Kazhdan describes the solution to the spectral problems naturally arising in the quantisation of the Hitchin integrable systems in terms of real opers, certain second order differential operators on a Riemann surface having real monodromy. We prove this correspondence in the cases associated to the group $\mathrm{PSL}(2,\mathbb{C})$, and Riemann surfaces of genus zero with a number of punctures larger than three. A crucial ingredient is a unitary integral transformation mapping products of solutions to the ordinary differential equation associated to a real oper to eigenfunctions of the quantised Hitchin Hamiltonians. This allows us to construct joint eigenfunctions of Hecke operators and Hitchin Hamiltonians from real opers.
+            </div>
+        </div>
+        <div class="paper" id="paper-22">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-22" data-paper-data='{"title": "Holomorphic Deformations of Hyperbolicity Notions on Compact Complex Manifolds", "author": "Abdelouahab Khelifati", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2512.19284", "summary": "arXiv:2512.19284v2 Announce Type: replace-cross \nAbstract: We investigate deformation properties of balanced hyperbolicity, with particular emphasis on degenerate balanced manifolds and their behavior under modifications.\n  In this context, we introduce two new notions of hyperbolicity for compact non-K\\\"ahler manifolds $X$ of complex dimension $\\dim_{\\mathbb{C}}X=n$ in degree $1 \\leq p \\leq n-1$, inspired by the work of F. Haggui and S. Marouani on $p$-K\\\"ahler hyperbolicity. The first notion, called \\emph{p-SKT hyperbolicity}, generalizes the notions of SKT hyperbolicity and Gauduchon hyperbolicity introduced by S. Marouani. The second notion, called \\emph{p-HS hyperbolicity}, extends the notion of sG hyperbolicity defined by Y. Ma.\n  We investigate the relationship between these notions of analytic nature and their geometric counterparts, namely Kobayashi hyperbolicity and \\emph{p-cyclic hyperbolicity} for $2 \\leq p \\leq n-1$, and we examine the openness under holomorphic deformations of both $p$-HS hyperbolicity and $p$-K\\\"ahler hyperbolicity.", "number": 22, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#22</span>
+                <a href="https://arxiv.org/abs/2512.19284" target="_blank">Holomorphic Deformations of Hyperbolicity Notions on Compact Complex Manifolds</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Abdelouahab Khelifati</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.19284" target="_blank">https://arxiv.org/abs/2512.19284</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We investigate deformation properties of balanced hyperbolicity, with particular emphasis on degenerate balanced manifolds and their behavior under modifications.
+  In this context, we introduce two new notions of hyperbolicity for compact non-K\"ahler manifolds $X$ of complex dimension $\dim_{\mathbb{C}}X=n$ in degree $1 \leq p \leq n-1$, inspired by the work of F. Haggui and S. Marouani on $p$-K\"ahler hyperbolicity. The first notion, called \emph{p-SKT hyperbolicity}, generalizes the notions of SKT hyperbolicity and Gauduchon hyperbolicity introduced by S. Marouani. The second notion, called \emph{p-HS hyperbolicity}, extends the notion of sG hyperbolicity defined by Y. Ma.
+  We investigate the relationship between these notions of analytic nature and their geometric counterparts, namely Kobayashi hyperbolicity and \emph{p-cyclic hyperbolicity} for $2 \leq p \leq n-1$, and we examine the openness under holomorphic deformations of both $p$-HS hyperbolicity and $p$-K\"ahler hyperbolicity.
+            </div>
+        </div>
+        <div class="paper" id="paper-23">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-23" data-paper-data='{"title": "Weyl Mutations in Quiver Yangians", "author": "Dmitry Galakhov, Alexei Gavshin, Alexei Morozov", "published": "Thu, 22 Jan 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2601.11736", "summary": "arXiv:2601.11736v2 Announce Type: replace-cross \nAbstract: The problem of solving non-linear equations would be considerably simplified by a possibility to convert known solutions into the new ones. This could seem an element of art, but in the context of ADHM-like equations describing quiver varieties there is a systematic approach. In this note we study moduli spaces and dualities of quiver gauge theories associated to effective dynamics of D-branes compactified on Calabi-Yau resolutions. We concentrate on a subfamily of quivers $\\mathfrak{Q}_{\\mathfrak{g}}$ covering Dynkin diagrams for simple Lie algebras $\\mathfrak{g}$, where the respective BPS algebra is expected to be the Yangian algebra $Y(\\mathfrak{g})$. For Yangians labeled by quivers their representations are described by solutions of ADHM-like equations. As quivers substitute Dynkin diagrams a generalization of the Weyl group $\\mathcal{W}_{\\mathfrak{g}}$ acts on the ADHM solutions. Here we work with the case $\\mathfrak{g}=\\mathfrak{sl}_{n+1}$ and treat this group as a group of electro-magnetic Seiberg-like dualities (we call them Weyl mutations) on the respective quiver gauge theories. We lift it to the case of higher representations associated to rectangular Young diagrams. An action of Weyl mutations on the BPS Yangian algebra is also discussed.", "number": 23, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#23</span>
+                <a href="https://arxiv.org/abs/2601.11736" target="_blank">Weyl Mutations in Quiver Yangians</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Dmitry Galakhov, Alexei Gavshin, Alexei Morozov</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 22 Jan 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.11736" target="_blank">https://arxiv.org/abs/2601.11736</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The problem of solving non-linear equations would be considerably simplified by a possibility to convert known solutions into the new ones. This could seem an element of art, but in the context of ADHM-like equations describing quiver varieties there is a systematic approach. In this note we study moduli spaces and dualities of quiver gauge theories associated to effective dynamics of D-branes compactified on Calabi-Yau resolutions. We concentrate on a subfamily of quivers $\mathfrak{Q}_{\mathfrak{g}}$ covering Dynkin diagrams for simple Lie algebras $\mathfrak{g}$, where the respective BPS algebra is expected to be the Yangian algebra $Y(\mathfrak{g})$. For Yangians labeled by quivers their representations are described by solutions of ADHM-like equations. As quivers substitute Dynkin diagrams a generalization of the Weyl group $\mathcal{W}_{\mathfrak{g}}$ acts on the ADHM solutions. Here we work with the case $\mathfrak{g}=\mathfrak{sl}_{n+1}$ and treat this group as a group of electro-magnetic Seiberg-like dualities (we call them Weyl mutations) on the respective quiver gauge theories. We lift it to the case of higher representations associated to rectangular Young diagrams. An action of Weyl mutations on the BPS Yangian algebra is also discussed.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-01-22 18:00:04
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>
