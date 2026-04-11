@@ -5,10 +5,22 @@
 
 from __future__ import annotations
 
+import re
 import subprocess
 import sys
 from html import escape
 from pathlib import Path
+
+
+# create_daily_html の出力: arXiv_csCR_YYYYMMDD_N.html（N = 論文数）
+_CS_CR_LIST_LABEL = re.compile(r"arXiv_csCR_(\d{8})_(\d+)\.html$")
+
+
+def _list_label_for_cs_cr_html(path: Path) -> str:
+    m = _CS_CR_LIST_LABEL.match(path.name)
+    if m:
+        return f"{m.group(1)}_{m.group(2)}本"
+    return path.stem
 
 
 SCRIPTS_DIR = Path(__file__).resolve().parent
@@ -42,7 +54,7 @@ def build_index_html() -> str:
     items: list[str] = []
     for p in files:
         href = f"csCR/{escape(p.name)}"
-        label = escape(p.stem)
+        label = escape(_list_label_for_cs_cr_html(p))
         items.append(f'        <li><a href="{href}">{label}</a></li>')
 
     list_body = "\n".join(items) if items else "        <li>（まだ HTML がありません）</li>"
