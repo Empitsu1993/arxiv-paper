@@ -18,6 +18,8 @@ def save_paper_list_to_html(
         feed_url: arXivのRSSフィードURL（デフォルトはcs.CR（暗号学・セキュリティ））
         max_papers: 表示する最大論文数（Noneの場合は全て表示）
         output_dir: 出力先ディレクトリ（デフォルトはresults_html）
+
+    論文が0件のときは HTML を生成・保存しない。
     """
     print(f"arXiv RSSフィードを取得中: {feed_url}\n")
 
@@ -30,16 +32,19 @@ def save_paper_list_to_html(
             print(f"詳細: {feed.bozo_exception}")
         return
 
-    # 出力ディレクトリを作成
-    output_path = Path(output_dir)
-    output_path.mkdir(exist_ok=True)
-
     # 論文エントリを取得
     entries = feed.entries
 
     # 最大論文数の制限
     if max_papers is not None:
         entries = entries[:max_papers]
+
+    if len(entries) == 0:
+        print("論文が0件のため、HTML の生成・保存をスキップします。")
+        return
+
+    output_path = Path(output_dir)
+    output_path.mkdir(exist_ok=True)
 
     # フィード情報を取得（エスケープ処理）
     feed_title = feed.feed.get('title', 'N/A').replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
