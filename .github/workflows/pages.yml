@@ -3,12 +3,14 @@ name: Deploy Pages
 on:
   push:
     branches: ["main"]
+    paths-ignore:
+      - "site/**"
   workflow_dispatch:
   schedule:
-    - cron: "0 9 * * *"  # 毎日 18:00 JST（UTC 09:00）
+    - cron: "0 9 * * *"  # 毎日 18:00 JST (UTC 09:00)
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -23,6 +25,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -31,12 +35,24 @@ jobs:
 
       - name: Install uv
         run: |
-          curl -Ls https://astral.sh/uv/install.sh | sh
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Run main script
         run: |
           uv run scripts/main.py
+
+      - name: Commit generated files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site/
+          if ! git diff --cached --quiet; then
+            git commit -m "Update generated site [skip ci]"
+            git push
+          else
+            echo "No changes to commit"
+          fi
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -44,7 +60,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: ./site   # main.py がここに出力する前提
+          path: ./site
 
   deploy:
     environment:
