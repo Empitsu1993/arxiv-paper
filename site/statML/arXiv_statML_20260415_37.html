@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - stat.ML updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>stat.ML updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Wed, 15 Apr 2026 04:00:05 +0000<br>
+        <strong>論文数:</strong> 37件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Obtaining Partition Crossover masks using Statistical Linkage Learning for solving noised optimization problems with hidden variable dependency structure</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">On the continuum limit of t-SNE for data visualization</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">A Nonparametric Adaptive EWMA Control Chart for Binary Monitoring of Multiple Stream Processes</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">Fine-tuning Factor Augmented Neural Lasso for Heterogeneous Environments</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">Information-Geometric Decomposition of Generalization Error in Unsupervised Learning</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">A Bayesian Perspective on the Role of Epistemic Uncertainty for Delayed Generalization in In-Context Learning</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Causal Diffusion Models for Counterfactual Outcome Distributions in Longitudinal Data</a>
+            <span class="title-label-badge" style="background-color: #9b59b6;">diffusion</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Subcritical Signal Propagation at Initialization in Normalization-Free Transformers</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">Offline-Online Reinforcement Learning for Linear Mixture MDPs</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">Convolutional Maximum Mean Discrepancy for Inference in Noisy Data</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">Adaptive Budget Allocation in LLM-Augmented Surveys</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">MCAnalysis: An Open-Source Package for Preprocessing, Modelling, and Visualisation of Menstrual Cycle Effects in Digital Health Data</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">Monte Carlo Stochastic Depth for Uncertainty Estimation in Deep Learning</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Asymptotic Theory for Graphical SLOPE: Precision Estimation and Pattern Convergence</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Understanding and Improving Continuous Adversarial Training for LLMs via In-context Learning Theory</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">Loop Corrections to the Training and Generalization Errors of Random Feature Models</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">An Optimal Sauer Lemma Over $k$-ary Alphabets</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">Nonparametric efficient inference for network quantile causal effects under partial interference</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Classical and Quantum Speedups for Non-Convex Optimization via Energy Conserving Descent</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">Gradient flow dynamics of shallow ReLU networks for square loss and orthogonal inputs</a>
+            <span class="title-label-badge" style="background-color: #f1c40f;">model extraction</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-21" onchange="updateSelectedCount()">
+            <span class="title-number">21.</span>
+            <a href="#paper-21">The Illusion of Fit: Spatially Resolved Assessment of Constitutive Model Validity in Elastography and Physics-Based Inverse Problems</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-22" onchange="updateSelectedCount()">
+            <span class="title-number">22.</span>
+            <a href="#paper-22">Privacy-Preserving Transfer Learning for Community Detection using Locally Distributed Multiple Networks</a>
+            <span class="title-label-badge" style="background-color: #ff69b4;">privacy</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-23" onchange="updateSelectedCount()">
+            <span class="title-number">23.</span>
+            <a href="#paper-23">On the Convergence Analysis of Muon</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-24" onchange="updateSelectedCount()">
+            <span class="title-number">24.</span>
+            <a href="#paper-24">Gaussian Equivalence for Self-Attention: Asymptotic Spectral Analysis of Attention Matrix</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-25" onchange="updateSelectedCount()">
+            <span class="title-number">25.</span>
+            <a href="#paper-25">A Theoretical Comparison of No-U-Turn Sampler Variants: Necessary and Sufficient Convergence Conditions and Mixing Time Analysis under Gaussian Targets</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-26" onchange="updateSelectedCount()">
+            <span class="title-number">26.</span>
+            <a href="#paper-26">Discrete Flow Maps</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-27" onchange="updateSelectedCount()">
+            <span class="title-number">27.</span>
+            <a href="#paper-27">Deep Learning using Rectified Linear Units (ReLU)</a>
+            <span class="title-label-badge" style="background-color: #f1c40f;">model extraction</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-28" onchange="updateSelectedCount()">
+            <span class="title-number">28.</span>
+            <a href="#paper-28">Clustering with Uniformity- and Neighbor-Based Random Geometric Graphs</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-29" onchange="updateSelectedCount()">
+            <span class="title-number">29.</span>
+            <a href="#paper-29">On the Geometry of Receiver Operating Characteristic and Precision-Recall Curves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-30" onchange="updateSelectedCount()">
+            <span class="title-number">30.</span>
+            <a href="#paper-30">Free Random Projection for In-Context Reinforcement Learning</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-31" onchange="updateSelectedCount()">
+            <span class="title-number">31.</span>
+            <a href="#paper-31">Variational Autoencoding Discrete Diffusion with Enhanced Dimensional Correlations Modeling</a>
+            <span class="title-label-badge" style="background-color: #9b59b6;">diffusion</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-32" onchange="updateSelectedCount()">
+            <span class="title-number">32.</span>
+            <a href="#paper-32">Incentivizing High-Quality Human Annotations with Golden Questions</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-33" onchange="updateSelectedCount()">
+            <span class="title-number">33.</span>
+            <a href="#paper-33">Simulation as Supervision: Mechanistic Pretraining for Scientific Discovery</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-34" onchange="updateSelectedCount()">
+            <span class="title-number">34.</span>
+            <a href="#paper-34">Turbo-DDCM: Fast and Flexible Zero-Shot Diffusion-Based Image Compression</a>
+            <span class="title-label-badge" style="background-color: #9b59b6;">diffusion</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-35" onchange="updateSelectedCount()">
+            <span class="title-number">35.</span>
+            <a href="#paper-35">Decoupling Distance and Networks: Hybrid Graph Attention-Geostatistical Methods for Spatio-temporal Risk Mapping</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-36" onchange="updateSelectedCount()">
+            <span class="title-number">36.</span>
+            <a href="#paper-36">A Large-Scale Comparative Analysis of Imputation Methods for Single-Cell RNA Sequencing Data</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-37" onchange="updateSelectedCount()">
+            <span class="title-number">37.</span>
+            <a href="#paper-37">Can LLMs Beat Classical Hyperparameter Optimization Algorithms? A Study on autoresearch</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Obtaining Partition Crossover masks using Statistical Linkage Learning for solving noised optimization problems with hidden variable dependency structure", "author": "M. W. Przewozniczek, B. Frej, M. M. Komarnicki, M. Prusik, R. Tin\\'os", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.11862", "summary": "arXiv:2604.11862v1 Announce Type: new \nAbstract: In optimization problems, some variable subsets may have a joint non-linear or non-monotonical influence on the function value. Therefore, knowledge of variable dependencies may be crucial for effective optimization, and many state-of-the-art optimizers leverage it to improve performance. However, some real-world problem instances may be the subject of noise of various origins. In such a case, variable dependencies relevant to optimization may be hard or impossible to tell using dependency checks sufficient for problems without noise, making highly effective operators, e.g., Partition Crossover (PX), useless. Therefore, we use Statistical Linkage Learning (SLL) to decompose problems with noise and propose a new SLL-dedicated mask construction algorithm. We prove that if the quality of the SLL-based decomposition is sufficiently high, the proposed clustering algorithm yields masks equivalent to PX masks for the noise-free instances. The experiments show that the optimizer using the proposed mechanisms remains equally effective despite the noise level and outperforms state-of-the-art optimizers for the problems with high noise.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2604.11862" target="_blank">Obtaining Partition Crossover masks using Statistical Linkage Learning for solving noised optimization problems with hidden variable dependency structure</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> M. W. Przewozniczek, B. Frej, M. M. Komarnicki, M. Prusik, R. Tin\'os</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.11862" target="_blank">https://arxiv.org/abs/2604.11862</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In optimization problems, some variable subsets may have a joint non-linear or non-monotonical influence on the function value. Therefore, knowledge of variable dependencies may be crucial for effective optimization, and many state-of-the-art optimizers leverage it to improve performance. However, some real-world problem instances may be the subject of noise of various origins. In such a case, variable dependencies relevant to optimization may be hard or impossible to tell using dependency checks sufficient for problems without noise, making highly effective operators, e.g., Partition Crossover (PX), useless. Therefore, we use Statistical Linkage Learning (SLL) to decompose problems with noise and propose a new SLL-dedicated mask construction algorithm. We prove that if the quality of the SLL-based decomposition is sufficiently high, the proposed clustering algorithm yields masks equivalent to PX masks for the noise-free instances. The experiments show that the optimizer using the proposed mechanisms remains equally effective despite the noise level and outperforms state-of-the-art optimizers for the problems with high noise.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "On the continuum limit of t-SNE for data visualization", "author": "Jeff Calder, Zhonggan Huang, Ryan Murray, Adam Pickarski", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.12041", "summary": "arXiv:2604.12041v1 Announce Type: new \nAbstract: This work is concerned with the continuum limit of a graph-based data visualization technique called the t-Distributed Stochastic Neighbor Embedding (t-SNE), which is widely used for visualizing data in a variety of applications, but is still poorly understood from a theoretical standpoint. The t-SNE algorithm produces visualizations by minimizing the Kullback-Leibler divergence between similarity matrices representing the high dimensional data and its low dimensional representation. We prove that as the number of data points $n \\to \\infty$, after a natural rescaling and in applicable parameter regimes, the Kullback-Leibler divergence is consistent as the number of data points $n \\to \\infty$ and the similarity graph remains sparse with a continuum variational problem that involves a non-convex gradient regularization term and a penalty on the magnitude of the probability density function in the visualization space. These two terms represent the continuum limits of the attraction and repulsion forces in the t-SNE algorithm.\n  Due to the lack of convexity in the continuum variational problem, the question of well-posedeness is only partially resolved. We show that when both dimensions are $1$, the problem admits a unique smooth minimizer, along with an infinite number of discontinuous minimizers (interpreted in a relaxed sense). This aligns well with the empirically observed ability of t-SNE to separate data in seemingly arbitrary ways in the visualization. The energy is also very closely related to the famously ill-posed Perona-Malik equation, which is used for denoising and simplifying images. We present numerical results validating the continuum limit, provide some preliminary results about the delicate nature of the limiting energetic problem in higher dimensions, and highlight several problems for future work.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2604.12041" target="_blank">On the continuum limit of t-SNE for data visualization</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jeff Calder, Zhonggan Huang, Ryan Murray, Adam Pickarski</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.12041" target="_blank">https://arxiv.org/abs/2604.12041</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This work is concerned with the continuum limit of a graph-based data visualization technique called the t-Distributed Stochastic Neighbor Embedding (t-SNE), which is widely used for visualizing data in a variety of applications, but is still poorly understood from a theoretical standpoint. The t-SNE algorithm produces visualizations by minimizing the Kullback-Leibler divergence between similarity matrices representing the high dimensional data and its low dimensional representation. We prove that as the number of data points $n \to \infty$, after a natural rescaling and in applicable parameter regimes, the Kullback-Leibler divergence is consistent as the number of data points $n \to \infty$ and the similarity graph remains sparse with a continuum variational problem that involves a non-convex gradient regularization term and a penalty on the magnitude of the probability density function in the visualization space. These two terms represent the continuum limits of the attraction and repulsion forces in the t-SNE algorithm.
+  Due to the lack of convexity in the continuum variational problem, the question of well-posedeness is only partially resolved. We show that when both dimensions are $1$, the problem admits a unique smooth minimizer, along with an infinite number of discontinuous minimizers (interpreted in a relaxed sense). This aligns well with the empirically observed ability of t-SNE to separate data in seemingly arbitrary ways in the visualization. The energy is also very closely related to the famously ill-posed Perona-Malik equation, which is used for denoising and simplifying images. We present numerical results validating the continuum limit, provide some preliminary results about the delicate nature of the limiting energetic problem in higher dimensions, and highlight several problems for future work.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "A Nonparametric Adaptive EWMA Control Chart for Binary Monitoring of Multiple Stream Processes", "author": "Faruk Muritala, Austin Brown, Dhrubajyoti Ghosh, Sherry Ni", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.12095", "summary": "arXiv:2604.12095v1 Announce Type: new \nAbstract: Monitoring binomial proportions across multiple independent streams is a critical challenge in Statistical Process Control (SPC), with applications from manufacturing to cybersecurity. While EWMA charts offer sensitivity to small shifts, existing implementations rely on asymptotic variance approximations that fail during early-phase monitoring. We introduce a Cumulative Standardized Binomial EWMA (CSB-EWMA) chart that overcomes this limitation by deriving the exact time-varying variance of the EWMA statistic for binary multiple-stream data, enabling adaptive control limits that ensure statistical rigor from the first sample. Through extensive simulations, we identify optimal smoothing ({\\lambda}) and limit (L) parameters to achieve target in-control average run length (ARL0) of 370 and 500. The CSB-EWMA chart demonstrates rapid shift detection across both ARL0 targets, with out-of-control average run length (ARL1) dropping to 3-7 samples for moderate shifts ({\\delta}=0.2), and exhibits exceptional robustness across different data distributions, with low ARL1 Coefficients of Variation (CV &lt; 0.10 for small shifts) for both ARL0 = 370 and 500. This work provides practitioners with a distribution-free, sensitive, and theoretically sound tool for early change detection in binomial multiple-stream processes.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2604.12095" target="_blank">A Nonparametric Adaptive EWMA Control Chart for Binary Monitoring of Multiple Stream Processes</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Faruk Muritala, Austin Brown, Dhrubajyoti Ghosh, Sherry Ni</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.12095" target="_blank">https://arxiv.org/abs/2604.12095</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Monitoring binomial proportions across multiple independent streams is a critical challenge in Statistical Process Control (SPC), with applications from manufacturing to cybersecurity. While EWMA charts offer sensitivity to small shifts, existing implementations rely on asymptotic variance approximations that fail during early-phase monitoring. We introduce a Cumulative Standardized Binomial EWMA (CSB-EWMA) chart that overcomes this limitation by deriving the exact time-varying variance of the EWMA statistic for binary multiple-stream data, enabling adaptive control limits that ensure statistical rigor from the first sample. Through extensive simulations, we identify optimal smoothing ({\lambda}) and limit (L) parameters to achieve target in-control average run length (ARL0) of 370 and 500. The CSB-EWMA chart demonstrates rapid shift detection across both ARL0 targets, with out-of-control average run length (ARL1) dropping to 3-7 samples for moderate shifts ({\delta}=0.2), and exhibits exceptional robustness across different data distributions, with low ARL1 Coefficients of Variation (CV &lt; 0.10 for small shifts) for both ARL0 = 370 and 500. This work provides practitioners with a distribution-free, sensitive, and theoretically sound tool for early change detection in binomial multiple-stream processes.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "Fine-tuning Factor Augmented Neural Lasso for Heterogeneous Environments", "author": "Jinhang Chai, Jianqing Fan, Cheng Gao, Qishuo Yin", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.12288", "summary": "arXiv:2604.12288v1 Announce Type: new \nAbstract: Fine-tuning is a widely used strategy for adapting pre-trained models to new tasks, yet its methodology and theoretical properties in high-dimensional nonparametric settings with variable selection have not yet been developed. This paper introduces the fine-tuning factor augmented neural Lasso (FAN-Lasso), a transfer learning framework for high-dimensional nonparametric regression with variable selection that simultaneously handles covariate and posterior shifts. We use a low-rank factor structure to manage high-dimensional dependent covariates and propose a novel residual fine-tuning decomposition in which the target function is expressed as a transformation of a frozen source function and other variables to achieve transfer learning and nonparametric variable selection. This augmented feature from the source predictor allows for the transfer of knowledge to the target domain and reduces model complexity there. We derive minimax-optimal excess risk bounds for the fine-tuning FAN-Lasso, characterizing the precise conditions, in terms of relative sample sizes and function complexities, under which fine-tuning yields statistical acceleration over single-task learning. The proposed framework also provides a theoretical perspective on parameter-efficient fine-tuning methods. Extensive numerical experiments across diverse covariate- and posterior-shift scenarios demonstrate that the fine-tuning FAN-Lasso consistently outperforms standard baselines and achieves near-oracle performance even under severe target sample size constraints, empirically validating the derived rates.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2604.12288" target="_blank">Fine-tuning Factor Augmented Neural Lasso for Heterogeneous Environments</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jinhang Chai, Jianqing Fan, Cheng Gao, Qishuo Yin</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.12288" target="_blank">https://arxiv.org/abs/2604.12288</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Fine-tuning is a widely used strategy for adapting pre-trained models to new tasks, yet its methodology and theoretical properties in high-dimensional nonparametric settings with variable selection have not yet been developed. This paper introduces the fine-tuning factor augmented neural Lasso (FAN-Lasso), a transfer learning framework for high-dimensional nonparametric regression with variable selection that simultaneously handles covariate and posterior shifts. We use a low-rank factor structure to manage high-dimensional dependent covariates and propose a novel residual fine-tuning decomposition in which the target function is expressed as a transformation of a frozen source function and other variables to achieve transfer learning and nonparametric variable selection. This augmented feature from the source predictor allows for the transfer of knowledge to the target domain and reduces model complexity there. We derive minimax-optimal excess risk bounds for the fine-tuning FAN-Lasso, characterizing the precise conditions, in terms of relative sample sizes and function complexities, under which fine-tuning yields statistical acceleration over single-task learning. The proposed framework also provides a theoretical perspective on parameter-efficient fine-tuning methods. Extensive numerical experiments across diverse covariate- and posterior-shift scenarios demonstrate that the fine-tuning FAN-Lasso consistently outperforms standard baselines and achieves near-oracle performance even under severe target sample size constraints, empirically validating the derived rates.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "Information-Geometric Decomposition of Generalization Error in Unsupervised Learning", "author": "Gilhan Kim", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.12340", "summary": "arXiv:2604.12340v1 Announce Type: new \nAbstract: We decompose the Kullback--Leibler generalization error (GE) -- the expected KL divergence from the data distribution to the trained model -- of unsupervised learning into three non-negative components: model error, data bias, and variance. The decomposition is exact for any e-flat model class and follows from two identities of information geometry: the generalized Pythagorean theorem and a dual e-mixture variance identity. As an analytically tractable demonstration, we apply the framework to $\\epsilon$-PCA, a regularized principal component analysis in which the empirical covariance is truncated at rank $N_K$ and discarded directions are pinned at a fixed noise floor $\\epsilon$. Although rank-constrained $\\epsilon$-PCA is not itself e-flat, it admits a technical reformulation with the same total GE on isotropic Gaussian data, under which each component of the decomposition takes closed form. The optimal rank emerges as the cutoff $\\lambda_{\\mathrm{cut}}^{*} = \\epsilon$ -- the model retains exactly those empirical eigenvalues exceeding the noise floor -- with the cutoff reflecting a marginal-rate balance between model-error gain and data-bias cost. A boundary comparison further yields a three-regime phase diagram -- retain-all, interior, and collapse -- separated by the lower Marchenko--Pastur edge and an analytically computable collapse threshold $\\epsilon_{*}(\\alpha)$, where $\\alpha$ is the dimension-to-sample-size ratio. All claims are verified numerically.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2604.12340" target="_blank">Information-Geometric Decomposition of Generalization Error in Unsupervised Learning</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Gilhan Kim</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.12340" target="_blank">https://arxiv.org/abs/2604.12340</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We decompose the Kullback--Leibler generalization error (GE) -- the expected KL divergence from the data distribution to the trained model -- of unsupervised learning into three non-negative components: model error, data bias, and variance. The decomposition is exact for any e-flat model class and follows from two identities of information geometry: the generalized Pythagorean theorem and a dual e-mixture variance identity. As an analytically tractable demonstration, we apply the framework to $\epsilon$-PCA, a regularized principal component analysis in which the empirical covariance is truncated at rank $N_K$ and discarded directions are pinned at a fixed noise floor $\epsilon$. Although rank-constrained $\epsilon$-PCA is not itself e-flat, it admits a technical reformulation with the same total GE on isotropic Gaussian data, under which each component of the decomposition takes closed form. The optimal rank emerges as the cutoff $\lambda_{\mathrm{cut}}^{*} = \epsilon$ -- the model retains exactly those empirical eigenvalues exceeding the noise floor -- with the cutoff reflecting a marginal-rate balance between model-error gain and data-bias cost. A boundary comparison further yields a three-regime phase diagram -- retain-all, interior, and collapse -- separated by the lower Marchenko--Pastur edge and an analytically computable collapse threshold $\epsilon_{*}(\alpha)$, where $\alpha$ is the dimension-to-sample-size ratio. All claims are verified numerically.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "A Bayesian Perspective on the Role of Epistemic Uncertainty for Delayed Generalization in In-Context Learning", "author": "Abdessamed Qchohi, Simone Rossi", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.12434", "summary": "arXiv:2604.12434v1 Announce Type: new \nAbstract: In-context learning enables transformers to adapt to new tasks from a few examples at inference time, while grokking highlights that this generalization can emerge abruptly only after prolonged training. We study task generalization and grokking in in-context learning using a Bayesian perspective, asking what enables the delayed transition from memorization to generalization. Concretely, we consider modular arithmetic tasks in which a transformer must infer a latent linear function solely from in-context examples and analyze how predictive uncertainty evolves during training. We combine approximate Bayesian techniques to estimate the posterior distribution and we study how uncertainty behaves across training and under changes in task diversity, context length, and context noise. We find that epistemic uncertainty collapses sharply when the model groks, making uncertainty a practical label-free diagnostic of generalization in transformers. Additionally, we provide theoretical support with a simplified Bayesian linear model, showing that asymptotically both delayed generalization and uncertainty peaks arise from the same underlying spectral mechanism, which links grokking time to uncertainty dynamics.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2604.12434" target="_blank">A Bayesian Perspective on the Role of Epistemic Uncertainty for Delayed Generalization in In-Context Learning</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Abdessamed Qchohi, Simone Rossi</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.12434" target="_blank">https://arxiv.org/abs/2604.12434</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In-context learning enables transformers to adapt to new tasks from a few examples at inference time, while grokking highlights that this generalization can emerge abruptly only after prolonged training. We study task generalization and grokking in in-context learning using a Bayesian perspective, asking what enables the delayed transition from memorization to generalization. Concretely, we consider modular arithmetic tasks in which a transformer must infer a latent linear function solely from in-context examples and analyze how predictive uncertainty evolves during training. We combine approximate Bayesian techniques to estimate the posterior distribution and we study how uncertainty behaves across training and under changes in task diversity, context length, and context noise. We find that epistemic uncertainty collapses sharply when the model groks, making uncertainty a practical label-free diagnostic of generalization in transformers. Additionally, we provide theoretical support with a simplified Bayesian linear model, showing that asymptotically both delayed generalization and uncertainty peaks arise from the same underlying spectral mechanism, which links grokking time to uncertainty dynamics.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Causal Diffusion Models for Counterfactual Outcome Distributions in Longitudinal Data", "author": "Farbod Alinezhad, Jianfei Cao, Gary J. Young, Brady Post", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.12992", "summary": "arXiv:2604.12992v1 Announce Type: new \nAbstract: Predicting counterfactual outcomes in longitudinal data, where sequential treatment decisions heavily depend on evolving patient states, is critical yet notoriously challenging due to complex time-dependent confounding and inadequate uncertainty quantification in existing methods. We introduce the Causal Diffusion Model (CDM), the first denoising diffusion probabilistic approach explicitly designed to generate full probabilistic distributions of counterfactual outcomes under sequential interventions. CDM employs a novel residual denoising architecture with relational self-attention, capturing intricate temporal dependencies and multimodal outcome trajectories without requiring explicit adjustments (e.g., inverse-probability weighting or adversarial balancing) for confounding. In rigorous evaluation on a pharmacokinetic-pharmacodynamic tumor-growth simulator widely adopted in prior work, CDM consistently outperforms state-of-the-art longitudinal causal inference methods, achieving a 15-30% relative improvement in distributional accuracy (1-Wasserstein distance) while maintaining competitive or superior point-estimate accuracy (RMSE) under high-confounding regimes. By unifying uncertainty quantification and robust counterfactual prediction in complex, sequentially confounded settings, without tailored deconfounding, CDM offers a flexible, high-impact tool for decision support in medicine, policy evaluation, and other longitudinal domains.", "number": 7, "labels": [{"name": "diffusion", "color": "#9b59b6"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2604.12992" target="_blank">Causal Diffusion Models for Counterfactual Outcome Distributions in Longitudinal Data</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #9b59b6;">diffusion</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Farbod Alinezhad, Jianfei Cao, Gary J. Young, Brady Post</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.12992" target="_blank">https://arxiv.org/abs/2604.12992</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Predicting counterfactual outcomes in longitudinal data, where sequential treatment decisions heavily depend on evolving patient states, is critical yet notoriously challenging due to complex time-dependent confounding and inadequate uncertainty quantification in existing methods. We introduce the Causal Diffusion Model (CDM), the first denoising diffusion probabilistic approach explicitly designed to generate full probabilistic distributions of counterfactual outcomes under sequential interventions. CDM employs a novel residual denoising architecture with relational self-attention, capturing intricate temporal dependencies and multimodal outcome trajectories without requiring explicit adjustments (e.g., inverse-probability weighting or adversarial balancing) for confounding. In rigorous evaluation on a pharmacokinetic-pharmacodynamic tumor-growth simulator widely adopted in prior work, CDM consistently outperforms state-of-the-art longitudinal causal inference methods, achieving a 15-30% relative improvement in distributional accuracy (1-Wasserstein distance) while maintaining competitive or superior point-estimate accuracy (RMSE) under high-confounding regimes. By unifying uncertainty quantification and robust counterfactual prediction in complex, sequentially confounded settings, without tailored deconfounding, CDM offers a flexible, high-impact tool for decision support in medicine, policy evaluation, and other longitudinal domains.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Subcritical Signal Propagation at Initialization in Normalization-Free Transformers", "author": "Sergey Alekseev", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.11890", "summary": "arXiv:2604.11890v1 Announce Type: cross \nAbstract: We study signal propagation at initialization in transformers through the averaged partial Jacobian norm (APJN), a measure of gradient amplification across layers. We extend APJN analysis to transformers with bidirectional attention and permutation-symmetric input token configurations by deriving recurrence relations for activation statistics and APJNs across layers. Our theory predicts how attention modifies the asymptotic behavior of the APJN at large depth and matches APJNs measured in deep vision transformers. The criticality picture known from residual networks carries over to transformers: the pre-LayerNorm architecture exhibits power-law APJN growth, whereas transformers with LayerNorm replaced by elementwise $\\tanh$-like nonlinearities have stretched-exponential APJN growth, indicating that the latter are subcritical. Applied to Dynamic Tanh (DyT) and Dynamic erf (Derf) transformers, the theory explains why these architectures can be more sensitive to initialization and optimization choices and require careful tuning for stable training.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2604.11890" target="_blank">Subcritical Signal Propagation at Initialization in Normalization-Free Transformers</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sergey Alekseev</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.11890" target="_blank">https://arxiv.org/abs/2604.11890</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study signal propagation at initialization in transformers through the averaged partial Jacobian norm (APJN), a measure of gradient amplification across layers. We extend APJN analysis to transformers with bidirectional attention and permutation-symmetric input token configurations by deriving recurrence relations for activation statistics and APJNs across layers. Our theory predicts how attention modifies the asymptotic behavior of the APJN at large depth and matches APJNs measured in deep vision transformers. The criticality picture known from residual networks carries over to transformers: the pre-LayerNorm architecture exhibits power-law APJN growth, whereas transformers with LayerNorm replaced by elementwise $\tanh$-like nonlinearities have stretched-exponential APJN growth, indicating that the latter are subcritical. Applied to Dynamic Tanh (DyT) and Dynamic erf (Derf) transformers, the theory explains why these architectures can be more sensitive to initialization and optimization choices and require careful tuning for stable training.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "Offline-Online Reinforcement Learning for Linear Mixture MDPs", "author": "Zhongjun Zhang, Sean R. Sinclair", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.11994", "summary": "arXiv:2604.11994v1 Announce Type: cross \nAbstract: We study offline-online reinforcement learning in linear mixture Markov decision processes (MDPs) under environment shift. In the offline phase, data are collected by an unknown behavior policy and may come from a mismatched environment, while in the online phase the learner interacts with the target environment. We propose an algorithm that adaptively leverages offline data. When the offline data are informative, either due to sufficient coverage or small environment shift, the algorithm provably improves over purely online learning. When the offline data are uninformative, it safely ignores them and matches the online-only performance. We establish regret upper bounds that explicitly characterize when offline data are beneficial, together with nearly matching lower bounds. Numerical experiments further corroborate our theoretical findings.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2604.11994" target="_blank">Offline-Online Reinforcement Learning for Linear Mixture MDPs</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Zhongjun Zhang, Sean R. Sinclair</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.11994" target="_blank">https://arxiv.org/abs/2604.11994</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study offline-online reinforcement learning in linear mixture Markov decision processes (MDPs) under environment shift. In the offline phase, data are collected by an unknown behavior policy and may come from a mismatched environment, while in the online phase the learner interacts with the target environment. We propose an algorithm that adaptively leverages offline data. When the offline data are informative, either due to sufficient coverage or small environment shift, the algorithm provably improves over purely online learning. When the offline data are uninformative, it safely ignores them and matches the online-only performance. We establish regret upper bounds that explicitly characterize when offline data are beneficial, together with nearly matching lower bounds. Numerical experiments further corroborate our theoretical findings.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "Convolutional Maximum Mean Discrepancy for Inference in Noisy Data", "author": "Ritwik Vashistha, Jeff M. Phillips, Abhra Sarkar, Arya Farahi", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.12022", "summary": "arXiv:2604.12022v1 Announce Type: cross \nAbstract: Modern data analyses frequently encounter settings where samples of variables are contaminated by measurement error. Ignoring measurement noise can substantially degrade statistical inference, while existing correction techniques are often computationally costly and inefficient. Recent advances in kernel methods, particularly those based on Maximum Mean Discrepancy (MMD), have enabled flexible, distribution-free inference, yet typically assume precise data and overlook contamination by measurement error. In this work, we introduce a novel framework for inference with samples corrupted by potentially heteroscedastic noise from a known distribution. Central to our approach is the convolutional MMD (convMMD), which compares distributions after noise convolution and retains metric validity under standard kernel conditions. We establish finite-sample deviation bounds that are unaffected by measurement error and prove an equivalence between testing under noise and kernel smoothing. Leveraging these insights, we introduce a convMMD-based estimator for inference with noisy, heteroscedastic observations. We establish its consistency and asymptotic normality, and provide an efficient implementation using stochastic gradient descent. We demonstrate the practical effectiveness of our approach through simulations and applications in astronomy and social sciences.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2604.12022" target="_blank">Convolutional Maximum Mean Discrepancy for Inference in Noisy Data</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ritwik Vashistha, Jeff M. Phillips, Abhra Sarkar, Arya Farahi</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.12022" target="_blank">https://arxiv.org/abs/2604.12022</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Modern data analyses frequently encounter settings where samples of variables are contaminated by measurement error. Ignoring measurement noise can substantially degrade statistical inference, while existing correction techniques are often computationally costly and inefficient. Recent advances in kernel methods, particularly those based on Maximum Mean Discrepancy (MMD), have enabled flexible, distribution-free inference, yet typically assume precise data and overlook contamination by measurement error. In this work, we introduce a novel framework for inference with samples corrupted by potentially heteroscedastic noise from a known distribution. Central to our approach is the convolutional MMD (convMMD), which compares distributions after noise convolution and retains metric validity under standard kernel conditions. We establish finite-sample deviation bounds that are unaffected by measurement error and prove an equivalence between testing under noise and kernel smoothing. Leveraging these insights, we introduce a convMMD-based estimator for inference with noisy, heteroscedastic observations. We establish its consistency and asymptotic normality, and provide an efficient implementation using stochastic gradient descent. We demonstrate the practical effectiveness of our approach through simulations and applications in astronomy and social sciences.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "Adaptive Budget Allocation in LLM-Augmented Surveys", "author": "Zikun Ye, Jiameng Lyu, Rui Tao", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.12497", "summary": "arXiv:2604.12497v1 Announce Type: cross \nAbstract: Large language models (LLMs) can generate survey responses at low cost, but their reliability varies substantially across questions and is unknown before data collection. Deploying LLMs in surveys still requires costly human responses for verification and correction. How should a limited human-labeling budget be allocated across questions in real time? We propose an adaptive allocation algorithm that learns which questions are hardest for the LLM while simultaneously collecting human responses. Each human label serves a dual role: it improves the estimate for that question and reveals how well the LLM predicts human responses on it. The algorithm directs more budget to questions where the LLM is least reliable, without requiring any prior knowledge of question-level LLM accuracy. We prove that the allocation gap relative to the best possible allocation vanishes as the budget grows, and validate the approach on both synthetic data and a real survey dataset with 68 questions and over 2000 respondents. On real survey data, the standard practice of allocating human labels uniformly across questions wastes 10--12% of the budget relative to the optimal; our algorithm reduces this waste to 2--6%, and the advantage grows as questions become more heterogeneous in LLM prediction quality. The algorithm achieves the same estimation quality as traditional uniform sampling with fewer human samples, requires no pilot study, and is backed by formal performance guarantees validated on real survey data. More broadly, the framework applies whenever scarce human oversight must be allocated across tasks where LLM reliability is unknown.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2604.12497" target="_blank">Adaptive Budget Allocation in LLM-Augmented Surveys</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Zikun Ye, Jiameng Lyu, Rui Tao</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.12497" target="_blank">https://arxiv.org/abs/2604.12497</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Large language models (LLMs) can generate survey responses at low cost, but their reliability varies substantially across questions and is unknown before data collection. Deploying LLMs in surveys still requires costly human responses for verification and correction. How should a limited human-labeling budget be allocated across questions in real time? We propose an adaptive allocation algorithm that learns which questions are hardest for the LLM while simultaneously collecting human responses. Each human label serves a dual role: it improves the estimate for that question and reveals how well the LLM predicts human responses on it. The algorithm directs more budget to questions where the LLM is least reliable, without requiring any prior knowledge of question-level LLM accuracy. We prove that the allocation gap relative to the best possible allocation vanishes as the budget grows, and validate the approach on both synthetic data and a real survey dataset with 68 questions and over 2000 respondents. On real survey data, the standard practice of allocating human labels uniformly across questions wastes 10--12% of the budget relative to the optimal; our algorithm reduces this waste to 2--6%, and the advantage grows as questions become more heterogeneous in LLM prediction quality. The algorithm achieves the same estimation quality as traditional uniform sampling with fewer human samples, requires no pilot study, and is backed by formal performance guarantees validated on real survey data. More broadly, the framework applies whenever scarce human oversight must be allocated across tasks where LLM reliability is unknown.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "MCAnalysis: An Open-Source Package for Preprocessing, Modelling, and Visualisation of Menstrual Cycle Effects in Digital Health Data", "author": "Kyra Delray, Glyn Lewis, Bola Grace, Joseph Hayes, Robin Evans", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.12536", "summary": "arXiv:2604.12536v1 Announce Type: cross \nAbstract: The menstrual cycle influences numerous physiological and psychological outcomes, yet standardised, open-source statistical methods for quantifying these cyclic effects remain lacking. We developed mcanalysis, an open-source package in R and Python implementing a Fourier-basis generalised additive model (GAM) for menstrual cycle research. The package provides a complete pipeline: processing period dates, labelling cycle days relative to menstruation onset, filtering physiologically plausible cycles, normalising outcomes to individual means, fitting cyclic GAMs with bootstrap confidence intervals, and identifying turning points to generate phase-specific linear trend estimates. We demonstrate the package on 15 wearable and self-reported outcomes using data from the Juli chronic health management application (N = 2,816 users). Nine of 15 outcomes showed evidence of association with the menstrual cycle (p &lt; 0.05), spanning physiological (HRV p &lt; 0.001, oxygen saturation p = 0.002), sleep (p = 0.003), symptom (migraine p &lt; 0.001, headache p = 0.005), mood (EMA mood p = 0.024, PHQ-8 lack of energy p = 0.008, mania p = 0.041), and activity (hours outside p = 0.019) domains. No tested confounders were significantly associated with cycle-normalised outcomes. mcanalysis provides a standardised, reproducible approach to menstrual cycle analysis for users at all levels of statistical expertise. The package is freely available at https://github.com/kyradelray/mcanalysis, with a no-code web interface at https://kyradelray.shinyapps.io/mcanalysis/.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2604.12536" target="_blank">MCAnalysis: An Open-Source Package for Preprocessing, Modelling, and Visualisation of Menstrual Cycle Effects in Digital Health Data</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Kyra Delray, Glyn Lewis, Bola Grace, Joseph Hayes, Robin Evans</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.12536" target="_blank">https://arxiv.org/abs/2604.12536</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The menstrual cycle influences numerous physiological and psychological outcomes, yet standardised, open-source statistical methods for quantifying these cyclic effects remain lacking. We developed mcanalysis, an open-source package in R and Python implementing a Fourier-basis generalised additive model (GAM) for menstrual cycle research. The package provides a complete pipeline: processing period dates, labelling cycle days relative to menstruation onset, filtering physiologically plausible cycles, normalising outcomes to individual means, fitting cyclic GAMs with bootstrap confidence intervals, and identifying turning points to generate phase-specific linear trend estimates. We demonstrate the package on 15 wearable and self-reported outcomes using data from the Juli chronic health management application (N = 2,816 users). Nine of 15 outcomes showed evidence of association with the menstrual cycle (p &lt; 0.05), spanning physiological (HRV p &lt; 0.001, oxygen saturation p = 0.002), sleep (p = 0.003), symptom (migraine p &lt; 0.001, headache p = 0.005), mood (EMA mood p = 0.024, PHQ-8 lack of energy p = 0.008, mania p = 0.041), and activity (hours outside p = 0.019) domains. No tested confounders were significantly associated with cycle-normalised outcomes. mcanalysis provides a standardised, reproducible approach to menstrual cycle analysis for users at all levels of statistical expertise. The package is freely available at https://github.com/kyradelray/mcanalysis, with a no-code web interface at https://kyradelray.shinyapps.io/mcanalysis/.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "Monte Carlo Stochastic Depth for Uncertainty Estimation in Deep Learning", "author": "Adam T. M\\\"uller, Tobias R\\\"ogelein, Nicolaj C. Stache", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.12719", "summary": "arXiv:2604.12719v1 Announce Type: cross \nAbstract: The deployment of deep neural networks in safety-critical systems necessitates reliable and efficient uncertainty quantification (UQ). A practical and widespread strategy for UQ is repurposing stochastic regularizers as scalable approximate Bayesian inference methods, such as Monte Carlo Dropout (MCD) and MC-DropBlock (MCDB). However, this paradigm remains under-explored for Stochastic Depth (SD), a regularizer integral to the residual-based backbones of most modern architectures. While prior work demonstrated its empirical promise for segmentation, a formal theoretical connection to Bayesian variational inference and a benchmark on complex, multi-task problems like object detection are missing. In this paper, we first provide theoretical insights connecting Monte Carlo Stochastic Depth (MCSD) to principled approximate variational inference. We then present the first comprehensive empirical benchmark of MCSD against MCD and MCDB on state-of-the-art detectors (YOLO, RT-DETR) using the COCO and COCO-O datasets. Our results position MCSD as a robust and computationally efficient method that achieves highly competitive predictive accuracy (mAP), notably yielding slight improvements in calibration (ECE) and uncertainty ranking (AUARC) compared to MCD. We thus establish MCSD as a theoretically-grounded and empirically-validated tool for efficient Bayesian approximation in modern deep learning.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2604.12719" target="_blank">Monte Carlo Stochastic Depth for Uncertainty Estimation in Deep Learning</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Adam T. M\"uller, Tobias R\"ogelein, Nicolaj C. Stache</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.12719" target="_blank">https://arxiv.org/abs/2604.12719</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The deployment of deep neural networks in safety-critical systems necessitates reliable and efficient uncertainty quantification (UQ). A practical and widespread strategy for UQ is repurposing stochastic regularizers as scalable approximate Bayesian inference methods, such as Monte Carlo Dropout (MCD) and MC-DropBlock (MCDB). However, this paradigm remains under-explored for Stochastic Depth (SD), a regularizer integral to the residual-based backbones of most modern architectures. While prior work demonstrated its empirical promise for segmentation, a formal theoretical connection to Bayesian variational inference and a benchmark on complex, multi-task problems like object detection are missing. In this paper, we first provide theoretical insights connecting Monte Carlo Stochastic Depth (MCSD) to principled approximate variational inference. We then present the first comprehensive empirical benchmark of MCSD against MCD and MCDB on state-of-the-art detectors (YOLO, RT-DETR) using the COCO and COCO-O datasets. Our results position MCSD as a robust and computationally efficient method that achieves highly competitive predictive accuracy (mAP), notably yielding slight improvements in calibration (ECE) and uncertainty ranking (AUARC) compared to MCD. We thus establish MCSD as a theoretically-grounded and empirically-validated tool for efficient Bayesian approximation in modern deep learning.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Asymptotic Theory for Graphical SLOPE: Precision Estimation and Pattern Convergence", "author": "Ivan Hejn\\'y, Giovanni Bonaccolto, Philipp Kremer, Sandra Paterlini, Ma{\\l}gorzata Bogdan, Jonas Wallin", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.12771", "summary": "arXiv:2604.12771v1 Announce Type: cross \nAbstract: This paper studies Graphical SLOPE for precision matrix estimation, with emphasis on its ability to recover both sparsity and clusters of edges with equal or similar strength. In a fixed-dimensional regime, we establish that the root-$n$ scaled estimation error converges to the unique minimizer of a strictly convex optimization problem defined through the directional derivative of the SLOPE penalty. We also establish convergence of the induced SLOPE pattern, thereby obtaining an asymptotic characterization of the clustering structure selected by the estimator. A comparison with GLASSO shows that the grouping property of SLOPE can substantially improve estimation accuracy when the precision matrix exhibits structured edge patterns. To assess the effect of departures from Gaussianity, we then analyze Gaussian-loss precision matrix estimation under elliptical distributions. In this setting, we derive the limiting distribution and quantify the inflation in variability induced by heavy tails relative to the Gaussian benchmark. We also study TSLOPE, based on the multivariate $t$-loss, and derive its limiting distribution. The results show that TSLOPE offers clear advantages over GSLOPE under heavy-tailed data-generating mechanisms. Simulation evidence suggests that these qualitative conclusions persist in high-dimensional settings, and an empirical application shows that SLOPE-based estimators, especially TSLOPE, can uncover economically meaningful clustered dependence structures.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2604.12771" target="_blank">Asymptotic Theory for Graphical SLOPE: Precision Estimation and Pattern Convergence</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ivan Hejn\'y, Giovanni Bonaccolto, Philipp Kremer, Sandra Paterlini, Ma{\l}gorzata Bogdan, Jonas Wallin</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.12771" target="_blank">https://arxiv.org/abs/2604.12771</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This paper studies Graphical SLOPE for precision matrix estimation, with emphasis on its ability to recover both sparsity and clusters of edges with equal or similar strength. In a fixed-dimensional regime, we establish that the root-$n$ scaled estimation error converges to the unique minimizer of a strictly convex optimization problem defined through the directional derivative of the SLOPE penalty. We also establish convergence of the induced SLOPE pattern, thereby obtaining an asymptotic characterization of the clustering structure selected by the estimator. A comparison with GLASSO shows that the grouping property of SLOPE can substantially improve estimation accuracy when the precision matrix exhibits structured edge patterns. To assess the effect of departures from Gaussianity, we then analyze Gaussian-loss precision matrix estimation under elliptical distributions. In this setting, we derive the limiting distribution and quantify the inflation in variability induced by heavy tails relative to the Gaussian benchmark. We also study TSLOPE, based on the multivariate $t$-loss, and derive its limiting distribution. The results show that TSLOPE offers clear advantages over GSLOPE under heavy-tailed data-generating mechanisms. Simulation evidence suggests that these qualitative conclusions persist in high-dimensional settings, and an empirical application shows that SLOPE-based estimators, especially TSLOPE, can uncover economically meaningful clustered dependence structures.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Understanding and Improving Continuous Adversarial Training for LLMs via In-context Learning Theory", "author": "Shaopeng Fu, Di Wang", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.12817", "summary": "arXiv:2604.12817v1 Announce Type: cross \nAbstract: Adversarial training (AT) is an effective defense for large language models (LLMs) against jailbreak attacks, but performing AT on LLMs is costly. To improve the efficiency of AT for LLMs, recent studies propose continuous AT (CAT) that searches for adversarial inputs within the continuous embedding space of LLMs during AT. While CAT has achieved empirical success, its underlying mechanism, i.e., why adversarial perturbations in the embedding space can help LLMs defend against jailbreak prompts synthesized in the input token space, remains unknown. This paper presents the first theoretical analysis of CAT on LLMs based on in-context learning (ICL) theory. For linear transformers trained with adversarial examples from the embedding space on in-context linear regression tasks, we prove a robust generalization bound that has a negative correlation with the perturbation radius in the embedding space. This clearly explains why CAT can defend against jailbreak prompts from the LLM's token space. Further, the robust bound shows that the robustness of an adversarially trained LLM is closely related to the singular values of its embedding matrix. Based on this, we propose to improve LLM CAT by introducing an additional regularization term, which depends on singular values of the LLM's embedding matrix, into the objective function of CAT. Experiments on real-world LLMs demonstrate that our method can help LLMs achieve a better jailbreak robustness-utility tradeoff. The code is available at https://github.com/fshp971/continuous-adv-icl.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2604.12817" target="_blank">Understanding and Improving Continuous Adversarial Training for LLMs via In-context Learning Theory</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Shaopeng Fu, Di Wang</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.12817" target="_blank">https://arxiv.org/abs/2604.12817</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Adversarial training (AT) is an effective defense for large language models (LLMs) against jailbreak attacks, but performing AT on LLMs is costly. To improve the efficiency of AT for LLMs, recent studies propose continuous AT (CAT) that searches for adversarial inputs within the continuous embedding space of LLMs during AT. While CAT has achieved empirical success, its underlying mechanism, i.e., why adversarial perturbations in the embedding space can help LLMs defend against jailbreak prompts synthesized in the input token space, remains unknown. This paper presents the first theoretical analysis of CAT on LLMs based on in-context learning (ICL) theory. For linear transformers trained with adversarial examples from the embedding space on in-context linear regression tasks, we prove a robust generalization bound that has a negative correlation with the perturbation radius in the embedding space. This clearly explains why CAT can defend against jailbreak prompts from the LLM's token space. Further, the robust bound shows that the robustness of an adversarially trained LLM is closely related to the singular values of its embedding matrix. Based on this, we propose to improve LLM CAT by introducing an additional regularization term, which depends on singular values of the LLM's embedding matrix, into the objective function of CAT. Experiments on real-world LLMs demonstrate that our method can help LLMs achieve a better jailbreak robustness-utility tradeoff. The code is available at https://github.com/fshp971/continuous-adv-icl.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "Loop Corrections to the Training and Generalization Errors of Random Feature Models", "author": "Taeyoung Kim", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.12827", "summary": "arXiv:2604.12827v1 Announce Type: cross \nAbstract: We investigate random feature models in which neural networks sampled from a prescribed initialization ensemble are frozen and used as random features, with only the readout weights optimized. Adopting a statistical-physics viewpoint, we study the training, test, and generalization errors beyond the mean-kernel approximation. Since the predictor is a nonlinear functional of the induced random kernel, the ensemble-averaged errors depend not only on the mean kernel but also on higher-order fluctuation statistics. Within an effective field-theoretic framework, these finite-width contributions naturally appear as loop corrections. We derive the loop corrections to the training, test, and generalization errors, obtain their scaling laws, and support the theory with experimental verification.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2604.12827" target="_blank">Loop Corrections to the Training and Generalization Errors of Random Feature Models</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Taeyoung Kim</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.12827" target="_blank">https://arxiv.org/abs/2604.12827</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We investigate random feature models in which neural networks sampled from a prescribed initialization ensemble are frozen and used as random features, with only the readout weights optimized. Adopting a statistical-physics viewpoint, we study the training, test, and generalization errors beyond the mean-kernel approximation. Since the predictor is a nonlinear functional of the induced random kernel, the ensemble-averaged errors depend not only on the mean kernel but also on higher-order fluctuation statistics. Within an effective field-theoretic framework, these finite-width contributions naturally appear as loop corrections. We derive the loop corrections to the training, test, and generalization errors, obtain their scaling laws, and support the theory with experimental verification.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "An Optimal Sauer Lemma Over $k$-ary Alphabets", "author": "Steve Hanneke, Qinglin Meng, Shay Moran, Amirreza Shaeiri", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.12952", "summary": "arXiv:2604.12952v1 Announce Type: cross \nAbstract: The Sauer-Shelah-Perles Lemma is a cornerstone of combinatorics and learning theory, bounding the size of a binary hypothesis class in terms of its Vapnik-Chervonenkis (VC) dimension. For classes of functions over a $k$-ary alphabet, namely the multiclass setting, the Natarajan dimension has long served as an analogue of VC dimension, yet the corresponding Sauer-type bounds are suboptimal for alphabet sizes $k&gt;2$.\n  In this work, we establish a sharp Sauer inequality for multiclass and list prediction. Our bound is expressed in terms of the Daniely--Shalev-Shwartz (DS) dimension, and more generally with its extension, the list-DS dimension -- the combinatorial parameters that characterize multiclass and list PAC learnability. Our bound is tight for every alphabet size $k$, list size $\\ell$, and dimension value, replacing the exponential dependence on $\\ell$ in the Natarajan-based bound by the optimal polynomial dependence, and improving the dependence on $k$ as well. Our proof uses the polynomial method. In contrast to the classical VC case, where several direct combinatorial proofs are known, we are not aware of any purely combinatorial proof in the DS setting. This motivates several directions for future research, which are discussed in the paper.\n  As consequences, we obtain improved sample complexity upper bounds for list PAC learning and for uniform convergence of list predictors, sharpening the recent results of Charikar et al.~(STOC~2023), Hanneke et al.~(COLT~2024), and Brukhim et al.~(NeurIPS~2024).", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2604.12952" target="_blank">An Optimal Sauer Lemma Over $k$-ary Alphabets</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Steve Hanneke, Qinglin Meng, Shay Moran, Amirreza Shaeiri</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.12952" target="_blank">https://arxiv.org/abs/2604.12952</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The Sauer-Shelah-Perles Lemma is a cornerstone of combinatorics and learning theory, bounding the size of a binary hypothesis class in terms of its Vapnik-Chervonenkis (VC) dimension. For classes of functions over a $k$-ary alphabet, namely the multiclass setting, the Natarajan dimension has long served as an analogue of VC dimension, yet the corresponding Sauer-type bounds are suboptimal for alphabet sizes $k&gt;2$.
+  In this work, we establish a sharp Sauer inequality for multiclass and list prediction. Our bound is expressed in terms of the Daniely--Shalev-Shwartz (DS) dimension, and more generally with its extension, the list-DS dimension -- the combinatorial parameters that characterize multiclass and list PAC learnability. Our bound is tight for every alphabet size $k$, list size $\ell$, and dimension value, replacing the exponential dependence on $\ell$ in the Natarajan-based bound by the optimal polynomial dependence, and improving the dependence on $k$ as well. Our proof uses the polynomial method. In contrast to the classical VC case, where several direct combinatorial proofs are known, we are not aware of any purely combinatorial proof in the DS setting. This motivates several directions for future research, which are discussed in the paper.
+  As consequences, we obtain improved sample complexity upper bounds for list PAC learning and for uniform convergence of list predictors, sharpening the recent results of Charikar et al.~(STOC~2023), Hanneke et al.~(COLT~2024), and Brukhim et al.~(NeurIPS~2024).
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "Nonparametric efficient inference for network quantile causal effects under partial interference", "author": "Chao Cheng, Fan Li", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.13008", "summary": "arXiv:2604.13008v1 Announce Type: cross \nAbstract: Interference arises when the treatment assigned to one individual affects the outcomes of other individuals. Commonly, individuals are naturally grouped into clusters, and interference occurs only among individuals within the same cluster, a setting referred to as partial interference. We study network causal effects on outcome quantiles in the presence of partial interference. We develop a general nonparametric efficiency theory for estimating these network quantile causal effects, which leads to a nonparametrically efficient estimator. The proposed estimator is consistent and asymptotically normal with parametric convergence rates, while allowing for flexible, data-adaptive estimation of complex nuisance functions. We leverage a three-way cross-fitting procedure that avoids direct estimation of the conditional outcome distribution. Simulations demonstrate adequate finite-sample performance of the proposed estimators, and we apply the methods to a clustered observational study.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2604.13008" target="_blank">Nonparametric efficient inference for network quantile causal effects under partial interference</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Chao Cheng, Fan Li</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.13008" target="_blank">https://arxiv.org/abs/2604.13008</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Interference arises when the treatment assigned to one individual affects the outcomes of other individuals. Commonly, individuals are naturally grouped into clusters, and interference occurs only among individuals within the same cluster, a setting referred to as partial interference. We study network causal effects on outcome quantiles in the presence of partial interference. We develop a general nonparametric efficiency theory for estimating these network quantile causal effects, which leads to a nonparametrically efficient estimator. The proposed estimator is consistent and asymptotically normal with parametric convergence rates, while allowing for flexible, data-adaptive estimation of complex nuisance functions. We leverage a three-way cross-fitting procedure that avoids direct estimation of the conditional outcome distribution. Simulations demonstrate adequate finite-sample performance of the proposed estimators, and we apply the methods to a clustered observational study.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Classical and Quantum Speedups for Non-Convex Optimization via Energy Conserving Descent", "author": "Yihang Sun, Huaijin Wang, Patrick Hayden, Jose Blanchet", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.13022", "summary": "arXiv:2604.13022v1 Announce Type: cross \nAbstract: The Energy Conserving Descent (ECD) algorithm was recently proposed (De Luca &amp; Silverstein, 2022) as a global non-convex optimization method. Unlike gradient descent, appropriately configured ECD dynamics escape strict local minima and converge to a global minimum, making it appealing for machine learning optimization.\n  We present the first analytical study of ECD, focusing on the one-dimensional setting for this first installment. We formalize a stochastic ECD dynamics (sECD) with energy-preserving noise, as well as a quantum analog of the ECD Hamiltonian (qECD), providing the foundation for a quantum algorithm through Hamiltonian simulation.\n  For positive double-well objectives, we compute the expected hitting time from a local to the global minimum. We prove that both sECD and qECD yield exponential speedup over respective gradient descent baselines--stochastic gradient descent and its quantization. For objectives with tall barriers, qECD achieves a further speedup over sECD.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2604.13022" target="_blank">Classical and Quantum Speedups for Non-Convex Optimization via Energy Conserving Descent</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yihang Sun, Huaijin Wang, Patrick Hayden, Jose Blanchet</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.13022" target="_blank">https://arxiv.org/abs/2604.13022</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The Energy Conserving Descent (ECD) algorithm was recently proposed (De Luca &amp; Silverstein, 2022) as a global non-convex optimization method. Unlike gradient descent, appropriately configured ECD dynamics escape strict local minima and converge to a global minimum, making it appealing for machine learning optimization.
+  We present the first analytical study of ECD, focusing on the one-dimensional setting for this first installment. We formalize a stochastic ECD dynamics (sECD) with energy-preserving noise, as well as a quantum analog of the ECD Hamiltonian (qECD), providing the foundation for a quantum algorithm through Hamiltonian simulation.
+  For positive double-well objectives, we compute the expected hitting time from a local to the global minimum. We prove that both sECD and qECD yield exponential speedup over respective gradient descent baselines--stochastic gradient descent and its quantization. For objectives with tall barriers, qECD achieves a further speedup over sECD.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "Gradient flow dynamics of shallow ReLU networks for square loss and orthogonal inputs", "author": "Etienne Boursier, Loucas Pillaud-Vivien, Nicolas Flammarion", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2206.00939", "summary": "arXiv:2206.00939v3 Announce Type: replace \nAbstract: The training of neural networks by gradient descent methods is a cornerstone of the deep learning revolution. Yet, despite some recent progress, a complete theory explaining its success is still missing. This article presents, for orthogonal input vectors, a precise description of the gradient flow dynamics of training one-hidden layer ReLU neural networks for the mean squared error at small initialisation. In this setting, despite non-convexity, we show that the gradient flow converges to zero loss and characterise its implicit bias towards minimum variation norm. Furthermore, some interesting phenomena are highlighted: a quantitative description of the initial alignment phenomenon and a proof that the process follows a specific saddle to saddle dynamics.", "number": 20, "labels": [{"name": "model extraction", "color": "#f1c40f"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2206.00939" target="_blank">Gradient flow dynamics of shallow ReLU networks for square loss and orthogonal inputs</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #f1c40f;">model extraction</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Etienne Boursier, Loucas Pillaud-Vivien, Nicolas Flammarion</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2206.00939" target="_blank">https://arxiv.org/abs/2206.00939</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The training of neural networks by gradient descent methods is a cornerstone of the deep learning revolution. Yet, despite some recent progress, a complete theory explaining its success is still missing. This article presents, for orthogonal input vectors, a precise description of the gradient flow dynamics of training one-hidden layer ReLU neural networks for the mean squared error at small initialisation. In this setting, despite non-convexity, we show that the gradient flow converges to zero loss and characterise its implicit bias towards minimum variation norm. Furthermore, some interesting phenomena are highlighted: a quantitative description of the initial alignment phenomenon and a proof that the process follows a specific saddle to saddle dynamics.
+            </div>
+        </div>
+        <div class="paper" id="paper-21">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-21" data-paper-data='{"title": "The Illusion of Fit: Spatially Resolved Assessment of Constitutive Model Validity in Elastography and Physics-Based Inverse Problems", "author": "Vincent C. Scholz, P. S. Koutsourelakis", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2502.07415", "summary": "arXiv:2502.07415v2 Announce Type: replace \nAbstract: Inferring the mechanical properties of soft tissues from measured deformations is a fundamental challenge in elastography. A rarely examined assumption underlying existing approaches is that the assumed constitutive law correctly describes the imaged material. When it fails, inversion still yields plausible-looking estimates - an illusion of fit with no indication of local model invalidity, which can mislead clinical interpretation.\n  We propose a probabilistic framework that transforms constitutive model validity from an implicit assumption into an explicit, spatially resolved inference target. The key is to treat the stress field as an independent latent variable rather than deriving it from the constitutive law. This enables a pointwise comparison between the stress required by mechanical equilibrium and the stress predicted by the assumed constitutive model. Both governing equations enter the probabilistic learning objective as virtual observables with separate precision hyperparameters: the conservation law precision is set a priori to a small value reflecting its undisputed validity, while the constitutive precision is inferred under a sparsity-promoting prior. The resulting constitutive precision field provides an uncertainty-aware map of where the assumed model is supported by the data and where it is not. Inference is carried out via stochastic variational inference and is forward-model-free.\n  We validate the framework on synthetic harmonic elastography experiments on a brain-slice geometry with an anisotropic inclusion. The inferred precision field identifies the inclusion with a five-order-of-magnitude precision contrast against the valid domain, robustly across 25-35 dB noise and four-fold sparser observations. A phantom experiment with ultrasound measurements on a linear elastic material yields no false-positive violations and recovers the true stiffness contrast.", "number": 21, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#21</span>
+                <a href="https://arxiv.org/abs/2502.07415" target="_blank">The Illusion of Fit: Spatially Resolved Assessment of Constitutive Model Validity in Elastography and Physics-Based Inverse Problems</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Vincent C. Scholz, P. S. Koutsourelakis</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2502.07415" target="_blank">https://arxiv.org/abs/2502.07415</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Inferring the mechanical properties of soft tissues from measured deformations is a fundamental challenge in elastography. A rarely examined assumption underlying existing approaches is that the assumed constitutive law correctly describes the imaged material. When it fails, inversion still yields plausible-looking estimates - an illusion of fit with no indication of local model invalidity, which can mislead clinical interpretation.
+  We propose a probabilistic framework that transforms constitutive model validity from an implicit assumption into an explicit, spatially resolved inference target. The key is to treat the stress field as an independent latent variable rather than deriving it from the constitutive law. This enables a pointwise comparison between the stress required by mechanical equilibrium and the stress predicted by the assumed constitutive model. Both governing equations enter the probabilistic learning objective as virtual observables with separate precision hyperparameters: the conservation law precision is set a priori to a small value reflecting its undisputed validity, while the constitutive precision is inferred under a sparsity-promoting prior. The resulting constitutive precision field provides an uncertainty-aware map of where the assumed model is supported by the data and where it is not. Inference is carried out via stochastic variational inference and is forward-model-free.
+  We validate the framework on synthetic harmonic elastography experiments on a brain-slice geometry with an anisotropic inclusion. The inferred precision field identifies the inclusion with a five-order-of-magnitude precision contrast against the valid domain, robustly across 25-35 dB noise and four-fold sparser observations. A phantom experiment with ultrasound measurements on a linear elastic material yields no false-positive violations and recovers the true stiffness contrast.
+            </div>
+        </div>
+        <div class="paper" id="paper-22">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-22" data-paper-data='{"title": "Privacy-Preserving Transfer Learning for Community Detection using Locally Distributed Multiple Networks", "author": "Xiao Guo, Xuming He, Xiangyu Chang, Shujie Ma", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2504.00890", "summary": "arXiv:2504.00890v2 Announce Type: replace \nAbstract: Modern applications increasingly involve highly sensitive network data, where raw edges cannot be shared due to privacy constraints. We propose \\texttt{TransNet}, a new spectral clustering-based transfer learning framework that improves community detection on a \\emph{target network} by leveraging heterogeneous, locally stored, and privacy-preserved auxiliary \\emph{source networks}. Our focus is the \\textit{local differential privacy} regime, in which each local data provider perturbs edges via \\textit{randomized response} before release, requiring no trusted third party. \\texttt{TransNet} aggregates source eigenspaces through a novel adaptive weighting scheme that accounts for both privacy and heterogeneity, and then regularizes the weighted source eigenspace with the target eigenspace to optimally balance the two. Theoretically, we establish an error-bound-oracle property: the estimation error for the aggregated eigenspace depends only on \\textit{informative sources}, ensuring robustness when some sources are highly heterogeneous or heavily privatized. We further show that the error bound of \\texttt{TransNet} is no greater than that of estimators using only the target network or only (weighted) sources. Empirically, \\texttt{TransNet} delivers strong gains across a range of privacy levels and heterogeneity patterns. For completeness, we also present \\texttt{TransNetX}, an extension based on Gaussian perturbation of projection matrices under the assumption that trusted local data curators are available.", "number": 22, "labels": [{"name": "privacy", "color": "#ff69b4"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#22</span>
+                <a href="https://arxiv.org/abs/2504.00890" target="_blank">Privacy-Preserving Transfer Learning for Community Detection using Locally Distributed Multiple Networks</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #ff69b4;">privacy</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Xiao Guo, Xuming He, Xiangyu Chang, Shujie Ma</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2504.00890" target="_blank">https://arxiv.org/abs/2504.00890</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Modern applications increasingly involve highly sensitive network data, where raw edges cannot be shared due to privacy constraints. We propose \texttt{TransNet}, a new spectral clustering-based transfer learning framework that improves community detection on a \emph{target network} by leveraging heterogeneous, locally stored, and privacy-preserved auxiliary \emph{source networks}. Our focus is the \textit{local differential privacy} regime, in which each local data provider perturbs edges via \textit{randomized response} before release, requiring no trusted third party. \texttt{TransNet} aggregates source eigenspaces through a novel adaptive weighting scheme that accounts for both privacy and heterogeneity, and then regularizes the weighted source eigenspace with the target eigenspace to optimally balance the two. Theoretically, we establish an error-bound-oracle property: the estimation error for the aggregated eigenspace depends only on \textit{informative sources}, ensuring robustness when some sources are highly heterogeneous or heavily privatized. We further show that the error bound of \texttt{TransNet} is no greater than that of estimators using only the target network or only (weighted) sources. Empirically, \texttt{TransNet} delivers strong gains across a range of privacy levels and heterogeneity patterns. For completeness, we also present \texttt{TransNetX}, an extension based on Gaussian perturbation of projection matrices under the assumption that trusted local data curators are available.
+            </div>
+        </div>
+        <div class="paper" id="paper-23">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-23" data-paper-data='{"title": "On the Convergence Analysis of Muon", "author": "Wei Shen, Ruichuan Huang, Minhui Huang, Cong Shen, Jiawei Zhang", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2505.23737", "summary": "arXiv:2505.23737v2 Announce Type: replace \nAbstract: The majority of parameters in neural networks are naturally represented as matrices. However, most commonly used optimizers treat these matrix parameters as flattened vectors during optimization, potentially overlooking their inherent structural properties. Recently, an optimizer called Muon has been proposed, specifically designed to optimize matrix-structured parameters. Extensive empirical evidence shows that Muon can significantly outperform traditional optimizers when training neural networks. Nonetheless, the theoretical understanding of Muon's convergence behavior and the reasons behind its superior performance remain limited. In this work, we present a comprehensive convergence rate analysis of Muon and its comparison with Gradient Descent (GD). We characterize the conditions under which Muon can outperform GD. Our theoretical results reveal that Muon can benefit from the low-rank structure of Hessian matrices, a phenomenon widely observed in practical neural network training. Our experimental results support and corroborate the theoretical findings.", "number": 23, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#23</span>
+                <a href="https://arxiv.org/abs/2505.23737" target="_blank">On the Convergence Analysis of Muon</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Wei Shen, Ruichuan Huang, Minhui Huang, Cong Shen, Jiawei Zhang</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2505.23737" target="_blank">https://arxiv.org/abs/2505.23737</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The majority of parameters in neural networks are naturally represented as matrices. However, most commonly used optimizers treat these matrix parameters as flattened vectors during optimization, potentially overlooking their inherent structural properties. Recently, an optimizer called Muon has been proposed, specifically designed to optimize matrix-structured parameters. Extensive empirical evidence shows that Muon can significantly outperform traditional optimizers when training neural networks. Nonetheless, the theoretical understanding of Muon's convergence behavior and the reasons behind its superior performance remain limited. In this work, we present a comprehensive convergence rate analysis of Muon and its comparison with Gradient Descent (GD). We characterize the conditions under which Muon can outperform GD. Our theoretical results reveal that Muon can benefit from the low-rank structure of Hessian matrices, a phenomenon widely observed in practical neural network training. Our experimental results support and corroborate the theoretical findings.
+            </div>
+        </div>
+        <div class="paper" id="paper-24">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-24" data-paper-data='{"title": "Gaussian Equivalence for Self-Attention: Asymptotic Spectral Analysis of Attention Matrix", "author": "Tomohiro Hayase, Beno\\^it Collins, Ryo Karakida", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2510.06685", "summary": "arXiv:2510.06685v2 Announce Type: replace \nAbstract: Self-attention layers have become fundamental building blocks of modern deep neural networks, yet their theoretical understanding remains limited, particularly from the perspective of random matrix theory. In this work, we provide a rigorous analysis of the singular value spectrum of the attention matrix and establish the first Gaussian equivalence result for attention. In a natural regime where the inverse temperature remains of constant order, we show that the singular value distribution of the attention matrix is asymptotically characterized by a tractable linear model. We further demonstrate that the distribution of squared singular values deviates from the Marchenko-Pastur law, which has been believed in previous work. Our proof relies on two key ingredients: precise control of fluctuations in the normalization term and a refined linearization that leverages favorable Taylor expansions of the exponential. This analysis also identifies a threshold for linearization and elucidates why attention, despite not being an entrywise operation, admits a rigorous Gaussian equivalence in this regime.", "number": 24, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#24</span>
+                <a href="https://arxiv.org/abs/2510.06685" target="_blank">Gaussian Equivalence for Self-Attention: Asymptotic Spectral Analysis of Attention Matrix</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Tomohiro Hayase, Beno\^it Collins, Ryo Karakida</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.06685" target="_blank">https://arxiv.org/abs/2510.06685</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Self-attention layers have become fundamental building blocks of modern deep neural networks, yet their theoretical understanding remains limited, particularly from the perspective of random matrix theory. In this work, we provide a rigorous analysis of the singular value spectrum of the attention matrix and establish the first Gaussian equivalence result for attention. In a natural regime where the inverse temperature remains of constant order, we show that the singular value distribution of the attention matrix is asymptotically characterized by a tractable linear model. We further demonstrate that the distribution of squared singular values deviates from the Marchenko-Pastur law, which has been believed in previous work. Our proof relies on two key ingredients: precise control of fluctuations in the normalization term and a refined linearization that leverages favorable Taylor expansions of the exponential. This analysis also identifies a threshold for linearization and elucidates why attention, despite not being an entrywise operation, admits a rigorous Gaussian equivalence in this regime.
+            </div>
+        </div>
+        <div class="paper" id="paper-25">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-25" data-paper-data='{"title": "A Theoretical Comparison of No-U-Turn Sampler Variants: Necessary and Sufficient Convergence Conditions and Mixing Time Analysis under Gaussian Targets", "author": "Samuel Gruffaz, Kyurae Kim, Fares Guehtar, Hadrien Duval-decaix, Pac\\^ome Trautmann", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.18640", "summary": "arXiv:2603.18640v3 Announce Type: replace \nAbstract: The No-U-Turn Sampler (NUTS) is the computational workhorse of modern Bayesian software libraries, yet its qualitative and quantitative convergence guarantees were established only recently. A significant gap remains in the theoretical comparison of its two main variants: NUTS-mul and NUTS-BPS, which use multinomial sampling and biased progressive sampling, respectively, for index selection. In this paper, we address this gap in three contributions. First, we derive the first necessary conditions for geometric ergodicity for both variants. Second, we establish the first sufficient conditions for geometric ergodicity and ergodicity for NUTS-mul. Third, we obtain the first mixing time result for NUTS-BPS on a standard Gaussian distribution. Our results show that NUTS-mul and NUTS-BPS exhibit nearly identical qualitative behavior, with geometric ergodicity depending on the tail properties of the target distribution. However, they differ quantitatively in their convergence rates. More precisely, when initialized in the typical set of the canonical Gaussian measure, the mixing times of both NUTS-mul and NUTS-BPS scale as $O(d^{1/4})$ up to logarithmic factors, where $d$ denotes the dimension. Nevertheless, the associated constants are strictly smaller for NUTS-BPS.", "number": 25, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#25</span>
+                <a href="https://arxiv.org/abs/2603.18640" target="_blank">A Theoretical Comparison of No-U-Turn Sampler Variants: Necessary and Sufficient Convergence Conditions and Mixing Time Analysis under Gaussian Targets</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Samuel Gruffaz, Kyurae Kim, Fares Guehtar, Hadrien Duval-decaix, Pac\^ome Trautmann</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.18640" target="_blank">https://arxiv.org/abs/2603.18640</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The No-U-Turn Sampler (NUTS) is the computational workhorse of modern Bayesian software libraries, yet its qualitative and quantitative convergence guarantees were established only recently. A significant gap remains in the theoretical comparison of its two main variants: NUTS-mul and NUTS-BPS, which use multinomial sampling and biased progressive sampling, respectively, for index selection. In this paper, we address this gap in three contributions. First, we derive the first necessary conditions for geometric ergodicity for both variants. Second, we establish the first sufficient conditions for geometric ergodicity and ergodicity for NUTS-mul. Third, we obtain the first mixing time result for NUTS-BPS on a standard Gaussian distribution. Our results show that NUTS-mul and NUTS-BPS exhibit nearly identical qualitative behavior, with geometric ergodicity depending on the tail properties of the target distribution. However, they differ quantitatively in their convergence rates. More precisely, when initialized in the typical set of the canonical Gaussian measure, the mixing times of both NUTS-mul and NUTS-BPS scale as $O(d^{1/4})$ up to logarithmic factors, where $d$ denotes the dimension. Nevertheless, the associated constants are strictly smaller for NUTS-BPS.
+            </div>
+        </div>
+        <div class="paper" id="paper-26">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-26" data-paper-data='{"title": "Discrete Flow Maps", "author": "Peter Potaptchik, Jason Yim, Adhi Saravanan, Peter Holderrieth, Eric Vanden-Eijnden, Michael S. Albergo", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.09784", "summary": "arXiv:2604.09784v2 Announce Type: replace \nAbstract: The sequential nature of autoregressive next-token prediction imposes a fundamental speed limit on large language models. While continuous flow models offer a path to parallel generation, they traditionally demand expensive iterative integration. Flow Maps bypass this bottleneck by compressing generative trajectories into single-step mappings, theoretically enabling the generation of full text sequences from noise in a single forward pass. However, standard formulations rely on Euclidean regression losses that are geometrically ill-suited for discrete data. In this work, we resolve this conflict with Discrete Flow Maps, a framework that reconciles trajectory compression with the geometry of the probability simplex. We recast standard flow map training for the discrete domain, aligning the training dynamics with the discrete nature of language. Empirically, this strict geometric alignment allows our method to surpass previous state-of-the-art results in discrete flow modeling.", "number": 26, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#26</span>
+                <a href="https://arxiv.org/abs/2604.09784" target="_blank">Discrete Flow Maps</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Peter Potaptchik, Jason Yim, Adhi Saravanan, Peter Holderrieth, Eric Vanden-Eijnden, Michael S. Albergo</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.09784" target="_blank">https://arxiv.org/abs/2604.09784</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The sequential nature of autoregressive next-token prediction imposes a fundamental speed limit on large language models. While continuous flow models offer a path to parallel generation, they traditionally demand expensive iterative integration. Flow Maps bypass this bottleneck by compressing generative trajectories into single-step mappings, theoretically enabling the generation of full text sequences from noise in a single forward pass. However, standard formulations rely on Euclidean regression losses that are geometrically ill-suited for discrete data. In this work, we resolve this conflict with Discrete Flow Maps, a framework that reconciles trajectory compression with the geometry of the probability simplex. We recast standard flow map training for the discrete domain, aligning the training dynamics with the discrete nature of language. Empirically, this strict geometric alignment allows our method to surpass previous state-of-the-art results in discrete flow modeling.
+            </div>
+        </div>
+        <div class="paper" id="paper-27">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-27" data-paper-data='{"title": "Deep Learning using Rectified Linear Units (ReLU)", "author": "Abien Fred Agarap", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/1803.08375", "summary": "arXiv:1803.08375v3 Announce Type: replace-cross \nAbstract: The Rectified Linear Unit (ReLU) is a foundational activation function in artficial neural networks. Recent literature frequently misattributes its origin to the 2018 (initial) version of this paper, which exclusively investigated ReLU at the classification layer. This paper formally corrects the citation record by tracing the mathematical lineage of piecewise linear functions from early biological models to their definitive integration into deep learning by Nair &amp; Hinton (2010). Alongside this historical rectification, we present a comprehensive empirical comparison of the ReLU, Hyperbolic Tangent (Tanh), and Logistic (Sigmoid) activation functions across image classification, text classification, and image reconstruction tasks. To ensure statistical robustness, we evaluated these functions using 10 independent randomized trials and assessed significance using the non-parametric Kruskal-Wallis $H$ test. The empirical data validates the theoretical limitations of saturating functions. Sigmoid failed to converge in deep convolutional vision tasks due to the vanishing gradient problem, thus yielding accuracies equivalent to random probability. Conversely, ReLU and Tanh exhibited stable convergence. ReLU achieved the highest mean accuracy and F1-score on image classification and text classification tasks, while Tanh yielded the highest peak signal to noise ratio in image reconstruction. Ultimately, this study confirms a statistically significant performance variance among activations, thus reaffirming the necessity of non-saturating functions in deep architectures, and restores proper historical attribution to prior literature.", "number": 27, "labels": [{"name": "model extraction", "color": "#f1c40f"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#27</span>
+                <a href="https://arxiv.org/abs/1803.08375" target="_blank">Deep Learning using Rectified Linear Units (ReLU)</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #f1c40f;">model extraction</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Abien Fred Agarap</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/1803.08375" target="_blank">https://arxiv.org/abs/1803.08375</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The Rectified Linear Unit (ReLU) is a foundational activation function in artficial neural networks. Recent literature frequently misattributes its origin to the 2018 (initial) version of this paper, which exclusively investigated ReLU at the classification layer. This paper formally corrects the citation record by tracing the mathematical lineage of piecewise linear functions from early biological models to their definitive integration into deep learning by Nair &amp; Hinton (2010). Alongside this historical rectification, we present a comprehensive empirical comparison of the ReLU, Hyperbolic Tangent (Tanh), and Logistic (Sigmoid) activation functions across image classification, text classification, and image reconstruction tasks. To ensure statistical robustness, we evaluated these functions using 10 independent randomized trials and assessed significance using the non-parametric Kruskal-Wallis $H$ test. The empirical data validates the theoretical limitations of saturating functions. Sigmoid failed to converge in deep convolutional vision tasks due to the vanishing gradient problem, thus yielding accuracies equivalent to random probability. Conversely, ReLU and Tanh exhibited stable convergence. ReLU achieved the highest mean accuracy and F1-score on image classification and text classification tasks, while Tanh yielded the highest peak signal to noise ratio in image reconstruction. Ultimately, this study confirms a statistically significant performance variance among activations, thus reaffirming the necessity of non-saturating functions in deep architectures, and restores proper historical attribution to prior literature.
+            </div>
+        </div>
+        <div class="paper" id="paper-28">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-28" data-paper-data='{"title": "Clustering with Uniformity- and Neighbor-Based Random Geometric Graphs", "author": "Rui Shi, Elvan Ceyhan, Nedret Billor", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2501.06268", "summary": "arXiv:2501.06268v3 Announce Type: replace-cross \nAbstract: We propose a graph-based clustering method based on Cluster Catch Digraphs (CCDs) that extends their applicability to\n  moderate-dimensional data settings. Existing CCD variants, such as RK-CCDs, rely on spatial randomness tests based on\n  Ripley's K function, which exhibit performance degradation as dimensionality increases. To address this limitation, we\n  introduce a nearest-neighbor-distance (NND) based Monte Carlo spatial randomness test (MC-SRT) for determining\n  covering radii, resulting in the proposed Uniformity- and Neighbor-based CCDs (UN-CCDs). The proposed method is\n  designed for datasets of moderate size and dimension, particularly in settings with complex cluster geometry and\n  uniformly distributed background noise. Through Monte Carlo simulations and experiments on benchmark datasets, we show\n  that UN-CCDs provide stable and competitive performance relative to several established clustering methods within the\n  evaluated regimes, while remaining largely parameter-free. We also discuss computational trade-offs and identify the\n  practical regimes in which the method is most effective. -- Keywords:\n  Graph-based clustering; Cluster catch digraphs; Moderate-dimensional data; the nearest neighbor distance; Spatial\n  randomness test.", "number": 28, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#28</span>
+                <a href="https://arxiv.org/abs/2501.06268" target="_blank">Clustering with Uniformity- and Neighbor-Based Random Geometric Graphs</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Rui Shi, Elvan Ceyhan, Nedret Billor</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2501.06268" target="_blank">https://arxiv.org/abs/2501.06268</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We propose a graph-based clustering method based on Cluster Catch Digraphs (CCDs) that extends their applicability to
+  moderate-dimensional data settings. Existing CCD variants, such as RK-CCDs, rely on spatial randomness tests based on
+  Ripley's K function, which exhibit performance degradation as dimensionality increases. To address this limitation, we
+  introduce a nearest-neighbor-distance (NND) based Monte Carlo spatial randomness test (MC-SRT) for determining
+  covering radii, resulting in the proposed Uniformity- and Neighbor-based CCDs (UN-CCDs). The proposed method is
+  designed for datasets of moderate size and dimension, particularly in settings with complex cluster geometry and
+  uniformly distributed background noise. Through Monte Carlo simulations and experiments on benchmark datasets, we show
+  that UN-CCDs provide stable and competitive performance relative to several established clustering methods within the
+  evaluated regimes, while remaining largely parameter-free. We also discuss computational trade-offs and identify the
+  practical regimes in which the method is most effective. -- Keywords:
+  Graph-based clustering; Cluster catch digraphs; Moderate-dimensional data; the nearest neighbor distance; Spatial
+  randomness test.
+            </div>
+        </div>
+        <div class="paper" id="paper-29">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-29" data-paper-data='{"title": "On the Geometry of Receiver Operating Characteristic and Precision-Recall Curves", "author": "Reza Sameni", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2504.02169", "summary": "arXiv:2504.02169v3 Announce Type: replace-cross \nAbstract: We study the geometry of Receiver Operating Characteristic (ROC) and Precision-Recall (PR) curves in binary classification problems. The key finding is that many of the most commonly used binary classification metrics are merely functions of the composition function $G := F_p \\circ F_n^{-1}$, where $F_p(\\cdot)$ and $F_n(\\cdot)$ are the class-conditional cumulative distribution functions of the classifier scores in the positive and negative classes, respectively. This geometric perspective facilitates the selection of operating points, understanding the effect of decision thresholds, and comparison between classifiers. It also helps explain how the shapes and geometry of ROC/PR curves reflect classifier behavior, providing objective tools for building classifiers optimized for specific applications with context-specific constraints. We further explore the conditions for classifier dominance, present analytical and numerical examples demonstrating the effects of class separability and variance on ROC and PR geometries, and derive a link between the positive-to-negative class leakage function $G(\\cdot)$ and the Kullback-Leibler divergence. The framework highlights practical considerations, such as model calibration, cost-sensitive optimization, and operating point selection under real-world capacity constraints, enabling more informed approaches to classifier deployment and decision-making.", "number": 29, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#29</span>
+                <a href="https://arxiv.org/abs/2504.02169" target="_blank">On the Geometry of Receiver Operating Characteristic and Precision-Recall Curves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Reza Sameni</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2504.02169" target="_blank">https://arxiv.org/abs/2504.02169</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the geometry of Receiver Operating Characteristic (ROC) and Precision-Recall (PR) curves in binary classification problems. The key finding is that many of the most commonly used binary classification metrics are merely functions of the composition function $G := F_p \circ F_n^{-1}$, where $F_p(\cdot)$ and $F_n(\cdot)$ are the class-conditional cumulative distribution functions of the classifier scores in the positive and negative classes, respectively. This geometric perspective facilitates the selection of operating points, understanding the effect of decision thresholds, and comparison between classifiers. It also helps explain how the shapes and geometry of ROC/PR curves reflect classifier behavior, providing objective tools for building classifiers optimized for specific applications with context-specific constraints. We further explore the conditions for classifier dominance, present analytical and numerical examples demonstrating the effects of class separability and variance on ROC and PR geometries, and derive a link between the positive-to-negative class leakage function $G(\cdot)$ and the Kullback-Leibler divergence. The framework highlights practical considerations, such as model calibration, cost-sensitive optimization, and operating point selection under real-world capacity constraints, enabling more informed approaches to classifier deployment and decision-making.
+            </div>
+        </div>
+        <div class="paper" id="paper-30">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-30" data-paper-data='{"title": "Free Random Projection for In-Context Reinforcement Learning", "author": "Tomohiro Hayase, Beno\\^it Collins, Nakamasa Inoue", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2504.06983", "summary": "arXiv:2504.06983v3 Announce Type: replace-cross \nAbstract: Hierarchical inductive biases are hypothesized to promote generalizable policies in reinforcement learning, as demonstrated by explicit hyperbolic latent representations and architectures. Therefore, a more flexible approach is to have these biases emerge naturally from the algorithm. We introduce Free Random Projection, an input mapping grounded in free probability theory that constructs random orthogonal matrices where hierarchical structure arises inherently. The free random projection integrates seamlessly into existing in-context reinforcement learning frameworks by encoding hierarchical organization within the input space without requiring explicit architectural modifications. Empirical results on multi-environment benchmarks show that free random projection consistently outperforms the standard random projection, leading to improvements in generalization. Furthermore, analyses within linearly solvable Markov decision processes and investigations of the spectrum of kernel random matrices reveal the theoretical underpinnings of free random projection's enhanced performance, highlighting its capacity for effective adaptation in hierarchically structured state spaces.", "number": 30, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#30</span>
+                <a href="https://arxiv.org/abs/2504.06983" target="_blank">Free Random Projection for In-Context Reinforcement Learning</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Tomohiro Hayase, Beno\^it Collins, Nakamasa Inoue</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2504.06983" target="_blank">https://arxiv.org/abs/2504.06983</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Hierarchical inductive biases are hypothesized to promote generalizable policies in reinforcement learning, as demonstrated by explicit hyperbolic latent representations and architectures. Therefore, a more flexible approach is to have these biases emerge naturally from the algorithm. We introduce Free Random Projection, an input mapping grounded in free probability theory that constructs random orthogonal matrices where hierarchical structure arises inherently. The free random projection integrates seamlessly into existing in-context reinforcement learning frameworks by encoding hierarchical organization within the input space without requiring explicit architectural modifications. Empirical results on multi-environment benchmarks show that free random projection consistently outperforms the standard random projection, leading to improvements in generalization. Furthermore, analyses within linearly solvable Markov decision processes and investigations of the spectrum of kernel random matrices reveal the theoretical underpinnings of free random projection's enhanced performance, highlighting its capacity for effective adaptation in hierarchically structured state spaces.
+            </div>
+        </div>
+        <div class="paper" id="paper-31">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-31" data-paper-data='{"title": "Variational Autoencoding Discrete Diffusion with Enhanced Dimensional Correlations Modeling", "author": "Tianyu Xie, Shuchen Xue, Zijin Feng, Tianyang Hu, Jiacheng Sun, Zhenguo Li, Cheng Zhang", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2505.17384", "summary": "arXiv:2505.17384v2 Announce Type: replace-cross \nAbstract: Discrete diffusion models have recently shown great promise for modeling complex discrete data, with masked diffusion models (MDMs) offering a compelling trade-off between quality and generation speed. MDMs denoise by progressively unmasking multiple dimensions from an all-masked input, but their performance can degrade when using few denoising steps due to limited modeling of inter-dimensional dependencies. In this paper, we propose Variational Autoencoding Discrete Diffusion (VADD), a novel framework that enhances discrete diffusion with latent variable modeling to implicitly capture correlations among dimensions. By introducing an auxiliary recognition model, VADD enables stable training via variational lower bounds maximization and amortized inference over the training set. Our approach retains the efficiency of traditional MDMs while significantly improving sample quality, especially when the number of denoising steps is small. Empirical results on 2D toy data, pixel-level image generation, and text generation demonstrate that VADD consistently outperforms MDM baselines in sample quality with few denoising steps.", "number": 31, "labels": [{"name": "diffusion", "color": "#9b59b6"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#31</span>
+                <a href="https://arxiv.org/abs/2505.17384" target="_blank">Variational Autoencoding Discrete Diffusion with Enhanced Dimensional Correlations Modeling</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #9b59b6;">diffusion</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Tianyu Xie, Shuchen Xue, Zijin Feng, Tianyang Hu, Jiacheng Sun, Zhenguo Li, Cheng Zhang</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2505.17384" target="_blank">https://arxiv.org/abs/2505.17384</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Discrete diffusion models have recently shown great promise for modeling complex discrete data, with masked diffusion models (MDMs) offering a compelling trade-off between quality and generation speed. MDMs denoise by progressively unmasking multiple dimensions from an all-masked input, but their performance can degrade when using few denoising steps due to limited modeling of inter-dimensional dependencies. In this paper, we propose Variational Autoencoding Discrete Diffusion (VADD), a novel framework that enhances discrete diffusion with latent variable modeling to implicitly capture correlations among dimensions. By introducing an auxiliary recognition model, VADD enables stable training via variational lower bounds maximization and amortized inference over the training set. Our approach retains the efficiency of traditional MDMs while significantly improving sample quality, especially when the number of denoising steps is small. Empirical results on 2D toy data, pixel-level image generation, and text generation demonstrate that VADD consistently outperforms MDM baselines in sample quality with few denoising steps.
+            </div>
+        </div>
+        <div class="paper" id="paper-32">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-32" data-paper-data='{"title": "Incentivizing High-Quality Human Annotations with Golden Questions", "author": "Shang Liu, Zhongze Cai, Hanzhao Wang, Zhongyao Ma, Xiaocheng Li", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2505.19134", "summary": "arXiv:2505.19134v2 Announce Type: replace-cross \nAbstract: Human-annotated data plays a vital role in training large language models (LLMs), such as supervised fine-tuning and human preference alignment. However, it is not guaranteed that paid human annotators produce high-quality data. In this paper, we study how to incentivize human annotators to do so. We start from a principal-agent model to model the dynamics between the company (the principal) and the annotator (the agent), where the principal can only monitor the annotation quality by examining $n$ samples. We investigate the maximum likelihood estimators (MLE) and the corresponding hypothesis testing to incentivize annotators: the agent is given a bonus if the MLE passes the test. By analyzing the variance of the outcome, we show that the strategic behavior of the agent makes the hypothesis testing very different from traditional ones: Unlike the exponential rate proved by the large deviation theory, the principal-agent model's hypothesis testing rate is of $\\Theta(1/\\sqrt{n \\log n})$. Our theory implies two criteria for the \\emph{golden questions} to monitor the performance of the annotators: they should be of (1) high certainty and (2) similar format to normal ones. In that light, we select a set of golden questions in human preference data. By doing incentive-compatible experiments, we find out that the annotators' behavior is better revealed by those golden questions, compared to traditional survey techniques such as instructed manipulation checks.", "number": 32, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#32</span>
+                <a href="https://arxiv.org/abs/2505.19134" target="_blank">Incentivizing High-Quality Human Annotations with Golden Questions</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Shang Liu, Zhongze Cai, Hanzhao Wang, Zhongyao Ma, Xiaocheng Li</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2505.19134" target="_blank">https://arxiv.org/abs/2505.19134</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Human-annotated data plays a vital role in training large language models (LLMs), such as supervised fine-tuning and human preference alignment. However, it is not guaranteed that paid human annotators produce high-quality data. In this paper, we study how to incentivize human annotators to do so. We start from a principal-agent model to model the dynamics between the company (the principal) and the annotator (the agent), where the principal can only monitor the annotation quality by examining $n$ samples. We investigate the maximum likelihood estimators (MLE) and the corresponding hypothesis testing to incentivize annotators: the agent is given a bonus if the MLE passes the test. By analyzing the variance of the outcome, we show that the strategic behavior of the agent makes the hypothesis testing very different from traditional ones: Unlike the exponential rate proved by the large deviation theory, the principal-agent model's hypothesis testing rate is of $\Theta(1/\sqrt{n \log n})$. Our theory implies two criteria for the \emph{golden questions} to monitor the performance of the annotators: they should be of (1) high certainty and (2) similar format to normal ones. In that light, we select a set of golden questions in human preference data. By doing incentive-compatible experiments, we find out that the annotators' behavior is better revealed by those golden questions, compared to traditional survey techniques such as instructed manipulation checks.
+            </div>
+        </div>
+        <div class="paper" id="paper-33">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-33" data-paper-data='{"title": "Simulation as Supervision: Mechanistic Pretraining for Scientific Discovery", "author": "Carson Dudley, Reiden Magdaleno, Christopher Harding, Marisa Eisenberg", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2507.08977", "summary": "arXiv:2507.08977v4 Announce Type: replace-cross \nAbstract: Scientific modeling faces a tradeoff between the interpretability of mechanistic theory and the predictive power of machine learning. While existing hybrid approaches have made progress by incorporating domain knowledge into machine learning methods as functional constraints, they can be limited by a reliance on precise mathematical specifications. When the underlying equations are partially unknown or misspecified, enforcing rigid constraints can introduce bias and hinder a model's ability to learn from data. We introduce Simulation-Grounded Neural Networks (SGNNs), a framework that incorporates scientific theory by using mechanistic simulations as training data for neural networks. By pretraining on diverse synthetic corpora that span multiple model structures and realistic observational noise, SGNNs internalize the underlying dynamics of a system as a structural prior.\n  We evaluated SGNNs across multiple disciplines, including epidemiology, ecology, social science, and chemistry. In forecasting tasks, SGNNs outperformed both standard data-driven baselines and physics-constrained hybrid models. They nearly tripled the forecasting skill of the average CDC models in COVID-19 mortality forecasts and accurately forecasted high-dimensional ecological systems. SGNNs demonstrated robustness to model misspecification, performing well even when trained on data with incorrect assumptions. Our framework also introduces back-to-simulation attribution, a method for mechanistic interpretability that explains real-world dynamics by identifying their most similar counterparts within the simulated corpus. By unifying these techniques into a single framework, we demonstrate that diverse mechanistic simulations can serve as effective training data for robust scientific inference.", "number": 33, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#33</span>
+                <a href="https://arxiv.org/abs/2507.08977" target="_blank">Simulation as Supervision: Mechanistic Pretraining for Scientific Discovery</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Carson Dudley, Reiden Magdaleno, Christopher Harding, Marisa Eisenberg</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2507.08977" target="_blank">https://arxiv.org/abs/2507.08977</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Scientific modeling faces a tradeoff between the interpretability of mechanistic theory and the predictive power of machine learning. While existing hybrid approaches have made progress by incorporating domain knowledge into machine learning methods as functional constraints, they can be limited by a reliance on precise mathematical specifications. When the underlying equations are partially unknown or misspecified, enforcing rigid constraints can introduce bias and hinder a model's ability to learn from data. We introduce Simulation-Grounded Neural Networks (SGNNs), a framework that incorporates scientific theory by using mechanistic simulations as training data for neural networks. By pretraining on diverse synthetic corpora that span multiple model structures and realistic observational noise, SGNNs internalize the underlying dynamics of a system as a structural prior.
+  We evaluated SGNNs across multiple disciplines, including epidemiology, ecology, social science, and chemistry. In forecasting tasks, SGNNs outperformed both standard data-driven baselines and physics-constrained hybrid models. They nearly tripled the forecasting skill of the average CDC models in COVID-19 mortality forecasts and accurately forecasted high-dimensional ecological systems. SGNNs demonstrated robustness to model misspecification, performing well even when trained on data with incorrect assumptions. Our framework also introduces back-to-simulation attribution, a method for mechanistic interpretability that explains real-world dynamics by identifying their most similar counterparts within the simulated corpus. By unifying these techniques into a single framework, we demonstrate that diverse mechanistic simulations can serve as effective training data for robust scientific inference.
+            </div>
+        </div>
+        <div class="paper" id="paper-34">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-34" data-paper-data='{"title": "Turbo-DDCM: Fast and Flexible Zero-Shot Diffusion-Based Image Compression", "author": "Amit Vaisman, Guy Ohayon, Hila Manor, Michael Elad, Tomer Michaeli", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2511.06424", "summary": "arXiv:2511.06424v2 Announce Type: replace-cross \nAbstract: While zero-shot diffusion-based compression methods have seen significant progress in recent years, they remain notoriously slow and computationally demanding. This paper presents an efficient zero-shot diffusion-based compression method that runs substantially faster than existing methods, while maintaining performance that is on par with the state-of-the-art techniques. Our method builds upon the recently proposed Denoising Diffusion Codebook Models (DDCMs) compression scheme. Specifically, DDCM compresses an image by sequentially choosing the diffusion noise vectors from reproducible random codebooks, guiding the denoiser's output to reconstruct the target image. We modify this framework with Turbo-DDCM, which efficiently combines a large number of noise vectors at each denoising step, thereby significantly reducing the number of required denoising operations. This modification is also coupled with an improved encoding protocol. Furthermore, we introduce two flexible variants of Turbo-DDCM, a priority-aware variant that prioritizes user-specified regions and a distortion-controlled variant that compresses an image based on a target PSNR rather than a target BPP. Comprehensive experiments position Turbo-DDCM as a compelling, practical, and flexible image compression scheme.", "number": 34, "labels": [{"name": "diffusion", "color": "#9b59b6"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#34</span>
+                <a href="https://arxiv.org/abs/2511.06424" target="_blank">Turbo-DDCM: Fast and Flexible Zero-Shot Diffusion-Based Image Compression</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #9b59b6;">diffusion</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Amit Vaisman, Guy Ohayon, Hila Manor, Michael Elad, Tomer Michaeli</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.06424" target="_blank">https://arxiv.org/abs/2511.06424</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                While zero-shot diffusion-based compression methods have seen significant progress in recent years, they remain notoriously slow and computationally demanding. This paper presents an efficient zero-shot diffusion-based compression method that runs substantially faster than existing methods, while maintaining performance that is on par with the state-of-the-art techniques. Our method builds upon the recently proposed Denoising Diffusion Codebook Models (DDCMs) compression scheme. Specifically, DDCM compresses an image by sequentially choosing the diffusion noise vectors from reproducible random codebooks, guiding the denoiser's output to reconstruct the target image. We modify this framework with Turbo-DDCM, which efficiently combines a large number of noise vectors at each denoising step, thereby significantly reducing the number of required denoising operations. This modification is also coupled with an improved encoding protocol. Furthermore, we introduce two flexible variants of Turbo-DDCM, a priority-aware variant that prioritizes user-specified regions and a distortion-controlled variant that compresses an image based on a target PSNR rather than a target BPP. Comprehensive experiments position Turbo-DDCM as a compelling, practical, and flexible image compression scheme.
+            </div>
+        </div>
+        <div class="paper" id="paper-35">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-35" data-paper-data='{"title": "Decoupling Distance and Networks: Hybrid Graph Attention-Geostatistical Methods for Spatio-temporal Risk Mapping", "author": "Toba Temitope Bamidele, Ezra Gayawan, Femi Barnabas Adebola, Olatunji Johnson", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.08393", "summary": "arXiv:2603.08393v2 Announce Type: replace-cross \nAbstract: Accurate spatial prediction and rigorous uncertainty quantification are central to modern spatial epidemiology and environmental risk analysis. We introduce a statistically principled hybrid modelling framework that integrates the nonlinear, attention-based representation learning capabilities of a dynamic Graph Attention Network (GATv2) with a latent Gaussian spatial process from model-based geostatistics (MBG). This framework jointly captures relational dependence encoded in graph structures and continuous spatial dependence governed by physical proximity. We evaluate the proposed model via a controlled simulation study and an applied analysis of malaria prevalence data, comparing its predictive accuracy, calibration, and uncertainty quantification against classical geostatistical models and standalone GATv2 architectures. Our analyses show that GATv2 captures complex nonlinear interactions but fails to account for residual spatial autocorrelation, resulting in miscalibrated predictive distributions. Conversely, geostatistical models provide coherent uncertainty quantification through structured covariance functions yet are constrained by linear predictor assumptions and by their reliance on Euclidean distance to encode spatial structure. By integrating attention mechanisms and nonlinear features with an explicit probabilistic spatial random field, the hybrid model captured the relational dependence, consistently improved predictive accuracy, and provided more realistic uncertainty quantification in both simulation and applied settings. Overall, the findings demonstrate that the hybrid model constitutes a statistically coherent and empirically robust framework for modelling complex spatial and spatio-temporal processes in settings where both distance-based and structure-based dependencies operate.", "number": 35, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#35</span>
+                <a href="https://arxiv.org/abs/2603.08393" target="_blank">Decoupling Distance and Networks: Hybrid Graph Attention-Geostatistical Methods for Spatio-temporal Risk Mapping</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Toba Temitope Bamidele, Ezra Gayawan, Femi Barnabas Adebola, Olatunji Johnson</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.08393" target="_blank">https://arxiv.org/abs/2603.08393</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Accurate spatial prediction and rigorous uncertainty quantification are central to modern spatial epidemiology and environmental risk analysis. We introduce a statistically principled hybrid modelling framework that integrates the nonlinear, attention-based representation learning capabilities of a dynamic Graph Attention Network (GATv2) with a latent Gaussian spatial process from model-based geostatistics (MBG). This framework jointly captures relational dependence encoded in graph structures and continuous spatial dependence governed by physical proximity. We evaluate the proposed model via a controlled simulation study and an applied analysis of malaria prevalence data, comparing its predictive accuracy, calibration, and uncertainty quantification against classical geostatistical models and standalone GATv2 architectures. Our analyses show that GATv2 captures complex nonlinear interactions but fails to account for residual spatial autocorrelation, resulting in miscalibrated predictive distributions. Conversely, geostatistical models provide coherent uncertainty quantification through structured covariance functions yet are constrained by linear predictor assumptions and by their reliance on Euclidean distance to encode spatial structure. By integrating attention mechanisms and nonlinear features with an explicit probabilistic spatial random field, the hybrid model captured the relational dependence, consistently improved predictive accuracy, and provided more realistic uncertainty quantification in both simulation and applied settings. Overall, the findings demonstrate that the hybrid model constitutes a statistically coherent and empirically robust framework for modelling complex spatial and spatio-temporal processes in settings where both distance-based and structure-based dependencies operate.
+            </div>
+        </div>
+        <div class="paper" id="paper-36">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-36" data-paper-data='{"title": "A Large-Scale Comparative Analysis of Imputation Methods for Single-Cell RNA Sequencing Data", "author": "Yuichiro Iwashita, Ahtisham Fazeel Abbasi, Koichi Kise, Andreas Dengel, Muhammad Nabeel Asim", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.24626", "summary": "arXiv:2603.24626v2 Announce Type: replace-cross \nAbstract: Background: Single-cell RNA sequencing (scRNA-seq) enables gene expression profiling at cellular resolution but is inherently affected by sparsity caused by dropout events, where expressed genes are recorded as zeros due to technical limitations. These artifacts distort gene expression distributions and compromise downstream analyses. Numerous imputation methods have been proposed to recover latent transcriptional signals. These methods range from traditional statistical models to deep learning (DL)-based methods. However, their comparative performance remains unclear, as existing benchmarks evaluate only a limited subset of methods, datasets, and downstream analyses. Results: We present a comprehensive benchmark of 15 scRNA-seq imputation methods spanning 7 methodological categories, including traditional and DL-based methods. Methods are evaluated across 30 datasets from 10 experimental protocols on 6 downstream analyses. Results show that traditional methods, such as model-based, smoothing-based, and low-rank matrix-based methods, generally outperform DL-based methods, including diffusion-based, GAN-based, GNN-based, and autoencoder-based methods. In addition, strong performance in numerical gene expression recovery does not necessarily translate into improved biological interpretability in downstream analyses, including cell clustering, differential expression analysis, marker gene analysis, trajectory analysis, and cell type annotation. Furthermore, method performance varies substantially across datasets, protocols, and downstream analyses, with no single method consistently outperforming others. Conclusions: Our findings provide practical guidance for selecting imputation methods tailored to specific analytical objectives and underscore the importance of task-specific evaluation when assessing imputation performance in scRNA-seq data analysis.", "number": 36, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#36</span>
+                <a href="https://arxiv.org/abs/2603.24626" target="_blank">A Large-Scale Comparative Analysis of Imputation Methods for Single-Cell RNA Sequencing Data</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yuichiro Iwashita, Ahtisham Fazeel Abbasi, Koichi Kise, Andreas Dengel, Muhammad Nabeel Asim</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.24626" target="_blank">https://arxiv.org/abs/2603.24626</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Background: Single-cell RNA sequencing (scRNA-seq) enables gene expression profiling at cellular resolution but is inherently affected by sparsity caused by dropout events, where expressed genes are recorded as zeros due to technical limitations. These artifacts distort gene expression distributions and compromise downstream analyses. Numerous imputation methods have been proposed to recover latent transcriptional signals. These methods range from traditional statistical models to deep learning (DL)-based methods. However, their comparative performance remains unclear, as existing benchmarks evaluate only a limited subset of methods, datasets, and downstream analyses. Results: We present a comprehensive benchmark of 15 scRNA-seq imputation methods spanning 7 methodological categories, including traditional and DL-based methods. Methods are evaluated across 30 datasets from 10 experimental protocols on 6 downstream analyses. Results show that traditional methods, such as model-based, smoothing-based, and low-rank matrix-based methods, generally outperform DL-based methods, including diffusion-based, GAN-based, GNN-based, and autoencoder-based methods. In addition, strong performance in numerical gene expression recovery does not necessarily translate into improved biological interpretability in downstream analyses, including cell clustering, differential expression analysis, marker gene analysis, trajectory analysis, and cell type annotation. Furthermore, method performance varies substantially across datasets, protocols, and downstream analyses, with no single method consistently outperforming others. Conclusions: Our findings provide practical guidance for selecting imputation methods tailored to specific analytical objectives and underscore the importance of task-specific evaluation when assessing imputation performance in scRNA-seq data analysis.
+            </div>
+        </div>
+        <div class="paper" id="paper-37">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-37" data-paper-data='{"title": "Can LLMs Beat Classical Hyperparameter Optimization Algorithms? A Study on autoresearch", "author": "Fabio Ferreira, Lucca Wobbe, Arjun Krishnakumar, Frank Hutter, Arber Zela", "published": "Wed, 15 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.24647", "summary": "arXiv:2603.24647v4 Announce Type: replace-cross \nAbstract: The autoresearch repository enables an LLM agent to optimize hyperparameters by editing training code directly. We use it as a testbed to compare classical HPO algorithms against LLM-based methods on tuning the hyperparameters of a small language model under a fixed compute budget. When defining a fixed search space over autoresearch, classical methods such as CMA-ES and TPE consistently outperform LLM-based agents, where avoiding out-of-memory failures matters more than search diversity. Allowing the LLM to directly edit source code narrows the gap to the classical methods but does not close it, even with frontier models available at the time of writing such as Claude Opus 4.6 and Gemini 3.1 Pro Preview. We observe that LLMs struggle to track optimization state across trials. In contrast, classical methods lack the domain knowledge of LLMs. To combine the strengths of both, we introduce Centaur, a hybrid that shares CMA-ES's interpretable internal state, including mean vector, step-size, and covariance matrix, with an LLM. Centaur achieves the best result in our experiments, and a 0.8B LLM already suffices to outperform all classical and pure LLM methods. Unconstrained code editing requires larger models to be competitive with classical methods. We further analyze search diversity, model scaling from 0.8B to frontier models, and ablate the fraction of LLM-proposed trials in Centaur. All in all, our results suggest that LLMs are most effective as a complement to classical optimizers, not as a replacement. Code is available at https://github.com/ferreirafabio/autoresearch-automl &amp; interactive demo at https://ferreirafabio.github.io/autoresearch-automl.", "number": 37, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#37</span>
+                <a href="https://arxiv.org/abs/2603.24647" target="_blank">Can LLMs Beat Classical Hyperparameter Optimization Algorithms? A Study on autoresearch</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Fabio Ferreira, Lucca Wobbe, Arjun Krishnakumar, Frank Hutter, Arber Zela</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 15 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.24647" target="_blank">https://arxiv.org/abs/2603.24647</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The autoresearch repository enables an LLM agent to optimize hyperparameters by editing training code directly. We use it as a testbed to compare classical HPO algorithms against LLM-based methods on tuning the hyperparameters of a small language model under a fixed compute budget. When defining a fixed search space over autoresearch, classical methods such as CMA-ES and TPE consistently outperform LLM-based agents, where avoiding out-of-memory failures matters more than search diversity. Allowing the LLM to directly edit source code narrows the gap to the classical methods but does not close it, even with frontier models available at the time of writing such as Claude Opus 4.6 and Gemini 3.1 Pro Preview. We observe that LLMs struggle to track optimization state across trials. In contrast, classical methods lack the domain knowledge of LLMs. To combine the strengths of both, we introduce Centaur, a hybrid that shares CMA-ES's interpretable internal state, including mean vector, step-size, and covariance matrix, with an LLM. Centaur achieves the best result in our experiments, and a 0.8B LLM already suffices to outperform all classical and pure LLM methods. Unconstrained code editing requires larger models to be competitive with classical methods. We further analyze search diversity, model scaling from 0.8B to frontier models, and ablate the fraction of LLM-proposed trials in Centaur. All in all, our results suggest that LLMs are most effective as a complement to classical optimizers, not as a replacement. Code is available at https://github.com/ferreirafabio/autoresearch-automl &amp; interactive demo at https://ferreirafabio.github.io/autoresearch-automl.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-04-15 10:19:38
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>
