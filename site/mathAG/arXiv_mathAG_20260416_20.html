@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Thu, 16 Apr 2026 04:00:16 +0000<br>
+        <strong>論文数:</strong> 20件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Mumford vanishing for threefolds in positive characteristic</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Deformations of fibered Calabi--Yau varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">A lower bound on the Calabi functional for a degeneration of polarized varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">Relative Langlands duality and Koszul duality</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">Lagrangian correspondences for moduli spaces of Higgs bundles and holomorphic connections</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">New examples of affine Calabi-Yau 3-folds with maximal volume growth</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Reduced Gromov-Witten invariants without ghost bubble censorship</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Growth in noncommutative algebras and entropy in derived categories</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">A Complete Symmetry Classification of Shallow ReLU Networks</a>
+            <span class="title-label-badge" style="background-color: #f1c40f;">model extraction</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">Duality for Landau-Ginzburg models</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">$b$-Hurwitz numbers from Whittaker vectors for $\mathcal{W}$-algebras</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">$p$-Adic Weight Spectral Sequences of Strictly Semi-stable Schemes over Formal Power Series Rings via Arithmetic $\mathcal{D}$-modules</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">Liftings of ideals in positive characteristic to those in characteristic zero:Surface case</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Automorphisms of prime power order of weighted hypersurfaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">The Hesse Pencil Variety</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">A Curve of Secants to the Kummer Variety from Degenerate Points</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">Genus three Ceresa cycles and limit of archimedean heights</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">Warped quasi-asymptotically conical Calabi-Yau metrics</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Closed Orbits and Descents for Enhanced Standard Representations of Classical Groups</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">Sha-rigidity of adjoint Chevalley groups of types $A_1$, $A_2$, $B_2$, $G_2$ over commutative rings</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Mumford vanishing for threefolds in positive characteristic", "author": "Tatsuro Kawakami, Hiromu Tanaka", "published": "Thu, 16 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.13823", "summary": "arXiv:2604.13823v1 Announce Type: new \nAbstract: Let $X$ be a projective klt threefold in characteristic $p&gt;5$ and let $L$ be a nef Cartier divisor on $X$. We show that $H^1(X, -L)=0$ for the following two cases: (1) $K_X$ is not big and $L$ is big; (2) $-K_X$ is nef and $L$ is of numerical dimension two.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2604.13823" target="_blank">Mumford vanishing for threefolds in positive characteristic</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Tatsuro Kawakami, Hiromu Tanaka</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.13823" target="_blank">https://arxiv.org/abs/2604.13823</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $X$ be a projective klt threefold in characteristic $p&gt;5$ and let $L$ be a nef Cartier divisor on $X$. We show that $H^1(X, -L)=0$ for the following two cases: (1) $K_X$ is not big and $L$ is big; (2) $-K_X$ is nef and $L$ is of numerical dimension two.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Deformations of fibered Calabi--Yau varieties", "author": "Benjamin Bakker, Kristin DeVleming, Stefano Filipazzi, Radu Laza, Jennifer Li, Roberto Svaldi, Chengxi Wang, Junyan Zhao", "published": "Thu, 16 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.14024", "summary": "arXiv:2604.14024v1 Announce Type: new \nAbstract: Koll\\'{a}r showed that small deformations of elliptically fibered smooth $K$-torsion varieties with $H^2(X,\\mathcal{O}_X)=0$ remain elliptically fibered. We extend this result to any fibered smooth $K$-torsion variety $X$ with $H^2(X,\\mathcal{O}_X)=0$, using Hodge theoretic techniques and the $T^1$-lifting criterion of Kawamata--Ran. More generally, our strategy implies that even without the cohomological assumption, small deformations of a semiample line bundle on a smooth $K$-torsion variety remain semiample up to homological equivalence.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2604.14024" target="_blank">Deformations of fibered Calabi--Yau varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Benjamin Bakker, Kristin DeVleming, Stefano Filipazzi, Radu Laza, Jennifer Li, Roberto Svaldi, Chengxi Wang, Junyan Zhao</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.14024" target="_blank">https://arxiv.org/abs/2604.14024</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Koll\'{a}r showed that small deformations of elliptically fibered smooth $K$-torsion varieties with $H^2(X,\mathcal{O}_X)=0$ remain elliptically fibered. We extend this result to any fibered smooth $K$-torsion variety $X$ with $H^2(X,\mathcal{O}_X)=0$, using Hodge theoretic techniques and the $T^1$-lifting criterion of Kawamata--Ran. More generally, our strategy implies that even without the cohomological assumption, small deformations of a semiample line bundle on a smooth $K$-torsion variety remain semiample up to homological equivalence.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "A lower bound on the Calabi functional for a degeneration of polarized varieties", "author": "Gabriel Frey", "published": "Thu, 16 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.14040", "summary": "arXiv:2604.14040v1 Announce Type: new \nAbstract: We prove a lower bound on the Calabi functional for degenerations of polarized varieties, involving the difference of CM degrees between generically isomorphic families. This may be viewed as a discretely valued version of Donaldson's lower bound for models, in the sense of non-Archimedean geometry. In particular, this generalizes a result of Donaldson, who considered a single polarized variety.\n  As a main tool, we develop the theory of GIT height, introduced by Wang, and apply it to the family GIT problem of the Chow variety. Using the GIT height, we also give a numerical proof of separatedness of GIT quotients for general and special linear actions, strengthening prior work of Wang--Xu.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2604.14040" target="_blank">A lower bound on the Calabi functional for a degeneration of polarized varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Gabriel Frey</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.14040" target="_blank">https://arxiv.org/abs/2604.14040</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove a lower bound on the Calabi functional for degenerations of polarized varieties, involving the difference of CM degrees between generically isomorphic families. This may be viewed as a discretely valued version of Donaldson's lower bound for models, in the sense of non-Archimedean geometry. In particular, this generalizes a result of Donaldson, who considered a single polarized variety.
+  As a main tool, we develop the theory of GIT height, introduced by Wang, and apply it to the family GIT problem of the Chow variety. Using the GIT height, we also give a numerical proof of separatedness of GIT quotients for general and special linear actions, strengthening prior work of Wang--Xu.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "Relative Langlands duality and Koszul duality", "author": "Alexander Braverman, Michael Finkelberg, Roman Travkin", "published": "Thu, 16 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.14085", "summary": "arXiv:2604.14085v1 Announce Type: new \nAbstract: Consider a pair of $S$-dual hyperspherical varieties $G\\circlearrowright X$ and $G^\\vee\\circlearrowright X^\\vee$ equipped with equivariant quantizations $Q(X)$, $Q(X^\\vee)$. Assume that the local conjecture of Ben-Zvi, Sakellaridis and Venkatesh holds for this pair, and also that $X\\simeq T^*_\\psi(Y)$ is polarized, so that $Q(X)=D_\\psi(Y)$. Let $B\\subset G$ (resp. $B^\\vee\\subset G^\\vee$) be Borel subgroups. Then we deduce an equivalence between the ${\\mathbb Z}/2$-graded $B$-equivariant category $(D_\\psi(Y)\\operatorname{-mod})^{{\\mathbb Z}/2})^B$ and the ${\\mathbb Z}/2$-graded unipotent $B^\\vee$-monodromic category $(Q(X^\\vee)\\operatorname{-mod}^{{\\mathbb Z}/2})^{B^\\vee,\\operatorname{mon}}$.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2604.14085" target="_blank">Relative Langlands duality and Koszul duality</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Alexander Braverman, Michael Finkelberg, Roman Travkin</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.14085" target="_blank">https://arxiv.org/abs/2604.14085</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Consider a pair of $S$-dual hyperspherical varieties $G\circlearrowright X$ and $G^\vee\circlearrowright X^\vee$ equipped with equivariant quantizations $Q(X)$, $Q(X^\vee)$. Assume that the local conjecture of Ben-Zvi, Sakellaridis and Venkatesh holds for this pair, and also that $X\simeq T^*_\psi(Y)$ is polarized, so that $Q(X)=D_\psi(Y)$. Let $B\subset G$ (resp. $B^\vee\subset G^\vee$) be Borel subgroups. Then we deduce an equivalence between the ${\mathbb Z}/2$-graded $B$-equivariant category $(D_\psi(Y)\operatorname{-mod})^{{\mathbb Z}/2})^B$ and the ${\mathbb Z}/2$-graded unipotent $B^\vee$-monodromic category $(Q(X^\vee)\operatorname{-mod}^{{\mathbb Z}/2})^{B^\vee,\operatorname{mon}}$.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "Lagrangian correspondences for moduli spaces of Higgs bundles and holomorphic connections", "author": "Panagiotis Dimakis, Duong Dinh, Shengjing Xu", "published": "Thu, 16 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.14127", "summary": "arXiv:2604.14127v1 Announce Type: new \nAbstract: On a compact connected Riemann surface $C$ of genus at least $2$, we construct Lagrangian correspondences between moduli spaces of rank-$n$ Higgs bundles (respectively, holomorphic connections) and the Hilbert schemes of points on $T^\\ast C$ (respectively, the twisted cotangent bundles of $C$). Central to these constructions are Higgs bundles (respectively, holomorphic connections) which are transversal to line subbundles of the underlying bundles: these naturally induce divisors on $C$ together with auxiliary parameters, namely lifts to divisors on spectral curves for Higgs bundles and residue parameters of apparent singularities for holomorphic connections. We discuss the evidence showing that the Dolbeault geometric Langlands correspondence is generically realized by these Lagrangian correspondences; we expect that the de Rham geometric Langlands correspondence can be realized by their quantization, following Drinfeld's construction of Hecke eigensheaves. We also discuss the relations of our constructions to various topics, including reductions of Kapustin-Witten equations, the conformal limit, separation of variables, and degenerate fields in conformal field theories.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2604.14127" target="_blank">Lagrangian correspondences for moduli spaces of Higgs bundles and holomorphic connections</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Panagiotis Dimakis, Duong Dinh, Shengjing Xu</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.14127" target="_blank">https://arxiv.org/abs/2604.14127</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                On a compact connected Riemann surface $C$ of genus at least $2$, we construct Lagrangian correspondences between moduli spaces of rank-$n$ Higgs bundles (respectively, holomorphic connections) and the Hilbert schemes of points on $T^\ast C$ (respectively, the twisted cotangent bundles of $C$). Central to these constructions are Higgs bundles (respectively, holomorphic connections) which are transversal to line subbundles of the underlying bundles: these naturally induce divisors on $C$ together with auxiliary parameters, namely lifts to divisors on spectral curves for Higgs bundles and residue parameters of apparent singularities for holomorphic connections. We discuss the evidence showing that the Dolbeault geometric Langlands correspondence is generically realized by these Lagrangian correspondences; we expect that the de Rham geometric Langlands correspondence can be realized by their quantization, following Drinfeld's construction of Hecke eigensheaves. We also discuss the relations of our constructions to various topics, including reductions of Kapustin-Witten equations, the conformal limit, separation of variables, and degenerate fields in conformal field theories.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "New examples of affine Calabi-Yau 3-folds with maximal volume growth", "author": "Shih-Kai Chiu, Ronan J. Conlon, Fr\\'ed\\'eric Rochon", "published": "Thu, 16 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.13198", "summary": "arXiv:2604.13198v1 Announce Type: cross \nAbstract: We construct examples of complete Calabi-Yau metrics on smoothings of 3-dimensional Calabi-Yau cones that are not products of lower-dimensional Calabi-Yau cones and that have orbifold singularities away from the vertex.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2604.13198" target="_blank">New examples of affine Calabi-Yau 3-folds with maximal volume growth</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Shih-Kai Chiu, Ronan J. Conlon, Fr\'ed\'eric Rochon</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.13198" target="_blank">https://arxiv.org/abs/2604.13198</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We construct examples of complete Calabi-Yau metrics on smoothings of 3-dimensional Calabi-Yau cones that are not products of lower-dimensional Calabi-Yau cones and that have orbifold singularities away from the vertex.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Reduced Gromov-Witten invariants without ghost bubble censorship", "author": "Guangbo Xu", "published": "Thu, 16 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.13209", "summary": "arXiv:2604.13209v1 Announce Type: cross \nAbstract: We give a definition of all-genus reduced Gromov-Witten invariants of symplectic manifolds by using effectively supported multivalued perturbations on derived orbifold/Kuranishi charts, which bypasses the hard analytical result of sharp compactification/ghost bubble censorship of Zinger and Ekholm-Shende.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2604.13209" target="_blank">Reduced Gromov-Witten invariants without ghost bubble censorship</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Guangbo Xu</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.13209" target="_blank">https://arxiv.org/abs/2604.13209</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We give a definition of all-genus reduced Gromov-Witten invariants of symplectic manifolds by using effectively supported multivalued perturbations on derived orbifold/Kuranishi charts, which bypasses the hard analytical result of sharp compactification/ghost bubble censorship of Zinger and Ekholm-Shende.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Growth in noncommutative algebras and entropy in derived categories", "author": "Dmitri Piontkovski", "published": "Thu, 16 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.13373", "summary": "arXiv:2604.13373v1 Announce Type: cross \nAbstract: A noncommutative projective variety is defined, after Artin and Zhang, by a graded coherent algebra A, where the category of coherent sheaves is the quotient qgr(A) of the category of finitely presented graded modules by the subcategory of torsion modules. We consider the categorical and polynomial entropies of the Serre twist, that is, of the degree shift functor on the bounded derived category of qgr(A). These two types of entropy can be viewed as analogues of the dimension of the noncommutative variety.\n  We relate these invariants with the growth of the algebra. For algebras of finite global dimension, the entropies are bounded above by the growth entropy and the Gelfand--Kirillov dimension of the algebra. Moreover, these equalities hold for regular algebras, as well as for coordinate rings of smooth projective varieties. However, the polynomial entropy is zero for monomial algebras of polynomial growth, so in this case the inequality is strict.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2604.13373" target="_blank">Growth in noncommutative algebras and entropy in derived categories</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Dmitri Piontkovski</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.13373" target="_blank">https://arxiv.org/abs/2604.13373</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                A noncommutative projective variety is defined, after Artin and Zhang, by a graded coherent algebra A, where the category of coherent sheaves is the quotient qgr(A) of the category of finitely presented graded modules by the subcategory of torsion modules. We consider the categorical and polynomial entropies of the Serre twist, that is, of the degree shift functor on the bounded derived category of qgr(A). These two types of entropy can be viewed as analogues of the dimension of the noncommutative variety.
+  We relate these invariants with the growth of the algebra. For algebras of finite global dimension, the entropies are bounded above by the growth entropy and the Gelfand--Kirillov dimension of the algebra. Moreover, these equalities hold for regular algebras, as well as for coordinate rings of smooth projective varieties. However, the polynomial entropy is zero for monomial algebras of polynomial growth, so in this case the inequality is strict.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "A Complete Symmetry Classification of Shallow ReLU Networks", "author": "Pranavkrishnan Ramakrishnan", "published": "Thu, 16 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.14037", "summary": "arXiv:2604.14037v1 Announce Type: cross \nAbstract: Parameter space is not function space for neural network architectures. This fact, investigated as early as the 1990s under terms such as ``reverse engineering,\" or ``parameter identifiability\", has led to the natural question of parameter space symmetries\\textemdash the study of distinct parameters in neural architectures which realize the same function. Indeed, the quotient space obtained by identifying parameters giving rise to the same function, called the \\textit{neuromanifold}, has been shown in some cases to have rich geometric properties, impacting optimization dynamics. Thus far, techniques towards complete classifications have required the analyticity of the activation function, notably excising the important case of ReLU. Here, in contrast, we exploit the non-differentiability of the ReLU activation to provide a complete classification of the symmetries in the shallow case.", "number": 9, "labels": [{"name": "model extraction", "color": "#f1c40f"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2604.14037" target="_blank">A Complete Symmetry Classification of Shallow ReLU Networks</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #f1c40f;">model extraction</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Pranavkrishnan Ramakrishnan</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.14037" target="_blank">https://arxiv.org/abs/2604.14037</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Parameter space is not function space for neural network architectures. This fact, investigated as early as the 1990s under terms such as ``reverse engineering," or ``parameter identifiability", has led to the natural question of parameter space symmetries\textemdash the study of distinct parameters in neural architectures which realize the same function. Indeed, the quotient space obtained by identifying parameters giving rise to the same function, called the \textit{neuromanifold}, has been shown in some cases to have rich geometric properties, impacting optimization dynamics. Thus far, techniques towards complete classifications have required the analyticity of the activation function, notably excising the important case of ReLU. Here, in contrast, we exploit the non-differentiability of the ReLU activation to provide a complete classification of the symmetries in the shallow case.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "Duality for Landau-Ginzburg models", "author": "Claude Sabbah", "published": "Thu, 16 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2212.07745", "summary": "arXiv:2212.07745v3 Announce Type: replace \nAbstract: This article surveys various duality statements attached to a pair consisting of a smooth complex quasi-projective variety and a regular function on it. It is dedicated to the memory of Bumsig Kim.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2212.07745" target="_blank">Duality for Landau-Ginzburg models</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Claude Sabbah</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2212.07745" target="_blank">https://arxiv.org/abs/2212.07745</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This article surveys various duality statements attached to a pair consisting of a smooth complex quasi-projective variety and a regular function on it. It is dedicated to the memory of Bumsig Kim.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "$b$-Hurwitz numbers from Whittaker vectors for $\\mathcal{W}$-algebras", "author": "Nitin K. Chidambaram, Maciej Do{\\l}\\k{e}ga, Kento Osuga", "published": "Thu, 16 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2401.12814", "summary": "arXiv:2401.12814v3 Announce Type: replace \nAbstract: We show that $b$-Hurwitz numbers with a rational weight are obtained by taking an explicit limit of a Whittaker vector for the $\\mathcal{W}$-algebra of type $A$. Our result is a vast generalization of several previous results that treated the monotone case, and the cases of quadratic and cubic polynomial weights. It also provides an interpretation of the associated Whittaker vector in terms of generalized branched coverings that might be of independent interest. Our result is new even in the special case $b=0$ that corresponds to classical hypergeometric Hurwitz numbers, and implies that they are governed by the topological recursion of Eynard-Orantin. This gives an independent proof of the recent result of Bychkov-Dunin-Barkowski-Kazarian-Shadrin.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2401.12814" target="_blank">$b$-Hurwitz numbers from Whittaker vectors for $\mathcal{W}$-algebras</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Nitin K. Chidambaram, Maciej Do{\l}\k{e}ga, Kento Osuga</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2401.12814" target="_blank">https://arxiv.org/abs/2401.12814</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We show that $b$-Hurwitz numbers with a rational weight are obtained by taking an explicit limit of a Whittaker vector for the $\mathcal{W}$-algebra of type $A$. Our result is a vast generalization of several previous results that treated the monotone case, and the cases of quadratic and cubic polynomial weights. It also provides an interpretation of the associated Whittaker vector in terms of generalized branched coverings that might be of independent interest. Our result is new even in the special case $b=0$ that corresponds to classical hypergeometric Hurwitz numbers, and implies that they are governed by the topological recursion of Eynard-Orantin. This gives an independent proof of the recent result of Bychkov-Dunin-Barkowski-Kazarian-Shadrin.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "$p$-Adic Weight Spectral Sequences of Strictly Semi-stable Schemes over Formal Power Series Rings via Arithmetic $\\mathcal{D}$-modules", "author": "Yuanmin Liu", "published": "Thu, 16 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2502.12136", "summary": "arXiv:2502.12136v2 Announce Type: replace \nAbstract: Let $k$ be a perfect field of characteristic $p &gt; 0$. For a strictly semi-stable scheme over $k[[t]]$, we construct the weight spectral sequence in $p$-adic cohomology using the theory of arithmetic $\\mathcal{D}$-modules, whose $E_1$ terms are described by rigid cohomologies of irreducible components of the closed fiber and whose $E_\\infty$ terms are conjecturally described by the (unipotent) nearby cycle of Lazda-P\\'{a}l's rigid cohomology over the bounded Robba ring. We also show its functoriality by pushforward and state the conjecture of its functoriality by pullback and dual.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2502.12136" target="_blank">$p$-Adic Weight Spectral Sequences of Strictly Semi-stable Schemes over Formal Power Series Rings via Arithmetic $\mathcal{D}$-modules</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yuanmin Liu</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2502.12136" target="_blank">https://arxiv.org/abs/2502.12136</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $k$ be a perfect field of characteristic $p &gt; 0$. For a strictly semi-stable scheme over $k[[t]]$, we construct the weight spectral sequence in $p$-adic cohomology using the theory of arithmetic $\mathcal{D}$-modules, whose $E_1$ terms are described by rigid cohomologies of irreducible components of the closed fiber and whose $E_\infty$ terms are conjecturally described by the (unipotent) nearby cycle of Lazda-P\'{a}l's rigid cohomology over the bounded Robba ring. We also show its functoriality by pushforward and state the conjecture of its functoriality by pullback and dual.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "Liftings of ideals in positive characteristic to those in characteristic zero:Surface case", "author": "Shihoko Ishii", "published": "Thu, 16 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2506.23533", "summary": "arXiv:2506.23533v4 Announce Type: replace \nAbstract: In this paper, we introduce the notion of a characteristic-zero lifting of an object in positive characteristic by means of ``skeletons''.\n  Using this notion, we relate invariants of singularities in positive characteristic to their counterparts in characteristic zero. As an application, we prove that the set of log discrepancies for pairs consisting of a smooth surface and a multi-ideal is discrete.\n  We also show that the set of minimal log discrepancies and the set of log canonical thresholds of such pairs in positive characteristic are contained in the corresponding sets in characteristic zero.\n  Another application is the construction of Campillo's complex model of a plane curve in positive characteristic via the skeleton lifting method.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2506.23533" target="_blank">Liftings of ideals in positive characteristic to those in characteristic zero:Surface case</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Shihoko Ishii</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2506.23533" target="_blank">https://arxiv.org/abs/2506.23533</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we introduce the notion of a characteristic-zero lifting of an object in positive characteristic by means of ``skeletons''.
+  Using this notion, we relate invariants of singularities in positive characteristic to their counterparts in characteristic zero. As an application, we prove that the set of log discrepancies for pairs consisting of a smooth surface and a multi-ideal is discrete.
+  We also show that the set of minimal log discrepancies and the set of log canonical thresholds of such pairs in positive characteristic are contained in the corresponding sets in characteristic zero.
+  Another application is the construction of Campillo's complex model of a plane curve in positive characteristic via the skeleton lifting method.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Automorphisms of prime power order of weighted hypersurfaces", "author": "Alvaro Liendo, Ana Julisa Palomino", "published": "Thu, 16 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2507.13538", "summary": "arXiv:2507.13538v2 Announce Type: replace \nAbstract: We study automorphisms of quasi-smooth hypersurfaces in weighted projective spaces, extending classical results for smooth hypersurfaces in projective space to the weighted setting. We establish effective criteria for when a power of a prime number can occur as the order of an automorphism, and we derive explicit bounds on the possible prime orders. A key role is played by a weighted analogue of the classical Klein hypersurface, which we show realizes the maximal prime order of an automorphism under suitable arithmetic conditions. Our results generalize earlier work by Gonz\\'alez-Aguilera and Liendo.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2507.13538" target="_blank">Automorphisms of prime power order of weighted hypersurfaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Alvaro Liendo, Ana Julisa Palomino</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2507.13538" target="_blank">https://arxiv.org/abs/2507.13538</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study automorphisms of quasi-smooth hypersurfaces in weighted projective spaces, extending classical results for smooth hypersurfaces in projective space to the weighted setting. We establish effective criteria for when a power of a prime number can occur as the order of an automorphism, and we derive explicit bounds on the possible prime orders. A key role is played by a weighted analogue of the classical Klein hypersurface, which we show realizes the maximal prime order of an automorphism under suitable arithmetic conditions. Our results generalize earlier work by Gonz\'alez-Aguilera and Liendo.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "The Hesse Pencil Variety", "author": "Elisabetta Rocchi", "published": "Thu, 16 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2510.16417", "summary": "arXiv:2510.16417v2 Announce Type: replace \nAbstract: We introduce and study the Hesse pencil variety $H_8$, obtained as the Zariski closure in the Grassmannian $G(1,9)$ of the set of pencils generated by a smooth plane cubic and its Hessian. We prove that $H_8$ has dimension $8$ and can be realized as the intersection of $G(1,9)$ with ten hyperplanes corresponding to the Schur module $\\mathbb{S}_{(5,1)}\\mathbb{C}^3$. Moreover, $H_8$ coincides with the closure of the $SL(3)$-orbit of the pencil $\\langle x^3+y^3+z^3,\\ xyz\\rangle$ and contains eight additional orbits. The variety is singular, and its singular locus is precisely the union of two orbits, $O(\\langle x^3,x^2y\\rangle)$ and $O(\\langle x^2y,x^2z\\rangle)$.\n  A key ingredient in our study is a cubic skew-invariant $R\\in \\bigwedge^3(\\mathrm{Sym}^3\\mathbb{C}^3)$ defined by $R(l^3,m^3,n^3)=(l\\wedge m\\wedge n)^3$, whose vanishing characterizes pencils generated by a cubic and its Hessian. This invariant allows us to write explicit equations defining $H_8$. A crucial geometric step in our argument is the fact that through four general points of $\\mathbb{P}^2$ there pass exactly six Hesse configurations, which enables us to compute the multidegree of $H_8$ and conclude that it coincides with the variety defined by the invariant $R$.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2510.16417" target="_blank">The Hesse Pencil Variety</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Elisabetta Rocchi</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.16417" target="_blank">https://arxiv.org/abs/2510.16417</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We introduce and study the Hesse pencil variety $H_8$, obtained as the Zariski closure in the Grassmannian $G(1,9)$ of the set of pencils generated by a smooth plane cubic and its Hessian. We prove that $H_8$ has dimension $8$ and can be realized as the intersection of $G(1,9)$ with ten hyperplanes corresponding to the Schur module $\mathbb{S}_{(5,1)}\mathbb{C}^3$. Moreover, $H_8$ coincides with the closure of the $SL(3)$-orbit of the pencil $\langle x^3+y^3+z^3,\ xyz\rangle$ and contains eight additional orbits. The variety is singular, and its singular locus is precisely the union of two orbits, $O(\langle x^3,x^2y\rangle)$ and $O(\langle x^2y,x^2z\rangle)$.
+  A key ingredient in our study is a cubic skew-invariant $R\in \bigwedge^3(\mathrm{Sym}^3\mathbb{C}^3)$ defined by $R(l^3,m^3,n^3)=(l\wedge m\wedge n)^3$, whose vanishing characterizes pencils generated by a cubic and its Hessian. This invariant allows us to write explicit equations defining $H_8$. A crucial geometric step in our argument is the fact that through four general points of $\mathbb{P}^2$ there pass exactly six Hesse configurations, which enables us to compute the multidegree of $H_8$ and conclude that it coincides with the variety defined by the invariant $R$.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "A Curve of Secants to the Kummer Variety from Degenerate Points", "author": "Jos\\'e Alejandro Aburto", "published": "Thu, 16 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.12393", "summary": "arXiv:2603.12393v2 Announce Type: replace \nAbstract: We prove that, under certain geometric conditions, that only \\(m-1\\) different non-degenerate \\((m+2)\\)-secant \\(m\\)-planes plus one degenerate \\((m+2)\\)-secant \\(m\\)-plane to the Kummer variety implies the existence of a curve of ${(m+2)}$-secants to the Kummer variety. This is done by constructing a set of equations in terms of theta functions from the germ of a curve on the described points. The relation between those equations allows to proceed by induction to get the entire desired curve since the first of them is equivalent to the hypothesis that we ask.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2603.12393" target="_blank">A Curve of Secants to the Kummer Variety from Degenerate Points</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jos\'e Alejandro Aburto</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.12393" target="_blank">https://arxiv.org/abs/2603.12393</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove that, under certain geometric conditions, that only \(m-1\) different non-degenerate \((m+2)\)-secant \(m\)-planes plus one degenerate \((m+2)\)-secant \(m\)-plane to the Kummer variety implies the existence of a curve of ${(m+2)}$-secants to the Kummer variety. This is done by constructing a set of equations in terms of theta functions from the germ of a curve on the described points. The relation between those equations allows to proceed by induction to get the entire desired curve since the first of them is equivalent to the hypothesis that we ask.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "Genus three Ceresa cycles and limit of archimedean heights", "author": "Souvik Goswami, Irene Spelta", "published": "Thu, 16 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.01842", "summary": "arXiv:2604.01842v2 Announce Type: replace \nAbstract: For a one-parameter variation of biextension mixed Hodge structures, Brosnan and Pearlstein showed that the limit of the asymptotic height of the variation is given by a certain limit height of the nilpotent orbit. This limit height depends on the choice of a parameter. In the case of a variation of geometric origin related to Ceresa cycles associated with curves of genus three, after fixing a parameter, we show that this limit height is given by the Deligne splitting of a biextension mixed Hodge structure associated with cycles in the boundary.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2604.01842" target="_blank">Genus three Ceresa cycles and limit of archimedean heights</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Souvik Goswami, Irene Spelta</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.01842" target="_blank">https://arxiv.org/abs/2604.01842</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                For a one-parameter variation of biextension mixed Hodge structures, Brosnan and Pearlstein showed that the limit of the asymptotic height of the variation is given by a certain limit height of the nilpotent orbit. This limit height depends on the choice of a parameter. In the case of a variation of geometric origin related to Ceresa cycles associated with curves of genus three, after fixing a parameter, we show that this limit height is given by the Deligne splitting of a biextension mixed Hodge structure associated with cycles in the boundary.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "Warped quasi-asymptotically conical Calabi-Yau metrics", "author": "Ronan J. Conlon, Fr\\'ed\\'eric Rochon", "published": "Thu, 16 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2308.02155", "summary": "arXiv:2308.02155v3 Announce Type: replace-cross \nAbstract: We construct many new examples of complete Calabi-Yau metrics of maximal volume growth on certain smoothings of Cartesian products of Calabi-Yau cones with smooth cross-sections. A detailed description of the geometry at infinity of these metrics is given in terms of a compactification by a manifold with corners obtained through the notion of weighted blow-up for manifolds with corners. A key analytical step in the construction of these Calabi-Yau metrics is to derive good mapping properties of the Laplacian on some suitable weighted H\\\"older spaces. Our methods also produce singular Calabi-Yau metrics with an isolated conical singularity modelled on a Calabi-Yau cone distinct from the tangent cone at infinity, in particular yielding a transition behavior between different Calabi-Yau cones as conjectured by Yang Li. This is used to exhibit many examples where the tangent cone at infinity does not uniquely specify a complete Calabi-Yau metric with exact K\\\"ahler form.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2308.02155" target="_blank">Warped quasi-asymptotically conical Calabi-Yau metrics</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ronan J. Conlon, Fr\'ed\'eric Rochon</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2308.02155" target="_blank">https://arxiv.org/abs/2308.02155</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We construct many new examples of complete Calabi-Yau metrics of maximal volume growth on certain smoothings of Cartesian products of Calabi-Yau cones with smooth cross-sections. A detailed description of the geometry at infinity of these metrics is given in terms of a compactification by a manifold with corners obtained through the notion of weighted blow-up for manifolds with corners. A key analytical step in the construction of these Calabi-Yau metrics is to derive good mapping properties of the Laplacian on some suitable weighted H\"older spaces. Our methods also produce singular Calabi-Yau metrics with an isolated conical singularity modelled on a Calabi-Yau cone distinct from the tangent cone at infinity, in particular yielding a transition behavior between different Calabi-Yau cones as conjectured by Yang Li. This is used to exhibit many examples where the tangent cone at infinity does not uniquely specify a complete Calabi-Yau metric with exact K\"ahler form.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Closed Orbits and Descents for Enhanced Standard Representations of Classical Groups", "author": "Chen Liang", "published": "Thu, 16 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2507.21911", "summary": "arXiv:2507.21911v3 Announce Type: replace-cross \nAbstract: Let $G=\\mathrm{GL}_n(\\mathbb{F})$, $\\mathrm{O}_n(\\mathbb{F})$, or $\\mathrm{Sp}_{2n}(\\mathbb{F})$ be one of the classical groups over an algebraically closed field $\\mathbb{F}$ of characteristic $0$, let $\\breve{G}$ be the MVW-extension of $G$, and let $\\mathfrak{g}$ be the Lie algebra of $G$. In this paper, we classify the closed orbits in the enhanced standard representation $\\mathfrak{g}\\times E$ of $G$, where $E$ is the natural representation if $G=\\mathrm{O}_n(\\mathbb{F})$ or $\\mathrm{Sp}_{2n}(\\mathbb{F})$, and is the direct sum of the natural representation and its dual if $G=\\mathrm{GL}_n(\\mathbb{F})$. Additionally, for every closed $G$-orbit in $\\mathfrak{g}\\times E$, we prove that it is $\\breve{G}$-stable, and determine explicitly the corresponding stabilizer group as well as the action on the normal space.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2507.21911" target="_blank">Closed Orbits and Descents for Enhanced Standard Representations of Classical Groups</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Chen Liang</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2507.21911" target="_blank">https://arxiv.org/abs/2507.21911</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $G=\mathrm{GL}_n(\mathbb{F})$, $\mathrm{O}_n(\mathbb{F})$, or $\mathrm{Sp}_{2n}(\mathbb{F})$ be one of the classical groups over an algebraically closed field $\mathbb{F}$ of characteristic $0$, let $\breve{G}$ be the MVW-extension of $G$, and let $\mathfrak{g}$ be the Lie algebra of $G$. In this paper, we classify the closed orbits in the enhanced standard representation $\mathfrak{g}\times E$ of $G$, where $E$ is the natural representation if $G=\mathrm{O}_n(\mathbb{F})$ or $\mathrm{Sp}_{2n}(\mathbb{F})$, and is the direct sum of the natural representation and its dual if $G=\mathrm{GL}_n(\mathbb{F})$. Additionally, for every closed $G$-orbit in $\mathfrak{g}\times E$, we prove that it is $\breve{G}$-stable, and determine explicitly the corresponding stabilizer group as well as the action on the normal space.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "Sha-rigidity of adjoint Chevalley groups of types $A_1$, $A_2$, $B_2$, $G_2$ over commutative rings", "author": "Elena Bunina, Vazgen Kirakosyan, Rachel Treskunov", "published": "Thu, 16 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.07243", "summary": "arXiv:2604.07243v2 Announce Type: replace-cross \nAbstract: We prove that every locally inner (class-preserving) endomorphism of the adjoint Chevalley group $G_{\\mathrm{ad}}(\\Phi,R)$ and of its elementary subgroup $E_{\\mathrm{ad}}(\\Phi,R)$ over a commutative ring $R$ is inner for $\\Phi\\in\\{\\mathbf A_1,\\mathbf A_2,\\mathbf B_2\\}$ under the assumption $2\\in R^\\times$, and for $\\Phi=\\mathbf G_2$ under the stronger assumption $2,3\\in R^\\times$. Consequently, all these groups are Sha-rigid.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2604.07243" target="_blank">Sha-rigidity of adjoint Chevalley groups of types $A_1$, $A_2$, $B_2$, $G_2$ over commutative rings</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Elena Bunina, Vazgen Kirakosyan, Rachel Treskunov</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.07243" target="_blank">https://arxiv.org/abs/2604.07243</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove that every locally inner (class-preserving) endomorphism of the adjoint Chevalley group $G_{\mathrm{ad}}(\Phi,R)$ and of its elementary subgroup $E_{\mathrm{ad}}(\Phi,R)$ over a commutative ring $R$ is inner for $\Phi\in\{\mathbf A_1,\mathbf A_2,\mathbf B_2\}$ under the assumption $2\in R^\times$, and for $\Phi=\mathbf G_2$ under the stronger assumption $2,3\in R^\times$. Consequently, all these groups are Sha-rigid.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-04-16 10:19:01
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>
