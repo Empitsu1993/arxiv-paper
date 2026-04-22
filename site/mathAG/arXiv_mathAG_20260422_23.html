@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Wed, 22 Apr 2026 04:00:14 +0000<br>
+        <strong>論文数:</strong> 23件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">The unirationality of $S_9^-$ and moduli spaces of pointed spin curves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">On the Hurwitz existence problem for branched covers of the projective line</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Distributivity, affineness, and the structure sheaf</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">Generalized algebraic Morse inequalities and Hasse-Schmidt jet differentials</a>
+            <span class="title-label-badge" style="background-color: #ff69b4;">privacy</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">From Finite-Node Conifold Geometry to BPS Structures I: Algebraic State Data</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">Algebraic Distance Optimization in Polyhedral Norms</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">The Lefschetz type theorem for fundamental group schemes</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">The integral Chow ring of $\mathcal{M}_{0}(\mathbb{P}^r, 2)</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">The reciprocal complement of a surface</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">The non-perturbative topological string: from resurgence to wall-crossing of DT invariants</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">The Expected Depth of Random Real Algebraic Plane Curves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">Hessenberg varieties of codimension one in the flag variety</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">Moduli stacks of Higgs bundles on stable curves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Tjurina spectrum and graded symmetry of missing spectral numbers</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">$\mathbb{A}^1$--connectedness of moduli stack of semi-stable and parabolic semi-stable vector bundles over a curve</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">A \v{C}ech--Stokes Pushout Groupoid: a Log/Kummer Betti Presenter for Stokes Torsors</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">Tannakian duality and Gauss-Manin connections for a family of curves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">A complete classification of modular compactifications of the universal Jacobian</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Pl\"ucker degrees of Quot schemes</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">Equivariant ($K$-)homology of affine Grassmannian and Toda lattice</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-21" onchange="updateSelectedCount()">
+            <span class="title-number">21.</span>
+            <a href="#paper-21">Majorization and Inequalities among Complete Homogeneous Symmetric Functions</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-22" onchange="updateSelectedCount()">
+            <span class="title-number">22.</span>
+            <a href="#paper-22">Approximate Algebra via Closure Operators: An Axiomatic Theory of Modules and Geometry</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-23" onchange="updateSelectedCount()">
+            <span class="title-number">23.</span>
+            <a href="#paper-23">Non-commutative crepant resolutions of toric singularities with divisor class group of rank one</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "The unirationality of $S_9^-$ and moduli spaces of pointed spin curves", "author": "Gavril Farkas, Alessandro Verra", "published": "Wed, 22 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.18719", "summary": "arXiv:2604.18719v1 Announce Type: new \nAbstract: We show that the moduli space of odd spin curves of genus 9 is unirational. This is the highest genus for which such a result is known. This is achieved by realizing birationally the moduli space of odd spin curves of genus g&lt;10 as a locally trivial projective bundle over a certain (finite quotient of the) moduli space of n-pointed odd stable spin curves of genus g'&lt;g. We then present general results on the Kodaira dimension of both components of the moduli spaces of n-pointed spin curves of genus g.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2604.18719" target="_blank">The unirationality of $S_9^-$ and moduli spaces of pointed spin curves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Gavril Farkas, Alessandro Verra</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 22 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.18719" target="_blank">https://arxiv.org/abs/2604.18719</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We show that the moduli space of odd spin curves of genus 9 is unirational. This is the highest genus for which such a result is known. This is achieved by realizing birationally the moduli space of odd spin curves of genus g&lt;10 as a locally trivial projective bundle over a certain (finite quotient of the) moduli space of n-pointed odd stable spin curves of genus g'&lt;g. We then present general results on the Kodaira dimension of both components of the moduli spaces of n-pointed spin curves of genus g.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "On the Hurwitz existence problem for branched covers of the projective line", "author": "Ciro Ciliberto, Andreas Leopold Knutsen, Sara Torelli", "published": "Wed, 22 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.18782", "summary": "arXiv:2604.18782v1 Announce Type: new \nAbstract: We solve the Hurwitz existence problems for branched covers of $\\mathbb{P}^1$ in the case where the number of ramification points equals the number of branch points, that is, where all the ramification profiles are of the form $[e,1,\\ldots,1]$ with $e \\geq 2$.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2604.18782" target="_blank">On the Hurwitz existence problem for branched covers of the projective line</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ciro Ciliberto, Andreas Leopold Knutsen, Sara Torelli</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 22 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.18782" target="_blank">https://arxiv.org/abs/2604.18782</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We solve the Hurwitz existence problems for branched covers of $\mathbb{P}^1$ in the case where the number of ramification points equals the number of branch points, that is, where all the ramification profiles are of the form $[e,1,\ldots,1]$ with $e \geq 2$.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Distributivity, affineness, and the structure sheaf", "author": "Andy Jiang, Greg Stevenson", "published": "Wed, 22 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.18793", "summary": "arXiv:2604.18793v1 Announce Type: new \nAbstract: We observe that for a quasi-compact and quasi-separated scheme the structure sheaf generates the perfect complexes if and only if the lattice of thick subcategories is distributive if and only if the affinization map is 0-affine. Examples are discussed, including an example of a quasi-projective scheme which is not quasi-affine but for which these equivalent conditions hold.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2604.18793" target="_blank">Distributivity, affineness, and the structure sheaf</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Andy Jiang, Greg Stevenson</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 22 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.18793" target="_blank">https://arxiv.org/abs/2604.18793</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We observe that for a quasi-compact and quasi-separated scheme the structure sheaf generates the perfect complexes if and only if the lattice of thick subcategories is distributive if and only if the affinization map is 0-affine. Examples are discussed, including an example of a quasi-projective scheme which is not quasi-affine but for which these equivalent conditions hold.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "Generalized algebraic Morse inequalities and Hasse-Schmidt jet differentials", "author": "Benoit Cadorel (IECL)", "published": "Wed, 22 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.19207", "summary": "arXiv:2604.19207v1 Announce Type: new \nAbstract: This is a remastered and expanded version of a an earlier preprint of the author, in which we give a fully algebraic proof of an important theorem of Demailly, stating the existence of many Green-Griffiths jet differentials on a complex projective manifold of general type. To this end, we introduce a new algebraic version of the Morse inequalities, which we use in our proof as an algebraic counterpart to Demailly's and Bonavero's holomorphic Morse inequalities. This new version also applies to positive characteristic, giving the existence of Hasse-Schmidt jet differentials for a smooth projective variety of general type over an arbitrary algebraically closed field.", "number": 4, "labels": [{"name": "privacy", "color": "#ff69b4"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2604.19207" target="_blank">Generalized algebraic Morse inequalities and Hasse-Schmidt jet differentials</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #ff69b4;">privacy</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Benoit Cadorel (IECL)</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 22 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.19207" target="_blank">https://arxiv.org/abs/2604.19207</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This is a remastered and expanded version of a an earlier preprint of the author, in which we give a fully algebraic proof of an important theorem of Demailly, stating the existence of many Green-Griffiths jet differentials on a complex projective manifold of general type. To this end, we introduce a new algebraic version of the Morse inequalities, which we use in our proof as an algebraic counterpart to Demailly's and Bonavero's holomorphic Morse inequalities. This new version also applies to positive characteristic, giving the existence of Hasse-Schmidt jet differentials for a smooth projective variety of general type over an arbitrary algebraically closed field.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "From Finite-Node Conifold Geometry to BPS Structures I: Algebraic State Data", "author": "Abdul Rahman", "published": "Wed, 22 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.19441", "summary": "arXiv:2604.19441v1 Announce Type: new \nAbstract: Let $\\pi:X\\to \\Delta$ be a one-parameter degeneration whose central fiber $X_0$ is a complex threefold with finitely many ordinary double points $\\Sigma=\\{p_1,\\dots,p_r\\}\\subset X_0$. Associated with this degeneration is the corrected finite-node perverse extension, together with its mixed-Hodge-module refinement and a finite-node schober datum whose perverse-sheaf shadow is identified with the corrected perverse sheaf $\\mathcal P$. The purpose of the present paper is to extract from these finite-node geometric, extension-theoretic, mixed-Hodge, and categorical inputs the intrinsic algebraic state data carried by the degeneration. More precisely, we isolate the finite localized quotient $Q_\\Sigma:=\\bigoplus_{k=1}^r i_{k*}\\Q_{\\{p_k\\}}$, the nodewise coupling space $E_\\Sigma:=\\Ext^1_{\\Perv(X_0;\\Q)}(Q_\\Sigma,IC_{X_0})$, its canonical nodewise decomposition $E_\\Sigma\\cong\\bigoplus_{k=1}^r \\Q e_k$, and the coefficient vector $c_\\Sigma=(c_1,\\dots,c_r)\\in\\Q^r$ defined by $[\\mathcal P]_{\\mathrm{perv}}=\\sum_{k=1}^r c_k e_k$. We then prove that these state variables are compatible with both the mixed-Hodge-module lift and the schober realization of $\\mathcal P$, so that the same finite-node architecture appears simultaneously in perverse, mixed-Hodge, and categorical form. The resulting package $(V_\\Sigma,E_\\Sigma,c_\\Sigma)$ is the intrinsic algebraic state data attached to the finite-node conifold degeneration. It provides the first algebraic layer in the passage from finite-node geometry to later incidence, quiver, stability, BPS-spectral, and wall-crossing structures.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2604.19441" target="_blank">From Finite-Node Conifold Geometry to BPS Structures I: Algebraic State Data</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Abdul Rahman</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 22 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.19441" target="_blank">https://arxiv.org/abs/2604.19441</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $\pi:X\to \Delta$ be a one-parameter degeneration whose central fiber $X_0$ is a complex threefold with finitely many ordinary double points $\Sigma=\{p_1,\dots,p_r\}\subset X_0$. Associated with this degeneration is the corrected finite-node perverse extension, together with its mixed-Hodge-module refinement and a finite-node schober datum whose perverse-sheaf shadow is identified with the corrected perverse sheaf $\mathcal P$. The purpose of the present paper is to extract from these finite-node geometric, extension-theoretic, mixed-Hodge, and categorical inputs the intrinsic algebraic state data carried by the degeneration. More precisely, we isolate the finite localized quotient $Q_\Sigma:=\bigoplus_{k=1}^r i_{k*}\Q_{\{p_k\}}$, the nodewise coupling space $E_\Sigma:=\Ext^1_{\Perv(X_0;\Q)}(Q_\Sigma,IC_{X_0})$, its canonical nodewise decomposition $E_\Sigma\cong\bigoplus_{k=1}^r \Q e_k$, and the coefficient vector $c_\Sigma=(c_1,\dots,c_r)\in\Q^r$ defined by $[\mathcal P]_{\mathrm{perv}}=\sum_{k=1}^r c_k e_k$. We then prove that these state variables are compatible with both the mixed-Hodge-module lift and the schober realization of $\mathcal P$, so that the same finite-node architecture appears simultaneously in perverse, mixed-Hodge, and categorical form. The resulting package $(V_\Sigma,E_\Sigma,c_\Sigma)$ is the intrinsic algebraic state data attached to the finite-node conifold degeneration. It provides the first algebraic layer in the passage from finite-node geometry to later incidence, quiver, stability, BPS-spectral, and wall-crossing structures.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "Algebraic Distance Optimization in Polyhedral Norms", "author": "Eliana Duarte, Nidhi Kaihnsa, Julia Lindberg, Ang\\'elica Torres, Madeleine Weinstein", "published": "Wed, 22 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.19479", "summary": "arXiv:2604.19479v1 Announce Type: new \nAbstract: We consider the distance minimization problem to a real algebraic variety $X \\subseteq \\RR^n$ when the metric is induced by a polyhedral norm. Each point in the variety has a Voronoi cell whose geometry depends on the normal space at the point and the inner normal fan of the polyhedral ball. For codimension-one varieties, we decompose $X$ into sets of points whose Voronoi cones have the same dimension, which is the expected dimension of their Voronoi cell. We prove that this decomposition is a stratification of $X$ and that each strata is a semialgebraic set. We conclude by giving an algebraic description of the medial axis, which is the locus of points whose minimal distance to $X$ is achieved at more than one point on $X$.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2604.19479" target="_blank">Algebraic Distance Optimization in Polyhedral Norms</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Eliana Duarte, Nidhi Kaihnsa, Julia Lindberg, Ang\'elica Torres, Madeleine Weinstein</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 22 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.19479" target="_blank">https://arxiv.org/abs/2604.19479</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We consider the distance minimization problem to a real algebraic variety $X \subseteq \RR^n$ when the metric is induced by a polyhedral norm. Each point in the variety has a Voronoi cell whose geometry depends on the normal space at the point and the inner normal fan of the polyhedral ball. For codimension-one varieties, we decompose $X$ into sets of points whose Voronoi cones have the same dimension, which is the expected dimension of their Voronoi cell. We prove that this decomposition is a stratification of $X$ and that each strata is a semialgebraic set. We conclude by giving an algebraic description of the medial axis, which is the locus of points whose minimal distance to $X$ is achieved at more than one point on $X$.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "The Lefschetz type theorem for fundamental group schemes", "author": "Lingguang Li, Niantao Tian", "published": "Wed, 22 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.19546", "summary": "arXiv:2604.19546v1 Announce Type: new \nAbstract: Let $k$ be a field, $X$ a connected scheme proper over $k$, $D\\subsetneq X$ an ample effective connected divisor, $x\\in D(k)$. For Tannakian categories $\\mathcal{C}_X$ and $\\mathcal{C}_D$ whose objects consist of vector bundles on $X$ and $D$ respectively, we establish general Tannakian criteria for the natural homomorphism \\(\\pi(\\mathcal{C}_D,x)\\longrightarrow \\pi(\\mathcal{C}_X,x)\\) to be faithfully flat, a closed immersion, or an isomorphism. As applications, under Langer type positivity assumptions, we prove that \\(\\pi^{\\ast}(D,x)\\longrightarrow \\pi^{\\ast}(X,x)\\) is an isomorphism for $\\ast\\in\\{S,N,EN,F, EF,Loc,ELoc,\\acute{e}t,E\\acute{e}t,uni\\}$ over perfect fields.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2604.19546" target="_blank">The Lefschetz type theorem for fundamental group schemes</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Lingguang Li, Niantao Tian</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 22 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.19546" target="_blank">https://arxiv.org/abs/2604.19546</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $k$ be a field, $X$ a connected scheme proper over $k$, $D\subsetneq X$ an ample effective connected divisor, $x\in D(k)$. For Tannakian categories $\mathcal{C}_X$ and $\mathcal{C}_D$ whose objects consist of vector bundles on $X$ and $D$ respectively, we establish general Tannakian criteria for the natural homomorphism \(\pi(\mathcal{C}_D,x)\longrightarrow \pi(\mathcal{C}_X,x)\) to be faithfully flat, a closed immersion, or an isomorphism. As applications, under Langer type positivity assumptions, we prove that \(\pi^{\ast}(D,x)\longrightarrow \pi^{\ast}(X,x)\) is an isomorphism for $\ast\in\{S,N,EN,F, EF,Loc,ELoc,\acute{e}t,E\acute{e}t,uni\}$ over perfect fields.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "The integral Chow ring of $\\mathcal{M}_{0}(\\mathbb{P}^r, 2)", "author": "Renzo Cavalieri, Damiano Fulghesu", "published": "Wed, 22 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.19713", "summary": "arXiv:2604.19713v1 Announce Type: new \nAbstract: We compute a presentation for the integral Chow rings of the moduli stacks of degree $2$ maps from smooth rational curves to projective space $\\mathbb{P}^r$, as a quotient of a three-variable polynomial ring. The relations as $r$ varies have rich combinatorial structure: all non-trivial relations are encoded by two generating functions which are rational functions.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2604.19713" target="_blank">The integral Chow ring of $\mathcal{M}_{0}(\mathbb{P}^r, 2)</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Renzo Cavalieri, Damiano Fulghesu</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 22 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.19713" target="_blank">https://arxiv.org/abs/2604.19713</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We compute a presentation for the integral Chow rings of the moduli stacks of degree $2$ maps from smooth rational curves to projective space $\mathbb{P}^r$, as a quotient of a three-variable polynomial ring. The relations as $r$ varies have rich combinatorial structure: all non-trivial relations are encoded by two generating functions which are rational functions.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "The reciprocal complement of a surface", "author": "Dario Spirito", "published": "Wed, 22 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.19253", "summary": "arXiv:2604.19253v1 Announce Type: cross \nAbstract: We study the reciprocal complement $\\mathcal{R}(D)$ of a two-dimensional finitely generated $K$-algebra $D$ by linking it with the properties of a surface with coordinate ring $D$. We give several sufficient criteria to have $\\dim\\mathcal{R}(D)=2$, and we use them to show several explicit examples; in particular, we determine the dimension of $\\mathcal{R}(D)$ when $D$ is the quotient of $K[X,Y,Z]$ by an irreducible polynomial of degree $2$. We also study the integral closure of the localizations of $\\mathcal{R}(K[X,Y])$.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2604.19253" target="_blank">The reciprocal complement of a surface</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Dario Spirito</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 22 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.19253" target="_blank">https://arxiv.org/abs/2604.19253</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the reciprocal complement $\mathcal{R}(D)$ of a two-dimensional finitely generated $K$-algebra $D$ by linking it with the properties of a surface with coordinate ring $D$. We give several sufficient criteria to have $\dim\mathcal{R}(D)=2$, and we use them to show several explicit examples; in particular, we determine the dimension of $\mathcal{R}(D)$ when $D$ is the quotient of $K[X,Y,Z]$ by an irreducible polynomial of degree $2$. We also study the integral closure of the localizations of $\mathcal{R}(K[X,Y])$.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "The non-perturbative topological string: from resurgence to wall-crossing of DT invariants", "author": "Simon Douaud, Amir-Kian Kashani-Poor", "published": "Wed, 22 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.19731", "summary": "arXiv:2604.19731v1 Announce Type: cross \nAbstract: We study the resurgence structure of the topological string partition function, with an emphasis on the Borel analysis of the instanton amplitudes. To this end, we introduce a differential operator that implements the pointed alien derivative when acting on the topological string partition function and its iterated alien derivatives. We show that the algebra of alien derivatives is isomorphic to the Kontsevich-Soibelman Lie algebra, thus establishing a direct link between the resurgence of the topological string and wall-crossing of generalized Donaldson-Thomas invariants. Numerically, we continue the exploration of the Borel plane of the quintic and local $\\mathbb{P}^2$. For the latter, we identify Borel singularities due to bound states involving D4-branes, and match the associated Stokes constants to the appropriate Donaldson-Thomas invariants. Finally, we identify the manifestation of a D2-brane decay in the Borel plane, and match to theoretical predictions.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2604.19731" target="_blank">The non-perturbative topological string: from resurgence to wall-crossing of DT invariants</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Simon Douaud, Amir-Kian Kashani-Poor</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 22 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.19731" target="_blank">https://arxiv.org/abs/2604.19731</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the resurgence structure of the topological string partition function, with an emphasis on the Borel analysis of the instanton amplitudes. To this end, we introduce a differential operator that implements the pointed alien derivative when acting on the topological string partition function and its iterated alien derivatives. We show that the algebra of alien derivatives is isomorphic to the Kontsevich-Soibelman Lie algebra, thus establishing a direct link between the resurgence of the topological string and wall-crossing of generalized Donaldson-Thomas invariants. Numerically, we continue the exploration of the Borel plane of the quintic and local $\mathbb{P}^2$. For the latter, we identify Borel singularities due to bound states involving D4-branes, and match the associated Stokes constants to the appropriate Donaldson-Thomas invariants. Finally, we identify the manifestation of a D2-brane decay in the Borel plane, and match to theoretical predictions.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "The Expected Depth of Random Real Algebraic Plane Curves", "author": "Turgay Bayraktar, Al\\.i Ula\\c{s} \\\"Ozg\\\"ur K\\.i\\c{s}\\.isel", "published": "Wed, 22 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2110.03198", "summary": "arXiv:2110.03198v2 Announce Type: replace \nAbstract: In this note we study asymptotic isotopy of random real algebraic plane curves. More precisely, we obtain a Kac-Rice type formula that gives the expected number of two-sided components (i.e.\\ ovals) of a random real algebraic plane curve winding around a given point. In particular, we show that expected number of such ovals for an even degree Kostlan polynomial is $\\frac{\\sqrt{d}}{2}$ and independent of the given point.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2110.03198" target="_blank">The Expected Depth of Random Real Algebraic Plane Curves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Turgay Bayraktar, Al\.i Ula\c{s} \"Ozg\"ur K\.i\c{s}\.isel</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 22 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2110.03198" target="_blank">https://arxiv.org/abs/2110.03198</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this note we study asymptotic isotopy of random real algebraic plane curves. More precisely, we obtain a Kac-Rice type formula that gives the expected number of two-sided components (i.e.\ ovals) of a random real algebraic plane curve winding around a given point. In particular, we show that expected number of such ovals for an even degree Kostlan polynomial is $\frac{\sqrt{d}}{2}$ and independent of the given point.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "Hessenberg varieties of codimension one in the flag variety", "author": "Laura Escobar, Martha Precup, John Shareshian", "published": "Wed, 22 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2208.06299", "summary": "arXiv:2208.06299v4 Announce Type: replace \nAbstract: We study geometric and topological properties of Hessenberg varieties of codimension one in the type A flag variety. Our main results: (1) give a formula for the Poincar\\'e polynomial, (2) characterize when these varieties are irreducible, and (3) show that all are reduced schemes. We prove that the singular locus of any nilpotent codimension one Hessenberg variety is also a Hessenberg variety. A key tool in our analysis is a new result applying to all (type A) Hessenberg varieties without any restriction on codimension, which states that their Poincar\\'e polynomials can be computed by counting the points in the corresponding variety defined over a finite field. The results below were originally motivated by work of the authors in [arXiv:2107.07929] studying the precise relationship between Hessenberg and Schubert varieties, and we obtain a corollary extending the results from that paper to all codimension one (type A) Schubert varieties.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2208.06299" target="_blank">Hessenberg varieties of codimension one in the flag variety</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Laura Escobar, Martha Precup, John Shareshian</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 22 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2208.06299" target="_blank">https://arxiv.org/abs/2208.06299</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study geometric and topological properties of Hessenberg varieties of codimension one in the type A flag variety. Our main results: (1) give a formula for the Poincar\'e polynomial, (2) characterize when these varieties are irreducible, and (3) show that all are reduced schemes. We prove that the singular locus of any nilpotent codimension one Hessenberg variety is also a Hessenberg variety. A key tool in our analysis is a new result applying to all (type A) Hessenberg varieties without any restriction on codimension, which states that their Poincar\'e polynomials can be computed by counting the points in the corresponding variety defined over a finite field. The results below were originally motivated by work of the authors in [arXiv:2107.07929] studying the precise relationship between Hessenberg and Schubert varieties, and we obtain a corollary extending the results from that paper to all codimension one (type A) Schubert varieties.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "Moduli stacks of Higgs bundles on stable curves", "author": "Oren Ben-Bassat, Sourav Das, Tony Pantev", "published": "Wed, 22 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2310.07778", "summary": "arXiv:2310.07778v3 Announce Type: replace \nAbstract: In this article, we construct a flat degeneration of the derived moduli stack of Higgs bundles on smooth curves using the stack of expanded degenerations of Jun Li. We show that there is an intrinsic relative log-symplectic form on the degeneration and we compare it with the one constructed by the second author. We show that the Hitchin map of the degeneration we construct has complete fibers. Furthermore, we show that the Hitchin map is flat and that a suitable open subset of the smooth locus of the reduced nilpotent cone is Lagrangian. We also extend the construction of the moduli of Higgs bundles along with the relative log-symplectic form over the universal moduli stack of stable curves.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2310.07778" target="_blank">Moduli stacks of Higgs bundles on stable curves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Oren Ben-Bassat, Sourav Das, Tony Pantev</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 22 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2310.07778" target="_blank">https://arxiv.org/abs/2310.07778</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this article, we construct a flat degeneration of the derived moduli stack of Higgs bundles on smooth curves using the stack of expanded degenerations of Jun Li. We show that there is an intrinsic relative log-symplectic form on the degeneration and we compare it with the one constructed by the second author. We show that the Hitchin map of the degeneration we construct has complete fibers. Furthermore, we show that the Hitchin map is flat and that a suitable open subset of the smooth locus of the reduced nilpotent cone is Lagrangian. We also extend the construction of the moduli of Higgs bundles along with the relative log-symplectic form over the universal moduli stack of stable curves.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Tjurina spectrum and graded symmetry of missing spectral numbers", "author": "Seung-Jo Jung, In-Kyun Kim, Morihiko Saito, Youngho Yoon", "published": "Wed, 22 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2411.17601", "summary": "arXiv:2411.17601v4 Announce Type: replace \nAbstract: For a hypersurface isolated singularity defined by a convergent power series $f$, the Steenbrink spectrum can be defined as the Poincar\\'e polynomial of the graded quotients of the $V$-filtration on the Jacobian ring of $f$. The Tjurina subspectrum is defined by replacing the Jacobian ring with its quotient by the image of the multiplication by $f$. We prove that their difference (consisting of missing spectral numbers) has a canonical graded symmetry. This follows from the self-duality of the Jacobian ring, which is compatible with the action of $f$ as well as the $V$-filtration. It implies for instance that the number of missing spectral numbers which are smaller than $(n{+}1)/2$ (with $n$ the number of variables) is bounded by $[(\\mu{-}\\tau)/2]$. We can moreover improve the estimate of Brian\\c{c}on-Skoda exponent in the semisimple monodromy case.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2411.17601" target="_blank">Tjurina spectrum and graded symmetry of missing spectral numbers</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Seung-Jo Jung, In-Kyun Kim, Morihiko Saito, Youngho Yoon</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 22 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2411.17601" target="_blank">https://arxiv.org/abs/2411.17601</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                For a hypersurface isolated singularity defined by a convergent power series $f$, the Steenbrink spectrum can be defined as the Poincar\'e polynomial of the graded quotients of the $V$-filtration on the Jacobian ring of $f$. The Tjurina subspectrum is defined by replacing the Jacobian ring with its quotient by the image of the multiplication by $f$. We prove that their difference (consisting of missing spectral numbers) has a canonical graded symmetry. This follows from the self-duality of the Jacobian ring, which is compatible with the action of $f$ as well as the $V$-filtration. It implies for instance that the number of missing spectral numbers which are smaller than $(n{+}1)/2$ (with $n$ the number of variables) is bounded by $[(\mu{-}\tau)/2]$. We can moreover improve the estimate of Brian\c{c}on-Skoda exponent in the semisimple monodromy case.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "$\\mathbb{A}^1$--connectedness of moduli stack of semi-stable and parabolic semi-stable vector bundles over a curve", "author": "Sujoy Chakraborty, Saurav Holme Choudhury", "published": "Wed, 22 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2512.14464", "summary": "arXiv:2512.14464v3 Announce Type: replace \nAbstract: Let $C$ be an irreducible smooth projective curve of genus $g\\geq 2$ over an algebraically closed field. We prove that the moduli stack of semi-stable vector bundles on $C$ of fixed rank and determinant is $\\mathbb{A}^1$--connected. We also show that the moduli stack of quasi-parabolic vector bundles with a fixed determinant and a given quasi-parabolic data along a set of points in $C$ is $\\mathbb{A}^1$-connected. Moreover, for small and generic weights $\\boldsymbol{\\alpha}$ with $\\gcd(n, \\deg L) = 1$, the open substack of $\\boldsymbol{\\alpha}$-semistable parabolic vector bundles is also $\\mathbb{A}^1$-connected.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2512.14464" target="_blank">$\mathbb{A}^1$--connectedness of moduli stack of semi-stable and parabolic semi-stable vector bundles over a curve</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sujoy Chakraborty, Saurav Holme Choudhury</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 22 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.14464" target="_blank">https://arxiv.org/abs/2512.14464</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $C$ be an irreducible smooth projective curve of genus $g\geq 2$ over an algebraically closed field. We prove that the moduli stack of semi-stable vector bundles on $C$ of fixed rank and determinant is $\mathbb{A}^1$--connected. We also show that the moduli stack of quasi-parabolic vector bundles with a fixed determinant and a given quasi-parabolic data along a set of points in $C$ is $\mathbb{A}^1$-connected. Moreover, for small and generic weights $\boldsymbol{\alpha}$ with $\gcd(n, \deg L) = 1$, the open substack of $\boldsymbol{\alpha}$-semistable parabolic vector bundles is also $\mathbb{A}^1$-connected.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "A \\v{C}ech--Stokes Pushout Groupoid: a Log/Kummer Betti Presenter for Stokes Torsors", "author": "Mauricio Corr\\^ea", "published": "Wed, 22 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2602.21304", "summary": "arXiv:2602.21304v2 Announce Type: replace \nAbstract: We give an explicit Betti presentation of the Stokes torsors attached to meromorphic flat connections of prescribed irregular type along a simple normal crossings divisor, at fixed Kummer level. Our construction is strictly 1-categorical and cover-based: on a punctured logarithmic collar of the divisor, we define a small Cech--Stokes groupoid and prove that the boundary Stokes moduli is described by sections of a natural forgetful functor, rather than by representations of the decorated boundary groupoid itself. By gluing this boundary model to the ordinary Cech presenter of the complement through an explicit pushout construction, we obtain a groupoid presentation that computes the global Stokes objects. The resulting presentation is canonical up to Morita equivalence, compatible with Kummer descent along all normal crossings strata, and admits an explicit finite local description near corners in terms of nonabelian cocycles and relations.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2602.21304" target="_blank">A \v{C}ech--Stokes Pushout Groupoid: a Log/Kummer Betti Presenter for Stokes Torsors</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Mauricio Corr\^ea</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 22 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.21304" target="_blank">https://arxiv.org/abs/2602.21304</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We give an explicit Betti presentation of the Stokes torsors attached to meromorphic flat connections of prescribed irregular type along a simple normal crossings divisor, at fixed Kummer level. Our construction is strictly 1-categorical and cover-based: on a punctured logarithmic collar of the divisor, we define a small Cech--Stokes groupoid and prove that the boundary Stokes moduli is described by sections of a natural forgetful functor, rather than by representations of the decorated boundary groupoid itself. By gluing this boundary model to the ordinary Cech presenter of the complement through an explicit pushout construction, we obtain a groupoid presentation that computes the global Stokes objects. The resulting presentation is canonical up to Morita equivalence, compatible with Kummer descent along all normal crossings strata, and admits an explicit finite local description near corners in terms of nonabelian cocycles and relations.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "Tannakian duality and Gauss-Manin connections for a family of curves", "author": "Ph\\`ung H\\^o Hai, V\\~o Qu\\^oc Bao, Tr\\^an Phan Qu\\^oc Bao", "published": "Wed, 22 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.03758", "summary": "arXiv:2603.03758v2 Announce Type: replace \nAbstract: Let $X/S$ be a smooth family of smooth projective varieties, where $S$ is a smooth affine curve over a field $k$ of characteristic $0.$ We relate the differential fundamental groupoid scheme of $X/k$ with the differential fundamental groupoid scheme of $S/k$ and the relative differential fundamental group of $X/S$ in a short exact sequence. This yields natural maps from the group cohomology of the geometric relative fundamental group to the Gauss-Manin connections. For families of curves of genus at least $1,$ we prove that these maps are isomorphisms. This gives an interpretation of the Gauss-Manin connection in terms of cohomology of the differential fundamental group. As a consequence we can shrink $X$ (as a family on $S$) to obtain a de Rham $K(\\pi,1)$ surface.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2603.03758" target="_blank">Tannakian duality and Gauss-Manin connections for a family of curves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ph\`ung H\^o Hai, V\~o Qu\^oc Bao, Tr\^an Phan Qu\^oc Bao</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 22 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.03758" target="_blank">https://arxiv.org/abs/2603.03758</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $X/S$ be a smooth family of smooth projective varieties, where $S$ is a smooth affine curve over a field $k$ of characteristic $0.$ We relate the differential fundamental groupoid scheme of $X/k$ with the differential fundamental groupoid scheme of $S/k$ and the relative differential fundamental group of $X/S$ in a short exact sequence. This yields natural maps from the group cohomology of the geometric relative fundamental group to the Gauss-Manin connections. For families of curves of genus at least $1,$ we prove that these maps are isomorphisms. This gives an interpretation of the Gauss-Manin connection in terms of cohomology of the differential fundamental group. As a consequence we can shrink $X$ (as a family on $S$) to obtain a de Rham $K(\pi,1)$ surface.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "A complete classification of modular compactifications of the universal Jacobian", "author": "Marco Fava, Nicola Pagani, Filippo Viviani", "published": "Wed, 22 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.05455", "summary": "arXiv:2603.05455v2 Announce Type: replace \nAbstract: This is the third paper in a series, following [FPVa] and [FPVb].\n  We classify all modular compactifications of the universal Jacobian over $\\overline{\\mathcal{M}}_{g,n}$, both as stacks and as their relative good moduli spaces. Our main result gives a combinatorial parametrization of compactified universal Jacobian stacks by $V$-functions on a stability domain $\\mathbb{D}_{g,n}$ of half-vine types (two-components topological types with a chosen side); under this correspondence, fine compactifications are exactly the general $V$-functions.\n  We single out the classical compactified universal Jacobians, namely those induced by numerical polarizations (relative $\\mathbb{R}$-line bundles on the universal curve $\\overline{\\mathcal{C}}_{g,n}/\\overline{\\mathcal{M}}_{g,n}$), recovering the constructions of Kass-Pagani and Melo in the fine case, and we prove that their good moduli spaces are locally projective over $\\overline{\\mathcal{M}}_{g,n}$.\n  We determine when two compactified universal Jacobians are isomorphic over $\\overline{\\mathcal{M}}_{g,n}$ and describe a resolution of the universal family via a compactified Jacobian over $\\overline{\\mathcal{M}}_{g,n+1}$.\n  Finally, we analyse the poset $\\Sigma_{g,n}$ of compactified universal Jacobians, an extension of the poset of regions of the hyperplane arrangement of classical stability conditions $\\mathcal{A}_{g,n}$ studied in Kass-Pagani. We prove that for $n=0$ all compactified universal Jacobians are those constructed by Caporaso. We then give an explicit description of the submaximal elements of $\\Sigma_{g,n}$ for all $n$, generalizing the stability walls in the classical stability space $\\mathcal{A}_{g,n}$ from Kass-Pagani's work.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2603.05455" target="_blank">A complete classification of modular compactifications of the universal Jacobian</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Marco Fava, Nicola Pagani, Filippo Viviani</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 22 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.05455" target="_blank">https://arxiv.org/abs/2603.05455</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This is the third paper in a series, following [FPVa] and [FPVb].
+  We classify all modular compactifications of the universal Jacobian over $\overline{\mathcal{M}}_{g,n}$, both as stacks and as their relative good moduli spaces. Our main result gives a combinatorial parametrization of compactified universal Jacobian stacks by $V$-functions on a stability domain $\mathbb{D}_{g,n}$ of half-vine types (two-components topological types with a chosen side); under this correspondence, fine compactifications are exactly the general $V$-functions.
+  We single out the classical compactified universal Jacobians, namely those induced by numerical polarizations (relative $\mathbb{R}$-line bundles on the universal curve $\overline{\mathcal{C}}_{g,n}/\overline{\mathcal{M}}_{g,n}$), recovering the constructions of Kass-Pagani and Melo in the fine case, and we prove that their good moduli spaces are locally projective over $\overline{\mathcal{M}}_{g,n}$.
+  We determine when two compactified universal Jacobians are isomorphic over $\overline{\mathcal{M}}_{g,n}$ and describe a resolution of the universal family via a compactified Jacobian over $\overline{\mathcal{M}}_{g,n+1}$.
+  Finally, we analyse the poset $\Sigma_{g,n}$ of compactified universal Jacobians, an extension of the poset of regions of the hyperplane arrangement of classical stability conditions $\mathcal{A}_{g,n}$ studied in Kass-Pagani. We prove that for $n=0$ all compactified universal Jacobians are those constructed by Caporaso. We then give an explicit description of the submaximal elements of $\Sigma_{g,n}$ for all $n$, generalizing the stability walls in the classical stability space $\mathcal{A}_{g,n}$ from Kass-Pagani's work.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Pl\\\"ucker degrees of Quot schemes", "author": "Samuel Stark", "published": "Wed, 22 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.02258", "summary": "arXiv:2604.02258v2 Announce Type: replace \nAbstract: We study the Pl\\\"{u}cker degree of the main component of the Quot scheme of length $l$ quotients of a locally free sheaf on a smooth projective scheme $\\mathrm{S}$ of dimension $d\\geqslant 1$. This degree is determined by classes in the Chow ring of the symmetric product $\\mathrm{S}^{(l)}$, which are given by the pushforward of the powers of $c_{1}(\\mathcal{O}^{[l]})$ with respect to the canonical morphism from the Quot scheme to $\\mathrm{S}^{(l)}$. We describe a decomposition of these classes, allowing us to compute the (in a certain sense) leading term of the Pl\\\"{u}cker degree. We also obtain a higher-dimensional analogue of a classical result of Schubert.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2604.02258" target="_blank">Pl\"ucker degrees of Quot schemes</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Samuel Stark</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 22 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.02258" target="_blank">https://arxiv.org/abs/2604.02258</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the Pl\"{u}cker degree of the main component of the Quot scheme of length $l$ quotients of a locally free sheaf on a smooth projective scheme $\mathrm{S}$ of dimension $d\geqslant 1$. This degree is determined by classes in the Chow ring of the symmetric product $\mathrm{S}^{(l)}$, which are given by the pushforward of the powers of $c_{1}(\mathcal{O}^{[l]})$ with respect to the canonical morphism from the Quot scheme to $\mathrm{S}^{(l)}$. We describe a decomposition of these classes, allowing us to compute the (in a certain sense) leading term of the Pl\"{u}cker degree. We also obtain a higher-dimensional analogue of a classical result of Schubert.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "Equivariant ($K$-)homology of affine Grassmannian and Toda lattice", "author": "Roman Bezrukavnikov, Michael Finkelberg, Ivan Mirkovi\\'c", "published": "Wed, 22 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/math/0306413", "summary": "arXiv:math/0306413v5 Announce Type: replace \nAbstract: For an almost simple complex algebraic group $G$ with affine Grassmannian $Gr_G= G(C((t)))/G(C[[t]])$ we consider the equivariant homology $H^{G(C[[t]])}(Gr_G)$, and $K$-theory $K^{G(C[[t]])}(Gr_G)$. They both have a commutative ring structure, with respect to convolution. We identify the spectrum of homology ring with the universal group-algebra centralizer of the Langlands dual group $\\check G$, and we relate the spectrum of $K$-homology ring to the universal group-group centralizer of $G$ and of $\\check G$. If we add the loop-rotation equivariance, we obtain a noncommutative deformation of the ($K$)-homology ring, and thus a Poisson structure on its spectrum. We identify this structure with the standard one on the universal centralizer. The commutative subring of $G(C[[t]])$-equivariant homology of the point gives rise to a polarization which is related to Kostant's Toda lattice integrable system. We also compute the equivariant $K$-ring of the affine Grassmannian Steinberg variety. The equivariant $K$-homology of $Gr_G$ is equipped with a canonical base formed by the classes of simple equivariant perverse coherent sheaves. Their convolution is again perverse and is related to the Feigin-Loktev fusion product of $G(C[[t]])$-modules.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/math/0306413" target="_blank">Equivariant ($K$-)homology of affine Grassmannian and Toda lattice</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Roman Bezrukavnikov, Michael Finkelberg, Ivan Mirkovi\'c</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 22 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/math/0306413" target="_blank">https://arxiv.org/abs/math/0306413</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                For an almost simple complex algebraic group $G$ with affine Grassmannian $Gr_G= G(C((t)))/G(C[[t]])$ we consider the equivariant homology $H^{G(C[[t]])}(Gr_G)$, and $K$-theory $K^{G(C[[t]])}(Gr_G)$. They both have a commutative ring structure, with respect to convolution. We identify the spectrum of homology ring with the universal group-algebra centralizer of the Langlands dual group $\check G$, and we relate the spectrum of $K$-homology ring to the universal group-group centralizer of $G$ and of $\check G$. If we add the loop-rotation equivariance, we obtain a noncommutative deformation of the ($K$)-homology ring, and thus a Poisson structure on its spectrum. We identify this structure with the standard one on the universal centralizer. The commutative subring of $G(C[[t]])$-equivariant homology of the point gives rise to a polarization which is related to Kostant's Toda lattice integrable system. We also compute the equivariant $K$-ring of the affine Grassmannian Steinberg variety. The equivariant $K$-homology of $Gr_G$ is equipped with a canonical base formed by the classes of simple equivariant perverse coherent sheaves. Their convolution is again perverse and is related to the Feigin-Loktev fusion product of $G(C[[t]])$-modules.
+            </div>
+        </div>
+        <div class="paper" id="paper-21">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-21" data-paper-data='{"title": "Majorization and Inequalities among Complete Homogeneous Symmetric Functions", "author": "Jia Xu, Yong Yao", "published": "Wed, 22 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2505.08149", "summary": "arXiv:2505.08149v4 Announce Type: replace-cross \nAbstract: Inequalities among symmetric functions are fundamental in various branches of mathematics, thus motivating a systematic study of their structure. Majorization has been shown to characterize inequalities among commonly used symmetric functions, except for complete homogeneous symmetric functions (shortened as CHs). In 2011, Cuttler, Greene, and Skandera posed a natural question: Can majorization also characterize inequalities among CHs? Their work demonstrated that majorization characterizes inequalities among CHs up to degree 7 and suggested exploring its validity for higher degrees. In this paper, we show that, for every degree greater than 7, majorization does not characterize inequalities among CHs.", "number": 21, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#21</span>
+                <a href="https://arxiv.org/abs/2505.08149" target="_blank">Majorization and Inequalities among Complete Homogeneous Symmetric Functions</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jia Xu, Yong Yao</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 22 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2505.08149" target="_blank">https://arxiv.org/abs/2505.08149</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Inequalities among symmetric functions are fundamental in various branches of mathematics, thus motivating a systematic study of their structure. Majorization has been shown to characterize inequalities among commonly used symmetric functions, except for complete homogeneous symmetric functions (shortened as CHs). In 2011, Cuttler, Greene, and Skandera posed a natural question: Can majorization also characterize inequalities among CHs? Their work demonstrated that majorization characterizes inequalities among CHs up to degree 7 and suggested exploring its validity for higher degrees. In this paper, we show that, for every degree greater than 7, majorization does not characterize inequalities among CHs.
+            </div>
+        </div>
+        <div class="paper" id="paper-22">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-22" data-paper-data='{"title": "Approximate Algebra via Closure Operators: An Axiomatic Theory of Modules and Geometry", "author": "Dang Vo Phuc", "published": "Wed, 22 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2509.25212", "summary": "arXiv:2509.25212v4 Announce Type: replace-cross \nAbstract: Building on the works of \\.{I}nan (2019) and Almahariq-Peters-Vergili (2025), we develop an axiomatic framework for approximate algebra via an algebra-compatible closure operator $\\mathrm{cl}$ satisfying \\textbf{(C1)}--\\textbf{(C4a)} together with the balanced multiplicativity axiom \\textbf{(C4b)}, while requiring absorption only in the definition of approximate ideals. A central structural result is that, in a unital ring, every approximate prime ideal is automatically $\\mathrm{cl}$-closed; hence, in the commutative unital case, the approximate prime spectrum is precisely the fixed-prime locus \\[ \\mathrm{Spec}_{\\Phi}(R)=\\{P\\in\\mathrm{Spec}(R):\\mathrm{cl}(P)=P\\}, \\] and its Zariski-type topology is the subspace topology induced from the classical spectrum. We develop quotient and factorization results for approximate ideals, a compatible module theory with quotient-compatible approximate homomorphisms and a first isomorphism theorem modulo $\\Phi^{\\!*}_{M'}(0)$, and separation criteria for the resulting spectrum. For ideal-translation closures $\\mathrm{cl}(A)=A+J$, we obtain $\\mathrm{Spec}_{\\Phi}(R)=V(J)\\cong\\mathrm{Spec}(R/J)$; in particular, for $\\mathrm{cl}(A)=A+m\\mathbb{Z}$ one obtains the finite discrete space of prime divisors of $m$. Finally, over an algebraically closed field we prove that $\\mathrm{rad}_{\\Phi}(I)=\\sqrt{\\mathrm{cl}(I)}$, that the evaluation--separation implication is automatic from the classical Hilbert Nullstellensatz, and that the exact identity $\\mathrm{rad}_{\\Phi}(I)=\\mathrm{I}(V(I))$ follows from closedness of all point ideals.", "number": 22, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#22</span>
+                <a href="https://arxiv.org/abs/2509.25212" target="_blank">Approximate Algebra via Closure Operators: An Axiomatic Theory of Modules and Geometry</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Dang Vo Phuc</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 22 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2509.25212" target="_blank">https://arxiv.org/abs/2509.25212</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Building on the works of \.{I}nan (2019) and Almahariq-Peters-Vergili (2025), we develop an axiomatic framework for approximate algebra via an algebra-compatible closure operator $\mathrm{cl}$ satisfying \textbf{(C1)}--\textbf{(C4a)} together with the balanced multiplicativity axiom \textbf{(C4b)}, while requiring absorption only in the definition of approximate ideals. A central structural result is that, in a unital ring, every approximate prime ideal is automatically $\mathrm{cl}$-closed; hence, in the commutative unital case, the approximate prime spectrum is precisely the fixed-prime locus \[ \mathrm{Spec}_{\Phi}(R)=\{P\in\mathrm{Spec}(R):\mathrm{cl}(P)=P\}, \] and its Zariski-type topology is the subspace topology induced from the classical spectrum. We develop quotient and factorization results for approximate ideals, a compatible module theory with quotient-compatible approximate homomorphisms and a first isomorphism theorem modulo $\Phi^{\!*}_{M'}(0)$, and separation criteria for the resulting spectrum. For ideal-translation closures $\mathrm{cl}(A)=A+J$, we obtain $\mathrm{Spec}_{\Phi}(R)=V(J)\cong\mathrm{Spec}(R/J)$; in particular, for $\mathrm{cl}(A)=A+m\mathbb{Z}$ one obtains the finite discrete space of prime divisors of $m$. Finally, over an algebraically closed field we prove that $\mathrm{rad}_{\Phi}(I)=\sqrt{\mathrm{cl}(I)}$, that the evaluation--separation implication is automatic from the classical Hilbert Nullstellensatz, and that the exact identity $\mathrm{rad}_{\Phi}(I)=\mathrm{I}(V(I))$ follows from closedness of all point ideals.
+            </div>
+        </div>
+        <div class="paper" id="paper-23">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-23" data-paper-data='{"title": "Non-commutative crepant resolutions of toric singularities with divisor class group of rank one", "author": "Ryu Tomonaga", "published": "Wed, 22 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2510.26252", "summary": "arXiv:2510.26252v2 Announce Type: replace-cross \nAbstract: We prove the existence and give a classification of toric non-commutative crepant resolutions (NCCRs) of Gorenstein toric singularities with divisor class group of rank one. We prove that they correspond bijectively to non-trivial upper sets in a certain quotient of the divisor class group equipped with a certain partial order. This classification allows us to prove that all toric NCCRs of such toric singularities are connected by iterated Iyama-Wemyss mutations, and hence are derived equivalent to each other.\n  We also describe explicitly the quivers with relations of these toric NCCRs in terms of higher dimensional analogue of dimer models.\n  In the Appendix, we give an explicit formula for the volume of $d$-dimensional lattice polytopes with $d+2$ vertices. As an application, we verify a conjecture of Van den Bergh in the case of Gorenstein toric singularities with divisor class group of rank one: the number of indecomposable direct summands of a toric NCCR coincides with the normalized volume of the corresponding lattice polytope.", "number": 23, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#23</span>
+                <a href="https://arxiv.org/abs/2510.26252" target="_blank">Non-commutative crepant resolutions of toric singularities with divisor class group of rank one</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ryu Tomonaga</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 22 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.26252" target="_blank">https://arxiv.org/abs/2510.26252</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove the existence and give a classification of toric non-commutative crepant resolutions (NCCRs) of Gorenstein toric singularities with divisor class group of rank one. We prove that they correspond bijectively to non-trivial upper sets in a certain quotient of the divisor class group equipped with a certain partial order. This classification allows us to prove that all toric NCCRs of such toric singularities are connected by iterated Iyama-Wemyss mutations, and hence are derived equivalent to each other.
+  We also describe explicitly the quivers with relations of these toric NCCRs in terms of higher dimensional analogue of dimer models.
+  In the Appendix, we give an explicit formula for the volume of $d$-dimensional lattice polytopes with $d+2$ vertices. As an application, we verify a conjecture of Van den Bergh in the case of Gorenstein toric singularities with divisor class group of rank one: the number of indecomposable direct summands of a toric NCCR coincides with the normalized volume of the corresponding lattice polytope.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-04-22 10:21:54
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>
