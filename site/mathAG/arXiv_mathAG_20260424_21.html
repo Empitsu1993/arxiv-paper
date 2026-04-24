@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Fri, 24 Apr 2026 04:00:29 +0000<br>
+        <strong>論文数:</strong> 21件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">$E_6$-local systems from cubic threefolds</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Two New Extensions of Reider's Theorem on Algebraic Surfaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Birational Geometry of Quot Schemes on smooth projective curves via Stable Pairs</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">Ribbon graphs and meromorphic functions</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">A chain of $\mathbb{C}^{*}$-flips of the moduli spaces of $\mathcal{O}$-twisted rank 2 constrained framed Hitchin pairs on a smooth curve</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">A gap principle for polynomial volume growth of zero-entropy automorphisms</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Triangulations and Maximal Cross-Ratio Degrees</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Normal Functions, Even Theta Characteristics and the Theta Divisor</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">A theory of generalized Lam\'e curves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">Hodge theory for combinatorial projective bundles</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">Embedded special Legendrian surfaces in $\mathbb S^5$</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">Residues of a tropical zeta function for convex domains</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">Three-periodic helices on elliptic curves and their associated regular algebras</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">On quantum $K$-groups of partial flag manifolds</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Extension of Hodge norms at infinity</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">Compactifications of the Eisenstein ancestral Deligne-Mostow variety</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">A Criterion for Perfectoid Purity and the Rationality of Thresholds</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">Real gamma distribution on analytic bundles of flag varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Handle decompositions and Kirby diagrams for the complement of plane algebraic curves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">Matroid analogues of Gal's conjecture</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-21" onchange="updateSelectedCount()">
+            <span class="title-number">21.</span>
+            <a href="#paper-21">On Holomorphicity of Fiberwise Analytic Mappings</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "$E_6$-local systems from cubic threefolds", "author": "Thomas Kr\\\"amer, Daniel Litt, Marco Maculan", "published": "Fri, 24 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.20970", "summary": "arXiv:2604.20970v1 Announce Type: new \nAbstract: We produce infinitely many local systems on (level covers of) the moduli space of smooth cubic threefolds, with algebraic monodromy group equal to the exceptional group $E_6$. These local systems arise in the middle cohomology of abelian \\'etale covers of the Fano scheme parametrizing lines in the universal cubic threefold.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2604.20970" target="_blank">$E_6$-local systems from cubic threefolds</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Thomas Kr\"amer, Daniel Litt, Marco Maculan</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 24 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.20970" target="_blank">https://arxiv.org/abs/2604.20970</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We produce infinitely many local systems on (level covers of) the moduli space of smooth cubic threefolds, with algebraic monodromy group equal to the exceptional group $E_6$. These local systems arise in the middle cohomology of abelian \'etale covers of the Fano scheme parametrizing lines in the universal cubic threefold.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Two New Extensions of Reider's Theorem on Algebraic Surfaces", "author": "Aaron Bertram, Jonathon Fleck, Liebo Pan, Joseph Sullivan", "published": "Fri, 24 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.21242", "summary": "arXiv:2604.21242v1 Announce Type: new \nAbstract: Reider's Theorem on the very ampleness of adjoint linear series on a complex projective algebraic surface is extended in two new directions. First, Reider-type inequalities are shown to imply nefness of linear series of the form dH - E on the blow-up of projective space along the embedded surface. This can be thought of as a weak analogy of Saint-Donat's Theorem on the generators of the ideal of a curve embedded by an adjoint linear series. Next, Reider-type inequalities give a sharp estimate for the ample cone of the Hilbert schemes of length d subschemes of the surface. The proofs consist of (a) finding a natural family of objects parametrized by the base (either the blow-up along the surface or the Hilbert scheme) and (b) finding the largest chamber in the stability manifold of the surface where the objects in the family are all Bridgeland semistable. A Theorem of Bayer-Macri then gives nefness of the determinant line bundle on the base of the family.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2604.21242" target="_blank">Two New Extensions of Reider's Theorem on Algebraic Surfaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Aaron Bertram, Jonathon Fleck, Liebo Pan, Joseph Sullivan</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 24 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.21242" target="_blank">https://arxiv.org/abs/2604.21242</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Reider's Theorem on the very ampleness of adjoint linear series on a complex projective algebraic surface is extended in two new directions. First, Reider-type inequalities are shown to imply nefness of linear series of the form dH - E on the blow-up of projective space along the embedded surface. This can be thought of as a weak analogy of Saint-Donat's Theorem on the generators of the ideal of a curve embedded by an adjoint linear series. Next, Reider-type inequalities give a sharp estimate for the ample cone of the Hilbert schemes of length d subschemes of the surface. The proofs consist of (a) finding a natural family of objects parametrized by the base (either the blow-up along the surface or the Hilbert scheme) and (b) finding the largest chamber in the stability manifold of the surface where the objects in the family are all Bridgeland semistable. A Theorem of Bayer-Macri then gives nefness of the determinant line bundle on the base of the family.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Birational Geometry of Quot Schemes on smooth projective curves via Stable Pairs", "author": "Chandranandan Gangopadhyay, Atsushi Ito", "published": "Fri, 24 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.21303", "summary": "arXiv:2604.21303v1 Announce Type: new \nAbstract: Let $C$ be a smooth projective curve of genus $g \\geq 2$ over $\\mathbb C$, and let $E^0$ be a vector bundle on $C$. We investigate the birational geometry of the Quot scheme ${\\rm Quot}_C(E^0, k, n)$, which parametrizes quotients of $E^0$ of rank $k$ and degree $n$, and its fiber $\\mathcal Q_L$ over ${\\rm Pic}^n(C)$ for $n \\gg 0$. Our main tool is the moduli space of stable pairs, which yields small $\\mathbb Q$-factorial modifications (SQMs) of ${\\rm Quot}_C(E^0, k, n)$ and $\\mathcal Q_L$. We explicitly describe the nef, movable, and effective cones of each SQM. Consequently, we prove that $\\mathcal Q_L$ is a Mori dream space and that the determinant morphism ${\\rm Quot}_C(E^0, k, n) \\to {\\rm Pic}^n(C)$ is a Mori dream morphism.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2604.21303" target="_blank">Birational Geometry of Quot Schemes on smooth projective curves via Stable Pairs</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Chandranandan Gangopadhyay, Atsushi Ito</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 24 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.21303" target="_blank">https://arxiv.org/abs/2604.21303</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $C$ be a smooth projective curve of genus $g \geq 2$ over $\mathbb C$, and let $E^0$ be a vector bundle on $C$. We investigate the birational geometry of the Quot scheme ${\rm Quot}_C(E^0, k, n)$, which parametrizes quotients of $E^0$ of rank $k$ and degree $n$, and its fiber $\mathcal Q_L$ over ${\rm Pic}^n(C)$ for $n \gg 0$. Our main tool is the moduli space of stable pairs, which yields small $\mathbb Q$-factorial modifications (SQMs) of ${\rm Quot}_C(E^0, k, n)$ and $\mathcal Q_L$. We explicitly describe the nef, movable, and effective cones of each SQM. Consequently, we prove that $\mathcal Q_L$ is a Mori dream space and that the determinant morphism ${\rm Quot}_C(E^0, k, n) \to {\rm Pic}^n(C)$ is a Mori dream morphism.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "Ribbon graphs and meromorphic functions", "author": "B. Shapiro", "published": "Fri, 24 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.21358", "summary": "arXiv:2604.21358v1 Announce Type: new \nAbstract: Let Y be a compact Riemann surface, phi:Y -&gt; CP^1 a meromorphic function, and Gamma in Y a ribbon graph avoiding the critical points of phi. Then phi(Gamma) is an immersed graph in CP^1. Conversely, given an immersion im:Theta to bCP^1 of an abstract multigraph Theta without vertices of valence 1 or 2, we describe a construction of a compact Riemann surface Y and a meromorphic function phi_{im}:Y in CP^1 such that phi_{im}(Gamma)=im(Theta).\n  We investigate the relation between the topology of Y and the combinatorics of Gamma. In particular, for a surface of genus g we construct spanning ribbon graphs whose underlying abstract graphs have arbitrary prescribed graph genus g' smaller or equal g, including the planar case. As a consequence, the number of self-intersections of \\phi(Gamma) cannot, in general, be controlled solely by the genus of Y. We establish general lower bounds for the number of self-intersections and formulate several open problems, with emphasis on planar ribbon graphs.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2604.21358" target="_blank">Ribbon graphs and meromorphic functions</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> B. Shapiro</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 24 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.21358" target="_blank">https://arxiv.org/abs/2604.21358</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let Y be a compact Riemann surface, phi:Y -&gt; CP^1 a meromorphic function, and Gamma in Y a ribbon graph avoiding the critical points of phi. Then phi(Gamma) is an immersed graph in CP^1. Conversely, given an immersion im:Theta to bCP^1 of an abstract multigraph Theta without vertices of valence 1 or 2, we describe a construction of a compact Riemann surface Y and a meromorphic function phi_{im}:Y in CP^1 such that phi_{im}(Gamma)=im(Theta).
+  We investigate the relation between the topology of Y and the combinatorics of Gamma. In particular, for a surface of genus g we construct spanning ribbon graphs whose underlying abstract graphs have arbitrary prescribed graph genus g' smaller or equal g, including the planar case. As a consequence, the number of self-intersections of \phi(Gamma) cannot, in general, be controlled solely by the genus of Y. We establish general lower bounds for the number of self-intersections and formulate several open problems, with emphasis on planar ribbon graphs.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "A chain of $\\mathbb{C}^{*}$-flips of the moduli spaces of $\\mathcal{O}$-twisted rank 2 constrained framed Hitchin pairs on a smooth curve", "author": "YongJoo Shin, Sang-Bum Yoo", "published": "Fri, 24 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.21367", "summary": "arXiv:2604.21367v1 Announce Type: new \nAbstract: Let $X$ be a smooth complex projective curve. We prove that there exists a surjective commutative forgetful diagram from the chain of $\\mathbb{C}^{*}$-flips of the moduli spaces of $\\mathcal{O}_{X}$-twisted rank 2 constrained framed Hitchin pairs on $X$ to the chain of $\\mathbb{C}^{*}$-flips of the moduli spaces of rank 2 framed modules on $X$.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2604.21367" target="_blank">A chain of $\mathbb{C}^{*}$-flips of the moduli spaces of $\mathcal{O}$-twisted rank 2 constrained framed Hitchin pairs on a smooth curve</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> YongJoo Shin, Sang-Bum Yoo</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 24 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.21367" target="_blank">https://arxiv.org/abs/2604.21367</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $X$ be a smooth complex projective curve. We prove that there exists a surjective commutative forgetful diagram from the chain of $\mathbb{C}^{*}$-flips of the moduli spaces of $\mathcal{O}_{X}$-twisted rank 2 constrained framed Hitchin pairs on $X$ to the chain of $\mathbb{C}^{*}$-flips of the moduli spaces of rank 2 framed modules on $X$.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "A gap principle for polynomial volume growth of zero-entropy automorphisms", "author": "Fei Hu, Chen Jiang", "published": "Fri, 24 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.21398", "summary": "arXiv:2604.21398v1 Announce Type: new \nAbstract: Let $X$ be a normal projective variety of dimension $d\\ge 4$ and let $f$ be a zero-entropy automorphism of $X$. Denote by $k$ the degree growth rate of $f$, so that $\\mathrm{deg}_1(f^n) \\asymp n^{k}$. We show that if $k=2d-2$ is maximal, then the polynomial volume growth of $f$ satisfies $\\mathrm{plov}(f)=d^2$. If instead $k\\le 2d-4$ is not maximal, then \\[\\mathrm{plov}(f) \\le d(d-2) + 2\\lfloor d/4 \\rfloor.\\] This establishes a gap principle: for every fixed dimension $d\\ge 4$, the invariant $\\mathrm{plov}(f)$ cannot take any value in the open interval $\\bigl(d(d-2) + 2\\lfloor d/4 \\rfloor, \\, d^2\\bigr)$. Our result thus reveals a new rigidity phenomenon for the polynomial volume growth of zero-entropy automorphisms. As a consequence, in dimension $4$ we determine all possible values of $\\mathrm{plov}$, equivalently of the Gelfand--Kirillov dimension, thereby extending the results of Artin--Van den Bergh for surfaces and Lin--Oguiso--Zhang for threefolds.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2604.21398" target="_blank">A gap principle for polynomial volume growth of zero-entropy automorphisms</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Fei Hu, Chen Jiang</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 24 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.21398" target="_blank">https://arxiv.org/abs/2604.21398</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $X$ be a normal projective variety of dimension $d\ge 4$ and let $f$ be a zero-entropy automorphism of $X$. Denote by $k$ the degree growth rate of $f$, so that $\mathrm{deg}_1(f^n) \asymp n^{k}$. We show that if $k=2d-2$ is maximal, then the polynomial volume growth of $f$ satisfies $\mathrm{plov}(f)=d^2$. If instead $k\le 2d-4$ is not maximal, then \[\mathrm{plov}(f) \le d(d-2) + 2\lfloor d/4 \rfloor.\] This establishes a gap principle: for every fixed dimension $d\ge 4$, the invariant $\mathrm{plov}(f)$ cannot take any value in the open interval $\bigl(d(d-2) + 2\lfloor d/4 \rfloor, \, d^2\bigr)$. Our result thus reveals a new rigidity phenomenon for the polynomial volume growth of zero-entropy automorphisms. As a consequence, in dimension $4$ we determine all possible values of $\mathrm{plov}$, equivalently of the Gelfand--Kirillov dimension, thereby extending the results of Artin--Van den Bergh for surfaces and Lin--Oguiso--Zhang for threefolds.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Triangulations and Maximal Cross-Ratio Degrees", "author": "Veronika K\\\"orber", "published": "Fri, 24 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.21653", "summary": "arXiv:2604.21653v1 Announce Type: new \nAbstract: The cross-ratio degree problem is about counting rational curves with $n$ marked points satisfying $n-3$ cross-ratio conditions. This problem has a tropical analogue which provides the same number, as shown by a correspondence theorem. In general, there are no closed formulas for this counting problem. In the special case of cross-ratio conditions given by triangulations, a formula was found by Silversmith via techniques of algebraic geometry.\n  We study the cross-ratio problem given by triangulations in the tropical world. In addition to computing the cross-ratio degree by tropical means, we provide concrete solutions for the counting problem in arbitrary settings, thus answering the question by Silversmith.\n  We also use the tropical recursive algorithm by Goldner to compute cross-ratio degrees to provide a new computational tool to compute cross-ratio degrees. With this, we can find all possible cross-ratio degrees for $n=9.$ Previously, these numbers were only known up to $n=8.$", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2604.21653" target="_blank">Triangulations and Maximal Cross-Ratio Degrees</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Veronika K\"orber</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 24 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.21653" target="_blank">https://arxiv.org/abs/2604.21653</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The cross-ratio degree problem is about counting rational curves with $n$ marked points satisfying $n-3$ cross-ratio conditions. This problem has a tropical analogue which provides the same number, as shown by a correspondence theorem. In general, there are no closed formulas for this counting problem. In the special case of cross-ratio conditions given by triangulations, a formula was found by Silversmith via techniques of algebraic geometry.
+  We study the cross-ratio problem given by triangulations in the tropical world. In addition to computing the cross-ratio degree by tropical means, we provide concrete solutions for the counting problem in arbitrary settings, thus answering the question by Silversmith.
+  We also use the tropical recursive algorithm by Goldner to compute cross-ratio degrees to provide a new computational tool to compute cross-ratio degrees. With this, we can find all possible cross-ratio degrees for $n=9.$ Previously, these numbers were only known up to $n=8.$
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Normal Functions, Even Theta Characteristics and the Theta Divisor", "author": "Indranil Biswas, Lorenzo Fassina, Gian Pietro Pirola", "published": "Fri, 24 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.21661", "summary": "arXiv:2604.21661v1 Announce Type: new \nAbstract: Let $[C]$ be a general point in the moduli space of curves $M_g$ with $g &gt; 1$. Let $G \\subset J(C)$ be a connected compact subgroup of real dimension $1$ of the Jacobian, and let $L$ be an even theta characteristic on $C$. We prove that $\\{\\zeta \\in G \\mid H^0(C, L \\otimes \\zeta) \\neq 0\\} = \\emptyset$ if and only if $L \\otimes \\zeta_G$ is an even theta characteristic on $C$, where $\\zeta_G$ is the unique non-trivial point of $G$ of order two.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2604.21661" target="_blank">Normal Functions, Even Theta Characteristics and the Theta Divisor</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Indranil Biswas, Lorenzo Fassina, Gian Pietro Pirola</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 24 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.21661" target="_blank">https://arxiv.org/abs/2604.21661</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $[C]$ be a general point in the moduli space of curves $M_g$ with $g &gt; 1$. Let $G \subset J(C)$ be a connected compact subgroup of real dimension $1$ of the Jacobian, and let $L$ be an even theta characteristic on $C$. We prove that $\{\zeta \in G \mid H^0(C, L \otimes \zeta) \neq 0\} = \emptyset$ if and only if $L \otimes \zeta_G$ is an even theta characteristic on $C$, where $\zeta_G$ is the unique non-trivial point of $G$ of order two.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "A theory of generalized Lam\\'e curves", "author": "You-Cheng Chou, Chin-Lung Wang, Po-Sheng Wu", "published": "Fri, 24 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.21880", "summary": "arXiv:2604.21880v1 Announce Type: new \nAbstract: We study the generalized Lam\\'e equation on an elliptic curve $E$ with multiple singularities. By restricting to the locus admitting solutions with quasi-periodic properties, we construct two curves:\n  (i) The generalized Lam'e curve: with $n:=\\sum\\nolimits_{i=1}^r n_i\\in\\mathbb Z_{\\geq 0}$, we construct $\\mathcal{Y}_{\\mathbf n}(\\mathbf p;\\tau)$, which lies in an affine bundle over $Sym^n E$ and parametrizes generalized Hermite--Halphen ansatz solutions.\n  (ii) The log-free curve: each $n_i\\in\\frac12\\mathbb N$ gives a polynomial equation in the accessory parameters. This leads to a non-complete intersection variety $V_{\\mathbf{n}}(\\mathbf{p};\\tau)$ when all $n_i\\in\\frac12\\mathbb N$. We prove that it is a reduced curve.\n  We analysis the GLC as an algebraic family over the pole configuration space $\\mathbf{p}$. We study the shifted addition map \\[ \\sigma: Sym^n E\\longrightarrow E, \\] establishing a generically finite, degree formula. The geometry of boundary degenerations under pole collisions perfectly mirrors the tensor algebra of $\\mathfrak{sl}_2(\\mathbb{C})$-modules within the BGG category $\\mathcal{O}$.\n  We generalize pre-modular forms to a framework of twisted isomonodromic deformations. We construct $(\\mathbf{n}, \\mathbf{p})$-deformed pre-modular forms parameterized by pseudo-monodromy data $(t,s)$, whose vanishing governs these deformations and factorizes along boundary strata. Iterating these deformations through the boundary allows any arbitrary configuration to be continuously deformed down to the classical Lam\\'e equation.\n  Finally, we prove the Treibich conjecture stated for $r=2$ extra symmetric pairs, as well as its generalizations for $r \\leq 4$.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2604.21880" target="_blank">A theory of generalized Lam\'e curves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> You-Cheng Chou, Chin-Lung Wang, Po-Sheng Wu</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 24 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.21880" target="_blank">https://arxiv.org/abs/2604.21880</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the generalized Lam\'e equation on an elliptic curve $E$ with multiple singularities. By restricting to the locus admitting solutions with quasi-periodic properties, we construct two curves:
+  (i) The generalized Lam'e curve: with $n:=\sum\nolimits_{i=1}^r n_i\in\mathbb Z_{\geq 0}$, we construct $\mathcal{Y}_{\mathbf n}(\mathbf p;\tau)$, which lies in an affine bundle over $Sym^n E$ and parametrizes generalized Hermite--Halphen ansatz solutions.
+  (ii) The log-free curve: each $n_i\in\frac12\mathbb N$ gives a polynomial equation in the accessory parameters. This leads to a non-complete intersection variety $V_{\mathbf{n}}(\mathbf{p};\tau)$ when all $n_i\in\frac12\mathbb N$. We prove that it is a reduced curve.
+  We analysis the GLC as an algebraic family over the pole configuration space $\mathbf{p}$. We study the shifted addition map \[ \sigma: Sym^n E\longrightarrow E, \] establishing a generically finite, degree formula. The geometry of boundary degenerations under pole collisions perfectly mirrors the tensor algebra of $\mathfrak{sl}_2(\mathbb{C})$-modules within the BGG category $\mathcal{O}$.
+  We generalize pre-modular forms to a framework of twisted isomonodromic deformations. We construct $(\mathbf{n}, \mathbf{p})$-deformed pre-modular forms parameterized by pseudo-monodromy data $(t,s)$, whose vanishing governs these deformations and factorizes along boundary strata. Iterating these deformations through the boundary allows any arbitrary configuration to be continuously deformed down to the classical Lam\'e equation.
+  Finally, we prove the Treibich conjecture stated for $r=2$ extra symmetric pairs, as well as its generalizations for $r \leq 4$.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "Hodge theory for combinatorial projective bundles", "author": "Matt Larson, Ethan Partida", "published": "Fri, 24 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.21925", "summary": "arXiv:2604.21925v1 Announce Type: new \nAbstract: We prove the Hard Lefschetz theorem and Hodge-Riemann relations for certain rings which resemble the cohomology rings of projectivizations of globally generated vector bundles over toric varieties. This proves new cases of the standard conjecture of Hodge type and gives Bloch-Gieseker-type results for tautological classes of matroids.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2604.21925" target="_blank">Hodge theory for combinatorial projective bundles</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Matt Larson, Ethan Partida</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 24 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.21925" target="_blank">https://arxiv.org/abs/2604.21925</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove the Hard Lefschetz theorem and Hodge-Riemann relations for certain rings which resemble the cohomology rings of projectivizations of globally generated vector bundles over toric varieties. This proves new cases of the standard conjecture of Hodge type and gives Bloch-Gieseker-type results for tautological classes of matroids.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "Embedded special Legendrian surfaces in $\\mathbb S^5$", "author": "Sebastian Heller, Franz Pedit, Charles Ouyang", "published": "Fri, 24 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.21521", "summary": "arXiv:2604.21521v1 Announce Type: cross \nAbstract: We construct the first smooth embedded compact special Legendrian surfaces in \\(\\mathbb S^5\\) of genus greater than one. More precisely, for every sufficiently large integer \\(k\\), we construct an embedded special Legendrian surface whose conformal structure is the Fermat curve of degree \\(k\\) and genus \\(\\tfrac12(k-1)(k-2)\\). Our approach combines an elementary implicit function theorem with the description of special Legendrian surfaces via loop algebra-valued meromorphic connections and a characterization of the unitarizability locus in the ${SL}_{3}(\\mathbb C)$-character variety of the thrice-punctured sphere.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2604.21521" target="_blank">Embedded special Legendrian surfaces in $\mathbb S^5$</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sebastian Heller, Franz Pedit, Charles Ouyang</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 24 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.21521" target="_blank">https://arxiv.org/abs/2604.21521</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We construct the first smooth embedded compact special Legendrian surfaces in \(\mathbb S^5\) of genus greater than one. More precisely, for every sufficiently large integer \(k\), we construct an embedded special Legendrian surface whose conformal structure is the Fermat curve of degree \(k\) and genus \(\tfrac12(k-1)(k-2)\). Our approach combines an elementary implicit function theorem with the description of special Legendrian surfaces via loop algebra-valued meromorphic connections and a characterization of the unitarizability locus in the ${SL}_{3}(\mathbb C)$-character variety of the thrice-punctured sphere.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "Residues of a tropical zeta function for convex domains", "author": "Nikita Kalinin, Ernesto Lupercio, Mikhail Shkolnikov", "published": "Fri, 24 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.21709", "summary": "arXiv:2604.21709v1 Announce Type: cross \nAbstract: We define an $\\operatorname{SL}_n(\\mathbb{Z})$-invariant tropical zeta function of a convex domain. In dimension 2 it admits boundary Dirichlet-series representation with summands indexed by Farey pairs. For $C^3$ strictly convex domains, it extends meromorphically to $\\Re(s)&gt;3/5$, holomorphic there except for a simple pole at $s=2/3$, with residue proportional to equiaffine perimeter. A Tauberian argument yields the $t^{1/3}$ wave-front lattice-perimeter asymptotic for $t\\rightarrow 0$.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2604.21709" target="_blank">Residues of a tropical zeta function for convex domains</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Nikita Kalinin, Ernesto Lupercio, Mikhail Shkolnikov</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 24 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.21709" target="_blank">https://arxiv.org/abs/2604.21709</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We define an $\operatorname{SL}_n(\mathbb{Z})$-invariant tropical zeta function of a convex domain. In dimension 2 it admits boundary Dirichlet-series representation with summands indexed by Farey pairs. For $C^3$ strictly convex domains, it extends meromorphically to $\Re(s)&gt;3/5$, holomorphic there except for a simple pole at $s=2/3$, with residue proportional to equiaffine perimeter. A Tauberian argument yields the $t^{1/3}$ wave-front lattice-perimeter asymptotic for $t\rightarrow 0$.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "Three-periodic helices on elliptic curves and their associated regular algebras", "author": "Daniel Chan, Adam Nyman", "published": "Fri, 24 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.21900", "summary": "arXiv:2604.21900v1 Announce Type: cross \nAbstract: Let $k$ denote an algebraically closed field of characteristic zero and let $X$ denote a smooth elliptic curve over $k$. Given a three-periodic elliptic helix $\\underline{\\mathcal{E}}$ of vector bundles over $X$ with endomorphism $\\mathbb{Z}$-algebra $\\operatorname{End} \\underline{\\mathcal{E}}$ and quadratic cover $\\mathbb{S}^{nc}(\\underline{\\mathcal{E}})$, we prove that $\\operatorname{End} \\underline{\\mathcal{E}}$ is the quotient of $\\mathbb{S}^{nc}(\\underline{\\mathcal{E}})$ by a degree three family of normal elements, generalizing a result of the authors to the case in which $\\operatorname{dim }(\\operatorname{End} \\underline{\\mathcal{E}})_{i, i+1}$ isn't a constant function of $i$. We then show that $\\operatorname{End} \\underline{\\mathcal{E}}$ is noetherian if and only if it has polynomial growth, and in this case, the ranks of any three consecutive bundles in the helix are a Markov triple. Furthermore, in this case $\\mathbb{S}^{nc}(\\underline{\\mathcal{E}})$ is a noetherian GK-three $\\mathbb{Z}$-algebra which is ${\\sf Proj }$-equivalent to an elliptic algebra. We conclude the paper by constructing several new families of elliptic helices with exponential growth.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2604.21900" target="_blank">Three-periodic helices on elliptic curves and their associated regular algebras</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Daniel Chan, Adam Nyman</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 24 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.21900" target="_blank">https://arxiv.org/abs/2604.21900</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $k$ denote an algebraically closed field of characteristic zero and let $X$ denote a smooth elliptic curve over $k$. Given a three-periodic elliptic helix $\underline{\mathcal{E}}$ of vector bundles over $X$ with endomorphism $\mathbb{Z}$-algebra $\operatorname{End} \underline{\mathcal{E}}$ and quadratic cover $\mathbb{S}^{nc}(\underline{\mathcal{E}})$, we prove that $\operatorname{End} \underline{\mathcal{E}}$ is the quotient of $\mathbb{S}^{nc}(\underline{\mathcal{E}})$ by a degree three family of normal elements, generalizing a result of the authors to the case in which $\operatorname{dim }(\operatorname{End} \underline{\mathcal{E}})_{i, i+1}$ isn't a constant function of $i$. We then show that $\operatorname{End} \underline{\mathcal{E}}$ is noetherian if and only if it has polynomial growth, and in this case, the ranks of any three consecutive bundles in the helix are a Markov triple. Furthermore, in this case $\mathbb{S}^{nc}(\underline{\mathcal{E}})$ is a noetherian GK-three $\mathbb{Z}$-algebra which is ${\sf Proj }$-equivalent to an elliptic algebra. We conclude the paper by constructing several new families of elliptic helices with exponential growth.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "On quantum $K$-groups of partial flag manifolds", "author": "Syu Kato", "published": "Fri, 24 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/1906.09343", "summary": "arXiv:1906.09343v4 Announce Type: replace \nAbstract: We show that the equivariant small quantum $K$-group of a partial flag manifold is a quotient of that of the full flag manifold in a way that respects the Schubert classes. This is a $K$-theoretic analogue of the parabolic version of Peterson's theorem [Lam-Shimozono, Acta Math. {\\bf 204} (2010)] that exhibits a different behavior from the case of quantum cohomology. Our quotient maps send some of the Novikov variables to $1$, and the geometric meaning of this specialization is unclear in quantum $K$-theory.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/1906.09343" target="_blank">On quantum $K$-groups of partial flag manifolds</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Syu Kato</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 24 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/1906.09343" target="_blank">https://arxiv.org/abs/1906.09343</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We show that the equivariant small quantum $K$-group of a partial flag manifold is a quotient of that of the full flag manifold in a way that respects the Schubert classes. This is a $K$-theoretic analogue of the parabolic version of Peterson's theorem [Lam-Shimozono, Acta Math. {\bf 204} (2010)] that exhibits a different behavior from the case of quantum cohomology. Our quotient maps send some of the Novikov variables to $1$, and the geometric meaning of this specialization is unclear in quantum $K$-theory.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Extension of Hodge norms at infinity", "author": "Colleen Robles", "published": "Fri, 24 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2302.04014", "summary": "arXiv:2302.04014v2 Announce Type: replace \nAbstract: It is a long-standing problem in Hodge theory to generalize the Satake--Baily--Borel (SBB) compactification of a locally Hermitian symmetric space to arbitrary period maps. A proper topological SBB-type completion has been constructed, and the problem of showing that the construction is algebraic has been reduced to showing that the compact fibres A of the completion admit neighborhoods X satisfying certain properties. All but one of those properties has been established; the outstanding problem is to show that holomorphic functions on certain divisors \"at infinity\" extend to X. Extension theorems of this type require that the complex manifold X be pseudoconvex; that is, admit a plurisubharmonic exhaustion function. The neighborhood X is stratified, and the strata admit Hodge norms which are may be used to produce plurisubharmonic functions on the strata. One would like to extend these norms to X so that they may be used to construct the desired plurisubharmonic exhaustion of X. The purpose of this paper is show that there exists a function that simultaneously extends all the Hodge norms along the strata that intersect the fibre A nontrivially.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2302.04014" target="_blank">Extension of Hodge norms at infinity</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Colleen Robles</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 24 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2302.04014" target="_blank">https://arxiv.org/abs/2302.04014</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                It is a long-standing problem in Hodge theory to generalize the Satake--Baily--Borel (SBB) compactification of a locally Hermitian symmetric space to arbitrary period maps. A proper topological SBB-type completion has been constructed, and the problem of showing that the construction is algebraic has been reduced to showing that the compact fibres A of the completion admit neighborhoods X satisfying certain properties. All but one of those properties has been established; the outstanding problem is to show that holomorphic functions on certain divisors "at infinity" extend to X. Extension theorems of this type require that the complex manifold X be pseudoconvex; that is, admit a plurisubharmonic exhaustion function. The neighborhood X is stratified, and the strata admit Hodge norms which are may be used to produce plurisubharmonic functions on the strata. One would like to extend these norms to X so that they may be used to construct the desired plurisubharmonic exhaustion of X. The purpose of this paper is show that there exists a function that simultaneously extends all the Hodge norms along the strata that intersect the fibre A nontrivially.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "Compactifications of the Eisenstein ancestral Deligne-Mostow variety", "author": "Klaus Hulek, Shigeyuki Kondo, Yota Maeda", "published": "Fri, 24 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2403.18345", "summary": "arXiv:2403.18345v3 Announce Type: replace \nAbstract: All arithmetic non-compact ball quotients by Deligne-Mostow's unitary monodromy group arise as sub-ball quotients of either of two spaces called ancestral cases, corresponding to Gaussian or Eisenstein Hermitian forms respectively. In a previous paper, we investigated the compactifications of the Gaussian Deligne-Mostow variety. Here we work on the remaining case, namely the ring of Eisenstein integers. This variety is related to the moduli space of unordered 12 points on $\\mathbb{P}^1$. In particular, we show that Kirwan's partial resolution of the moduli space is not a semi-toroidal compactification and Deligne-Mostow's period map does not lift to the unique toroidal compactification. We give two interpretations of these phenomena in terms of the log minimal model program and automorphic forms. As an application, we prove that the above two compactifications are not (stacky) derived equivalent, as the $DK$-conjecture predicts. Furthermore, we construct an automorphic form on the moduli space of non-hyperelliptic curves of genus 4, which is isogenous to the Eisenstein Deligne-Mostow variety, giving another intrinsic proof, independent of lattice embeddings, of a result by Casalaina-Martin, Jensen and Laza.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2403.18345" target="_blank">Compactifications of the Eisenstein ancestral Deligne-Mostow variety</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Klaus Hulek, Shigeyuki Kondo, Yota Maeda</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 24 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2403.18345" target="_blank">https://arxiv.org/abs/2403.18345</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                All arithmetic non-compact ball quotients by Deligne-Mostow's unitary monodromy group arise as sub-ball quotients of either of two spaces called ancestral cases, corresponding to Gaussian or Eisenstein Hermitian forms respectively. In a previous paper, we investigated the compactifications of the Gaussian Deligne-Mostow variety. Here we work on the remaining case, namely the ring of Eisenstein integers. This variety is related to the moduli space of unordered 12 points on $\mathbb{P}^1$. In particular, we show that Kirwan's partial resolution of the moduli space is not a semi-toroidal compactification and Deligne-Mostow's period map does not lift to the unique toroidal compactification. We give two interpretations of these phenomena in terms of the log minimal model program and automorphic forms. As an application, we prove that the above two compactifications are not (stacky) derived equivalent, as the $DK$-conjecture predicts. Furthermore, we construct an automorphic form on the moduli space of non-hyperelliptic curves of genus 4, which is isogenous to the Eisenstein Deligne-Mostow variety, giving another intrinsic proof, independent of lattice embeddings, of a result by Casalaina-Martin, Jensen and Laza.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "A Criterion for Perfectoid Purity and the Rationality of Thresholds", "author": "Shou Yoshikawa", "published": "Fri, 24 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2510.19319", "summary": "arXiv:2510.19319v4 Announce Type: replace \nAbstract: We introduce a new criterion providing a sufficient condition for a hypersurface in an unramified regular local ring to be perfectoid pure. The criterion is formulated in terms of an explicitly computable sequence of integers, called the splitting-order sequence. Our main theorem shows that if all entries of the sequence are at most $p-1$, then the hypersurface is perfectoid pure, and the perfectoid-pure threshold can be computed explicitly from it. As a consequence, we prove that for any regular local ring $R$, the perfectoid pure threshold $\\mathrm{ppt}(R,p)$ with respect to $p$ is always a rational number. Moreover, we show that for sufficiently large primes $p$, the cone over a Fermat type Calabi-Yau hypersurface is perfectoid pure, revealing new and unexpected examples of perfectoid pure singularities. Moreover, we show that for sufficiently large primes $p$, the cone over a Fermat type Calabi-Yau hypersurface is perfectoid pure, revealing new and unexpected examples of perfectoid pure singularities.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2510.19319" target="_blank">A Criterion for Perfectoid Purity and the Rationality of Thresholds</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Shou Yoshikawa</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 24 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.19319" target="_blank">https://arxiv.org/abs/2510.19319</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We introduce a new criterion providing a sufficient condition for a hypersurface in an unramified regular local ring to be perfectoid pure. The criterion is formulated in terms of an explicitly computable sequence of integers, called the splitting-order sequence. Our main theorem shows that if all entries of the sequence are at most $p-1$, then the hypersurface is perfectoid pure, and the perfectoid-pure threshold can be computed explicitly from it. As a consequence, we prove that for any regular local ring $R$, the perfectoid pure threshold $\mathrm{ppt}(R,p)$ with respect to $p$ is always a rational number. Moreover, we show that for sufficiently large primes $p$, the cone over a Fermat type Calabi-Yau hypersurface is perfectoid pure, revealing new and unexpected examples of perfectoid pure singularities. Moreover, we show that for sufficiently large primes $p$, the cone over a Fermat type Calabi-Yau hypersurface is perfectoid pure, revealing new and unexpected examples of perfectoid pure singularities.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "Real gamma distribution on analytic bundles of flag varieties", "author": "Haoming Wang", "published": "Fri, 24 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2601.21304", "summary": "arXiv:2601.21304v2 Announce Type: replace \nAbstract: This paper introduces four matrix normal distributions on analytic bundles of flag varieties, extending the separable covariance $\\varPhi \\otimes \\varPsi$ with potentially variable-level ($\\varPsi$) and/or sample-level ($\\varPhi$) correlations. The joint distribution of sample variances and covariances, leading to the product moment distribution, is considered when precision matrices admit a specific form. Several well-known consequences, including the non-central Wishart distribution and normal quadratic forms, now appear as corollaries.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2601.21304" target="_blank">Real gamma distribution on analytic bundles of flag varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Haoming Wang</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 24 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.21304" target="_blank">https://arxiv.org/abs/2601.21304</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This paper introduces four matrix normal distributions on analytic bundles of flag varieties, extending the separable covariance $\varPhi \otimes \varPsi$ with potentially variable-level ($\varPsi$) and/or sample-level ($\varPhi$) correlations. The joint distribution of sample variances and covariances, leading to the product moment distribution, is considered when precision matrices admit a specific form. Several well-known consequences, including the non-central Wishart distribution and normal quadratic forms, now appear as corollaries.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Handle decompositions and Kirby diagrams for the complement of plane algebraic curves", "author": "Sakumi Sugawara", "published": "Fri, 24 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2306.10519", "summary": "arXiv:2306.10519v3 Announce Type: replace-cross \nAbstract: The complement of plane algebraic curves are well studied from topological and algebro-geometric viewpoints. In this paper, we will describe the explicit handle decompositions and the Kirby diagrams for the complement of plane algebraic curves. The method is based on the notion of braid monodromy. We refined this technique to obtain handle decompositions and Kirby diagrams.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2306.10519" target="_blank">Handle decompositions and Kirby diagrams for the complement of plane algebraic curves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sakumi Sugawara</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 24 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2306.10519" target="_blank">https://arxiv.org/abs/2306.10519</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The complement of plane algebraic curves are well studied from topological and algebro-geometric viewpoints. In this paper, we will describe the explicit handle decompositions and the Kirby diagrams for the complement of plane algebraic curves. The method is based on the notion of braid monodromy. We refined this technique to obtain handle decompositions and Kirby diagrams.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "Matroid analogues of Gal's conjecture", "author": "Basile Coron, Luis Ferroni, Shiyue Li", "published": "Fri, 24 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.04550", "summary": "arXiv:2604.04550v2 Announce Type: replace-cross \nAbstract: Well-known conjectures of Charney--Davis, Gal, and Nevo--Petersen predict increasingly strong positivity phenomena for the h-vectors of flag simplicial spheres. In this paper, we formulate and prove matroid analogues of these conjectures in the setting of Chow polynomials of matroids with building sets. Our proofs rely on toric geometry and make crucial use of tropical intersection theory.\n  We begin by introducing complete building sets, a class encompassing all maximal building sets and other important families such as minimal building sets of braid matroids. For matroids with complete building sets, we analyze the Chow rings of the associated toric varieties, and prove that their Hilbert--Poincar\\'e polynomials are gamma-positive. From this analysis, we derive a combinatorial formula for the coefficients of the gamma-expansion, and use it to explicitly construct a simplicial complex $\\Gamma$, whose f-vector coincides with the gamma-vector. This establishes a matroid analogue of the Nevo--Petersen conjecture. When the building set is maximal, we further prove that $\\Gamma$ is balanced, confirming the strongest such analogue in this case. As an application, we obtain a new combinatorial formula for the gamma-expansion of the Poincar\\'e polynomial of the Deligne--Mumford--Knudsen compactification $\\overline{\\mathcal{M}}_{0,n}$, and derive several novel numerical inequalities for its coefficients.\n  We also study the toric varieties of matroids with flag building sets, another class containing maximal building sets as well as several other prominent families. We prove that the Hilbert--Poincar\\'e polynomials of these toric varieties are gamma-positive. This result establishes matroid analogues of the Charney--Davis and Gal conjectures, and simultaneously extends several recent gamma-positivity results for Chow polynomials.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2604.04550" target="_blank">Matroid analogues of Gal's conjecture</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Basile Coron, Luis Ferroni, Shiyue Li</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 24 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.04550" target="_blank">https://arxiv.org/abs/2604.04550</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Well-known conjectures of Charney--Davis, Gal, and Nevo--Petersen predict increasingly strong positivity phenomena for the h-vectors of flag simplicial spheres. In this paper, we formulate and prove matroid analogues of these conjectures in the setting of Chow polynomials of matroids with building sets. Our proofs rely on toric geometry and make crucial use of tropical intersection theory.
+  We begin by introducing complete building sets, a class encompassing all maximal building sets and other important families such as minimal building sets of braid matroids. For matroids with complete building sets, we analyze the Chow rings of the associated toric varieties, and prove that their Hilbert--Poincar\'e polynomials are gamma-positive. From this analysis, we derive a combinatorial formula for the coefficients of the gamma-expansion, and use it to explicitly construct a simplicial complex $\Gamma$, whose f-vector coincides with the gamma-vector. This establishes a matroid analogue of the Nevo--Petersen conjecture. When the building set is maximal, we further prove that $\Gamma$ is balanced, confirming the strongest such analogue in this case. As an application, we obtain a new combinatorial formula for the gamma-expansion of the Poincar\'e polynomial of the Deligne--Mumford--Knudsen compactification $\overline{\mathcal{M}}_{0,n}$, and derive several novel numerical inequalities for its coefficients.
+  We also study the toric varieties of matroids with flag building sets, another class containing maximal building sets as well as several other prominent families. We prove that the Hilbert--Poincar\'e polynomials of these toric varieties are gamma-positive. This result establishes matroid analogues of the Charney--Davis and Gal conjectures, and simultaneously extends several recent gamma-positivity results for Chow polynomials.
+            </div>
+        </div>
+        <div class="paper" id="paper-21">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-21" data-paper-data='{"title": "On Holomorphicity of Fiberwise Analytic Mappings", "author": "Hanwen Liu", "published": "Fri, 24 Apr 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.10676", "summary": "arXiv:2604.10676v3 Announce Type: replace-cross \nAbstract: We establish two rigidity results for mappings in complex geometry. First, we investigate the elevation of continuous mappings to holomorphic ones in the setting of proper fibrations. By leveraging relative morphism spaces and the Noetherian property of their local rings, we prove that a continuous, fiber-wise holomorphic map uniquely extends to a global holomorphic map, provided it is anchored by a sequence of holomorphic sections with mutually disjoint images. This result is then applied to establish the rigidity of homomorphisms between elliptic fibrations and Abelian schemes. Second, for a compact Kobayashi hyperbolic manifold fibered over $\\mathbb{P}^1$, we prove that a continuous, fiber-wise holomorphic map of degree $1$ to a projective variety is a bi-holomorphic isomorphism, provided it is injective on a very ample hypersurface.", "number": 21, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#21</span>
+                <a href="https://arxiv.org/abs/2604.10676" target="_blank">On Holomorphicity of Fiberwise Analytic Mappings</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Hanwen Liu</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 24 Apr 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.10676" target="_blank">https://arxiv.org/abs/2604.10676</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We establish two rigidity results for mappings in complex geometry. First, we investigate the elevation of continuous mappings to holomorphic ones in the setting of proper fibrations. By leveraging relative morphism spaces and the Noetherian property of their local rings, we prove that a continuous, fiber-wise holomorphic map uniquely extends to a global holomorphic map, provided it is anchored by a sequence of holomorphic sections with mutually disjoint images. This result is then applied to establish the rigidity of homomorphisms between elliptic fibrations and Abelian schemes. Second, for a compact Kobayashi hyperbolic manifold fibered over $\mathbb{P}^1$, we prove that a continuous, fiber-wise holomorphic map of degree $1$ to a projective variety is a bi-holomorphic isomorphism, provided it is injective on a very ample hypersurface.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-04-24 10:25:48
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>
