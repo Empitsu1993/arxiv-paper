@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Mon, 04 May 2026 04:00:11 +0000<br>
+        <strong>論文数:</strong> 21件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Cylinders and the zero locus of the plinth ideal</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Stable Wild Vafa-Witten Bundles on the Projective Plane</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">On logarithmic Poisson cohomology of a degenerate Poisson bivector in affine plane</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">The logarithmic leaf complex and foliated d-semistability</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">The GIT Boundary of Quintic Threefolds (Announcement of Results)</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">Torsion Trajectories from Local Discriminants to Global Obstructions</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Valuative independence and metric SYZ conjecture</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">A new family of weighted double Hurwitz numbers and a new ELSV-type formula with $\Omega$-classes</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">Delta characters and crystalline cohomology of abelian schemes</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">Trace ideals of exterior powers of the module of differentials</a>
+            <span class="title-label-badge" style="background-color: #ff69b4;">privacy</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">The Hurwitz sum-of-squares problem depends on the base field</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">Curves on surfaces and moduli of associative algebras</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">A note on Zilber-Pink in $Y(1)^n$</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Finite symplectic automorphism groups of supersingular K3 surfaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">A Semi-Orthogonal Decomposition Theorem for Weighted Blowups</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">The essential and Cremona dimensions of a group</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">Geometric classification of primes modulo a (bend) congruence</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">The generic crystallographic phase retrieval problem</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Dynamical Mordell-Lang problem for automorphisms of surfaces in positive characteristic</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">Hypergeometric decomposition of Delsarte K3 pencils</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-21" onchange="updateSelectedCount()">
+            <span class="title-number">21.</span>
+            <a href="#paper-21">Faithful perversities</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Cylinders and the zero locus of the plinth ideal", "author": "Kirill Shakhmatov", "published": "Mon, 04 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.00138", "summary": "arXiv:2605.00138v1 Announce Type: new \nAbstract: Given a $\\mathbb{G}_\\mathrm{a}$-action on an affine variety $X$, we show that the complement of the union of all principal invariant cylinders in $X$ is equal to the zero locus of the plinth ideal of the corresponding locally nilpotent derivation.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2605.00138" target="_blank">Cylinders and the zero locus of the plinth ideal</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Kirill Shakhmatov</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 04 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.00138" target="_blank">https://arxiv.org/abs/2605.00138</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Given a $\mathbb{G}_\mathrm{a}$-action on an affine variety $X$, we show that the complement of the union of all principal invariant cylinders in $X$ is equal to the zero locus of the plinth ideal of the corresponding locally nilpotent derivation.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Stable Wild Vafa-Witten Bundles on the Projective Plane", "author": "Robert Cornea", "published": "Mon, 04 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.00164", "summary": "arXiv:2605.00164v1 Announce Type: new \nAbstract: This work explores the geometry of stable wild Vafa-Witten bundles over the complex projective plane $\\mathbb{P}^2$. Specifically, we consider stable rank-two pairs $(E,\\Phi)$, with $E\\to\\mathbb{P}^2$ a rank-two holomorphic vector bundle and $\\Phi\\in H^0(\\mathbb{P}^2,\\mathrm{End}_0E\\otimes\\mathcal{O}(d))$ for $d\\geq0$, and compute the dimension of the moduli space of such stable pairs. Moreover, we classify stable pairs $(E,\\Phi)$ when the underlying rank-two bundle $E$ splits or is the push-forward of a line bundle on $\\mathbb{P}^1\\times\\mathbb{P}^1$. Lastly, we examine the fixed point locus of the natural $\\mathbb{C}^*$-action on the moduli space.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2605.00164" target="_blank">Stable Wild Vafa-Witten Bundles on the Projective Plane</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Robert Cornea</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 04 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.00164" target="_blank">https://arxiv.org/abs/2605.00164</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This work explores the geometry of stable wild Vafa-Witten bundles over the complex projective plane $\mathbb{P}^2$. Specifically, we consider stable rank-two pairs $(E,\Phi)$, with $E\to\mathbb{P}^2$ a rank-two holomorphic vector bundle and $\Phi\in H^0(\mathbb{P}^2,\mathrm{End}_0E\otimes\mathcal{O}(d))$ for $d\geq0$, and compute the dimension of the moduli space of such stable pairs. Moreover, we classify stable pairs $(E,\Phi)$ when the underlying rank-two bundle $E$ splits or is the push-forward of a line bundle on $\mathbb{P}^1\times\mathbb{P}^1$. Lastly, we examine the fixed point locus of the natural $\mathbb{C}^*$-action on the moduli space.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "On logarithmic Poisson cohomology of a degenerate Poisson bivector in affine plane", "author": "Kamtila Kari, Iskaml\\'e Bruno, Diekouam Fotso Luc \\'Em\\'ery, Tcheka Calvin", "published": "Mon, 04 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.00217", "summary": "arXiv:2605.00217v1 Announce Type: new \nAbstract: In this paper, we show that for a given degenerate bivector $\\pi= y^n\\partial_x \\wedge \\partial_y$ with $n&gt;1$, the classical Poisson cohomology group and the logarithmic Poisson cohomology group along the ideal $\\mathcal{I}=y^n\\mathbb{F}[x,y] $ are isomorphics in every d\\'egr\\'ee. This result follows from determination of the logarithmic Hamiltonian operator and the logarithmic Poisson cochain complexe in order to compute the cohomological invariants associated to $\\pi$. $\\mathbb{F}$ is the field of characteristic 0.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2605.00217" target="_blank">On logarithmic Poisson cohomology of a degenerate Poisson bivector in affine plane</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Kamtila Kari, Iskaml\'e Bruno, Diekouam Fotso Luc \'Em\'ery, Tcheka Calvin</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 04 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.00217" target="_blank">https://arxiv.org/abs/2605.00217</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we show that for a given degenerate bivector $\pi= y^n\partial_x \wedge \partial_y$ with $n&gt;1$, the classical Poisson cohomology group and the logarithmic Poisson cohomology group along the ideal $\mathcal{I}=y^n\mathbb{F}[x,y] $ are isomorphics in every d\'egr\'ee. This result follows from determination of the logarithmic Hamiltonian operator and the logarithmic Poisson cochain complexe in order to compute the cohomological invariants associated to $\pi$. $\mathbb{F}$ is the field of characteristic 0.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "The logarithmic leaf complex and foliated d-semistability", "author": "Mauricio Corr\\^ea, Pablo Perrella, Sebasti\\'an Velazquez", "published": "Mon, 04 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.00285", "summary": "arXiv:2605.00285v1 Announce Type: new \nAbstract: We study holomorphic foliations on normal crossings varieties arising as semistable degenerations. We do so by we exploring the notion of foliated d-semistability using the language of logarithmic structures in the sense of Fontaine-Illusie. First, we identify both local and global obstructions to d-semistability. In order to analyze the existence of smoothings, we develop a logarithmic deformation theory of foliations and show that the corresponding moduli functor admits a versal hull.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2605.00285" target="_blank">The logarithmic leaf complex and foliated d-semistability</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Mauricio Corr\^ea, Pablo Perrella, Sebasti\'an Velazquez</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 04 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.00285" target="_blank">https://arxiv.org/abs/2605.00285</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study holomorphic foliations on normal crossings varieties arising as semistable degenerations. We do so by we exploring the notion of foliated d-semistability using the language of logarithmic structures in the sense of Fontaine-Illusie. First, we identify both local and global obstructions to d-semistability. In order to analyze the existence of smoothings, we develop a logarithmic deformation theory of foliations and show that the corresponding moduli functor admits a versal hull.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "The GIT Boundary of Quintic Threefolds (Announcement of Results)", "author": "Yasutaka Shibata", "published": "Mon, 04 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.00309", "summary": "arXiv:2605.00309v1 Announce Type: new \nAbstract: We announce an explicit description of the strictly semistable boundary of the GIT moduli space of quintic threefolds. For the natural action of \\(\\mathrm{SL}(5)\\) on \\(\\mathbb P(\\mathrm{Sym}^5\\mathbb C^5)\\), we classify the 38 boundary components arising from maximal strictly semistable supports and construct closed-orbit normal forms for the general polystable representative in each component. We also determine the singular loci of these general representatives and compute their local and global minimal exponents. The isolated boundary singularities are quasi-homogeneous and fall into eleven analytic types, all with local minimal exponent equal to \\(1\\). Consequently, the global minimal exponent of a general closed-orbit representative in every boundary component is \\(1=(4+1)/5\\), the critical value in the stability criterion for quintic hypersurfaces in \\(\\mathbb P^4\\). We further announce the pairwise non-inclusion of the 38 quotient-side boundary families and compute the codimension-one wall-adjacency graph, which has 38 vertices and 184 edges, is connected, and has diameter 4. Detailed proofs and complete case-by-case computations will appear in a forthcoming full-length paper.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2605.00309" target="_blank">The GIT Boundary of Quintic Threefolds (Announcement of Results)</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yasutaka Shibata</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 04 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.00309" target="_blank">https://arxiv.org/abs/2605.00309</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We announce an explicit description of the strictly semistable boundary of the GIT moduli space of quintic threefolds. For the natural action of \(\mathrm{SL}(5)\) on \(\mathbb P(\mathrm{Sym}^5\mathbb C^5)\), we classify the 38 boundary components arising from maximal strictly semistable supports and construct closed-orbit normal forms for the general polystable representative in each component. We also determine the singular loci of these general representatives and compute their local and global minimal exponents. The isolated boundary singularities are quasi-homogeneous and fall into eleven analytic types, all with local minimal exponent equal to \(1\). Consequently, the global minimal exponent of a general closed-orbit representative in every boundary component is \(1=(4+1)/5\), the critical value in the stability criterion for quintic hypersurfaces in \(\mathbb P^4\). We further announce the pairwise non-inclusion of the 38 quotient-side boundary families and compute the codimension-one wall-adjacency graph, which has 38 vertices and 184 edges, is connected, and has diameter 4. Detailed proofs and complete case-by-case computations will appear in a forthcoming full-length paper.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "Torsion Trajectories from Local Discriminants to Global Obstructions", "author": "Abdul Rahman", "published": "Mon, 04 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.00355", "summary": "arXiv:2605.00355v1 Announce Type: new \nAbstract: For a normal surface singularity, the discrepancy between the ordinary and dual middle-perversity intersection complexes over \\(\\mathbb Z\\) is measured by a finite group \\(E\\). In previous work, \\(E\\) was identified with link torsion, the exceptional-lattice discriminant group \\(\\Lambda^\\vee/\\Lambda\\), a resolution-neighborhood boundary quotient, and, in the hypersurface case, \\(\\operatorname{coker}(T-\\mathrm{id})_{\\mathrm{tors}}\\). This paper tracks the trajectory of this torsion from local singularity data to global obstruction theory. We follow the discriminant package \\((E,q)\\) through support cohomology, excision, global torsion, Brauer comparison, Bloch--Ogus residues, and rationalization. The method is example-driven: trajectory tables are computed for \\(A_1\\), \\(A_k\\), \\(D_4\\), \\(E_8\\), a non-ADE Brieskorn singularity, the threefold ordinary double point, nodal threefolds, nodal quintics, and the Benoist--Ottem benchmark. The computations reveal a sharp distinction: a surface \\(A_1\\) singularity has local \\(\\mathbb Z/2\\)-torsion, whereas a threefold ordinary double point has torsion-free link \\(S^2\\times S^3\\) and contributes free vanishing-cycle data instead. Thus finite discriminant torsion is naturally a codimension-two phenomenon, not a generic feature of nodes. The resulting pattern motivates a specialization problem: whether the Enriques \\(2\\)-torsion in Benoist--Ottem integral Hodge counterexamples is genuinely global, or can arise after degeneration from transverse \\(A_1\\)-type discriminant data along codimension-two strata.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2605.00355" target="_blank">Torsion Trajectories from Local Discriminants to Global Obstructions</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Abdul Rahman</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 04 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.00355" target="_blank">https://arxiv.org/abs/2605.00355</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                For a normal surface singularity, the discrepancy between the ordinary and dual middle-perversity intersection complexes over \(\mathbb Z\) is measured by a finite group \(E\). In previous work, \(E\) was identified with link torsion, the exceptional-lattice discriminant group \(\Lambda^\vee/\Lambda\), a resolution-neighborhood boundary quotient, and, in the hypersurface case, \(\operatorname{coker}(T-\mathrm{id})_{\mathrm{tors}}\). This paper tracks the trajectory of this torsion from local singularity data to global obstruction theory. We follow the discriminant package \((E,q)\) through support cohomology, excision, global torsion, Brauer comparison, Bloch--Ogus residues, and rationalization. The method is example-driven: trajectory tables are computed for \(A_1\), \(A_k\), \(D_4\), \(E_8\), a non-ADE Brieskorn singularity, the threefold ordinary double point, nodal threefolds, nodal quintics, and the Benoist--Ottem benchmark. The computations reveal a sharp distinction: a surface \(A_1\) singularity has local \(\mathbb Z/2\)-torsion, whereas a threefold ordinary double point has torsion-free link \(S^2\times S^3\) and contributes free vanishing-cycle data instead. Thus finite discriminant torsion is naturally a codimension-two phenomenon, not a generic feature of nodes. The resulting pattern motivates a specialization problem: whether the Enriques \(2\)-torsion in Benoist--Ottem integral Hodge counterexamples is genuinely global, or can arise after degeneration from transverse \(A_1\)-type discriminant data along codimension-two strata.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Valuative independence and metric SYZ conjecture", "author": "Yang Li", "published": "Mon, 04 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.00516", "summary": "arXiv:2605.00516v1 Announce Type: new \nAbstract: Given a polarised maximal degeneration of compact Calabi-Yau manifolds, assuming there exists a canonical basis of the section ring for the polarisation line bundle, satisfying the valuative independence condition, we will prove the metric SYZ conjecture.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2605.00516" target="_blank">Valuative independence and metric SYZ conjecture</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yang Li</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 04 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.00516" target="_blank">https://arxiv.org/abs/2605.00516</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Given a polarised maximal degeneration of compact Calabi-Yau manifolds, assuming there exists a canonical basis of the section ring for the polarisation line bundle, satisfying the valuative independence condition, we will prove the metric SYZ conjecture.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "A new family of weighted double Hurwitz numbers and a new ELSV-type formula with $\\Omega$-classes", "author": "Alexander Alexandrov, Boris Bychkov, Petr Dunin-Barkowski, Maxim Kazarian, Sergey Shadrin", "published": "Mon, 04 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.00584", "summary": "arXiv:2605.00584v1 Announce Type: new \nAbstract: We analyze a new family of weighted double Hurwitz numbers that was introduced as a notable example in the context of the $x-y$ duality for logarithmic topological recursion. We use this family to systematically demonstrate, refine and develop techniques that play a crucial role in the interaction of hypergeometric (Orlov--Scherbin) KP tau functions and intersection theory of moduli spaces of curves. In particular, we discuss the subtleties related to the derivation of the ELSV-type formulas in this context and derive a new, explicit ELSV-type formula in terms of the so-called $\\Omega$-classes.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2605.00584" target="_blank">A new family of weighted double Hurwitz numbers and a new ELSV-type formula with $\Omega$-classes</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Alexander Alexandrov, Boris Bychkov, Petr Dunin-Barkowski, Maxim Kazarian, Sergey Shadrin</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 04 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.00584" target="_blank">https://arxiv.org/abs/2605.00584</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We analyze a new family of weighted double Hurwitz numbers that was introduced as a notable example in the context of the $x-y$ duality for logarithmic topological recursion. We use this family to systematically demonstrate, refine and develop techniques that play a crucial role in the interaction of hypergeometric (Orlov--Scherbin) KP tau functions and intersection theory of moduli spaces of curves. In particular, we discuss the subtleties related to the derivation of the ELSV-type formulas in this context and derive a new, explicit ELSV-type formula in terms of the so-called $\Omega$-classes.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "Delta characters and crystalline cohomology of abelian schemes", "author": "Sudip Pandit", "published": "Mon, 04 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.00713", "summary": "arXiv:2605.00713v1 Announce Type: new \nAbstract: We provide an explicit description of the smallest filtered sub-isocrystal generated by the Hodge filtered piece of the crystalline cohomology for an abelian scheme over a $p$-adic ring. Our method is based on the theory of arithmetic jet spaces and delta characters associated to the abelian scheme, introduced by Buium and later studied by Borger and Saha using a functor of points approach. In particular, we prove that the delta isocrystal constructed by Borger and Saha is indeed isomorphic to the fundamental smallest sub-isocrystal of the crystalline cohomology in the category of filtered $F$-isocrystals. As an application, we establish a comparison isomorphism between the delta isocrystal and the crystalline cohomology of abelian schemes, which is governed by the group of order $1$ delta characters of the abelian scheme.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2605.00713" target="_blank">Delta characters and crystalline cohomology of abelian schemes</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sudip Pandit</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 04 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.00713" target="_blank">https://arxiv.org/abs/2605.00713</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We provide an explicit description of the smallest filtered sub-isocrystal generated by the Hodge filtered piece of the crystalline cohomology for an abelian scheme over a $p$-adic ring. Our method is based on the theory of arithmetic jet spaces and delta characters associated to the abelian scheme, introduced by Buium and later studied by Borger and Saha using a functor of points approach. In particular, we prove that the delta isocrystal constructed by Borger and Saha is indeed isomorphic to the fundamental smallest sub-isocrystal of the crystalline cohomology in the category of filtered $F$-isocrystals. As an application, we establish a comparison isomorphism between the delta isocrystal and the crystalline cohomology of abelian schemes, which is governed by the group of order $1$ delta characters of the abelian scheme.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "Trace ideals of exterior powers of the module of differentials", "author": "Ryo Ishizuka, Sora Miyashita", "published": "Mon, 04 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.00418", "summary": "arXiv:2605.00418v1 Announce Type: cross \nAbstract: For each $i \\geq 0$, we study the trace ideal of the $i$-th exterior power of the module of differentials. We show that these ideals characterize the polynomial rank of graded rings and the formal power series rank of complete local rings, namely the maximal number of variables for a polynomial or formal power series extension over a subring. For the top exterior power, we introduce the top differential trace and prove that it precisely defines the singular locus of reduced equidimensional local or graded rings. Motivated by this, we introduce and investigate nearly regular rings, which are Noetherian rings whose top differential trace contains the maximal ideal.", "number": 10, "labels": [{"name": "privacy", "color": "#ff69b4"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2605.00418" target="_blank">Trace ideals of exterior powers of the module of differentials</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #ff69b4;">privacy</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ryo Ishizuka, Sora Miyashita</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 04 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.00418" target="_blank">https://arxiv.org/abs/2605.00418</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                For each $i \geq 0$, we study the trace ideal of the $i$-th exterior power of the module of differentials. We show that these ideals characterize the polynomial rank of graded rings and the formal power series rank of complete local rings, namely the maximal number of variables for a polynomial or formal power series extension over a subring. For the top exterior power, we introduce the top differential trace and prove that it precisely defines the singular locus of reduced equidimensional local or graded rings. Motivated by this, we introduce and investigate nearly regular rings, which are Noetherian rings whose top differential trace contains the maximal ideal.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "The Hurwitz sum-of-squares problem depends on the base field", "author": "Chi Zhang, Haoran Zhu", "published": "Mon, 04 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.00590", "summary": "arXiv:2605.00590v1 Announce Type: cross \nAbstract: We show that the Hurwitz problem for sums of squares can depend on the base field. More precisely, we construct an explicit formula of type $[12,12,18]$ over every field of characteristic different from $2$ in which $-1$ is a square, whereas no such formula exists over any formally real field. This settles, in the negative, a longstanding conjecture of Shapiro. In particular, a formula of this type exists over $\\mathbb Q(i)$ and over $\\mathbb C$, but not over $\\mathbb Q$ or over $\\mathbb R$.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2605.00590" target="_blank">The Hurwitz sum-of-squares problem depends on the base field</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Chi Zhang, Haoran Zhu</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 04 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.00590" target="_blank">https://arxiv.org/abs/2605.00590</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We show that the Hurwitz problem for sums of squares can depend on the base field. More precisely, we construct an explicit formula of type $[12,12,18]$ over every field of characteristic different from $2$ in which $-1$ is a square, whereas no such formula exists over any formally real field. This settles, in the negative, a longstanding conjecture of Shapiro. In particular, a formula of this type exists over $\mathbb Q(i)$ and over $\mathbb C$, but not over $\mathbb Q$ or over $\mathbb R$.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "Curves on surfaces and moduli of associative algebras", "author": "Yanki Lekili", "published": "Mon, 04 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.00715", "summary": "arXiv:2605.00715v1 Announce Type: cross \nAbstract: Given an immersion of a circle in a punctured surface $\\Sigma$, we give an explicit (and finite) computation of the $A_\\infty$-algebra associated with this curve when viewed as an object in a (relative) Fukaya category of $\\Sigma$ in terms of the signed Gauss word recording the double points in a traversal of the curve and the visible polygons that it bounds in $\\Sigma$. We illustrate our computational technique by fully determining the $A_\\infty$-products for immersions with up to three self-intersections. In particular, it is proved that all associative algebras of dimension $\\leq 4$ except one, over an algebraically closed field, can be realized as the (degree 0) endomorphism algebra of some Lagrangian immersion of a circle equipped with a bounding cochain computed in some relative Fukaya category $\\mathcal{F}(\\Sigma,D)$.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2605.00715" target="_blank">Curves on surfaces and moduli of associative algebras</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yanki Lekili</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 04 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.00715" target="_blank">https://arxiv.org/abs/2605.00715</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Given an immersion of a circle in a punctured surface $\Sigma$, we give an explicit (and finite) computation of the $A_\infty$-algebra associated with this curve when viewed as an object in a (relative) Fukaya category of $\Sigma$ in terms of the signed Gauss word recording the double points in a traversal of the curve and the visible polygons that it bounds in $\Sigma$. We illustrate our computational technique by fully determining the $A_\infty$-products for immersions with up to three self-intersections. In particular, it is proved that all associative algebras of dimension $\leq 4$ except one, over an algebraically closed field, can be realized as the (degree 0) endomorphism algebra of some Lagrangian immersion of a circle equipped with a bounding cochain computed in some relative Fukaya category $\mathcal{F}(\Sigma,D)$.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "A note on Zilber-Pink in $Y(1)^n$", "author": "Georgios Papas", "published": "Mon, 04 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.00766", "summary": "arXiv:2605.00766v1 Announce Type: cross \nAbstract: Building on \\cite{daworrpap,dawpap}, we prove two Zilber-Pink-type statements in $Y(1)^n$, assuming a weak form of the Lang-Trotter conjecture for pairs of elliptic curves.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2605.00766" target="_blank">A note on Zilber-Pink in $Y(1)^n$</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Georgios Papas</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 04 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.00766" target="_blank">https://arxiv.org/abs/2605.00766</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Building on \cite{daworrpap,dawpap}, we prove two Zilber-Pink-type statements in $Y(1)^n$, assuming a weak form of the Lang-Trotter conjecture for pairs of elliptic curves.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Finite symplectic automorphism groups of supersingular K3 surfaces", "author": "Hisanori Ohashi, Matthias Sch\\\"utt", "published": "Mon, 04 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2405.06341", "summary": "arXiv:2405.06341v2 Announce Type: replace \nAbstract: We give a complete classification of finite groups acting symplectically on supersingular K3 surfaces of Artin invariant one. Using work of Dolgachev and Keum, this provides the full classification of tame finite symplectic automorphism groups on any K3 surface, and in particular of all finite symplectic automorphism groups on K3 surfaces in characteristic p&gt;11.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2405.06341" target="_blank">Finite symplectic automorphism groups of supersingular K3 surfaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Hisanori Ohashi, Matthias Sch\"utt</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 04 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2405.06341" target="_blank">https://arxiv.org/abs/2405.06341</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We give a complete classification of finite groups acting symplectically on supersingular K3 surfaces of Artin invariant one. Using work of Dolgachev and Keum, this provides the full classification of tame finite symplectic automorphism groups on any K3 surface, and in particular of all finite symplectic automorphism groups on K3 surfaces in characteristic p&gt;11.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "A Semi-Orthogonal Decomposition Theorem for Weighted Blowups", "author": "Oliver Li", "published": "Mon, 04 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2501.08624", "summary": "arXiv:2501.08624v3 Announce Type: replace \nAbstract: We establish a semi-orthogonal decomposition for the weighted blowup of an algebraic stack along a Koszul-regular weighted centre, generalising the classic result of Orlov. Our approach is based on the work of Bergh-Schn\\\"urer.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2501.08624" target="_blank">A Semi-Orthogonal Decomposition Theorem for Weighted Blowups</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Oliver Li</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 04 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2501.08624" target="_blank">https://arxiv.org/abs/2501.08624</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We establish a semi-orthogonal decomposition for the weighted blowup of an algebraic stack along a Koszul-regular weighted centre, generalising the classic result of Orlov. Our approach is based on the work of Bergh-Schn\"urer.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "The essential and Cremona dimensions of a group", "author": "Igor Dolgachev", "published": "Mon, 04 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2507.15096", "summary": "arXiv:2507.15096v3 Announce Type: replace \nAbstract: The Cremona dimension of a group $G$ is the minimal $n$ such that $G$ is isomorphic to a subgroup of the Cremona group of birational transformations of an $n$-dimensional rational variety. In this survey article, we give many examples that gives evidence to the conjecture that the Cremona dimension of a finite group over the field of complex numbers is less than or equal to the essential dimension of the group.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2507.15096" target="_blank">The essential and Cremona dimensions of a group</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Igor Dolgachev</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 04 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2507.15096" target="_blank">https://arxiv.org/abs/2507.15096</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The Cremona dimension of a group $G$ is the minimal $n$ such that $G$ is isomorphic to a subgroup of the Cremona group of birational transformations of an $n$-dimensional rational variety. In this survey article, we give many examples that gives evidence to the conjecture that the Cremona dimension of a finite group over the field of complex numbers is less than or equal to the essential dimension of the group.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "Geometric classification of primes modulo a (bend) congruence", "author": "Netanel Friedenberg, Kalina Mincheva", "published": "Mon, 04 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.25953", "summary": "arXiv:2603.25953v2 Announce Type: replace \nAbstract: In this paper we continue the program to develop the algebraic foundations of tropical (algebraic) geometry. We give strong characterizations of prime congruences containing a given congruence on a toric semiring. We give four applications of this result. (1) We prove an analogue of the strong Nullstellensatz for congruences with finite tropical basis. This extends the existing result of Jo\\'o-Mincheva to cases, such as the bend congruence of a tropical(ized) ideal, where the congruence is not finitely generated. (2) We show that, if $I$ is the ideal of an affine variety not contained in the coordinate hyperplanes, then $\\mathbb{T}[x_1, \\dots, x_n]/\\sqrt{\\operatorname{Bend}(\\operatorname{trop} I)}$ is cancellative. This result has applications to the integral closure (as per Tolliver) of $\\mathbb{T}[x_1, \\dots, x_n]/\\operatorname{Bend}(\\operatorname{trop} I)$ which we explore in a forthcoming paper. (3) We show that $\\mathbb{T}[x_1, \\dots, x_n]/\\sqrt{\\operatorname{Bend}(\\operatorname{trop} I)}$ is the tropical function semiring on $\\operatorname{trop} V(I)$, which creates a bridge between the algebraic approach to non-embedded tropicalization in the work of J. Song and the bend congruence approach of Giansiracusa-Giansiracusa and Maclagan-Rinc\\'on. (4) As a consequence of one of our lemmas, we describe the closure of a polyhedron in a tropical toric variety even when the polyhedron is not compatible with the fan defining the tropical toric variety.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2603.25953" target="_blank">Geometric classification of primes modulo a (bend) congruence</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Netanel Friedenberg, Kalina Mincheva</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 04 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.25953" target="_blank">https://arxiv.org/abs/2603.25953</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper we continue the program to develop the algebraic foundations of tropical (algebraic) geometry. We give strong characterizations of prime congruences containing a given congruence on a toric semiring. We give four applications of this result. (1) We prove an analogue of the strong Nullstellensatz for congruences with finite tropical basis. This extends the existing result of Jo\'o-Mincheva to cases, such as the bend congruence of a tropical(ized) ideal, where the congruence is not finitely generated. (2) We show that, if $I$ is the ideal of an affine variety not contained in the coordinate hyperplanes, then $\mathbb{T}[x_1, \dots, x_n]/\sqrt{\operatorname{Bend}(\operatorname{trop} I)}$ is cancellative. This result has applications to the integral closure (as per Tolliver) of $\mathbb{T}[x_1, \dots, x_n]/\operatorname{Bend}(\operatorname{trop} I)$ which we explore in a forthcoming paper. (3) We show that $\mathbb{T}[x_1, \dots, x_n]/\sqrt{\operatorname{Bend}(\operatorname{trop} I)}$ is the tropical function semiring on $\operatorname{trop} V(I)$, which creates a bridge between the algebraic approach to non-embedded tropicalization in the work of J. Song and the bend congruence approach of Giansiracusa-Giansiracusa and Maclagan-Rinc\'on. (4) As a consequence of one of our lemmas, we describe the closure of a polyhedron in a tropical toric variety even when the polyhedron is not compatible with the fan defining the tropical toric variety.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "The generic crystallographic phase retrieval problem", "author": "Dan Edidin, Arun Suresh", "published": "Mon, 04 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2307.06835", "summary": "arXiv:2307.06835v3 Announce Type: replace-cross \nAbstract: In this paper we consider the problem of recovering a signal $x \\in \\mathbb{R}^N$ from its power spectrum assuming that the signal is sparse with respect to a generic basis for $\\mathbb{R}^N$. Our main result is that if the sparsity level is at most $\\sim\\! N/2$ in this basis then the generic sparse vector is uniquely determined up to sign from its power spectrum. We also prove that if the sparsity level is $\\sim\\! N/4$ then every sparse vector is determined up to sign from its power spectrum. Analogous results are also obtained for the power spectrum of a vector in $\\mathbb{C}^N$ which extend earlier results of Wang and Xu \\cite{arXiv:1310.0873}.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2307.06835" target="_blank">The generic crystallographic phase retrieval problem</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Dan Edidin, Arun Suresh</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 04 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2307.06835" target="_blank">https://arxiv.org/abs/2307.06835</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper we consider the problem of recovering a signal $x \in \mathbb{R}^N$ from its power spectrum assuming that the signal is sparse with respect to a generic basis for $\mathbb{R}^N$. Our main result is that if the sparsity level is at most $\sim\! N/2$ in this basis then the generic sparse vector is uniquely determined up to sign from its power spectrum. We also prove that if the sparsity level is $\sim\! N/4$ then every sparse vector is determined up to sign from its power spectrum. Analogous results are also obtained for the power spectrum of a vector in $\mathbb{C}^N$ which extend earlier results of Wang and Xu \cite{arXiv:1310.0873}.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Dynamical Mordell-Lang problem for automorphisms of surfaces in positive characteristic", "author": "Junyi Xie, She Yang", "published": "Mon, 04 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2504.02295", "summary": "arXiv:2504.02295v2 Announce Type: replace-cross \nAbstract: We solve the dynamical Mordell-Lang problem in positive characteristic for automorphisms of projective surfaces.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2504.02295" target="_blank">Dynamical Mordell-Lang problem for automorphisms of surfaces in positive characteristic</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Junyi Xie, She Yang</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 04 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2504.02295" target="_blank">https://arxiv.org/abs/2504.02295</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We solve the dynamical Mordell-Lang problem in positive characteristic for automorphisms of projective surfaces.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "Hypergeometric decomposition of Delsarte K3 pencils", "author": "Rachel Davis, Jessamyn Dukes, Thais Gomes Ribeiro, Eli Orvis, Adriana Salerno, Leah Sturman, Ursula Whitcher", "published": "Mon, 04 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2508.15049", "summary": "arXiv:2508.15049v3 Announce Type: replace-cross \nAbstract: We study five pencils of projective quartic Delsarte K3 surfaces. Over finite fields, we give explicit formulas for the point counts of each family, written in terms of hypergeometric sums. Over the complex numbers, we match the periods of the corresponding family with hypergeometric differential operators and series. We also obtain a decomposition of the $L$-function of each pencil in terms of hypergeometric $L$-series and Dedekind zeta functions. This gives an explicit description of the hypergeometric motives geometrically realised by each pencil.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2508.15049" target="_blank">Hypergeometric decomposition of Delsarte K3 pencils</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Rachel Davis, Jessamyn Dukes, Thais Gomes Ribeiro, Eli Orvis, Adriana Salerno, Leah Sturman, Ursula Whitcher</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 04 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2508.15049" target="_blank">https://arxiv.org/abs/2508.15049</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study five pencils of projective quartic Delsarte K3 surfaces. Over finite fields, we give explicit formulas for the point counts of each family, written in terms of hypergeometric sums. Over the complex numbers, we match the periods of the corresponding family with hypergeometric differential operators and series. We also obtain a decomposition of the $L$-function of each pencil in terms of hypergeometric $L$-series and Dedekind zeta functions. This gives an explicit description of the hypergeometric motives geometrically realised by each pencil.
+            </div>
+        </div>
+        <div class="paper" id="paper-21">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-21" data-paper-data='{"title": "Faithful perversities", "author": "Alessio Cipriani, Jon Woolf", "published": "Mon, 04 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.25465", "summary": "arXiv:2604.25465v2 Announce Type: replace-cross \nAbstract: We show that the faithful highest weight hearts in an algebraic triangulated category are the serially faithful glued hearts, equivalently the hearts containing a dual pair of full exceptional collections in the sense of Bodzenta--Bondal (arXiv:2601.22004). We then characterise faithful highest weight categories of perverse sheaves on topologically stratified spaces algebraically, in terms of the exactness of certain functors, and topologically, in terms of the vanishing of certain cohomology groups of pairwise links.\n  We prove that the global dimension of a faithful category of perverse sheaves on a topologically stratified space $X$ with finitely many strata is bounded by the dimension of $X$. Finally, we show that in this setting the hypercohomology of a perverse sheaf can be computed from a projective resolution of the constant sheaf, and conversely that the multiplicities of the terms in a minimal projective resolution of the constant sheaf can be computed as intersection cohomology groups.", "number": 21, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#21</span>
+                <a href="https://arxiv.org/abs/2604.25465" target="_blank">Faithful perversities</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Alessio Cipriani, Jon Woolf</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 04 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.25465" target="_blank">https://arxiv.org/abs/2604.25465</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We show that the faithful highest weight hearts in an algebraic triangulated category are the serially faithful glued hearts, equivalently the hearts containing a dual pair of full exceptional collections in the sense of Bodzenta--Bondal (arXiv:2601.22004). We then characterise faithful highest weight categories of perverse sheaves on topologically stratified spaces algebraically, in terms of the exactness of certain functors, and topologically, in terms of the vanishing of certain cohomology groups of pairwise links.
+  We prove that the global dimension of a faithful category of perverse sheaves on a topologically stratified space $X$ with finitely many strata is bounded by the dimension of $X$. Finally, we show that in this setting the hypercohomology of a perverse sheaf can be computed from a projective resolution of the constant sheaf, and conversely that the multiplicities of the terms in a minimal projective resolution of the constant sheaf can be computed as intersection cohomology groups.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-05-04 11:08:22
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>
