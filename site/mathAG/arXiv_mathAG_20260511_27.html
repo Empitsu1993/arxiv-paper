@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Mon, 11 May 2026 04:00:10 +0000<br>
+        <strong>論文数:</strong> 27件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Corrigendum to `Evaluation of motivic functions, non-nullity, and integrability in fibers', Advances in Mathematics, Vol. 409, Part A, Paper No. 108635, 29 pages, doi:10.1016/j.aim.2022.108635 (2022)</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">The Local Bourbaki Degree of a Plane Projective Curve</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Weight of the De Rham-Betti Structures of Abelian Varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">The Structure of $C^\infty$-Superschemes</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">Modularity of Feynman Integrals and Factorization of Appell F2 Systems</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">Geometry of weak contact conics to irreducible quartics with 2 nodes and 1 cusp via rational elliptic surfaces and Zariski pairs</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">The Isomorphism Classes of the Surfaces $x_1^{a_1} + x_2^{a_2} + x_3^{a_3} + 1 = 0$</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Relative $\mathbb{A}^1$-Contractibility of Smooth Schemes</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">Root bounds of vertical systems using tropical geometry</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">Homogeneous pre-foliations of co-degree one and degree four on the projective plane</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">Adjoint test modules along Cohen--Macaulay morphisms</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">Tensor product surfaces and graded syzygies</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">On Bands and Limit Theorems in Tropical Geometry</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Finite order symplectic birational self-maps on Kummer-type manifolds</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Analytical solutions for some quadratic ODEs found via linear rational eigenfunctions and the rational eigenfunction variety</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">Genus drop involving non-hyperelliptic curves in Feynman integrals</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">Asymptotics of small eigenvalues on degenerations of K\"ahler manifolds</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">The limits of Kahler manifolds under holomorphic deformations</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">A strong counterexample to the log canonical Beauville--Bogomolov decomposition</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">Deformation rigidity for projective manifolds and isotriviality of smooth families</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-21" onchange="updateSelectedCount()">
+            <span class="title-number">21.</span>
+            <a href="#paper-21">Isoresidual curves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-22" onchange="updateSelectedCount()">
+            <span class="title-number">22.</span>
+            <a href="#paper-22">Abelian varieties analogs of two results about algebraic curves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-23" onchange="updateSelectedCount()">
+            <span class="title-number">23.</span>
+            <a href="#paper-23">Del Pezzo surfaces of degree one and examples of Zariski multiples</a>
+            <span class="title-label-badge" style="background-color: #9b59b6;">del Pezzo</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-24" onchange="updateSelectedCount()">
+            <span class="title-number">24.</span>
+            <a href="#paper-24">Combinatorial Nonresonance Theorems for Hyperplane Arrangement Complements</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-25" onchange="updateSelectedCount()">
+            <span class="title-number">25.</span>
+            <a href="#paper-25">Height arguments toward the dynamical Mordell-Lang problem in arbitrary characteristic</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-26" onchange="updateSelectedCount()">
+            <span class="title-number">26.</span>
+            <a href="#paper-26">The Extended Alpha Group Dynamic Mapping</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-27" onchange="updateSelectedCount()">
+            <span class="title-number">27.</span>
+            <a href="#paper-27">Bounded core partitions and Borel-Weil-Bott</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Corrigendum to `Evaluation of motivic functions, non-nullity, and integrability in fibers', Advances in Mathematics, Vol. 409, Part A, Paper No. 108635, 29 pages, doi:10.1016/j.aim.2022.108635 (2022)", "author": "Raf Cluckers, Immanuel Halupczok", "published": "Mon, 11 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.06674", "summary": "arXiv:2605.06674v1 Announce Type: new \nAbstract: We correct the statements and proofs of the (auxiliary) Propositions 4.1 and 4.2 of our paper `Evaluation of motivic functions, non-nullity, and integrability in fibers' in Advances in Mathematics, Vol. 409, Part A, Paper No. 108635, 29 pages (2022), and we explain how the proofs of the main results can be adapted to work with those corrected propositions.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2605.06674" target="_blank">Corrigendum to `Evaluation of motivic functions, non-nullity, and integrability in fibers', Advances in Mathematics, Vol. 409, Part A, Paper No. 108635, 29 pages, doi:10.1016/j.aim.2022.108635 (2022)</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Raf Cluckers, Immanuel Halupczok</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 11 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.06674" target="_blank">https://arxiv.org/abs/2605.06674</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We correct the statements and proofs of the (auxiliary) Propositions 4.1 and 4.2 of our paper `Evaluation of motivic functions, non-nullity, and integrability in fibers' in Advances in Mathematics, Vol. 409, Part A, Paper No. 108635, 29 pages (2022), and we explain how the proofs of the main results can be adapted to work with those corrected propositions.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "The Local Bourbaki Degree of a Plane Projective Curve", "author": "Roberto Alvarenga, Murillo Lozano, Parham Salehyan", "published": "Mon, 11 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.06956", "summary": "arXiv:2605.06956v1 Announce Type: new \nAbstract: The Bourbaki degree of a plane projective curve $F$, denoted by $\\mathrm{Bour}(F)$, was introduced in \\cite{Marcos} by Jardim, Nejad and Simis. It is defined as the degree of $R/I_\\epsilon$, where $R = k[x,y,z]$ is the graded polynomial ring, with $k$ algebraically closed, and $I_\\epsilon \\subseteq R$ is the Bourbaki ideal associated with a minimal generator $\\epsilon$ of the module of first syzygies of the Jacobian ideal $J_F$. In this work, we propose the definition of the local Bourbaki degree at a point $P \\in \\mathbb{P}^2$, denoted by $\\mathrm{Bour}_P(F)$, and prove that $\\mathrm{Bour}(F) = \\sum_{P \\in \\mathbb{P}^2}\\mathrm{Bour}_P(F).$\n  Furthermore, we present results that follow from this local definition, which are instrumental in determining the Bourbaki degree and in establishing whether a curve is (nearly) free. In addition, we provide examples of computing the Bourbaki degree via the local formula - an approach that is computationally advantageous, as it, generically, demands fewer calculations.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2605.06956" target="_blank">The Local Bourbaki Degree of a Plane Projective Curve</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Roberto Alvarenga, Murillo Lozano, Parham Salehyan</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 11 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.06956" target="_blank">https://arxiv.org/abs/2605.06956</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The Bourbaki degree of a plane projective curve $F$, denoted by $\mathrm{Bour}(F)$, was introduced in \cite{Marcos} by Jardim, Nejad and Simis. It is defined as the degree of $R/I_\epsilon$, where $R = k[x,y,z]$ is the graded polynomial ring, with $k$ algebraically closed, and $I_\epsilon \subseteq R$ is the Bourbaki ideal associated with a minimal generator $\epsilon$ of the module of first syzygies of the Jacobian ideal $J_F$. In this work, we propose the definition of the local Bourbaki degree at a point $P \in \mathbb{P}^2$, denoted by $\mathrm{Bour}_P(F)$, and prove that $\mathrm{Bour}(F) = \sum_{P \in \mathbb{P}^2}\mathrm{Bour}_P(F).$
+  Furthermore, we present results that follow from this local definition, which are instrumental in determining the Bourbaki degree and in establishing whether a curve is (nearly) free. In addition, we provide examples of computing the Bourbaki degree via the local formula - an approach that is computationally advantageous, as it, generically, demands fewer calculations.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Weight of the De Rham-Betti Structures of Abelian Varieties", "author": "Zekun Ji", "published": "Mon, 11 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.07009", "summary": "arXiv:2605.07009v1 Announce Type: new \nAbstract: In this note, we prove that for any abelian variety defined over $\\overline{\\mathbb{Q}}$, its de Rham-Betti (dRB) group necessarily contains $\\mathbb{G}_{m}$ as the group of homotheties. Consequently, this rules out the existence of non-zero dRB classes in odd-degree cohomology groups of abelian varieties over $\\overline{\\mathbb{Q}}$. This generalises results of the first part of arXiv:2511.01072.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2605.07009" target="_blank">Weight of the De Rham-Betti Structures of Abelian Varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Zekun Ji</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 11 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.07009" target="_blank">https://arxiv.org/abs/2605.07009</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this note, we prove that for any abelian variety defined over $\overline{\mathbb{Q}}$, its de Rham-Betti (dRB) group necessarily contains $\mathbb{G}_{m}$ as the group of homotheties. Consequently, this rules out the existence of non-zero dRB classes in odd-degree cohomology groups of abelian varieties over $\overline{\mathbb{Q}}$. This generalises results of the first part of arXiv:2511.01072.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "The Structure of $C^\\infty$-Superschemes", "author": "Cristian Danilo Olarte, Pedro Rizzo, Alexander Torres-Gomez", "published": "Mon, 11 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.07169", "summary": "arXiv:2605.07169v1 Announce Type: new \nAbstract: This paper establishes a structural generalization of Batchelor's theorem within the framework of $C^\\infty$-superschemes. Our main result proves that any Batchelor space satisfies a global splitness condition, establishing an isomorphism between the structure sheaf and its associated graded sheaf. Although this isomorphism is non-canonical, the existence of a splitting endows the structure sheaf with a natural $\\mathbb{Z}_{\\geq 0}$-grading. This grading is shown to be equivalent to the data of an even superderivation, which we term an Euler vector field. Consequently, global splittings of $C^\\infty$-superspaces can be characterized in terms of Euler vector fields, providing a differential-geometric formulation of the splitting.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2605.07169" target="_blank">The Structure of $C^\infty$-Superschemes</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Cristian Danilo Olarte, Pedro Rizzo, Alexander Torres-Gomez</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 11 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.07169" target="_blank">https://arxiv.org/abs/2605.07169</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This paper establishes a structural generalization of Batchelor's theorem within the framework of $C^\infty$-superschemes. Our main result proves that any Batchelor space satisfies a global splitness condition, establishing an isomorphism between the structure sheaf and its associated graded sheaf. Although this isomorphism is non-canonical, the existence of a splitting endows the structure sheaf with a natural $\mathbb{Z}_{\geq 0}$-grading. This grading is shown to be equivalent to the data of an even superderivation, which we term an Euler vector field. Consequently, global splittings of $C^\infty$-superspaces can be characterized in terms of Euler vector fields, providing a differential-geometric formulation of the splitting.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "Modularity of Feynman Integrals and Factorization of Appell F2 Systems", "author": "Murad Alim, Filippo La Mantia", "published": "Mon, 11 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.07431", "summary": "arXiv:2605.07431v1 Announce Type: new \nAbstract: Certain Feynman integrals can be expressed as periods of differential forms on Calabi--Yau manifolds. We provide a mathematical proof of a result of Duhr and Maggio on the modularity of the two-dimensional conformal traintrack integral. Our approach is based on a factorization of the associated Picard-Fuchs system into a tensor product of Gauss hypergeometric systems via a gauge transformation due to Clingher, Doran and Malmendier.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2605.07431" target="_blank">Modularity of Feynman Integrals and Factorization of Appell F2 Systems</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Murad Alim, Filippo La Mantia</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 11 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.07431" target="_blank">https://arxiv.org/abs/2605.07431</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Certain Feynman integrals can be expressed as periods of differential forms on Calabi--Yau manifolds. We provide a mathematical proof of a result of Duhr and Maggio on the modularity of the two-dimensional conformal traintrack integral. Our approach is based on a factorization of the associated Picard-Fuchs system into a tensor product of Gauss hypergeometric systems via a gauge transformation due to Clingher, Doran and Malmendier.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "Geometry of weak contact conics to irreducible quartics with 2 nodes and 1 cusp via rational elliptic surfaces and Zariski pairs", "author": "Khulan Tumenbayar", "published": "Mon, 11 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.07493", "summary": "arXiv:2605.07493v1 Announce Type: new \nAbstract: Let $\\mathcal{Q}$ be an irreducible quartic with two nodes and one cusp as its singularities and let $\\mathcal{C}$ be a conic such that the intersection multiplicity at each point of $\\mathcal{C} \\cap \\mathcal{Q}$ is even and $\\mathcal{C} \\cap \\mathcal{Q}$ contain at least one smooth point $z_o$ of $\\mathcal{Q}$. In this paper, for every $\\mathcal{Q}$ we find all possible conics $\\mathcal{C}$ as above via studying geometry of $\\mathcal{C}$ and $\\mathcal{Q}$ through that of integral sections of a rational elliptic surface which canonically arises from $\\mathcal{Q}$ and $z_o \\in \\mathcal{C} \\cap \\mathcal{Q}$. As an application, we construct Zariski pairs of degree 7 and degree 8, whose irreducible components consist of $\\mathcal{Q}$, $\\mathcal{C}$ and line passing through two of the singular points of $\\mathcal{Q}$ .", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2605.07493" target="_blank">Geometry of weak contact conics to irreducible quartics with 2 nodes and 1 cusp via rational elliptic surfaces and Zariski pairs</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Khulan Tumenbayar</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 11 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.07493" target="_blank">https://arxiv.org/abs/2605.07493</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $\mathcal{Q}$ be an irreducible quartic with two nodes and one cusp as its singularities and let $\mathcal{C}$ be a conic such that the intersection multiplicity at each point of $\mathcal{C} \cap \mathcal{Q}$ is even and $\mathcal{C} \cap \mathcal{Q}$ contain at least one smooth point $z_o$ of $\mathcal{Q}$. In this paper, for every $\mathcal{Q}$ we find all possible conics $\mathcal{C}$ as above via studying geometry of $\mathcal{C}$ and $\mathcal{Q}$ through that of integral sections of a rational elliptic surface which canonically arises from $\mathcal{Q}$ and $z_o \in \mathcal{C} \cap \mathcal{Q}$. As an application, we construct Zariski pairs of degree 7 and degree 8, whose irreducible components consist of $\mathcal{Q}$, $\mathcal{C}$ and line passing through two of the singular points of $\mathcal{Q}$ .
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "The Isomorphism Classes of the Surfaces $x_1^{a_1} + x_2^{a_2} + x_3^{a_3} + 1 = 0$", "author": "Michael Chitayat, Buddhadev Hajra", "published": "Mon, 11 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.07617", "summary": "arXiv:2605.07617v1 Announce Type: new \nAbstract: Let $f = x_1^{a_1} + x_2^{a_2} + x_3^{a_3} + 1 \\in \\mathbb{C}[x_1,x_2,x_3]$ and let $g = y_1^{b_1} + y_2^{b_2} + y_3^{b_3} + 1 \\in \\mathbb{C}[y_1,y_2,y_3]$ where $a_1,a_2,a_3,b_1,b_2,b_3 \\geq 2$. We prove that the surfaces $V(f) \\subset \\mathbb{A}^3$ and $V(g) \\subset \\mathbb{A}^3$ are isomorphic if and only if $(a_1,a_2,a_3) = (b_1,b_2,b_3)$ up to a permutation of the entries.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2605.07617" target="_blank">The Isomorphism Classes of the Surfaces $x_1^{a_1} + x_2^{a_2} + x_3^{a_3} + 1 = 0$</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Michael Chitayat, Buddhadev Hajra</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 11 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.07617" target="_blank">https://arxiv.org/abs/2605.07617</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $f = x_1^{a_1} + x_2^{a_2} + x_3^{a_3} + 1 \in \mathbb{C}[x_1,x_2,x_3]$ and let $g = y_1^{b_1} + y_2^{b_2} + y_3^{b_3} + 1 \in \mathbb{C}[y_1,y_2,y_3]$ where $a_1,a_2,a_3,b_1,b_2,b_3 \geq 2$. We prove that the surfaces $V(f) \subset \mathbb{A}^3$ and $V(g) \subset \mathbb{A}^3$ are isomorphic if and only if $(a_1,a_2,a_3) = (b_1,b_2,b_3)$ up to a permutation of the entries.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Relative $\\mathbb{A}^1$-Contractibility of Smooth Schemes", "author": "Adrien Dubouloz, Krishna Kumar Madhavan Vijayalakshmi, Paul Arne {\\O}stv{\\ae}r", "published": "Mon, 11 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.07638", "summary": "arXiv:2605.07638v1 Announce Type: new \nAbstract: We study smooth morphisms $f \\colon X \\to S$ that are $\\mathbb{A}^1$-contractible in the unstable $\\mathbb{A}^1$-homotopy category $\\mathcal{H}(S)$. For base schemes $S$ of finite Krull dimension, we show that $\\mathbb{A}^1$-contractibility is a fiberwise property: such a morphism is $\\mathbb{A}^1$-contractible if and only if all its geometric fibers are $\\mathbb{A}^1$-contractible. We apply this criterion to $\\mathbb{A}^n$-fiber spaces, obtaining a geometric description of their $\\mathbb{A}^1$-contractibility in terms of local factorizations as towers of torsors under vector bundles, building on results of Asanuma. In low relative dimensions, we establish rigidity results. In relative dimension $1$, $\\mathbb{A}^1$-contractible morphisms over normal bases are precisely Zariski locally trivial $\\mathbb{A}^1$-bundles. In relative dimension $2$, we show that over bases with characteristic zero residue fields, $\\mathbb{A}^1$-contractible morphisms are $\\mathbb{A}^2$-fiber spaces, and we obtain Zariski local triviality under additional hypotheses on the base. We also exhibit counterexamples in positive and mixed characteristic and formulate open problems concerning the existence of exotic $\\mathbb{A}^1$-contractible surfaces.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2605.07638" target="_blank">Relative $\mathbb{A}^1$-Contractibility of Smooth Schemes</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Adrien Dubouloz, Krishna Kumar Madhavan Vijayalakshmi, Paul Arne {\O}stv{\ae}r</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 11 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.07638" target="_blank">https://arxiv.org/abs/2605.07638</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study smooth morphisms $f \colon X \to S$ that are $\mathbb{A}^1$-contractible in the unstable $\mathbb{A}^1$-homotopy category $\mathcal{H}(S)$. For base schemes $S$ of finite Krull dimension, we show that $\mathbb{A}^1$-contractibility is a fiberwise property: such a morphism is $\mathbb{A}^1$-contractible if and only if all its geometric fibers are $\mathbb{A}^1$-contractible. We apply this criterion to $\mathbb{A}^n$-fiber spaces, obtaining a geometric description of their $\mathbb{A}^1$-contractibility in terms of local factorizations as towers of torsors under vector bundles, building on results of Asanuma. In low relative dimensions, we establish rigidity results. In relative dimension $1$, $\mathbb{A}^1$-contractible morphisms over normal bases are precisely Zariski locally trivial $\mathbb{A}^1$-bundles. In relative dimension $2$, we show that over bases with characteristic zero residue fields, $\mathbb{A}^1$-contractible morphisms are $\mathbb{A}^2$-fiber spaces, and we obtain Zariski local triviality under additional hypotheses on the base. We also exhibit counterexamples in positive and mixed characteristic and formulate open problems concerning the existence of exotic $\mathbb{A}^1$-contractible surfaces.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "Root bounds of vertical systems using tropical geometry", "author": "Elisenda Feliu, Paul Alexander Helminck, Oskar Henriksson, Yue Ren, Benjamin Schr\\\"oter, M\\'at\\'e L. Telek", "published": "Mon, 11 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.07645", "summary": "arXiv:2605.07645v1 Announce Type: new \nAbstract: Sparse polynomial systems with vertical coefficient dependencies arise naturally when describing the critical points of optimization problems and, when augmented with linear forms, the steady states of chemical reaction networks. Moreover, any polynomial system is the specialization of such a parametrized system. We prove that the generic number of complex zeros of an augmented vertically parametrized system is the tropical intersection number of a tropical linear space and a classical linear space. In the special case when the matroid of the tropical linear space is cotransversal, we express this number as a mixed volume. We also obtain bounds on the maximal number of positive zeros, which is often the significant number in applications. We derive lower bounds from the number of intersections between positive tropicalizations, and when the positive zeros have toric structure, we provide upper bounds that are simpler and in some cases smaller than the generic root count. The resulting algorithms are implemented in Julia.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2605.07645" target="_blank">Root bounds of vertical systems using tropical geometry</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Elisenda Feliu, Paul Alexander Helminck, Oskar Henriksson, Yue Ren, Benjamin Schr\"oter, M\'at\'e L. Telek</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 11 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.07645" target="_blank">https://arxiv.org/abs/2605.07645</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Sparse polynomial systems with vertical coefficient dependencies arise naturally when describing the critical points of optimization problems and, when augmented with linear forms, the steady states of chemical reaction networks. Moreover, any polynomial system is the specialization of such a parametrized system. We prove that the generic number of complex zeros of an augmented vertically parametrized system is the tropical intersection number of a tropical linear space and a classical linear space. In the special case when the matroid of the tropical linear space is cotransversal, we express this number as a mixed volume. We also obtain bounds on the maximal number of positive zeros, which is often the significant number in applications. We derive lower bounds from the number of intersections between positive tropicalizations, and when the positive zeros have toric structure, we provide upper bounds that are simpler and in some cases smaller than the generic root count. The resulting algorithms are implemented in Julia.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "Homogeneous pre-foliations of co-degree one and degree four on the projective plane", "author": "Carla Pracias, Maycol Falla Luza", "published": "Mon, 11 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.07944", "summary": "arXiv:2605.07944v1 Announce Type: new \nAbstract: We classify, up to projective automorphism, all homogeneous pre-foliations of co-degree one and degree four on the complex projective plane $\\Ptwo$ whose Legendre transform defines a flat $4$-web. The classification is organized according to the type of the underlying homogeneous foliation $\\Hcal$ of degree~$3$, distinguishing the cases $\\deg(\\Tcal_{\\Hcal})=2$, $3$, and~$4$. The case $\\deg(\\Tcal_{\\Hcal})=2$ was treated by Bedrouni, while the cases $\\deg(\\Tcal_{\\Hcal})=3$ and $\\deg(\\Tcal_{\\Hcal})=4$ are completed here. The proof combines Bedrouni's curvature-holomorphy criteria with explicit normal forms and symbolic computation; the result yields a finite list of explicit one-forms, parametrised by the ramification data of the Gauss map of~$\\Hcal$.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2605.07944" target="_blank">Homogeneous pre-foliations of co-degree one and degree four on the projective plane</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Carla Pracias, Maycol Falla Luza</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 11 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.07944" target="_blank">https://arxiv.org/abs/2605.07944</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We classify, up to projective automorphism, all homogeneous pre-foliations of co-degree one and degree four on the complex projective plane $\Ptwo$ whose Legendre transform defines a flat $4$-web. The classification is organized according to the type of the underlying homogeneous foliation $\Hcal$ of degree~$3$, distinguishing the cases $\deg(\Tcal_{\Hcal})=2$, $3$, and~$4$. The case $\deg(\Tcal_{\Hcal})=2$ was treated by Bedrouni, while the cases $\deg(\Tcal_{\Hcal})=3$ and $\deg(\Tcal_{\Hcal})=4$ are completed here. The proof combines Bedrouni's curvature-holomorphy criteria with explicit normal forms and symbolic computation; the result yields a finite list of explicit one-forms, parametrised by the ramification data of the Gauss map of~$\Hcal$.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "Adjoint test modules along Cohen--Macaulay morphisms", "author": "Javier Carvajal-Rojas, Axel St\\\"abler", "published": "Mon, 11 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.07956", "summary": "arXiv:2605.07956v1 Announce Type: new \nAbstract: We provide a transformation rule for adjoint test modules along Cohen--Macaulay maps between Cohen--Macaulay varieties that have $F$-rational geometric fibers. This is, in part, an effective version of Enescu's theorem on the ascent of $F$-rationality under local maps with $F$-rational geometric fibers.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2605.07956" target="_blank">Adjoint test modules along Cohen--Macaulay morphisms</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Javier Carvajal-Rojas, Axel St\"abler</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 11 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.07956" target="_blank">https://arxiv.org/abs/2605.07956</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We provide a transformation rule for adjoint test modules along Cohen--Macaulay maps between Cohen--Macaulay varieties that have $F$-rational geometric fibers. This is, in part, an effective version of Enescu's theorem on the ascent of $F$-rationality under local maps with $F$-rational geometric fibers.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "Tensor product surfaces and graded syzygies", "author": "Matthew Weaver", "published": "Mon, 11 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.07974", "summary": "arXiv:2605.07974v1 Announce Type: new \nAbstract: Let $U\\subseteq H^0(\\mathcal{O}_{\\mathbb{P}^1\\times \\mathbb{P}^1}(a,b))$ be a four-dimensional vector space and consider the rational map $\\phi_U:\\,\\mathbb{P}^1\\times \\mathbb{P}^1 \\dashrightarrow \\mathbb{P}^3$ defined by its basis of bihomogeneous polynomials. The tensor product surface $X_U\\subseteq \\mathbb{P}^3$ is the closed image of $\\phi_U$, and a fundamental problem in this setting is to determine its implicit equation. As these surfaces are ubiquitous within the field of geometric modeling and design, knowledge of their implicit equations is particularly advantageous, allowing for more effective and efficient computations. In this article, we expand upon work of Duarte-Schenck and work of the present author to solve this implicitization problem when the bigraded ideal $I_U$ admits a singly graded syzygy.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2605.07974" target="_blank">Tensor product surfaces and graded syzygies</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Matthew Weaver</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 11 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.07974" target="_blank">https://arxiv.org/abs/2605.07974</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $U\subseteq H^0(\mathcal{O}_{\mathbb{P}^1\times \mathbb{P}^1}(a,b))$ be a four-dimensional vector space and consider the rational map $\phi_U:\,\mathbb{P}^1\times \mathbb{P}^1 \dashrightarrow \mathbb{P}^3$ defined by its basis of bihomogeneous polynomials. The tensor product surface $X_U\subseteq \mathbb{P}^3$ is the closed image of $\phi_U$, and a fundamental problem in this setting is to determine its implicit equation. As these surfaces are ubiquitous within the field of geometric modeling and design, knowledge of their implicit equations is particularly advantageous, allowing for more effective and efficient computations. In this article, we expand upon work of Duarte-Schenck and work of the present author to solve this implicitization problem when the bigraded ideal $I_U$ admits a singly graded syzygy.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "On Bands and Limit Theorems in Tropical Geometry", "author": "Arne Kuhrs, Alejandro Mart\\'inez M\\'endez, Pedro Souza", "published": "Mon, 11 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.07991", "summary": "arXiv:2605.07991v1 Announce Type: new \nAbstract: We review the basic theory of bands and band schemes introduced by Baker-Jin-Lorscheid, which is an algebraic framework for tropicalization, analytification, and $\\mathbb{F}_1$-geometry. For an affine scheme $X$ over a non-Archimedean valued field $k$, one can associate to every affine embedding $\\iota$ of $X$ a naturally defined affine band scheme $Y_\\iota$ whose rational points over the tropical band $\\mathbb{T}$ recover the tropicalization $Trop(X,\\iota)$. We prove that $X$ is the limit of the $Y_\\iota$ in the category of band schemes, thereby obtaining a scheme-theoretic enhancement of Payne's limit theorem. By taking $\\mathbb{T}$-rational points, this recovers Payne's theorem for affine tropicalizations from the perspective of band scheme theory and the same method provides an analogous result in the real tropical setting.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2605.07991" target="_blank">On Bands and Limit Theorems in Tropical Geometry</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Arne Kuhrs, Alejandro Mart\'inez M\'endez, Pedro Souza</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 11 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.07991" target="_blank">https://arxiv.org/abs/2605.07991</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We review the basic theory of bands and band schemes introduced by Baker-Jin-Lorscheid, which is an algebraic framework for tropicalization, analytification, and $\mathbb{F}_1$-geometry. For an affine scheme $X$ over a non-Archimedean valued field $k$, one can associate to every affine embedding $\iota$ of $X$ a naturally defined affine band scheme $Y_\iota$ whose rational points over the tropical band $\mathbb{T}$ recover the tropicalization $Trop(X,\iota)$. We prove that $X$ is the limit of the $Y_\iota$ in the category of band schemes, thereby obtaining a scheme-theoretic enhancement of Payne's limit theorem. By taking $\mathbb{T}$-rational points, this recovers Payne's theorem for affine tropicalizations from the perspective of band scheme theory and the same method provides an analogous result in the real tropical setting.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Finite order symplectic birational self-maps on Kummer-type manifolds", "author": "Yajnaseni Dutta, Dominique Mattei, Stevell Muller, Howard Nuer", "published": "Mon, 11 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.08062", "summary": "arXiv:2605.08062v1 Announce Type: new \nAbstract: A projective hyperk\\\"ahler manifold of Kummer-type is said to be twisted modular if it is birational to the Albanese fiber of a moduli space of twisted sheaves on an abelian surface. We prove that, with the exception of certain cases of Picard rank 3, any projective Kummer-type manifold admitting a finite-order symplectic birational self-map that acts nontrivially on its second cohomology group is twisted modular. We provide a complete characterization of these exceptions in terms of their N\\'eron-Severi lattices. We then investigate symplectic birational self-maps of modular Kummer-type manifolds, determining exactly which Mukai vectors allow the birational transformation induced by crossing the vertical wall, which acts on cohomology as a reflection, to correspond to a finite-order symplectic birational self-map. Additionally, we prove in an appendix several results concerning moduli spaces of twisted sheaves on abelian surfaces which were not readily available in the literature.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2605.08062" target="_blank">Finite order symplectic birational self-maps on Kummer-type manifolds</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yajnaseni Dutta, Dominique Mattei, Stevell Muller, Howard Nuer</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 11 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.08062" target="_blank">https://arxiv.org/abs/2605.08062</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                A projective hyperk\"ahler manifold of Kummer-type is said to be twisted modular if it is birational to the Albanese fiber of a moduli space of twisted sheaves on an abelian surface. We prove that, with the exception of certain cases of Picard rank 3, any projective Kummer-type manifold admitting a finite-order symplectic birational self-map that acts nontrivially on its second cohomology group is twisted modular. We provide a complete characterization of these exceptions in terms of their N\'eron-Severi lattices. We then investigate symplectic birational self-maps of modular Kummer-type manifolds, determining exactly which Mukai vectors allow the birational transformation induced by crossing the vertical wall, which acts on cohomology as a reflection, to correspond to a finite-order symplectic birational self-map. Additionally, we prove in an appendix several results concerning moduli spaces of twisted sheaves on abelian surfaces which were not readily available in the literature.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Analytical solutions for some quadratic ODEs found via linear rational eigenfunctions and the rational eigenfunction variety", "author": "Megan Morrison, Sonja Petrovi\\'c", "published": "Mon, 11 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.06950", "summary": "arXiv:2605.06950v1 Announce Type: cross \nAbstract: Many important systems across biology, engineering, physics, and economics are characterized by polynomial ordinary differential equations (ODEs), yet analytical solutions are rare. We develop a framework for identifying and solving a broad class of two-dimensional quadratic ODEs using linear rational Koopman eigenfunctions. By imposing a linear rational form on the eigenfunctions, we convert the Koopman eigenfunction PDE into a large algebraic system of polynomials. We then study the solutions of this polynomial system that satisfy the ODE restrictions; we call the solution set the rational eigenfunction variety of an ODE system. The nonlinear algebra method uses formal algebraic geometry theory to analyze and solve systems otherwise intractable and to discover relationships between ODE and eigenfunction parameters that must hold to extract eigenfunctions. We identify families of quadratic ODEs that can be solved analytically, characterize their eigenfunction parameters, and use the resulting eigenfunctions to produce closed-form analytical solutions.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2605.06950" target="_blank">Analytical solutions for some quadratic ODEs found via linear rational eigenfunctions and the rational eigenfunction variety</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Megan Morrison, Sonja Petrovi\'c</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 11 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.06950" target="_blank">https://arxiv.org/abs/2605.06950</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Many important systems across biology, engineering, physics, and economics are characterized by polynomial ordinary differential equations (ODEs), yet analytical solutions are rare. We develop a framework for identifying and solving a broad class of two-dimensional quadratic ODEs using linear rational Koopman eigenfunctions. By imposing a linear rational form on the eigenfunctions, we convert the Koopman eigenfunction PDE into a large algebraic system of polynomials. We then study the solutions of this polynomial system that satisfy the ODE restrictions; we call the solution set the rational eigenfunction variety of an ODE system. The nonlinear algebra method uses formal algebraic geometry theory to analyze and solve systems otherwise intractable and to discover relationships between ODE and eigenfunction parameters that must hold to extract eigenfunctions. We identify families of quadratic ODEs that can be solved analytically, characterize their eigenfunction parameters, and use the resulting eigenfunctions to produce closed-form analytical solutions.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "Genus drop involving non-hyperelliptic curves in Feynman integrals", "author": "Feiyu Yang, Jianyu Gong, Yang Zhang", "published": "Mon, 11 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.07729", "summary": "arXiv:2605.07729v1 Announce Type: cross \nAbstract: For both theoretical and phenomenological studies, it is important to analyze the function types of Feynman integrals. The phenomenon of genus drop between different representations of hyperelliptic Feynman integrals was discussed in \\cite{Marzucca2024Genusdrop}. In this paper, we reformulate the extra-involution mechanism of \\cite{Marzucca2024Genusdrop} as a special case of an unramified double covering between algebraic curves, and show that this covering mechanism also explains genus drops accompanied by a curve-type change from non-hyperelliptic to hyperelliptic for a class of three-loop Feynman diagrams. We also demonstrate that within a specific framework, the origin of the discrete spacetime symmetry that leads to the genus drop in hyperelliptic cases is manifest. This work also points out that there exist non-hyperelliptic Feynman integrals that exhibit no apparent genus drop.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2605.07729" target="_blank">Genus drop involving non-hyperelliptic curves in Feynman integrals</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Feiyu Yang, Jianyu Gong, Yang Zhang</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 11 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.07729" target="_blank">https://arxiv.org/abs/2605.07729</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                For both theoretical and phenomenological studies, it is important to analyze the function types of Feynman integrals. The phenomenon of genus drop between different representations of hyperelliptic Feynman integrals was discussed in \cite{Marzucca2024Genusdrop}. In this paper, we reformulate the extra-involution mechanism of \cite{Marzucca2024Genusdrop} as a special case of an unramified double covering between algebraic curves, and show that this covering mechanism also explains genus drops accompanied by a curve-type change from non-hyperelliptic to hyperelliptic for a class of three-loop Feynman diagrams. We also demonstrate that within a specific framework, the origin of the discrete spacetime symmetry that leads to the genus drop in hyperelliptic cases is manifest. This work also points out that there exist non-hyperelliptic Feynman integrals that exhibit no apparent genus drop.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "Asymptotics of small eigenvalues on degenerations of K\\\"ahler manifolds", "author": "Junyu Cao", "published": "Mon, 11 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.08023", "summary": "arXiv:2605.08023v1 Announce Type: cross \nAbstract: We derive the exact asymptotic rates of the small eigenvalues of the Laplacian on one-parameter degenerations of compact K\\\"ahler manifolds equipped with induced background metrics. This generalizes a recent result of Dai and Yoshikawa to higher dimensions. To achieve this, we combine Li's uniform Skoda inequality with the method of auxiliary Monge-Amp\\`ere equations, introduced by Guo--Phong--Song--Sturm--Tong and adapted by Guedj--T\\^o. As an application, we establish estimates for degenerations of compact K\\\"ahler manifolds with reducible singular fibers.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2605.08023" target="_blank">Asymptotics of small eigenvalues on degenerations of K\"ahler manifolds</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Junyu Cao</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 11 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.08023" target="_blank">https://arxiv.org/abs/2605.08023</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We derive the exact asymptotic rates of the small eigenvalues of the Laplacian on one-parameter degenerations of compact K\"ahler manifolds equipped with induced background metrics. This generalizes a recent result of Dai and Yoshikawa to higher dimensions. To achieve this, we combine Li's uniform Skoda inequality with the method of auxiliary Monge-Amp\`ere equations, introduced by Guo--Phong--Song--Sturm--Tong and adapted by Guedj--T\^o. As an application, we establish estimates for degenerations of compact K\"ahler manifolds with reducible singular fibers.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "The limits of Kahler manifolds under holomorphic deformations", "author": "Mu-Lin Li, Wanmin Liu", "published": "Mon, 11 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2406.14076", "summary": "arXiv:2406.14076v3 Announce Type: replace \nAbstract: With some mild assumptions on metric and topology of the central fiber, we prove that the limit of Kahler manifolds under holomorphic deformation is still Kahler.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2406.14076" target="_blank">The limits of Kahler manifolds under holomorphic deformations</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Mu-Lin Li, Wanmin Liu</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 11 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2406.14076" target="_blank">https://arxiv.org/abs/2406.14076</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                With some mild assumptions on metric and topology of the central fiber, we prove that the limit of Kahler manifolds under holomorphic deformation is still Kahler.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "A strong counterexample to the log canonical Beauville--Bogomolov decomposition", "author": "Fabio Bernasconi, Stefano Filipazzi, Zsolt Patakfalvi, Nikolaos Tsakanikas", "published": "Mon, 11 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2407.17260", "summary": "arXiv:2407.17260v4 Announce Type: replace \nAbstract: For every $d \\geq 4$, we construct a $d$-dimensional, log canonical, $K$-trivial variety with the property that two general fibers of its Albanese morphism are not birational. This provides a strong counterexample to the Beauville--Bogomolov decomposition in the log canonical setting. This construction can also be adapted to construct a smooth quasi-projective variety of logarithmic Kodaira dimension 0 whose quasi-Albanese morphism has maximal variation. On the positive side, we show that the Albanese morphism for log canonical pairs with nef anti-canonical class is a locally stable family of pairs.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2407.17260" target="_blank">A strong counterexample to the log canonical Beauville--Bogomolov decomposition</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Fabio Bernasconi, Stefano Filipazzi, Zsolt Patakfalvi, Nikolaos Tsakanikas</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 11 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2407.17260" target="_blank">https://arxiv.org/abs/2407.17260</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                For every $d \geq 4$, we construct a $d$-dimensional, log canonical, $K$-trivial variety with the property that two general fibers of its Albanese morphism are not birational. This provides a strong counterexample to the Beauville--Bogomolov decomposition in the log canonical setting. This construction can also be adapted to construct a smooth quasi-projective variety of logarithmic Kodaira dimension 0 whose quasi-Albanese morphism has maximal variation. On the positive side, we show that the Albanese morphism for log canonical pairs with nef anti-canonical class is a locally stable family of pairs.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "Deformation rigidity for projective manifolds and isotriviality of smooth families", "author": "Mu-Lin Li, Xiao-Lei Liu", "published": "Mon, 11 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2407.18491", "summary": "arXiv:2407.18491v2 Announce Type: replace \nAbstract: Let $\\pi\\cln X\\to \\Delta^m$ be a proper smooth K\\\"ahler morphism from a complex manifold $X$ to the unit polydisc $\\Delta^m$. Suppose the fibers over the complement of a proper analytic subset are biholomorphic to a fixed projective manifold $S$. If the canonical line bundle of $S$ is semiample, then we show that all fibers over $\\Delta^m$ are biholomorphic to $S$. As an application, we obtain that for smooth families where the canonical line bundle of the generic fiber is semiample, birational isotriviality is equivalent to isotriviality. Moreover, we establish a new Parshin-Arakelov type isotriviality criterion.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2407.18491" target="_blank">Deformation rigidity for projective manifolds and isotriviality of smooth families</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Mu-Lin Li, Xiao-Lei Liu</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 11 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2407.18491" target="_blank">https://arxiv.org/abs/2407.18491</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $\pi\cln X\to \Delta^m$ be a proper smooth K\"ahler morphism from a complex manifold $X$ to the unit polydisc $\Delta^m$. Suppose the fibers over the complement of a proper analytic subset are biholomorphic to a fixed projective manifold $S$. If the canonical line bundle of $S$ is semiample, then we show that all fibers over $\Delta^m$ are biholomorphic to $S$. As an application, we obtain that for smooth families where the canonical line bundle of the generic fiber is semiample, birational isotriviality is equivalent to isotriviality. Moreover, we establish a new Parshin-Arakelov type isotriviality criterion.
+            </div>
+        </div>
+        <div class="paper" id="paper-21">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-21" data-paper-data='{"title": "Isoresidual curves", "author": "Dawei Chen, Quentin Gendron, Miguel Prado, Guillaume Tahar", "published": "Mon, 11 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2412.16810", "summary": "arXiv:2412.16810v3 Announce Type: replace \nAbstract: Given a partition $\\mu$ of $-2$, the stratum $\\mathcal{H}(\\mu)$ parametrizes meromorphic differential one-forms on the Riemann sphere $\\mathbb{CP}^{1}$ with~$n$ zeros and $p$ poles of orders prescribed by $\\mu$. The isoresidual fibration is defined by assigning to each differential in $\\mathcal{H}(\\mu)$ its configuration of residues at the poles. In the case of differentials with $n=2$ zeros, generic isoresidual fibers are complex curves endowed with a canonical translation structure, which we describe extensively in this paper. Quantitative characteristics of the translation structure on isoresidual fiber curves, including the orders of the singularities and a period central charge encapsulating the linear dependence of periods on the underlying configuration of residues, provide rich discrete invariants for these fibers. We also determine the Euler characteristic of generic isoresidual fiber curves from intersection-theoretic computations, relying on the multi-scale compactification of strata of differentials. In particular, we describe a wall and chamber structure for the Euler characteristic of generic isoresidual fiber curves in terms of the partition $\\mu$. Additionally, we classify the connected components of generic isoresidual fibers for strata in genus zero with an arbitrary number of zeros.", "number": 21, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#21</span>
+                <a href="https://arxiv.org/abs/2412.16810" target="_blank">Isoresidual curves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Dawei Chen, Quentin Gendron, Miguel Prado, Guillaume Tahar</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 11 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2412.16810" target="_blank">https://arxiv.org/abs/2412.16810</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Given a partition $\mu$ of $-2$, the stratum $\mathcal{H}(\mu)$ parametrizes meromorphic differential one-forms on the Riemann sphere $\mathbb{CP}^{1}$ with~$n$ zeros and $p$ poles of orders prescribed by $\mu$. The isoresidual fibration is defined by assigning to each differential in $\mathcal{H}(\mu)$ its configuration of residues at the poles. In the case of differentials with $n=2$ zeros, generic isoresidual fibers are complex curves endowed with a canonical translation structure, which we describe extensively in this paper. Quantitative characteristics of the translation structure on isoresidual fiber curves, including the orders of the singularities and a period central charge encapsulating the linear dependence of periods on the underlying configuration of residues, provide rich discrete invariants for these fibers. We also determine the Euler characteristic of generic isoresidual fiber curves from intersection-theoretic computations, relying on the multi-scale compactification of strata of differentials. In particular, we describe a wall and chamber structure for the Euler characteristic of generic isoresidual fiber curves in terms of the partition $\mu$. Additionally, we classify the connected components of generic isoresidual fibers for strata in genus zero with an arbitrary number of zeros.
+            </div>
+        </div>
+        <div class="paper" id="paper-22">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-22" data-paper-data='{"title": "Abelian varieties analogs of two results about algebraic curves", "author": "Nelson Alvarado, Giuseppe Pareschi", "published": "Mon, 11 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2502.11288", "summary": "arXiv:2502.11288v3 Announce Type: replace \nAbstract: We characterize decomposable principally polarized abelian varieties of the form $E\\times B$, with $E$ an elliptic curve, in two different ways, which are, surprisingly, completely analogous to classical results of curve theory concerning hyperelliptic curves. The first one is by the failure of a normal generation property, namely the generation in degree zero of a certain graded module over the symmetric algebra over $H^0(2\\Theta)$.\n  This appears to be the first result of this type in the realm of p.p.a.v.'s. The second characterization is by the failure of surjectivity of second order gaussian maps associated to line bundles corresponding to $6\\Theta$, or, equivalently, by the fact that at some point, the line bundle corresponding to $3\\Theta$ fails to separate $2$-jets. We also show that this last result is equivalent to an effective version of a theorem of Nakamaye characterizing the above decomposable abelian varieties as those computing the minimal Seshadri constant. Finally we propose some conjectural generalizations relating $p$-jets separation thresholds, higher gaussian maps sujectivity thresholds, and Seshadri constants.", "number": 22, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#22</span>
+                <a href="https://arxiv.org/abs/2502.11288" target="_blank">Abelian varieties analogs of two results about algebraic curves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Nelson Alvarado, Giuseppe Pareschi</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 11 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2502.11288" target="_blank">https://arxiv.org/abs/2502.11288</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We characterize decomposable principally polarized abelian varieties of the form $E\times B$, with $E$ an elliptic curve, in two different ways, which are, surprisingly, completely analogous to classical results of curve theory concerning hyperelliptic curves. The first one is by the failure of a normal generation property, namely the generation in degree zero of a certain graded module over the symmetric algebra over $H^0(2\Theta)$.
+  This appears to be the first result of this type in the realm of p.p.a.v.'s. The second characterization is by the failure of surjectivity of second order gaussian maps associated to line bundles corresponding to $6\Theta$, or, equivalently, by the fact that at some point, the line bundle corresponding to $3\Theta$ fails to separate $2$-jets. We also show that this last result is equivalent to an effective version of a theorem of Nakamaye characterizing the above decomposable abelian varieties as those computing the minimal Seshadri constant. Finally we propose some conjectural generalizations relating $p$-jets separation thresholds, higher gaussian maps sujectivity thresholds, and Seshadri constants.
+            </div>
+        </div>
+        <div class="paper" id="paper-23">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-23" data-paper-data='{"title": "Del Pezzo surfaces of degree one and examples of Zariski multiples", "author": "Ichiro Shimada", "published": "Mon, 11 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2507.15210", "summary": "arXiv:2507.15210v3 Announce Type: replace \nAbstract: We construct examples of Zariski N-tuples with large N using the monodromy action of the Weyl group of type E8 on the set of 240 lines in a del Pezzo surface of degree one.", "number": 23, "labels": [{"name": "del Pezzo", "color": "#9b59b6"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#23</span>
+                <a href="https://arxiv.org/abs/2507.15210" target="_blank">Del Pezzo surfaces of degree one and examples of Zariski multiples</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #9b59b6;">del Pezzo</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ichiro Shimada</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 11 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2507.15210" target="_blank">https://arxiv.org/abs/2507.15210</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We construct examples of Zariski N-tuples with large N using the monodromy action of the Weyl group of type E8 on the set of 240 lines in a del Pezzo surface of degree one.
+            </div>
+        </div>
+        <div class="paper" id="paper-24">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-24" data-paper-data='{"title": "Combinatorial Nonresonance Theorems for Hyperplane Arrangement Complements", "author": "Baiting Xie", "published": "Mon, 11 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.01408", "summary": "arXiv:2605.01408v2 Announce Type: replace \nAbstract: We study the nonresonance phenomenon for complex rank-one local systems on complements of hyperplane arrangements. We refine the method of Cohen, Dimca, and Orlik and obtain a combinatorial sufficient condition for nonresonance. As an application, we strengthen a theorem of Bailet, Dimca, and Yoshinaga by removing one of its conditions. We also develop restriction and lifting techniques to prove a nonresonance theorem for line arrangements.", "number": 24, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#24</span>
+                <a href="https://arxiv.org/abs/2605.01408" target="_blank">Combinatorial Nonresonance Theorems for Hyperplane Arrangement Complements</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Baiting Xie</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 11 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.01408" target="_blank">https://arxiv.org/abs/2605.01408</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the nonresonance phenomenon for complex rank-one local systems on complements of hyperplane arrangements. We refine the method of Cohen, Dimca, and Orlik and obtain a combinatorial sufficient condition for nonresonance. As an application, we strengthen a theorem of Bailet, Dimca, and Yoshinaga by removing one of its conditions. We also develop restriction and lifting techniques to prove a nonresonance theorem for line arrangements.
+            </div>
+        </div>
+        <div class="paper" id="paper-25">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-25" data-paper-data='{"title": "Height arguments toward the dynamical Mordell-Lang problem in arbitrary characteristic", "author": "Junyi Xie, She Yang", "published": "Mon, 11 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2504.01563", "summary": "arXiv:2504.01563v3 Announce Type: replace-cross \nAbstract: We use height arguments to prove two results about the dynamical Mordell-Lang problem.\n  (i) For an endomorphism of a projective variety, the return set of a dense orbit into a curve is finite if any cohomological Lyapunov multiplier of any iteration is not an integer.\n  (ii) Let $f\\times g:X\\times C\\rightarrow X\\times C$ be an endomorphism, where $f$ and $g$ are surjective endomorphisms of a projective variety $X$ and a projective curve $C$, respectively. If the degree of $g$ is greater than the first dynamical degree of $f$, then the return sets of the system $(X\\times C,f\\times g)$ have the same form as the return sets of the system $(X,f)$.\n  Using the second result, we deal with the case of split self-maps of products of curves, for which the degrees of the factors are pairwise distinct.\n  In the cases that the height argument cannot be applied, we find examples which show that the return set can be very complicated -- more complicated than experts once imagined -- even for endomorphisms of tori with zero entropy. One may compare them with the conjectures and results stated in [CGSZ21] and [XY25].", "number": 25, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#25</span>
+                <a href="https://arxiv.org/abs/2504.01563" target="_blank">Height arguments toward the dynamical Mordell-Lang problem in arbitrary characteristic</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Junyi Xie, She Yang</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 11 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2504.01563" target="_blank">https://arxiv.org/abs/2504.01563</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We use height arguments to prove two results about the dynamical Mordell-Lang problem.
+  (i) For an endomorphism of a projective variety, the return set of a dense orbit into a curve is finite if any cohomological Lyapunov multiplier of any iteration is not an integer.
+  (ii) Let $f\times g:X\times C\rightarrow X\times C$ be an endomorphism, where $f$ and $g$ are surjective endomorphisms of a projective variety $X$ and a projective curve $C$, respectively. If the degree of $g$ is greater than the first dynamical degree of $f$, then the return sets of the system $(X\times C,f\times g)$ have the same form as the return sets of the system $(X,f)$.
+  Using the second result, we deal with the case of split self-maps of products of curves, for which the degrees of the factors are pairwise distinct.
+  In the cases that the height argument cannot be applied, we find examples which show that the return set can be very complicated -- more complicated than experts once imagined -- even for endomorphisms of tori with zero entropy. One may compare them with the conjectures and results stated in [CGSZ21] and [XY25].
+            </div>
+        </div>
+        <div class="paper" id="paper-26">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-26" data-paper-data='{"title": "The Extended Alpha Group Dynamic Mapping", "author": "Cleber Souza Corr\\^ea, Thiago Braido Nogueira de Melo", "published": "Mon, 11 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2507.18303", "summary": "arXiv:2507.18303v2 Announce Type: replace-cross \nAbstract: This paper investigates the qualitative behavior of a system of ordinary differential equations (ODEs) defined by a matrix operator derived from the algebraic structure of the Alpha Group. The system depends on a rotational parameter that continuously deforms the underlying geometry of the phase space.\n  Using a fourth-order Runge-Kutta numerical scheme, we analyze the evolution of trajectories and identify the presence of critical parameter values at which the system undergoes qualitative transitions. In particular, we observe the emergence of critical dynamical regions associated with changes in the interaction between dynamically defined subspaces. As the rotation parameter varies from $0$ to $\\pi/2$, the system transitions from a regime with Euclidean-type geometric behavior to a non-Euclidean configuration induced by the Alpha Group structure.\n  These transitions correspond to changes in stability and global phase space organization, including the formation of invariant structures and attractor-like behavior at infinity. The results suggest that the underlying matrix operator acts as a generator of structured transformations governing the system dynamics.\n  This work provides a computational and qualitative framework for studying parameter-dependent dynamical systems with evolving geometric structure.", "number": 26, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#26</span>
+                <a href="https://arxiv.org/abs/2507.18303" target="_blank">The Extended Alpha Group Dynamic Mapping</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Cleber Souza Corr\^ea, Thiago Braido Nogueira de Melo</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 11 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2507.18303" target="_blank">https://arxiv.org/abs/2507.18303</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This paper investigates the qualitative behavior of a system of ordinary differential equations (ODEs) defined by a matrix operator derived from the algebraic structure of the Alpha Group. The system depends on a rotational parameter that continuously deforms the underlying geometry of the phase space.
+  Using a fourth-order Runge-Kutta numerical scheme, we analyze the evolution of trajectories and identify the presence of critical parameter values at which the system undergoes qualitative transitions. In particular, we observe the emergence of critical dynamical regions associated with changes in the interaction between dynamically defined subspaces. As the rotation parameter varies from $0$ to $\pi/2$, the system transitions from a regime with Euclidean-type geometric behavior to a non-Euclidean configuration induced by the Alpha Group structure.
+  These transitions correspond to changes in stability and global phase space organization, including the formation of invariant structures and attractor-like behavior at infinity. The results suggest that the underlying matrix operator acts as a generator of structured transformations governing the system dynamics.
+  This work provides a computational and qualitative framework for studying parameter-dependent dynamical systems with evolving geometric structure.
+            </div>
+        </div>
+        <div class="paper" id="paper-27">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-27" data-paper-data='{"title": "Bounded core partitions and Borel-Weil-Bott", "author": "Fern Gossow, Andrew Huchala", "published": "Mon, 11 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2510.17239", "summary": "arXiv:2510.17239v2 Announce Type: replace-cross \nAbstract: The Borel-Weil-Bott theorem can be used to decompose the cohomology of twisted sheaves of holomorphic forms on the complex Grassmannian into irreducible representations of the general linear group. By analyzing this decomposition, we provide two effective formulae for computing the associated Hodge numbers, and give examples in special cases. One of these involves a novel integer-valued hook-product statistic on bounded partitions, and the other is based on semistandard tableaux. We reformulate Snow's observation that the positivity of the Hodge numbers is equivalent to the existence of a partition satisfying certain properties, and improve known bounds on when this occurs. This involves a combinatorial proof of the Nakano vanishing theorem for the Grassmannian utilizing a map from core partitions to plane partitions. Finally, we extend our computation of the Hodge numbers of twisted holomorphic forms on the Grassmannian to a q-analogue.", "number": 27, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#27</span>
+                <a href="https://arxiv.org/abs/2510.17239" target="_blank">Bounded core partitions and Borel-Weil-Bott</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Fern Gossow, Andrew Huchala</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 11 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.17239" target="_blank">https://arxiv.org/abs/2510.17239</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The Borel-Weil-Bott theorem can be used to decompose the cohomology of twisted sheaves of holomorphic forms on the complex Grassmannian into irreducible representations of the general linear group. By analyzing this decomposition, we provide two effective formulae for computing the associated Hodge numbers, and give examples in special cases. One of these involves a novel integer-valued hook-product statistic on bounded partitions, and the other is based on semistandard tableaux. We reformulate Snow's observation that the positivity of the Hodge numbers is equivalent to the existence of a partition satisfying certain properties, and improve known bounds on when this occurs. This involves a combinatorial proof of the Nakano vanishing theorem for the Grassmannian utilizing a map from core partitions to plane partitions. Finally, we extend our computation of the Hodge numbers of twisted holomorphic forms on the Grassmannian to a q-analogue.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-05-11 12:14:27
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>
