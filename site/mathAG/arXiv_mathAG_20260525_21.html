@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Mon, 25 May 2026 04:00:50 +0000<br>
+        <strong>論文数:</strong> 21件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Optimal embedding dimension in the Nash--Tognoli theorem</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Invariants of real affine varieties based on their complexifications</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Positivity in the context of Hodge modules and Higgs bundles on Deligne-Mumford stacks</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">Functional codes arising from rank $n$ Hermitian varieties and hypersurfaces in low dimensions</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">Tropical Cartan's second main theorem for hyperplanes in general position</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">Cartier algebras through the lens of $p$-families</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">What is the Geometric Langlands Correspondence about?</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Multi-valued Morse homotopy for the SYZ mirror of the complex projective plane</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">Commutator-Induced Uncertainty in VAEs</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">Linear spaces of rational integrable 1-forms</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">On the canonical bundle formula in positive characteristic</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">On the $p$-adic deformation problem for the $K$-theory of semistable schemes</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">Some lower bounds for the maximal number of A-singularities in algebraic surfaces. II</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Chern classes of Laughlin bundles on the quasihole moduli space</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Serre functors and local duality for affine quotients</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">Homological mirror symmetry of toric Fano surfaces via Morse homotopy</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">SYZ mirror of Hirzebruch surface $\mathbb{F}_k$ and Morse homotopy</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">Three formulas for CSM classes of open quiver loci</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Positive representations over real closed fields</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">Computing points in connected components defined by a real inequation: algorithms, complexity and implementations, Part I</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-21" onchange="updateSelectedCount()">
+            <span class="title-number">21.</span>
+            <a href="#paper-21">The nearby Lagrangian conjecture for pinwheels</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Optimal embedding dimension in the Nash--Tognoli theorem", "author": "Juliusz Banecki", "published": "Mon, 25 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.22928", "summary": "arXiv:2605.22928v1 Announce Type: new \nAbstract: We prove that every smooth compact submanifold of $\\R^n$ can be approximated up to a small isotopy by the real locus of a nonsingular complex algebraic subset of $\\C^n$ defined over $\\R$. This settles a version of a conjecture posed in 1952 by Nash. Moreover, we show that if the codimension of the manifold being approximated is at least two, then the approximating real algebraic sets can be chosen to all have the same predetermined biregular isomorphism type.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2605.22928" target="_blank">Optimal embedding dimension in the Nash--Tognoli theorem</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Juliusz Banecki</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 25 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.22928" target="_blank">https://arxiv.org/abs/2605.22928</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove that every smooth compact submanifold of $\R^n$ can be approximated up to a small isotopy by the real locus of a nonsingular complex algebraic subset of $\C^n$ defined over $\R$. This settles a version of a conjecture posed in 1952 by Nash. Moreover, we show that if the codimension of the manifold being approximated is at least two, then the approximating real algebraic sets can be chosen to all have the same predetermined biregular isomorphism type.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Invariants of real affine varieties based on their complexifications", "author": "Juliusz Banecki", "published": "Mon, 25 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.22941", "summary": "arXiv:2605.22941v1 Announce Type: new \nAbstract: We introduce a new family of invariants of real algebraic sets defined in terms of the topology of their complexifications and compute some of these invariants for spheres. This allows us to completely classify topological isomorphism classes of algebraic vector bundles over products of two spheres. We also obtain new results concerning both the existence and nonexistence of regular maps from products of spheres into spheres. Additionally, we show that the newly defined invariants provide obstructions to weak algebraic approximation of smooth submanifolds of real algebraic sets, disproving a conjecture of Kucharz and Kurdyka.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2605.22941" target="_blank">Invariants of real affine varieties based on their complexifications</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Juliusz Banecki</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 25 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.22941" target="_blank">https://arxiv.org/abs/2605.22941</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We introduce a new family of invariants of real algebraic sets defined in terms of the topology of their complexifications and compute some of these invariants for spheres. This allows us to completely classify topological isomorphism classes of algebraic vector bundles over products of two spheres. We also obtain new results concerning both the existence and nonexistence of regular maps from products of spheres into spheres. Additionally, we show that the newly defined invariants provide obstructions to weak algebraic approximation of smooth submanifolds of real algebraic sets, disproving a conjecture of Kucharz and Kurdyka.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Positivity in the context of Hodge modules and Higgs bundles on Deligne-Mumford stacks", "author": "Sebastian Casalaina-Martin, Shend Zhjeqi", "published": "Mon, 25 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.22989", "summary": "arXiv:2605.22989v1 Announce Type: new \nAbstract: We generalize positivity results due to Popa-Wu and Popa-Schnell for Hodge modules and Higgs bundles on smooth projective varieties to the case of smooth proper DM stacks admitting projective coarse moduli spaces. This paper is the first in a series aiming to generalize results of Popa-Schnell and Wei-Wu on Viehweg hyperbolicity to the setting of DM stacks, and in particular, to certain KSBA moduli spaces.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2605.22989" target="_blank">Positivity in the context of Hodge modules and Higgs bundles on Deligne-Mumford stacks</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sebastian Casalaina-Martin, Shend Zhjeqi</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 25 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.22989" target="_blank">https://arxiv.org/abs/2605.22989</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We generalize positivity results due to Popa-Wu and Popa-Schnell for Hodge modules and Higgs bundles on smooth projective varieties to the case of smooth proper DM stacks admitting projective coarse moduli spaces. This paper is the first in a series aiming to generalize results of Popa-Schnell and Wei-Wu on Viehweg hyperbolicity to the setting of DM stacks, and in particular, to certain KSBA moduli spaces.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "Functional codes arising from rank $n$ Hermitian varieties and hypersurfaces in low dimensions", "author": "Subrata Manna", "published": "Mon, 25 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.23221", "summary": "arXiv:2605.23221v1 Announce Type: new \nAbstract: We study the functional code $C_d(\\mathcal{X})$, introduced by G. Lachaud in 1996, in the case where $\\mathcal{X}$ is a rank $n$ degenerate Hermitian variety $P\\mathcal{U}_{n-1}$ in $\\mathbb{P}^n(\\mathbb{F}_{q^2})$ and $d\\leq q$. We establish an upper bound for the maximum number of $\\mathbb{F}_{q^2}$-rational points in the intersection of $P\\mathcal{U}_{n-1}$ with an $\\mathbb{F}_{q^2}$-hypersurface of degree at most $q$ in $\\mathbb{P}^n$. Using this bound, we determine the parameters of the codes $C_d(P\\mathcal{U}_{n-1})$ in the cases $n=2,3,4$. We also characterize the hypersurfaces that correspond to the minimum distance of these codes in the cases $n=2,3,4$.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2605.23221" target="_blank">Functional codes arising from rank $n$ Hermitian varieties and hypersurfaces in low dimensions</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Subrata Manna</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 25 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.23221" target="_blank">https://arxiv.org/abs/2605.23221</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the functional code $C_d(\mathcal{X})$, introduced by G. Lachaud in 1996, in the case where $\mathcal{X}$ is a rank $n$ degenerate Hermitian variety $P\mathcal{U}_{n-1}$ in $\mathbb{P}^n(\mathbb{F}_{q^2})$ and $d\leq q$. We establish an upper bound for the maximum number of $\mathbb{F}_{q^2}$-rational points in the intersection of $P\mathcal{U}_{n-1}$ with an $\mathbb{F}_{q^2}$-hypersurface of degree at most $q$ in $\mathbb{P}^n$. Using this bound, we determine the parameters of the codes $C_d(P\mathcal{U}_{n-1})$ in the cases $n=2,3,4$. We also characterize the hypersurfaces that correspond to the minimum distance of these codes in the cases $n=2,3,4$.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "Tropical Cartan's second main theorem for hyperplanes in general position", "author": "Yuting Wang, Tingbin Cao", "published": "Mon, 25 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.23687", "summary": "arXiv:2605.23687v1 Announce Type: new \nAbstract: We prove a tropical analogue of Cartan's second main theorem for holomorphic curves intersecting hyperplanes in general position--a setting that was not fully resolved by previous tropical Nevanlinna theory. Two versions are obtained. The first (Theorem 1.7) requires subnormal growth and involves the tropical Casorati determinant. The second and main version (Theorem 1.9) is completely free of growth conditions and exceptional sets; it replaces the Casorati term by the sum of the counting functions of the curve's components, yielding an inequality valid for every r. The proof uses a tropical Cramer theorem, bypassing the logarithmic derivative lemma. This improves upon previous results by Korhonen-Tohge and Cao-Zheng, where the coefficient could be suboptimal even under the general position hypothesis. We also clarify the relation between different notions of linear independence, and present the first counterexample to the truncated second main theorem in the tropical setting (Example 5.4).", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2605.23687" target="_blank">Tropical Cartan's second main theorem for hyperplanes in general position</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yuting Wang, Tingbin Cao</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 25 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.23687" target="_blank">https://arxiv.org/abs/2605.23687</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove a tropical analogue of Cartan's second main theorem for holomorphic curves intersecting hyperplanes in general position--a setting that was not fully resolved by previous tropical Nevanlinna theory. Two versions are obtained. The first (Theorem 1.7) requires subnormal growth and involves the tropical Casorati determinant. The second and main version (Theorem 1.9) is completely free of growth conditions and exceptional sets; it replaces the Casorati term by the sum of the counting functions of the curve's components, yielding an inequality valid for every r. The proof uses a tropical Cramer theorem, bypassing the logarithmic derivative lemma. This improves upon previous results by Korhonen-Tohge and Cao-Zheng, where the coefficient could be suboptimal even under the general position hypothesis. We also clarify the relation between different notions of linear independence, and present the first counterexample to the truncated second main theorem in the tropical setting (Example 5.4).
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "Cartier algebras through the lens of $p$-families", "author": "Anna Brosowsky", "published": "Mon, 25 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.22987", "summary": "arXiv:2605.22987v1 Announce Type: cross \nAbstract: We study $F$-graded systems of ideals in $R$, which are sequences of ideals giving rise to Cartier algebras on $R$. We identify how properties of these systems (or modifications of these systems) affect the singularity properties of the corresponding Cartier algebra. In particular, we show that in a Gorenstein and strongly $F$-regular local ring, strong $F$-regularity and $F$-splitting are the same for a special class of $F$-graded systems called $p$-families. Further, we make use of this and a new operation we introduce called $p$-stabilization to get a criterion that in a Gorenstein and strongly $F$-regular local ring, a system is strongly $F$-regular exactly when its $p$-stabilization is $F$-split. Finally, we associate a combinatorial object to systems built out of monomial ideals and show how this can help compute the $p$-stabilization.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2605.22987" target="_blank">Cartier algebras through the lens of $p$-families</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Anna Brosowsky</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 25 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.22987" target="_blank">https://arxiv.org/abs/2605.22987</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study $F$-graded systems of ideals in $R$, which are sequences of ideals giving rise to Cartier algebras on $R$. We identify how properties of these systems (or modifications of these systems) affect the singularity properties of the corresponding Cartier algebra. In particular, we show that in a Gorenstein and strongly $F$-regular local ring, strong $F$-regularity and $F$-splitting are the same for a special class of $F$-graded systems called $p$-families. Further, we make use of this and a new operation we introduce called $p$-stabilization to get a criterion that in a Gorenstein and strongly $F$-regular local ring, a system is strongly $F$-regular exactly when its $p$-stabilization is $F$-split. Finally, we associate a combinatorial object to systems built out of monomial ideals and show how this can help compute the $p$-stabilization.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "What is the Geometric Langlands Correspondence about?", "author": "David Ben-Zvi", "published": "Mon, 25 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.23167", "summary": "arXiv:2605.23167v1 Announce Type: cross \nAbstract: The recent proof of the unramified Geometric Langlands Conjecture has attracted a lot of publicity, so this seems like a good time to address the title question. In one line, the Geometric Langlands correspondence is an algebraic spectral theorem for a certain class of differential equations called automorphic sheaves: it asserts they can be decomposed into monochromatic objects, which diagonalize the action of natural symmetries (Hecke operators), and it describes the corresponding colors or frequencies (Langlands parameters). The statement is very technical and esoteric sounding, the proof takes thousands of pages, and there are relatively few easily stated immediate consequences. So what's the deal? In this brief survey I will present the subject informally as a blueprint for a master plan for the study of nonabelian symmetry, touching on some of the main motivations, connections and structures that have emerged.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2605.23167" target="_blank">What is the Geometric Langlands Correspondence about?</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> David Ben-Zvi</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 25 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.23167" target="_blank">https://arxiv.org/abs/2605.23167</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The recent proof of the unramified Geometric Langlands Conjecture has attracted a lot of publicity, so this seems like a good time to address the title question. In one line, the Geometric Langlands correspondence is an algebraic spectral theorem for a certain class of differential equations called automorphic sheaves: it asserts they can be decomposed into monochromatic objects, which diagonalize the action of natural symmetries (Hecke operators), and it describes the corresponding colors or frequencies (Langlands parameters). The statement is very technical and esoteric sounding, the proof takes thousands of pages, and there are relatively few easily stated immediate consequences. So what's the deal? In this brief survey I will present the subject informally as a blueprint for a master plan for the study of nonabelian symmetry, touching on some of the main motivations, connections and structures that have emerged.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Multi-valued Morse homotopy for the SYZ mirror of the complex projective plane", "author": "Hayato Nakanishi, Yat-Hin Suen", "published": "Mon, 25 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.23404", "summary": "arXiv:2605.23404v1 Announce Type: cross \nAbstract: We propose a definition of the category $\\mathit{Mo}^{\\mathrm{mult}}(P)$ of multi-valued Morse homotopy on $P$ consisting of multi-valued functions associated to Lagrangian multi-sections. We then show that a full subcategory $\\mathit{Mo}^{\\mathrm{mult}}_{\\mathcal{E}}(P)$ of $\\mathit{Mo}^{\\mathrm{mult}}(P)$ is $A_\\infty$-equivalent to a full subcategory $\\mathit{DG}_{\\mathcal{E}}^{\\mathrm{vect}}(\\mathbb{C}P^2)$ of the category $\\mathit{DG}^{\\mathrm{vect}}(\\mathbb{C}P^2)$ consisting of holomorphic vector bundles over the complex projective plane $\\mathbb{C}P^2$. As an application, we study the mirror description for global sections of the holomorphic tangent bundle over $\\mathbb{C}P^2$.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2605.23404" target="_blank">Multi-valued Morse homotopy for the SYZ mirror of the complex projective plane</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Hayato Nakanishi, Yat-Hin Suen</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 25 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.23404" target="_blank">https://arxiv.org/abs/2605.23404</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We propose a definition of the category $\mathit{Mo}^{\mathrm{mult}}(P)$ of multi-valued Morse homotopy on $P$ consisting of multi-valued functions associated to Lagrangian multi-sections. We then show that a full subcategory $\mathit{Mo}^{\mathrm{mult}}_{\mathcal{E}}(P)$ of $\mathit{Mo}^{\mathrm{mult}}(P)$ is $A_\infty$-equivalent to a full subcategory $\mathit{DG}_{\mathcal{E}}^{\mathrm{vect}}(\mathbb{C}P^2)$ of the category $\mathit{DG}^{\mathrm{vect}}(\mathbb{C}P^2)$ consisting of holomorphic vector bundles over the complex projective plane $\mathbb{C}P^2$. As an application, we study the mirror description for global sections of the holomorphic tangent bundle over $\mathbb{C}P^2$.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "Commutator-Induced Uncertainty in VAEs", "author": "Tahereh Dehdarirad, Michael Felsberg, Gabriel Eilertsen, Ziliang Xiong", "published": "Mon, 25 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.23449", "summary": "arXiv:2605.23449v1 Announce Type: cross \nAbstract: Variational autoencoders (VAEs) often struggle to represent non-commutative structure in learned latent spaces. Symmetry-aware VAEs commonly address this issue by enforcing commutativity through algebraic regularization, which is appropriate for commutative transformation groups but can suppress meaningful non-commutative structure when it is intrinsic to the data. We argue that non-commutativity should instead be explicitly diagnosed and reflected in reconstruction behavior. We introduce a Lie Group VAE framework that combines geometric and algebraic perspectives on uncertainty while separating discrete generative factors from continuous geometric transformations. In a first phase, the model is trained without structural constraints while algebraic non-commutativity is measured through finite Baker-Campbell-Hausdorff deviations and decoder order sensitivity is measured through reconstruction order-swap tests. These diagnostics reveal a scale mismatch between latent non-commutativity and reconstruction behavior under unconstrained training. In a second phase, we introduce a deformation-stability constraint with a data-driven calibration constant that aligns decoder sensitivity with algebraic non-commutativity. We evaluate the framework on dSprites, 3DShapes, 3DCars, and CelebA against generic and symmetry-aware baselines, including beta-VAE, CLG-VAE, and CFASL. Across synthetic benchmarks, the method improves reconstruction quality and yields decoder-level behavior more consistent with latent non-commutative structure. Qualitative analyses show clearer order-dependent latent compositions and more stable reconstructions. On CelebA, the model yields more faithful reconstructions and factor-specific latent traversals than CFASL, while also exhibiting meaningful order-dependent interactions between learned latent directions.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2605.23449" target="_blank">Commutator-Induced Uncertainty in VAEs</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Tahereh Dehdarirad, Michael Felsberg, Gabriel Eilertsen, Ziliang Xiong</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 25 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.23449" target="_blank">https://arxiv.org/abs/2605.23449</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Variational autoencoders (VAEs) often struggle to represent non-commutative structure in learned latent spaces. Symmetry-aware VAEs commonly address this issue by enforcing commutativity through algebraic regularization, which is appropriate for commutative transformation groups but can suppress meaningful non-commutative structure when it is intrinsic to the data. We argue that non-commutativity should instead be explicitly diagnosed and reflected in reconstruction behavior. We introduce a Lie Group VAE framework that combines geometric and algebraic perspectives on uncertainty while separating discrete generative factors from continuous geometric transformations. In a first phase, the model is trained without structural constraints while algebraic non-commutativity is measured through finite Baker-Campbell-Hausdorff deviations and decoder order sensitivity is measured through reconstruction order-swap tests. These diagnostics reveal a scale mismatch between latent non-commutativity and reconstruction behavior under unconstrained training. In a second phase, we introduce a deformation-stability constraint with a data-driven calibration constant that aligns decoder sensitivity with algebraic non-commutativity. We evaluate the framework on dSprites, 3DShapes, 3DCars, and CelebA against generic and symmetry-aware baselines, including beta-VAE, CLG-VAE, and CFASL. Across synthetic benchmarks, the method improves reconstruction quality and yields decoder-level behavior more consistent with latent non-commutative structure. Qualitative analyses show clearer order-dependent latent compositions and more stable reconstructions. On CelebA, the model yields more faithful reconstructions and factor-specific latent traversals than CFASL, while also exhibiting meaningful order-dependent interactions between learned latent directions.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "Linear spaces of rational integrable 1-forms", "author": "Gabriel Barbosa", "published": "Mon, 25 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.23749", "summary": "arXiv:2605.23749v1 Announce Type: cross \nAbstract: We study finite-dimensional spaces of rational one-forms on a projective manifold by means of their integrable locus.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2605.23749" target="_blank">Linear spaces of rational integrable 1-forms</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Gabriel Barbosa</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 25 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.23749" target="_blank">https://arxiv.org/abs/2605.23749</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study finite-dimensional spaces of rational one-forms on a projective manifold by means of their integrable locus.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "On the canonical bundle formula in positive characteristic", "author": "Marta Benozzo", "published": "Mon, 25 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2305.19841", "summary": "arXiv:2305.19841v3 Announce Type: replace \nAbstract: Let $f: X \\to Z$ be a fibration from a normal projective variety $X$ of dimension $n$ onto a normal curve $Z$ over a perfect field of characteristic $p&gt;2$. Let $(X, B)$ be a dlt pair such that the induced pair on a general fibre is log canonical. Assuming the LMMP and the existence of log resolutions in dimension $\\leq n$, we prove that, when $K_X+B$ is $f$-nef, the moduli part is nef up to a birational map $Y \\dashrightarrow X$. As a corollary, we prove positivity of the moduli part in the $K$-trivial case, i.e. when $K_X+B \\sim_{\\Q} f^*L$ for some $\\Q$-Cartier $\\Q$-divisor $L$ on $Z$. In particular, consider a dlt pair $(X, B)$ of dimension $3$ over an algebraically closed field of characteristic $p&gt;5$ such that the induced pair on a general fibre is log canonical, then the canonical bundle formula holds unconditionally.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2305.19841" target="_blank">On the canonical bundle formula in positive characteristic</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Marta Benozzo</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 25 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2305.19841" target="_blank">https://arxiv.org/abs/2305.19841</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $f: X \to Z$ be a fibration from a normal projective variety $X$ of dimension $n$ onto a normal curve $Z$ over a perfect field of characteristic $p&gt;2$. Let $(X, B)$ be a dlt pair such that the induced pair on a general fibre is log canonical. Assuming the LMMP and the existence of log resolutions in dimension $\leq n$, we prove that, when $K_X+B$ is $f$-nef, the moduli part is nef up to a birational map $Y \dashrightarrow X$. As a corollary, we prove positivity of the moduli part in the $K$-trivial case, i.e. when $K_X+B \sim_{\Q} f^*L$ for some $\Q$-Cartier $\Q$-divisor $L$ on $Z$. In particular, consider a dlt pair $(X, B)$ of dimension $3$ over an algebraically closed field of characteristic $p&gt;5$ such that the induced pair on a general fibre is log canonical, then the canonical bundle formula holds unconditionally.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "On the $p$-adic deformation problem for the $K$-theory of semistable schemes", "author": "Federico Binda, Tommy Lundemo, Alberto Merici, Doosung Park", "published": "Mon, 25 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2601.14146", "summary": "arXiv:2601.14146v2 Announce Type: replace \nAbstract: We establish a semistable generalization of the Beilinson-Bloch-Esnault-Kerz fiber square, relating the algebraic K-theory of a semistable scheme to its logarithmic topological cyclic homology. We prove that the obstruction to lifting K-theory classes is governed by the Hyodo-Kato Chern character. This answers the $p$-adic deformation problem for continuous K-theory in the semistable case, extending the work of Antieau-Mathew-Morrow-Nikolaus. As an application, we provide a purely K-theoretic proof of Yamashita's semistable $p$-adic Lefschetz $(1,1)$-theorem.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2601.14146" target="_blank">On the $p$-adic deformation problem for the $K$-theory of semistable schemes</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Federico Binda, Tommy Lundemo, Alberto Merici, Doosung Park</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 25 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.14146" target="_blank">https://arxiv.org/abs/2601.14146</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We establish a semistable generalization of the Beilinson-Bloch-Esnault-Kerz fiber square, relating the algebraic K-theory of a semistable scheme to its logarithmic topological cyclic homology. We prove that the obstruction to lifting K-theory classes is governed by the Hyodo-Kato Chern character. This answers the $p$-adic deformation problem for continuous K-theory in the semistable case, extending the work of Antieau-Mathew-Morrow-Nikolaus. As an application, we provide a purely K-theoretic proof of Yamashita's semistable $p$-adic Lefschetz $(1,1)$-theorem.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "Some lower bounds for the maximal number of A-singularities in algebraic surfaces. II", "author": "Juan Garc\\'ia Escudero", "published": "Mon, 25 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.15060", "summary": "arXiv:2604.15060v2 Announce Type: replace \nAbstract: Algebraic surfaces in the complex projective space with a high number of A-type singularities have been presented in a recent paper. We extend the construction in order to obtain lower bounds for the maximal number of A singularities for certain additional cases.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2604.15060" target="_blank">Some lower bounds for the maximal number of A-singularities in algebraic surfaces. II</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Juan Garc\'ia Escudero</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 25 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.15060" target="_blank">https://arxiv.org/abs/2604.15060</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Algebraic surfaces in the complex projective space with a high number of A-type singularities have been presented in a recent paper. We extend the construction in order to obtain lower bounds for the maximal number of A singularities for certain additional cases.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Chern classes of Laughlin bundles on the quasihole moduli space", "author": "Florent Dupont (IRMA), Semyon Klevtsov (IRMA)", "published": "Mon, 25 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.18089", "summary": "arXiv:2605.18089v2 Announce Type: replace \nAbstract: We study fractional quantum Hall states with quasihole excitations, on Riemann surfaces of arbitrary genus. For configurations with $m$ quasiholes we construct a vector bundle above the $m$-th symmetric power of the curve so that the fiber at a point $\\lbrace w_1,\\dots,w_m \\rbrace$ corresponds to the state with quasiholes localized at these positions. We determine the Chern character of this bundle via the Grothendieck-Riemann-Roch theorem and show that in the completely filled state, i.e. when the number of particles is maximal, the vector bundle is compatible with the condition of projective flatness. Furthermore, we obtain a generalization of this result to the case of multiple layers and multiple quasihole types. In genus zero and one, we construct explicit wave-functions and verify that the curvature of the associated Chern connection reproduces the predicted Chern classes. The Chern classes obtained match, term by term, the predicted decomposition of the Berry phase under quasihole exchange, into an extensive Aharonov--Bohm contribution and a fractional statistical contribution.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2605.18089" target="_blank">Chern classes of Laughlin bundles on the quasihole moduli space</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Florent Dupont (IRMA), Semyon Klevtsov (IRMA)</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 25 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.18089" target="_blank">https://arxiv.org/abs/2605.18089</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study fractional quantum Hall states with quasihole excitations, on Riemann surfaces of arbitrary genus. For configurations with $m$ quasiholes we construct a vector bundle above the $m$-th symmetric power of the curve so that the fiber at a point $\lbrace w_1,\dots,w_m \rbrace$ corresponds to the state with quasiholes localized at these positions. We determine the Chern character of this bundle via the Grothendieck-Riemann-Roch theorem and show that in the completely filled state, i.e. when the number of particles is maximal, the vector bundle is compatible with the condition of projective flatness. Furthermore, we obtain a generalization of this result to the case of multiple layers and multiple quasihole types. In genus zero and one, we construct explicit wave-functions and verify that the curvature of the associated Chern connection reproduces the predicted Chern classes. The Chern classes obtained match, term by term, the predicted decomposition of the Berry phase under quasihole exchange, into an extensive Aharonov--Bohm contribution and a fractional statistical contribution.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Serre functors and local duality for affine quotients", "author": "Ivan Noden", "published": "Mon, 25 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.21290", "summary": "arXiv:2605.21290v2 Announce Type: replace \nAbstract: The purpose of this short note is to study Serre functors of categories of quasicoherent sheaves on stacks of the form $\\mathcal{Y} = \\mathrm{Spec} A/G$ where $G$ is a reductive group acting on $\\mathrm{Spec} A$ with a unique closed orbit. We show that the Serre functor is given by tensoring with the local cohomology of $\\omega_\\mathcal{Y}$ at the unique closed orbit. Using this description, we develop analogues of the Matlis and local duality theorems for local rings.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2605.21290" target="_blank">Serre functors and local duality for affine quotients</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ivan Noden</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 25 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.21290" target="_blank">https://arxiv.org/abs/2605.21290</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The purpose of this short note is to study Serre functors of categories of quasicoherent sheaves on stacks of the form $\mathcal{Y} = \mathrm{Spec} A/G$ where $G$ is a reductive group acting on $\mathrm{Spec} A$ with a unique closed orbit. We show that the Serre functor is given by tensoring with the local cohomology of $\omega_\mathcal{Y}$ at the unique closed orbit. Using this description, we develop analogues of the Matlis and local duality theorems for local rings.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "Homological mirror symmetry of toric Fano surfaces via Morse homotopy", "author": "Hayato Nakanishi", "published": "Mon, 25 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2303.07851", "summary": "arXiv:2303.07851v3 Announce Type: replace-cross \nAbstract: Strominger-Yau-Zaslow (SYZ) proposed a way of constructing mirror pairs as pairs of torus fibrations. We apply this SYZ construction to toric Fano surfaces as complex manifolds, and discuss the homological mirror symmetry, where we consider Morse homotopy of the moment polytope instead of the Fukaya category.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2303.07851" target="_blank">Homological mirror symmetry of toric Fano surfaces via Morse homotopy</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Hayato Nakanishi</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 25 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2303.07851" target="_blank">https://arxiv.org/abs/2303.07851</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Strominger-Yau-Zaslow (SYZ) proposed a way of constructing mirror pairs as pairs of torus fibrations. We apply this SYZ construction to toric Fano surfaces as complex manifolds, and discuss the homological mirror symmetry, where we consider Morse homotopy of the moment polytope instead of the Fukaya category.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "SYZ mirror of Hirzebruch surface $\\mathbb{F}_k$ and Morse homotopy", "author": "Hayato Nakanishi", "published": "Mon, 25 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2312.01329", "summary": "arXiv:2312.01329v2 Announce Type: replace-cross \nAbstract: We study homological mirror symmetry for Hirzebruch surface $\\mathbb{F}_k$ as a complex manifold by using the Strominger-Yau-Zaslow construction of mirror pair and Morse homotopy. For the toric Fano surfaces, Futaki-Kajiura and the author proved homological mirror symmetry by using Morse homotopy in arXiv:2008.13462, arXiv:2012.06801, and arXiv:2303.07851. In this paper, we extend Futaki-Kajiura's result of Hirzebruch surface $\\mathbb{F}_1$ to $\\mathbb{F}_k$. We discuss Morse homotopy and show homological mirror symmetry in the sense above holds true.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2312.01329" target="_blank">SYZ mirror of Hirzebruch surface $\mathbb{F}_k$ and Morse homotopy</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Hayato Nakanishi</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 25 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2312.01329" target="_blank">https://arxiv.org/abs/2312.01329</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study homological mirror symmetry for Hirzebruch surface $\mathbb{F}_k$ as a complex manifold by using the Strominger-Yau-Zaslow construction of mirror pair and Morse homotopy. For the toric Fano surfaces, Futaki-Kajiura and the author proved homological mirror symmetry by using Morse homotopy in arXiv:2008.13462, arXiv:2012.06801, and arXiv:2303.07851. In this paper, we extend Futaki-Kajiura's result of Hirzebruch surface $\mathbb{F}_1$ to $\mathbb{F}_k$. We discuss Morse homotopy and show homological mirror symmetry in the sense above holds true.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "Three formulas for CSM classes of open quiver loci", "author": "Moriah Elkin", "published": "Mon, 25 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2511.17723", "summary": "arXiv:2511.17723v4 Announce Type: replace-cross \nAbstract: In the space of equioriented type $A$ quiver representations, we define subvarieties called \"open quiver loci\" by placing strict rank conditions on the maps within representations. The closures of these subvarieties are the quiver loci, whose equivariant cohomology classes are the quiver polynomials of Buch and Fulton. We present one geometric formula and two combinatorial formulas that compute equivariant Chern-Schwartz-MacPherson (CSM) classes of open quiver loci; these classes refine the data of the quiver polynomials. The second combinatorial formula is in terms of \"chained generic pipe dreams,\" which modify the pipe dreams of Bergeron and Billey to more strongly resemble the lacing diagrams of Abeasis and Del Fra.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2511.17723" target="_blank">Three formulas for CSM classes of open quiver loci</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Moriah Elkin</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 25 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.17723" target="_blank">https://arxiv.org/abs/2511.17723</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In the space of equioriented type $A$ quiver representations, we define subvarieties called "open quiver loci" by placing strict rank conditions on the maps within representations. The closures of these subvarieties are the quiver loci, whose equivariant cohomology classes are the quiver polynomials of Buch and Fulton. We present one geometric formula and two combinatorial formulas that compute equivariant Chern-Schwartz-MacPherson (CSM) classes of open quiver loci; these classes refine the data of the quiver polynomials. The second combinatorial formula is in terms of "chained generic pipe dreams," which modify the pipe dreams of Bergeron and Billey to more strongly resemble the lacing diagrams of Abeasis and Del Fra.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Positive representations over real closed fields", "author": "Xenia Flamm, Nicolas Tholozan, Tianqi Wang, Tengren Zhang", "published": "Mon, 25 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2601.05102", "summary": "arXiv:2601.05102v2 Announce Type: replace-cross \nAbstract: We develop the theory of $\\Theta$-positive representations from general Fuchsian groups to linear groups over real closed fields. Our definition, which does not assume the boundary map to be continuous, encompasses many generalizations of positive or Anosov representations that have been considered in the literature.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2601.05102" target="_blank">Positive representations over real closed fields</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Xenia Flamm, Nicolas Tholozan, Tianqi Wang, Tengren Zhang</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 25 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2601.05102" target="_blank">https://arxiv.org/abs/2601.05102</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We develop the theory of $\Theta$-positive representations from general Fuchsian groups to linear groups over real closed fields. Our definition, which does not assume the boundary map to be continuous, encompasses many generalizations of positive or Anosov representations that have been considered in the literature.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "Computing points in connected components defined by a real inequation: algorithms, complexity and implementations, Part I", "author": "J\\'er\\'emy Berthomieu (PolSys), Edern Gillot (PolSys), Mohab Safey El Din (PolSys)", "published": "Mon, 25 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.18110", "summary": "arXiv:2605.18110v2 Announce Type: replace-cross \nAbstract: We consider the problem of computing sample points in each connected component of a semi-algebraic set defined by the non-vanishing or the positivity of an n-variate polynomial of degree d, with rational coefficients of bit size bounded by $\\tau$. Such a problem is a basic routine in effective real algebraic geometry, used in higher-level algorithms for solving polynomial systems over the reals and finds many applications in sciences. We design a probabilistic algorithm for solving this problem, which is based on reductions to different routines for solving zero-dimensional polynomial systems. It assumes that the input polynomial satisfies sufficiently generic properties (namely, smoothness of its defining hypersurface). This is done through the computations of critical points of well-chosen maps to capture the connected components of the semi-algebraic set under study. We derive a bit complexity estimate for the cost of this algorithm, which is, in terms of the B{\\'e}zout bound d(d -1)^{n-1}, essentially cubic for obtaining parametrisations of the sought-for real points. Moreover, we also consider the case of obtaining rational approximations of those points, which are precise enough to lie in the same connected components as their exact counterparts, which yields a cost that is essentially quartic in the B{\\'e}zout bound. In these complexity estimates, we take into account the degree structure of the input polynomial and its partial derivatives, allowing for a more refined bit complexity when the partial derivative of the input polynomial have degree lower than expected. We also analyse the probability of success of those algorithms. We report on practical experiments, benchmarking with random dense input polynomials as well as polynomials coming from applications, which were out of reach of the state-of-the-art implementations, and hence illustrate the practical efficiency of these new algorithms.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2605.18110" target="_blank">Computing points in connected components defined by a real inequation: algorithms, complexity and implementations, Part I</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> J\'er\'emy Berthomieu (PolSys), Edern Gillot (PolSys), Mohab Safey El Din (PolSys)</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 25 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.18110" target="_blank">https://arxiv.org/abs/2605.18110</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We consider the problem of computing sample points in each connected component of a semi-algebraic set defined by the non-vanishing or the positivity of an n-variate polynomial of degree d, with rational coefficients of bit size bounded by $\tau$. Such a problem is a basic routine in effective real algebraic geometry, used in higher-level algorithms for solving polynomial systems over the reals and finds many applications in sciences. We design a probabilistic algorithm for solving this problem, which is based on reductions to different routines for solving zero-dimensional polynomial systems. It assumes that the input polynomial satisfies sufficiently generic properties (namely, smoothness of its defining hypersurface). This is done through the computations of critical points of well-chosen maps to capture the connected components of the semi-algebraic set under study. We derive a bit complexity estimate for the cost of this algorithm, which is, in terms of the B{\'e}zout bound d(d -1)^{n-1}, essentially cubic for obtaining parametrisations of the sought-for real points. Moreover, we also consider the case of obtaining rational approximations of those points, which are precise enough to lie in the same connected components as their exact counterparts, which yields a cost that is essentially quartic in the B{\'e}zout bound. In these complexity estimates, we take into account the degree structure of the input polynomial and its partial derivatives, allowing for a more refined bit complexity when the partial derivative of the input polynomial have degree lower than expected. We also analyse the probability of success of those algorithms. We report on practical experiments, benchmarking with random dense input polynomials as well as polynomials coming from applications, which were out of reach of the state-of-the-art implementations, and hence illustrate the practical efficiency of these new algorithms.
+            </div>
+        </div>
+        <div class="paper" id="paper-21">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-21" data-paper-data='{"title": "The nearby Lagrangian conjecture for pinwheels", "author": "Nikolas Adaloglou, Gerard Bargall\\'o i G\\'omez, Johannes Hauber", "published": "Mon, 25 May 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.22473", "summary": "arXiv:2605.22473v2 Announce Type: replace-cross \nAbstract: The Lagrangian skeleton of the rational homology ball $B_{p,q}$, for $0&lt;q&gt;&lt;p$ coprime integers, is an immersed but not embedded Lagrangian, called a $(p,q)$-pinwheel. We show that any two embeddings of Lagrangian $(p,q)$-pinwheels in $B_{p,q}$ are related by a compactly supported Hamiltonian isotopy, establishing Arnold's nearby Lagrangian conjecture for this wide class of singular Lagrangians. Our proof has two largely independent parts: the first uses neck-stretching and the symplectic rational blow-up to understand embeddings of pinwheels up to symplectomorphism; the second computes that $\\text{Symp}_c(B_{p,q})$ is generated by a twist about the pinwheel, which we call the pintwist $\\tau_{p,q}$. We provide three applications of our methods: Gromov non-squeezing for pin-balls; a new proof of the local Lagrangian unknotting theorem of Eliashberg--Polterovich; and that the only Lagrangian $(n,m)$-pinwheel in $B_{p,q}$ is of type $(p,q)$.", "number": 21, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#21</span>
+                <a href="https://arxiv.org/abs/2605.22473" target="_blank">The nearby Lagrangian conjecture for pinwheels</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Nikolas Adaloglou, Gerard Bargall\'o i G\'omez, Johannes Hauber</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 25 May 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.22473" target="_blank">https://arxiv.org/abs/2605.22473</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The Lagrangian skeleton of the rational homology ball $B_{p,q}$, for $0&lt;q&gt;&lt;p$ coprime integers, is an immersed but not embedded Lagrangian, called a $(p,q)$-pinwheel. We show that any two embeddings of Lagrangian $(p,q)$-pinwheels in $B_{p,q}$ are related by a compactly supported Hamiltonian isotopy, establishing Arnold's nearby Lagrangian conjecture for this wide class of singular Lagrangians. Our proof has two largely independent parts: the first uses neck-stretching and the symplectic rational blow-up to understand embeddings of pinwheels up to symplectomorphism; the second computes that $\text{Symp}_c(B_{p,q})$ is generated by a twist about the pinwheel, which we call the pintwist $\tau_{p,q}$. We provide three applications of our methods: Gromov non-squeezing for pin-balls; a new proof of the local Lagrangian unknotting theorem of Eliashberg--Polterovich; and that the only Lagrangian $(n,m)$-pinwheel in $B_{p,q}$ is of type $(p,q)$.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-05-25 12:35:18
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>
