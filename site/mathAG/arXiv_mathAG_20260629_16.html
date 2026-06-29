@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Mon, 29 Jun 2026 04:00:30 +0000<br>
+        <strong>論文数:</strong> 16件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Any-dimensional Positivstellens\"atze for symmetric functions</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">The derived moduli of perverse sheaves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Varieties with Ulrich exterior powers of the tangent bundle</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">Curves in High Degree Plane Pencils with Bounded Degree Components</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">On the maximal variation problem and Lefschetz pencils</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">General position on Severi--Brauer surfaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Enumerating matrices with prescribed entries in an adjoint orbit</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Abelian Orbifolds for Brane Brick Models</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">The quantum connection and its mod p reduction</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">Fine multidegrees, universal Grobner bases, and matrix Schubert varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">Variation of cones of divisors in a family of varieties -- Fano type case</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">The Isomorphism Classes of the Surfaces $x_1^{a_1} + x_2^{a_2} + x_3^{a_3} + 1 = 0$</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">On the image of Hitchin morphism for some classical groups on algebraic surfaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Higher Hida theory for Hilbert modular varieties in the totally split case</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">A Hodge filtration on chiral homology and Poisson homology of associated schemes</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">Sum of Squares Submodularity</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Any-dimensional Positivstellens\\\"atze for symmetric functions", "author": "Sebastian Debus, Robin Schabert", "published": "Mon, 29 Jun 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2606.27551", "summary": "arXiv:2606.27551v1 Announce Type: new \nAbstract: Positivstellens\\\"atze provide certificates of positivity for polynomials. Extending these certificates to symmetric functions, uniformly across all dimensions, presents structural challenges. For instance, the underlying domain is not semialgebraic. In this paper, we prove two Positivstellens\\\"atze for symmetric functions that are uniformly bounded below by some $\\varepsilon &gt; 0$. These are infinite dimensional analogous of theorems of P\\'olya and Reznick. The proof relates evaluations of the (truncated) power sum map $(p_2,p_3,\\dots)$ to moments of discrete probability measures on the compact interval $[-1,1]$. This yields a characterization of the orbit space of the infinite symmetric group. Finally, we provide an alternative proof of existing Positivstellens\\\"atze for normalized symmetric functions.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2606.27551" target="_blank">Any-dimensional Positivstellens\"atze for symmetric functions</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sebastian Debus, Robin Schabert</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 29 Jun 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2606.27551" target="_blank">https://arxiv.org/abs/2606.27551</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Positivstellens\"atze provide certificates of positivity for polynomials. Extending these certificates to symmetric functions, uniformly across all dimensions, presents structural challenges. For instance, the underlying domain is not semialgebraic. In this paper, we prove two Positivstellens\"atze for symmetric functions that are uniformly bounded below by some $\varepsilon &gt; 0$. These are infinite dimensional analogous of theorems of P\'olya and Reznick. The proof relates evaluations of the (truncated) power sum map $(p_2,p_3,\dots)$ to moments of discrete probability measures on the compact interval $[-1,1]$. This yields a characterization of the orbit space of the infinite symmetric group. Finally, we provide an alternative proof of existing Positivstellens\"atze for normalized symmetric functions.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "The derived moduli of perverse sheaves", "author": "Peter J. Haine, Mauro Porta, Jean-Baptiste Teyssier", "published": "Mon, 29 Jun 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2606.27790", "summary": "arXiv:2606.27790v1 Announce Type: new \nAbstract: We construct higher derived Artin stacks parametrizing constructible sheaves on complex algebraic varieties and compact real analytic varieties. Furthermore, we show that every perversity function gives rise to an open substack of perverse sheaves, which is a 1-Artin stack locally of finite presentation that generalizes usual character stacks. As a sample application of the derived structure, we construct new examples of cohomological Hall algebras associated to punctured Riemann surfaces.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2606.27790" target="_blank">The derived moduli of perverse sheaves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Peter J. Haine, Mauro Porta, Jean-Baptiste Teyssier</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 29 Jun 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2606.27790" target="_blank">https://arxiv.org/abs/2606.27790</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We construct higher derived Artin stacks parametrizing constructible sheaves on complex algebraic varieties and compact real analytic varieties. Furthermore, we show that every perversity function gives rise to an open substack of perverse sheaves, which is a 1-Artin stack locally of finite presentation that generalizes usual character stacks. As a sample application of the derived structure, we construct new examples of cohomological Hall algebras associated to punctured Riemann surfaces.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Varieties with Ulrich exterior powers of the tangent bundle", "author": "Yuta Takahashi, Kiwamu Watanabe", "published": "Mon, 29 Jun 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2606.27851", "summary": "arXiv:2606.27851v1 Announce Type: new \nAbstract: We study smooth polarized projective varieties $(X,H)$ whose exterior powers of the tangent bundle are Ulrich. We prove that if $\\bigwedge^rT_X$ is $H$-Ulrich for some $0&lt;\\dim X$, then $X$ is Fano and the intersection number $(-K_X)\\cdot H^{n-1}$ is determined explicitly. We then classify the Picard number one case: the only example is the Veronese surface $(\\mathbb P^2,\\mathcal O_{\\mathbb P^2}(2))$.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2606.27851" target="_blank">Varieties with Ulrich exterior powers of the tangent bundle</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yuta Takahashi, Kiwamu Watanabe</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 29 Jun 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2606.27851" target="_blank">https://arxiv.org/abs/2606.27851</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study smooth polarized projective varieties $(X,H)$ whose exterior powers of the tangent bundle are Ulrich. We prove that if $\bigwedge^rT_X$ is $H$-Ulrich for some $0&lt;\dim X$, then $X$ is Fano and the intersection number $(-K_X)\cdot H^{n-1}$ is determined explicitly. We then classify the Picard number one case: the only example is the Veronese surface $(\mathbb P^2,\mathcal O_{\mathbb P^2}(2))$.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "Curves in High Degree Plane Pencils with Bounded Degree Components", "author": "Hasan Suluyer", "published": "Mon, 29 Jun 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2606.27890", "summary": "arXiv:2606.27890v1 Announce Type: new \nAbstract: In this paper, we study pencils of plane curves of sufficiently large degree $d$ with simple base points, and their reducible curves whose irreducible components have degree at most $k\\geq 2$. Combining techniques from algebraic geometry and combinatorics, we establish an explicit upper bound on the number $m_k$ of such curves in the pencils. We prove that, for sufficiently large $d$, pencils with more than six such curves do not exist. Consequently, under the stronger assumption $d\\geq\\frac{7}{2}k(k-1)-2$, we obtain the bound $m_k\\leq 6$, improving the previously known bound for $d \\ge 2k$. We also establish restrictions on pencils containing reducible curves consisting of one irreducible component of degree $k$ together with lines, and obtain nonexistence results for certain such pencils.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2606.27890" target="_blank">Curves in High Degree Plane Pencils with Bounded Degree Components</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Hasan Suluyer</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 29 Jun 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2606.27890" target="_blank">https://arxiv.org/abs/2606.27890</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we study pencils of plane curves of sufficiently large degree $d$ with simple base points, and their reducible curves whose irreducible components have degree at most $k\geq 2$. Combining techniques from algebraic geometry and combinatorics, we establish an explicit upper bound on the number $m_k$ of such curves in the pencils. We prove that, for sufficiently large $d$, pencils with more than six such curves do not exist. Consequently, under the stronger assumption $d\geq\frac{7}{2}k(k-1)-2$, we obtain the bound $m_k\leq 6$, improving the previously known bound for $d \ge 2k$. We also establish restrictions on pencils containing reducible curves consisting of one irreducible component of degree $k$ together with lines, and obtain nonexistence results for certain such pencils.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "On the maximal variation problem and Lefschetz pencils", "author": "Davide Bricalli, Gian Pietro Pirola", "published": "Mon, 29 Jun 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2606.27893", "summary": "arXiv:2606.27893v1 Announce Type: new \nAbstract: We study the maximal variation problem for linear systems associated with a very ample line bundle, using Hodge theory and Picard-Lefschetz theory. We provide an affirmative answer to the maximal variation problem for a broad class of smooth projective varieties. This includes varieties $X$ of dimension $n\\geq2$ with $p_g=h^{n,0}(X)&gt;0$ and $H^{n-1,0}(X)=\\{0\\}$, Enriques surfaces, irregular surfaces with maximal Albanese dimension, smooth hyperk\\\"ahler varieties, and all the smooth not Fano hypersurfaces in $\\mathbb{P}^n$. As a consequence, by a result of Beauville, we establish a Lefschetz property for the Jacobian rings of smooth hypersurfaces in $\\mathbb{P}^n$ of degree n+1.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2606.27893" target="_blank">On the maximal variation problem and Lefschetz pencils</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Davide Bricalli, Gian Pietro Pirola</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 29 Jun 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2606.27893" target="_blank">https://arxiv.org/abs/2606.27893</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the maximal variation problem for linear systems associated with a very ample line bundle, using Hodge theory and Picard-Lefschetz theory. We provide an affirmative answer to the maximal variation problem for a broad class of smooth projective varieties. This includes varieties $X$ of dimension $n\geq2$ with $p_g=h^{n,0}(X)&gt;0$ and $H^{n-1,0}(X)=\{0\}$, Enriques surfaces, irregular surfaces with maximal Albanese dimension, smooth hyperk\"ahler varieties, and all the smooth not Fano hypersurfaces in $\mathbb{P}^n$. As a consequence, by a result of Beauville, we establish a Lefschetz property for the Jacobian rings of smooth hypersurfaces in $\mathbb{P}^n$ of degree n+1.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "General position on Severi--Brauer surfaces", "author": "Jack Ritschel", "published": "Mon, 29 Jun 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2606.27940", "summary": "arXiv:2606.27940v1 Announce Type: new \nAbstract: The blowing-up of the projective plane at a finite set of points yields a del Pezzo surface if and only if the points lie in general position. In this note, we generalize this result to Severi--Brauer surfaces over arbitrary ground fields. Using Galois descent, intersection theory and combinatorial arguments, we provide explicit arithmetic and geometric conditions on the centre of the blowing-up.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2606.27940" target="_blank">General position on Severi--Brauer surfaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jack Ritschel</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 29 Jun 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2606.27940" target="_blank">https://arxiv.org/abs/2606.27940</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The blowing-up of the projective plane at a finite set of points yields a del Pezzo surface if and only if the points lie in general position. In this note, we generalize this result to Severi--Brauer surfaces over arbitrary ground fields. Using Galois descent, intersection theory and combinatorial arguments, we provide explicit arithmetic and geometric conditions on the centre of the blowing-up.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Enumerating matrices with prescribed entries in an adjoint orbit", "author": "Samrith Ram", "published": "Mon, 29 Jun 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2606.27497", "summary": "arXiv:2606.27497v1 Announce Type: cross \nAbstract: We study intersections of conjugacy classes of square matrices over a finite field with affine coordinate subspaces, or equivalently matrices in a fixed adjoint orbit with prescribed entries. Our main result treats the case of prescribed columns: for a partially defined linear map we give a Hall scalar product formula for the number of extensions to an endomorphism with prescribed similarity invariants. This formula is expressed in terms of skew modified Hall--Littlewood functions and $q$-Whittaker functions. As applications, we count monic matrix polynomials over $\\mathbb{F}_q$ with prescribed Smith normal form and with prescribed determinant, and recover the Gerstenhaber--Reiner formula for the number of square matrices with a fixed characteristic polynomial. We also note that known point-count formulas for Hessenberg varieties imply related formulas for Hessenberg supports involving chromatic quasisymmetric functions, motivating polynomiality questions for more general supports and prescribed affine slices.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2606.27497" target="_blank">Enumerating matrices with prescribed entries in an adjoint orbit</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Samrith Ram</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 29 Jun 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2606.27497" target="_blank">https://arxiv.org/abs/2606.27497</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study intersections of conjugacy classes of square matrices over a finite field with affine coordinate subspaces, or equivalently matrices in a fixed adjoint orbit with prescribed entries. Our main result treats the case of prescribed columns: for a partially defined linear map we give a Hall scalar product formula for the number of extensions to an endomorphism with prescribed similarity invariants. This formula is expressed in terms of skew modified Hall--Littlewood functions and $q$-Whittaker functions. As applications, we count monic matrix polynomials over $\mathbb{F}_q$ with prescribed Smith normal form and with prescribed determinant, and recover the Gerstenhaber--Reiner formula for the number of square matrices with a fixed characteristic polynomial. We also note that known point-count formulas for Hessenberg varieties imply related formulas for Hessenberg supports involving chromatic quasisymmetric functions, motivating polynomiality questions for more general supports and prescribed affine slices.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Abelian Orbifolds for Brane Brick Models", "author": "Juno Kwon, Rak-Kyeong Seong", "published": "Mon, 29 Jun 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2606.28110", "summary": "arXiv:2606.28110v1 Announce Type: cross \nAbstract: We present a systematic procedure for constructing brane brick models corresponding to abelian orbifolds of toric Calabi-Yau 4-folds, extending the orbifold construction beyond the well-studied case of abelian orbifolds of C^4. Given a parent brane brick model corresponding to a toric Calabi-Yau 4-fold M, we show that the action of an abelian orbifold group Gamma on the generators of M induces an action on the chiral and Fermi fields as well as the J- and E-terms of the associated 2d (0,2) supersymmetric gauge theory. The requirement that the orbifolded brane brick model remains consistent with the closed paths associated with the J- and E-terms, together with the chiral cycles formed by their products, precisely reproduces the Calabi-Yau condition on the orbifold action. This procedure yields an explicit formula for the J- and E-terms of the orbifolded brane brick model in terms of those of the parent theory. We apply our construction to the brane brick models corresponding to Q^{1,1,1} and D_3, and present the resulting families of 2d (0,2) quiver gauge theories. We also present explicit expressions for generating functions that count distinct abelian orbifolds of Q^{1,1,1} and D_3.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2606.28110" target="_blank">Abelian Orbifolds for Brane Brick Models</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Juno Kwon, Rak-Kyeong Seong</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 29 Jun 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2606.28110" target="_blank">https://arxiv.org/abs/2606.28110</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We present a systematic procedure for constructing brane brick models corresponding to abelian orbifolds of toric Calabi-Yau 4-folds, extending the orbifold construction beyond the well-studied case of abelian orbifolds of C^4. Given a parent brane brick model corresponding to a toric Calabi-Yau 4-fold M, we show that the action of an abelian orbifold group Gamma on the generators of M induces an action on the chiral and Fermi fields as well as the J- and E-terms of the associated 2d (0,2) supersymmetric gauge theory. The requirement that the orbifolded brane brick model remains consistent with the closed paths associated with the J- and E-terms, together with the chiral cycles formed by their products, precisely reproduces the Calabi-Yau condition on the orbifold action. This procedure yields an explicit formula for the J- and E-terms of the orbifolded brane brick model in terms of those of the parent theory. We apply our construction to the brane brick models corresponding to Q^{1,1,1} and D_3, and present the resulting families of 2d (0,2) quiver gauge theories. We also present explicit expressions for generating functions that count distinct abelian orbifolds of Q^{1,1,1} and D_3.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "The quantum connection and its mod p reduction", "author": "Dan Pomerleano, Paul Seidel", "published": "Mon, 29 Jun 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2606.28256", "summary": "arXiv:2606.28256v1 Announce Type: cross \nAbstract: Recent progress on the structure of the quantum connection for monotone symplectic manifolds has used two approaches, which share the common feature of reducing to mod $p$ coefficients. We refine and compare those approaches. In particular, we establish a relation with quantum Steenrod operations which is stronger than that in Chen's work, leading to more precise information about the singularity at $\\infty$ of the quantum connection. For the version of the connection relative to a smooth anticanonical divisor, we draw attention to the implications of the categorical mod $p$ Fontaine-Laffaille structure established by Petrov-Vaintrob-Vologodsky.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2606.28256" target="_blank">The quantum connection and its mod p reduction</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Dan Pomerleano, Paul Seidel</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 29 Jun 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2606.28256" target="_blank">https://arxiv.org/abs/2606.28256</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Recent progress on the structure of the quantum connection for monotone symplectic manifolds has used two approaches, which share the common feature of reducing to mod $p$ coefficients. We refine and compare those approaches. In particular, we establish a relation with quantum Steenrod operations which is stronger than that in Chen's work, leading to more precise information about the singularity at $\infty$ of the quantum connection. For the version of the connection relative to a smooth anticanonical divisor, we draw attention to the implications of the categorical mod $p$ Fontaine-Laffaille structure established by Petrov-Vaintrob-Vologodsky.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "Fine multidegrees, universal Grobner bases, and matrix Schubert varieties", "author": "Daoji Huang, Matt Larson", "published": "Mon, 29 Jun 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2410.02135", "summary": "arXiv:2410.02135v3 Announce Type: replace \nAbstract: We give a criterion for a collection of polynomials to be a universal Gr\\\"{o}bner basis for an ideal in terms of the multidegree of the closure of the corresponding affine variety in $(\\mathbb{P}^1)^N$. This criterion can be used to give simple proofs of several existing results on universal Gr\\\"{o}bner bases. We introduce fine Schubert polynomials, which record the multidegrees of the closures of matrix Schubert varieties in $(\\mathbb{P}^1)^{n^2}$. We compute the fine Schubert polynomials of permutations $w$ where the coefficients of the Schubert polynomials of $w$ and $w^{-1}$ are all either 0 or 1, and we use this to give a universal Gr\\\"{o}bner basis for the ideal of the matrix Schubert variety of such a permutation.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2410.02135" target="_blank">Fine multidegrees, universal Grobner bases, and matrix Schubert varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Daoji Huang, Matt Larson</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 29 Jun 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2410.02135" target="_blank">https://arxiv.org/abs/2410.02135</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We give a criterion for a collection of polynomials to be a universal Gr\"{o}bner basis for an ideal in terms of the multidegree of the closure of the corresponding affine variety in $(\mathbb{P}^1)^N$. This criterion can be used to give simple proofs of several existing results on universal Gr\"{o}bner bases. We introduce fine Schubert polynomials, which record the multidegrees of the closures of matrix Schubert varieties in $(\mathbb{P}^1)^{n^2}$. We compute the fine Schubert polynomials of permutations $w$ where the coefficients of the Schubert polynomials of $w$ and $w^{-1}$ are all either 0 or 1, and we use this to give a universal Gr\"{o}bner basis for the ideal of the matrix Schubert variety of such a permutation.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "Variation of cones of divisors in a family of varieties -- Fano type case", "author": "Sung Rak Choi, Zhan Li, Chuyu Zhou", "published": "Mon, 29 Jun 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2504.04109", "summary": "arXiv:2504.04109v5 Announce Type: replace \nAbstract: We investigate the relationship between the Fano type property on fibers over a Zariski dense subset and the global Fano type property. We establish the invariance of N\\'eron-Severi spaces, nef cones, effective cones, movable cones, and Mori chamber decompositions for a family of Fano type varieties after a generically finite base change. Additionally, we show the uniform behavior of the minimal model program for this family. These results are applied to the boundedness problem of Fano type varieties.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2504.04109" target="_blank">Variation of cones of divisors in a family of varieties -- Fano type case</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sung Rak Choi, Zhan Li, Chuyu Zhou</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 29 Jun 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2504.04109" target="_blank">https://arxiv.org/abs/2504.04109</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We investigate the relationship between the Fano type property on fibers over a Zariski dense subset and the global Fano type property. We establish the invariance of N\'eron-Severi spaces, nef cones, effective cones, movable cones, and Mori chamber decompositions for a family of Fano type varieties after a generically finite base change. Additionally, we show the uniform behavior of the minimal model program for this family. These results are applied to the boundedness problem of Fano type varieties.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "The Isomorphism Classes of the Surfaces $x_1^{a_1} + x_2^{a_2} + x_3^{a_3} + 1 = 0$", "author": "Michael Chitayat, Buddhadev Hajra", "published": "Mon, 29 Jun 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.07617", "summary": "arXiv:2605.07617v2 Announce Type: replace \nAbstract: Let $f = x_1^{a_1} + x_2^{a_2} + x_3^{a_3} + 1 \\in \\mathbb{C}[x_1,x_2,x_3]$ and let $g = y_1^{b_1} + y_2^{b_2} + y_3^{b_3} + 1 \\in \\mathbb{C}[y_1,y_2,y_3]$ where $a_1,a_2,a_3,b_1,b_2,b_3 \\geq 2$. We prove that the surfaces $V(f) \\subset \\mathbb{A}^3$ and $V(g) \\subset \\mathbb{A}^3$ are isomorphic if and only if $(a_1,a_2,a_3) = (b_1,b_2,b_3)$ up to a permutation of the entries.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2605.07617" target="_blank">The Isomorphism Classes of the Surfaces $x_1^{a_1} + x_2^{a_2} + x_3^{a_3} + 1 = 0$</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Michael Chitayat, Buddhadev Hajra</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 29 Jun 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.07617" target="_blank">https://arxiv.org/abs/2605.07617</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $f = x_1^{a_1} + x_2^{a_2} + x_3^{a_3} + 1 \in \mathbb{C}[x_1,x_2,x_3]$ and let $g = y_1^{b_1} + y_2^{b_2} + y_3^{b_3} + 1 \in \mathbb{C}[y_1,y_2,y_3]$ where $a_1,a_2,a_3,b_1,b_2,b_3 \geq 2$. We prove that the surfaces $V(f) \subset \mathbb{A}^3$ and $V(g) \subset \mathbb{A}^3$ are isomorphic if and only if $(a_1,a_2,a_3) = (b_1,b_2,b_3)$ up to a permutation of the entries.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "On the image of Hitchin morphism for some classical groups on algebraic surfaces", "author": "Artan Sheshmani, Jianping Wang, Xiaopeng Xia", "published": "Mon, 29 Jun 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2606.17505", "summary": "arXiv:2606.17505v2 Announce Type: replace \nAbstract: In this article, we study the image of the Hitchin morphism for some classical groups over an algebraic surface. The Hitchin morphism is a map from the moduli stack of $G$-Higgs bundles $\\mathscr{M}_{X,G}$ to the Hitchin base $\\mathscr{A}_{X,G}$, where $X$ is a smooth projective variety. In general, this morphism is not surjective when the dimension of $X$ is greater than one. Chen and Ng{\\^o} showed that the Hitchin morphism factors through a closed subscheme $\\mathscr{B}_{X,G}$ of the Hitchin base, which is called the spectral base. They conjectured that the image of the Hitchin morphism is exactly the spectral base. When $X$ is a smooth projective surface, we prove that this conjecture holds for the special linear algebraic group of odd rank. We also confirm this conjecture for the classical groups ${\\rm SL}_n$ and ${\\rm Sp}_{2n}$ when $X$ is a product of smooth curves.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2606.17505" target="_blank">On the image of Hitchin morphism for some classical groups on algebraic surfaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Artan Sheshmani, Jianping Wang, Xiaopeng Xia</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 29 Jun 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2606.17505" target="_blank">https://arxiv.org/abs/2606.17505</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this article, we study the image of the Hitchin morphism for some classical groups over an algebraic surface. The Hitchin morphism is a map from the moduli stack of $G$-Higgs bundles $\mathscr{M}_{X,G}$ to the Hitchin base $\mathscr{A}_{X,G}$, where $X$ is a smooth projective variety. In general, this morphism is not surjective when the dimension of $X$ is greater than one. Chen and Ng{\^o} showed that the Hitchin morphism factors through a closed subscheme $\mathscr{B}_{X,G}$ of the Hitchin base, which is called the spectral base. They conjectured that the image of the Hitchin morphism is exactly the spectral base. When $X$ is a smooth projective surface, we prove that this conjecture holds for the special linear algebraic group of odd rank. We also confirm this conjecture for the classical groups ${\rm SL}_n$ and ${\rm Sp}_{2n}$ when $X$ is a product of smooth curves.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Higher Hida theory for Hilbert modular varieties in the totally split case", "author": "Giada Grossi", "published": "Mon, 29 Jun 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2106.05666", "summary": "arXiv:2106.05666v4 Announce Type: replace-cross \nAbstract: We study $p$-adic properties of the coherent cohomology of some automorphic sheaves on the Hilbert modular variety $X$ for a totally real field $F$ in the case where the prime $p$ is totally split in $F$. More precisely, we develop higher Hida theory \\`{a} la Pilloni, constructing, for $0\\leq q\\leq [F:\\mathbb{Q}]$, some modules $M^q$ which $p$-adically interpolate the ordinary part of the cohomology groups $H^q(X, \\underline{\\omega}^{\\kappa})$, varying the weight $\\kappa$ of the automorphic sheaf.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2106.05666" target="_blank">Higher Hida theory for Hilbert modular varieties in the totally split case</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Giada Grossi</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 29 Jun 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2106.05666" target="_blank">https://arxiv.org/abs/2106.05666</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study $p$-adic properties of the coherent cohomology of some automorphic sheaves on the Hilbert modular variety $X$ for a totally real field $F$ in the case where the prime $p$ is totally split in $F$. More precisely, we develop higher Hida theory \`{a} la Pilloni, constructing, for $0\leq q\leq [F:\mathbb{Q}]$, some modules $M^q$ which $p$-adically interpolate the ordinary part of the cohomology groups $H^q(X, \underline{\omega}^{\kappa})$, varying the weight $\kappa$ of the automorphic sheaf.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "A Hodge filtration on chiral homology and Poisson homology of associated schemes", "author": "Jethro van Ekeren, Reimundo Heluani", "published": "Mon, 29 Jun 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2311.16327", "summary": "arXiv:2311.16327v2 Announce Type: replace-cross \nAbstract: We introduce filtrations in chiral homology complexes of smooth elliptic curves, exploiting the mixed Hodge structure on cohomology groups of configuration spaces. We use these to relate the chiral homology of a smooth elliptic curve with coefficients in a vertex algebra with the Poisson homology of the associated Poisson scheme. As an application we deduce finite dimensionality results for chiral homology in low degrees.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2311.16327" target="_blank">A Hodge filtration on chiral homology and Poisson homology of associated schemes</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jethro van Ekeren, Reimundo Heluani</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 29 Jun 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2311.16327" target="_blank">https://arxiv.org/abs/2311.16327</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We introduce filtrations in chiral homology complexes of smooth elliptic curves, exploiting the mixed Hodge structure on cohomology groups of configuration spaces. We use these to relate the chiral homology of a smooth elliptic curve with coefficients in a vertex algebra with the Poisson homology of the associated Poisson scheme. As an application we deduce finite dimensionality results for chiral homology in low degrees.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "Sum of Squares Submodularity", "author": "Anna Deza, Georgina Hall", "published": "Mon, 29 Jun 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2510.24550", "summary": "arXiv:2510.24550v2 Announce Type: replace-cross \nAbstract: We introduce the notion of $t$-sum of squares (sos) submodularity, which is a hierarchy, indexed by $t$, of sufficient algebraic conditions for certifying submodularity of set functions. We show that, for fixed $t$, each level of the hierarchy can be verified via a semidefinite program of size polynomial in $n$, the size of the ground set of the set function. This is particularly relevant given existing hardness results around testing whether a set function is submodular (Crama, 1989). We derive several equivalent algebraic characterizations of $t$-sos submodularity and identify submodularity-preserving operations that also preserve $t$-sos submodularity. We further present a complete classification of the cases for which submodularity and $t$-sos submodularity coincide, as well as examples of $t$-sos-submodular functions. We demonstrate the usefulness of $t$-sos submodularity through three applications: (i) a new convex approach to submodular regression, involving minimal manual tuning; (ii) a systematic procedure to derive lower bounds on the submodularity ratio in approximate submodular maximization, and (iii) improved difference-of-submodular decompositions for difference-of-submodular optimization. Overall, our work builds a new bridge between discrete optimization and real algebraic geometry by connecting sum of squares-based algebraic certificates to a fundamental discrete structure, submodularity.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2510.24550" target="_blank">Sum of Squares Submodularity</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Anna Deza, Georgina Hall</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 29 Jun 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.24550" target="_blank">https://arxiv.org/abs/2510.24550</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We introduce the notion of $t$-sum of squares (sos) submodularity, which is a hierarchy, indexed by $t$, of sufficient algebraic conditions for certifying submodularity of set functions. We show that, for fixed $t$, each level of the hierarchy can be verified via a semidefinite program of size polynomial in $n$, the size of the ground set of the set function. This is particularly relevant given existing hardness results around testing whether a set function is submodular (Crama, 1989). We derive several equivalent algebraic characterizations of $t$-sos submodularity and identify submodularity-preserving operations that also preserve $t$-sos submodularity. We further present a complete classification of the cases for which submodularity and $t$-sos submodularity coincide, as well as examples of $t$-sos-submodular functions. We demonstrate the usefulness of $t$-sos submodularity through three applications: (i) a new convex approach to submodular regression, involving minimal manual tuning; (ii) a systematic procedure to derive lower bounds on the submodularity ratio in approximate submodular maximization, and (iii) improved difference-of-submodular decompositions for difference-of-submodular optimization. Overall, our work builds a new bridge between discrete optimization and real algebraic geometry by connecting sum of squares-based algebraic certificates to a fundamental discrete structure, submodularity.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-06-29 13:09:54
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>
