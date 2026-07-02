@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Thu, 02 Jul 2026 04:00:25 +0000<br>
+        <strong>論文数:</strong> 19件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Generalized Nikulin surfaces and irreducible symplectic fourfolds</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Automorphism groups of non-normal rigid affine surfaces are finite-dimensional</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">An equivariant fixed-level Demailly identity for Fano manifolds</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">An introduction to the intersection theory of the moduli space of curves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">Prym-Brill-Noether Theory for General Covers</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">Sheared Witt Vectors</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Central isogenies and conjugacy classes in reductive groups</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Reductive monoids over general base</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">Pseudo-centralizers in affine Hecke algebras</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">La geometr\'ia de los monoides</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">K-stability of special Gushel-Mukai manifolds</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">On Gorenstein $\mathbb{Q}_p$-rational threefold and fourfold singularities</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">Logarithmic Geometry and Geometric Class Field Theory</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Minimal Non-Weierstrass Semigroups</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Modular inequalities and Alexander polynomials of pencil type conic-line arrangements</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">Lagrangian correspondences of nonabelian Hodge type and shifted twistor structures</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">Algebraic groups generated by semisimple elements</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">On the derived Tate curve and global smooth Tate $K$-theory</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">On depth-zero integral models of local Shimura varieties</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Generalized Nikulin surfaces and irreducible symplectic fourfolds", "author": "Chiara Camere, Alice Garbagnati, Grzegorz Kapustka, Micha{\\l} Kapustka", "published": "Thu, 02 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.00130", "summary": "arXiv:2607.00130v1 Announce Type: new \nAbstract: A Nikulin surface is the minimal resolution of the quotient of a $K3$ surface $S$ by a symplectic involution $\\iota_S$. Equivalently, it is the $2$-dimensional component of the fixed locus of the involution induced by $\\iota_S$ on the Hilbert scheme $S^{[2]}$. We study $K3$ surfaces $F$ that are the $2$-dimensional component of the fixed locus of a symplectic involution $\\iota$ on hyper-K\\\"ahler manifolds $X$ of $K3^{[2]}$-type; we call them generalized Nikulin surfaces. We show that a projective $K3$ surface is a generalized Nikulin surface if and only if its N\\'eron-Severi lattice contains primitively the lattice $E_7(-2)$. Moreover, we show that the transcendental lattices $T_F$ and $T_{\\widetilde{X/ \\iota}}$, where $\\widetilde{X/ \\iota}$ is the terminalization of the quotient $X/\\iota$, are Hodge isometric. Finally, we describe projective models of generalized Nikulin surfaces of small degrees.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2607.00130" target="_blank">Generalized Nikulin surfaces and irreducible symplectic fourfolds</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Chiara Camere, Alice Garbagnati, Grzegorz Kapustka, Micha{\l} Kapustka</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 02 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.00130" target="_blank">https://arxiv.org/abs/2607.00130</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                A Nikulin surface is the minimal resolution of the quotient of a $K3$ surface $S$ by a symplectic involution $\iota_S$. Equivalently, it is the $2$-dimensional component of the fixed locus of the involution induced by $\iota_S$ on the Hilbert scheme $S^{[2]}$. We study $K3$ surfaces $F$ that are the $2$-dimensional component of the fixed locus of a symplectic involution $\iota$ on hyper-K\"ahler manifolds $X$ of $K3^{[2]}$-type; we call them generalized Nikulin surfaces. We show that a projective $K3$ surface is a generalized Nikulin surface if and only if its N\'eron-Severi lattice contains primitively the lattice $E_7(-2)$. Moreover, we show that the transcendental lattices $T_F$ and $T_{\widetilde{X/ \iota}}$, where $\widetilde{X/ \iota}$ is the terminalization of the quotient $X/\iota$, are Hodge isometric. Finally, we describe projective models of generalized Nikulin surfaces of small degrees.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Automorphism groups of non-normal rigid affine surfaces are finite-dimensional", "author": "Ivan Beldiev, Alexander Perepechko", "published": "Thu, 02 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.00652", "summary": "arXiv:2607.00652v1 Announce Type: new \nAbstract: It was recently established by Perepechko and Zaidenberg that the automorphism group of a normal affine surface is finite-dimensional if and only if the surface admits no non-trivial action of the additive group of the base field. We extend this result to non-normal affine surfaces.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2607.00652" target="_blank">Automorphism groups of non-normal rigid affine surfaces are finite-dimensional</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ivan Beldiev, Alexander Perepechko</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 02 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.00652" target="_blank">https://arxiv.org/abs/2607.00652</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                It was recently established by Perepechko and Zaidenberg that the automorphism group of a normal affine surface is finite-dimensional if and only if the surface admits no non-trivial action of the additive group of the base field. We extend this result to non-normal affine surfaces.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "An equivariant fixed-level Demailly identity for Fano manifolds", "author": "Jihao Liu, Sheng Qin", "published": "Thu, 02 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.00708", "summary": "arXiv:2607.00708v1 Announce Type: new \nAbstract: Jin and Rubinstein asked whether the fixed-level equivariant Tian's alpha invariant equals the fixed-level equivariant global log canonical threshold, and proved this equality for toric varieties. In this paper we provide a positive answer to Jin and Rubinstein's question in full generality. The main result of this paper was obtained by Chatgpt 5.5 pro, and the Danus system based on the Rethlas system.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2607.00708" target="_blank">An equivariant fixed-level Demailly identity for Fano manifolds</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jihao Liu, Sheng Qin</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 02 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.00708" target="_blank">https://arxiv.org/abs/2607.00708</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Jin and Rubinstein asked whether the fixed-level equivariant Tian's alpha invariant equals the fixed-level equivariant global log canonical threshold, and proved this equality for toric varieties. In this paper we provide a positive answer to Jin and Rubinstein's question in full generality. The main result of this paper was obtained by Chatgpt 5.5 pro, and the Danus system based on the Rethlas system.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "An introduction to the intersection theory of the moduli space of curves", "author": "Hannah Larson", "published": "Thu, 02 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.01112", "summary": "arXiv:2607.01112v1 Announce Type: new \nAbstract: We introduce the intersection theory of the moduli space of curves and its tautological ring. We survey open questions about the tautological ring and sketch techniques for proving the Chow ring is or is not generated by tautological classes.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2607.01112" target="_blank">An introduction to the intersection theory of the moduli space of curves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Hannah Larson</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 02 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.01112" target="_blank">https://arxiv.org/abs/2607.01112</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We introduce the intersection theory of the moduli space of curves and its tautological ring. We survey open questions about the tautological ring and sketch techniques for proving the Chow ring is or is not generated by tautological classes.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "Prym-Brill-Noether Theory for General Covers", "author": "David Jensen", "published": "Thu, 02 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.01173", "summary": "arXiv:2607.01173v1 Announce Type: new \nAbstract: We bound the dimension of the Prym-Brill-Noether variety for an open subset of the moduli space of \\'{e}tale double covers of k-elliptic curves. We also obtain new bounds on the dimension of the Prym-Brill-Noether variety for general \\'{e}tale double covers of k-gonal curves, disproving a conjecture of Creech, Len, Ritter, and Wu, and provide a new conjecture for its dimension. To do this, we completely describe the Prym-Brill-Noether variety of a double cover of a certain tropical curve known as the loop of loops. We use the combinatorics of Coxeter groups to establish several topological properties of these tropical Prym-Brill-Noether varieties, and prove a lifting result when the edge lengths are generic.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2607.01173" target="_blank">Prym-Brill-Noether Theory for General Covers</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> David Jensen</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 02 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.01173" target="_blank">https://arxiv.org/abs/2607.01173</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We bound the dimension of the Prym-Brill-Noether variety for an open subset of the moduli space of \'{e}tale double covers of k-elliptic curves. We also obtain new bounds on the dimension of the Prym-Brill-Noether variety for general \'{e}tale double covers of k-gonal curves, disproving a conjecture of Creech, Len, Ritter, and Wu, and provide a new conjecture for its dimension. To do this, we completely describe the Prym-Brill-Noether variety of a double cover of a certain tropical curve known as the loop of loops. We use the combinatorics of Coxeter groups to establish several topological properties of these tropical Prym-Brill-Noether varieties, and prove a lifting result when the edge lengths are generic.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "Sheared Witt Vectors", "author": "Bhargav Bhatt, Akhil Mathew, Vadim Vologodsky", "published": "Thu, 02 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.01178", "summary": "arXiv:2607.01178v1 Announce Type: new \nAbstract: V. Drinfeld and E. Lau introduced a ``decompletion'' of the ring of $p$-typical Witt vectors, following earlier work of T. Zink. The goal of this paper is to offer an exposition of this construction, which we call the sheared Witt vectors, on the category of rings $R$ whose reduction is a perfect $\\mathbb{F}_p$-algebra.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2607.01178" target="_blank">Sheared Witt Vectors</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Bhargav Bhatt, Akhil Mathew, Vadim Vologodsky</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 02 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.01178" target="_blank">https://arxiv.org/abs/2607.01178</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                V. Drinfeld and E. Lau introduced a ``decompletion'' of the ring of $p$-typical Witt vectors, following earlier work of T. Zink. The goal of this paper is to offer an exposition of this construction, which we call the sheared Witt vectors, on the category of rings $R$ whose reduction is a perfect $\mathbb{F}_p$-algebra.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Central isogenies and conjugacy classes in reductive groups", "author": "Sean Cotner", "published": "Thu, 02 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.00088", "summary": "arXiv:2607.00088v1 Announce Type: cross \nAbstract: Steinberg described the group of components of the centralizer of a semisimple element of a connected semisimple algebraic group $G$ as a subgroup of the fundamental group of $G$. We show that this description can be generalized to explain the fact that centralizers of unipotent elements can fail to be reduced when the universal cover of $G$ is not \\'etale. As applications, we compute generic multiplicities in the special fibers of moduli spaces of L-parameters and universal deformation rings, and we show there is no Springer isomorphism for $\\mathrm{PGL}_p$ in characteristic $p$.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2607.00088" target="_blank">Central isogenies and conjugacy classes in reductive groups</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sean Cotner</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 02 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.00088" target="_blank">https://arxiv.org/abs/2607.00088</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Steinberg described the group of components of the centralizer of a semisimple element of a connected semisimple algebraic group $G$ as a subgroup of the fundamental group of $G$. We show that this description can be generalized to explain the fact that centralizers of unipotent elements can fail to be reduced when the universal cover of $G$ is not \'etale. As applications, we compute generic multiplicities in the special fibers of moduli spaces of L-parameters and universal deformation rings, and we show there is no Springer isomorphism for $\mathrm{PGL}_p$ in characteristic $p$.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Reductive monoids over general base", "author": "Jingren Chi, Simon Jacques", "published": "Thu, 02 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.00322", "summary": "arXiv:2607.00322v1 Announce Type: cross \nAbstract: We develop a theory of affine algebraic monoids over general base schemes whose unit groups are split reductive groups. Our main result is a classification theorem for such objects, generalizing works of Vinberg and Rittatore over a field. As applications, we obtain combinatorial descriptions and normality properties of orbit closures, prove a Steinberg-type theorem on adjoint quotients of reductive monoids over general base schemes, and construct finite type integral models of the Vinberg monoids. A main tool in our construction is Lusztig's theory of modified quantum groups and their canonical bases.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2607.00322" target="_blank">Reductive monoids over general base</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jingren Chi, Simon Jacques</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 02 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.00322" target="_blank">https://arxiv.org/abs/2607.00322</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We develop a theory of affine algebraic monoids over general base schemes whose unit groups are split reductive groups. Our main result is a classification theorem for such objects, generalizing works of Vinberg and Rittatore over a field. As applications, we obtain combinatorial descriptions and normality properties of orbit closures, prove a Steinberg-type theorem on adjoint quotients of reductive monoids over general base schemes, and construct finite type integral models of the Vinberg monoids. A main tool in our construction is Lusztig's theory of modified quantum groups and their canonical bases.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "Pseudo-centralizers in affine Hecke algebras", "author": "Jonathan Gruber", "published": "Thu, 02 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.00426", "summary": "arXiv:2607.00426v1 Announce Type: cross \nAbstract: We introduce and study a subalgebra $\\mathcal{B}$ of the affine Hecke algebra, which arises from a centralizer construction in the double affine Hecke algebra, and which may be regarded as a $v$-deformation of the affine Fomin-Stanley subalgebra introduced by Lam as a combinatorial model for the affine Grassmannian homology ring. In types $\\mathsf{A}_n$ and $\\mathsf{B}_2$ and $\\mathsf{G}_2$, we show that $\\mathcal{B}_\\mathrm{aff}$ admits a canonical basis indexed by the cosets of the finite Weyl group in the affine Weyl group. We also discuss conjectural positivity properties of the canonical basis and explain how it can be used to study the center of the affine Hecke algebra.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2607.00426" target="_blank">Pseudo-centralizers in affine Hecke algebras</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jonathan Gruber</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 02 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.00426" target="_blank">https://arxiv.org/abs/2607.00426</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We introduce and study a subalgebra $\mathcal{B}$ of the affine Hecke algebra, which arises from a centralizer construction in the double affine Hecke algebra, and which may be regarded as a $v$-deformation of the affine Fomin-Stanley subalgebra introduced by Lam as a combinatorial model for the affine Grassmannian homology ring. In types $\mathsf{A}_n$ and $\mathsf{B}_2$ and $\mathsf{G}_2$, we show that $\mathcal{B}_\mathrm{aff}$ admits a canonical basis indexed by the cosets of the finite Weyl group in the affine Weyl group. We also discuss conjectural positivity properties of the canonical basis and explain how it can be used to study the center of the affine Hecke algebra.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "La geometr\\'ia de los monoides", "author": "J. Rogelio P\\'erez-Buend\\'ia, Ernesto Antonio Reyes-Ram\\'irez", "published": "Thu, 02 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2209.02110", "summary": "arXiv:2209.02110v2 Announce Type: replace \nAbstract: In this article we present the basis of Monoid Theory from a categorical point of view, emphasizing the analogies and differences with the theory of modules over commutative rings. We present the generalization of affine schemes to affine monoidal schemes. We study the relationship between the latter and toric varieties, and we set up the basis for the study of Fontaine-Kato-Illusie's Logarithmic Geometry, widely used in Arithmetic Geometry.\n  En este art\\'iculo presentamos las bases de la teor\\'ia de monoides desde el punto de vista categ\\'orico, haciendo \\'enfasis en las analog\\'ias y diferencias con la teor\\'ia de m\\'odulos sobre anillos conmutativos. Se presenta la generalizaci\\'on de esquema af\\'in a esquema af\\'in monoidal; estudiamos la relaci\\'on que \\'estos tienen con las variedades t\\'oricas y sentamos las bases para el estudio de la Geometr\\'ia Logar\\'itmica de Fontaine-Kato-Illusie, ampliamente usada en Geometr\\'ia Aritm\\'etica.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2209.02110" target="_blank">La geometr\'ia de los monoides</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> J. Rogelio P\'erez-Buend\'ia, Ernesto Antonio Reyes-Ram\'irez</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 02 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2209.02110" target="_blank">https://arxiv.org/abs/2209.02110</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this article we present the basis of Monoid Theory from a categorical point of view, emphasizing the analogies and differences with the theory of modules over commutative rings. We present the generalization of affine schemes to affine monoidal schemes. We study the relationship between the latter and toric varieties, and we set up the basis for the study of Fontaine-Kato-Illusie's Logarithmic Geometry, widely used in Arithmetic Geometry.
+  En este art\'iculo presentamos las bases de la teor\'ia de monoides desde el punto de vista categ\'orico, haciendo \'enfasis en las analog\'ias y diferencias con la teor\'ia de m\'odulos sobre anillos conmutativos. Se presenta la generalizaci\'on de esquema af\'in a esquema af\'in monoidal; estudiamos la relaci\'on que \'estos tienen con las variedades t\'oricas y sentamos las bases para el estudio de la Geometr\'ia Logar\'itmica de Fontaine-Kato-Illusie, ampliamente usada en Geometr\'ia Aritm\'etica.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "K-stability of special Gushel-Mukai manifolds", "author": "Yuchen Liu, Linsheng Wang", "published": "Thu, 02 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2405.10797", "summary": "arXiv:2405.10797v5 Announce Type: replace \nAbstract: Gushel-Mukai manifolds are specific families of $n$-dimensional Fano manifolds of Picard rank $1$ and index $n-2$ where $3\\leq n \\leq 6$. A Gushel-Mukai $n$-fold is either ordinary, i.e. a hyperquadric section of a quintic Del Pezzo $(n+1)$-fold, or special, i.e. it admits a double cover over the quintic Del Pezzo $n$-fold branched along an ordinary Gushel-Mukai $(n-1)$-fold. In this paper, we prove that a general special Gushel-Mukai $n$-fold is K-stable for every $3\\leq n\\leq 6$. Furthermore, we give a description of the first and last walls of the K-moduli of the pair $(M,cQ)$, where $M$ is the quintic Del Pezzo fourfold (or fivefold) and $Q$ is an ordinary Gushel-Mukai threefold (or fourfold). Besides, we compute $\\delta$-invariants of quintic Del Pezzo fourfolds and fivefolds which were shown to be K-unstable by K. Fujita, and show that they admit K\\\"ahler-Ricci solitons.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2405.10797" target="_blank">K-stability of special Gushel-Mukai manifolds</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yuchen Liu, Linsheng Wang</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 02 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2405.10797" target="_blank">https://arxiv.org/abs/2405.10797</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Gushel-Mukai manifolds are specific families of $n$-dimensional Fano manifolds of Picard rank $1$ and index $n-2$ where $3\leq n \leq 6$. A Gushel-Mukai $n$-fold is either ordinary, i.e. a hyperquadric section of a quintic Del Pezzo $(n+1)$-fold, or special, i.e. it admits a double cover over the quintic Del Pezzo $n$-fold branched along an ordinary Gushel-Mukai $(n-1)$-fold. In this paper, we prove that a general special Gushel-Mukai $n$-fold is K-stable for every $3\leq n\leq 6$. Furthermore, we give a description of the first and last walls of the K-moduli of the pair $(M,cQ)$, where $M$ is the quintic Del Pezzo fourfold (or fivefold) and $Q$ is an ordinary Gushel-Mukai threefold (or fourfold). Besides, we compute $\delta$-invariants of quintic Del Pezzo fourfolds and fivefolds which were shown to be K-unstable by K. Fujita, and show that they admit K\"ahler-Ricci solitons.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "On Gorenstein $\\mathbb{Q}_p$-rational threefold and fourfold singularities", "author": "Jefferson Baudin, Zsolt Patakfalvi, Linus R\\\"osler, Maciej Zdanowicz", "published": "Thu, 02 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2506.15491", "summary": "arXiv:2506.15491v3 Announce Type: replace \nAbstract: We prove that for $n \\leq 4$ and $p &gt; 5$, quasi--Gorenstein $F$--pure and $\\mathbb{Q}_p$--rational $n$--fold singularities are canonical. This is analogous to the usual fact that rational Gorenstein singularities are canonical. The proof is based on a careful analysis of the dual complex of a dlt modification of a log canonical singularity. The result for $n = 4$ is contingent upon the existence of log resolutions.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2506.15491" target="_blank">On Gorenstein $\mathbb{Q}_p$-rational threefold and fourfold singularities</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jefferson Baudin, Zsolt Patakfalvi, Linus R\"osler, Maciej Zdanowicz</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 02 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2506.15491" target="_blank">https://arxiv.org/abs/2506.15491</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove that for $n \leq 4$ and $p &gt; 5$, quasi--Gorenstein $F$--pure and $\mathbb{Q}_p$--rational $n$--fold singularities are canonical. This is analogous to the usual fact that rational Gorenstein singularities are canonical. The proof is based on a careful analysis of the dual complex of a dlt modification of a log canonical singularity. The result for $n = 4$ is contingent upon the existence of log resolutions.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "Logarithmic Geometry and Geometric Class Field Theory", "author": "Aaron Slipper", "published": "Thu, 02 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2508.08648", "summary": "arXiv:2508.08648v2 Announce Type: replace \nAbstract: We demonstrate an application of logarithmic geometry in the context of geometric Langlands, by providing a logarithmic upgrade of Deligne's geometric class field theory for tamely ramified Galois groups. In particular, we define a framed logarithmic Picard space, and show that a logarithmic compactification of the classical tamely ramified Div-to-Pic map has, for sufficiently large degree, log-simply connected fibers given by logarithmically compactified vector spaces. This provides a canonical bijection between local systems on the curve with divisorial log structure and multiplicative local systems on the framed logarithmic Picard, a logarithmic version of the Hecke eigensheaf correspondence of geometric Langlands for GL_1. We use this to re-derive tamely ramified global Artin reciprocity for function fields, and show that logarithmic geometry allows for a geometric interpretation of local-to-global compatibility at all places, in addition to the unramified places.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2508.08648" target="_blank">Logarithmic Geometry and Geometric Class Field Theory</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Aaron Slipper</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 02 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2508.08648" target="_blank">https://arxiv.org/abs/2508.08648</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We demonstrate an application of logarithmic geometry in the context of geometric Langlands, by providing a logarithmic upgrade of Deligne's geometric class field theory for tamely ramified Galois groups. In particular, we define a framed logarithmic Picard space, and show that a logarithmic compactification of the classical tamely ramified Div-to-Pic map has, for sufficiently large degree, log-simply connected fibers given by logarithmically compactified vector spaces. This provides a canonical bijection between local systems on the curve with divisorial log structure and multiplicative local systems on the framed logarithmic Picard, a logarithmic version of the Hecke eigensheaf correspondence of geometric Langlands for GL_1. We use this to re-derive tamely ramified global Artin reciprocity for function fields, and show that logarithmic geometry allows for a geometric interpretation of local-to-global compatibility at all places, in addition to the unramified places.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Minimal Non-Weierstrass Semigroups", "author": "David Eisenbud, Frank-Olaf Schreyer", "published": "Thu, 02 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.00780", "summary": "arXiv:2603.00780v4 Announce Type: replace \nAbstract: Let p in X be a point on a compact Riemann surface. The Weierstrass semigroup of p is the semigroup of pole orders of meromorphic functions on X that are regular at all but p. Hurwitz asked in 1892 whether all numerical semigroups occur as Weierstrass semigroups.\n  In this paper we give a new method for showing that certain numerical semigroups are not Weierstrass, including some of every genus g in which non-Weierstrass examples could possibly exist, except g=18. Our example for g=13 has at once the smallest possible genus, multiplicity and number of generators of any possible non-Weierstrass semigroup.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2603.00780" target="_blank">Minimal Non-Weierstrass Semigroups</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> David Eisenbud, Frank-Olaf Schreyer</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 02 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.00780" target="_blank">https://arxiv.org/abs/2603.00780</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let p in X be a point on a compact Riemann surface. The Weierstrass semigroup of p is the semigroup of pole orders of meromorphic functions on X that are regular at all but p. Hurwitz asked in 1892 whether all numerical semigroups occur as Weierstrass semigroups.
+  In this paper we give a new method for showing that certain numerical semigroups are not Weierstrass, including some of every genus g in which non-Weierstrass examples could possibly exist, except g=18. Our example for g=13 has at once the smallest possible genus, multiplicity and number of generators of any possible non-Weierstrass semigroup.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Modular inequalities and Alexander polynomials of pencil type conic-line arrangements", "author": "Anca Macinic", "published": "Thu, 02 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2606.03706", "summary": "arXiv:2606.03706v4 Announce Type: replace \nAbstract: We use recent results, among which modular inequalities for curves, to determine the Alexander polynomials for some classes of pencil-type conic-line arrangements. For these classes of curves we prove that the Alexander polynomial is (at least partially) combinatorial. To this end, we exemplify new techniques that are suitable for broader use, lending themselves to more general classes of curves.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2606.03706" target="_blank">Modular inequalities and Alexander polynomials of pencil type conic-line arrangements</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Anca Macinic</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 02 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2606.03706" target="_blank">https://arxiv.org/abs/2606.03706</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We use recent results, among which modular inequalities for curves, to determine the Alexander polynomials for some classes of pencil-type conic-line arrangements. For these classes of curves we prove that the Alexander polynomial is (at least partially) combinatorial. To this end, we exemplify new techniques that are suitable for broader use, lending themselves to more general classes of curves.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "Lagrangian correspondences of nonabelian Hodge type and shifted twistor structures", "author": "Jacob Kryczka, Yuuji Tanaka, Shing-Tung Yau", "published": "Thu, 02 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2606.30637", "summary": "arXiv:2606.30637v2 Announce Type: replace \nAbstract: Classical nonabelian Hodge theory identifies Dolbeault and de Rham moduli spaces by providing a real-analytic isomorphism. In this paper, motivated by the Kapustin--Witten theory, we study this correspondence in the more general framework of perfect complexes on proper varieties, paying special attention to the surface case. We establish a Lagrangian correspondence which relates the shifted symplectic geometries by Pantev--To\\\"en--Vaqui\\'e--Vezzosi (PTVV) between the derived stacks of flat and Higgs perfect complexes. We investigate the existence of derived twistor structures of hyperk\\\"ahler type on the moduli stack of perfect complexes endowed with $\\lambda$-connections by Deligne--Hitchin--Simpson. We establish a version of the AKSZ/PTVV transgression, Lagrangian intersection, and (hyperk\\\"ahler) symplectic reduction theorems in this context. Moreover, we prove that the derived Riemann--Hilbert correspondence of Porta and Holstein--Porta, which states an equivalence of derived analytic stacks of perfect complexes on $X_{\\mathrm{Betti}}$ and $X_{\\mathrm{DR}}$, is compatible with the natural shifted--symplectic structures. We then study the relation between the shifted (pre-)twistor structures and the shifted symplectic forms on the fibers, and prove that the analytic Deligne--Hitchin--Simpson moduli stack on a smooth projective variety $X$ has a canonical $2(1-\\dim X)$ shifted pretwistor structure over $\\mathbb{P}^1_{\\mathbb{C}}$, a result which has been anticipated for some time. In particular, the moduli stack of solutions to the Kapustin--Witten equations modulo gauge equivalence on a smooth proper complex algebraic surface exibits a $(-2)$-shifted (pre)twistor structure as a family over $\\mathbb{P}^1_{\\mathbb{C}}$.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2606.30637" target="_blank">Lagrangian correspondences of nonabelian Hodge type and shifted twistor structures</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jacob Kryczka, Yuuji Tanaka, Shing-Tung Yau</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 02 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2606.30637" target="_blank">https://arxiv.org/abs/2606.30637</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Classical nonabelian Hodge theory identifies Dolbeault and de Rham moduli spaces by providing a real-analytic isomorphism. In this paper, motivated by the Kapustin--Witten theory, we study this correspondence in the more general framework of perfect complexes on proper varieties, paying special attention to the surface case. We establish a Lagrangian correspondence which relates the shifted symplectic geometries by Pantev--To\"en--Vaqui\'e--Vezzosi (PTVV) between the derived stacks of flat and Higgs perfect complexes. We investigate the existence of derived twistor structures of hyperk\"ahler type on the moduli stack of perfect complexes endowed with $\lambda$-connections by Deligne--Hitchin--Simpson. We establish a version of the AKSZ/PTVV transgression, Lagrangian intersection, and (hyperk\"ahler) symplectic reduction theorems in this context. Moreover, we prove that the derived Riemann--Hilbert correspondence of Porta and Holstein--Porta, which states an equivalence of derived analytic stacks of perfect complexes on $X_{\mathrm{Betti}}$ and $X_{\mathrm{DR}}$, is compatible with the natural shifted--symplectic structures. We then study the relation between the shifted (pre-)twistor structures and the shifted symplectic forms on the fibers, and prove that the analytic Deligne--Hitchin--Simpson moduli stack on a smooth projective variety $X$ has a canonical $2(1-\dim X)$ shifted pretwistor structure over $\mathbb{P}^1_{\mathbb{C}}$, a result which has been anticipated for some time. In particular, the moduli stack of solutions to the Kapustin--Witten equations modulo gauge equivalence on a smooth proper complex algebraic surface exibits a $(-2)$-shifted (pre)twistor structure as a family over $\mathbb{P}^1_{\mathbb{C}}$.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "Algebraic groups generated by semisimple elements", "author": "Ivan Arzhantsev", "published": "Thu, 02 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2412.10936", "summary": "arXiv:2412.10936v2 Announce Type: replace-cross \nAbstract: Given a connected linear algebraic group $G$ over an algebraically closed field of characteristic zero, we describe the subgroup of $G$ generated by all semisimple elements.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2412.10936" target="_blank">Algebraic groups generated by semisimple elements</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ivan Arzhantsev</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 02 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2412.10936" target="_blank">https://arxiv.org/abs/2412.10936</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Given a connected linear algebraic group $G$ over an algebraically closed field of characteristic zero, we describe the subgroup of $G$ generated by all semisimple elements.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "On the derived Tate curve and global smooth Tate $K$-theory", "author": "Jack Morgan Davies, Sil Linskens", "published": "Thu, 02 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2503.04494", "summary": "arXiv:2503.04494v2 Announce Type: replace-cross \nAbstract: The interplay between equivariant stable homotopy theory and spectral algebraic geometry is used to construct a derived Tate curve over $\\mathrm{KU}((q))$, a lift of the classical elliptic curve of Tate over $\\mathbf{Z}((q))$. Applications of both an algebro-geometric and a topological flavour follow. First, we construct a spectral algebro-geometric model for the compactification of the moduli stack of oriented elliptic curves, giving a canonical choice of holomorphic topological $q$-expansion map. Then we define globally equivariant forms of Tate $K$-theory $\\mathbf{KO}((q))$ and $\\mathbf{KU}((q))$, and equip them with globally equivariant meromorphic topological $q$-expansion maps from global topological modular forms. Finally, we explore $C_2$-equivariant versions of global Tate $K$-theory and connect them with $C_2$-equivariant global topological modular forms with level structures.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2503.04494" target="_blank">On the derived Tate curve and global smooth Tate $K$-theory</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jack Morgan Davies, Sil Linskens</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 02 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2503.04494" target="_blank">https://arxiv.org/abs/2503.04494</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The interplay between equivariant stable homotopy theory and spectral algebraic geometry is used to construct a derived Tate curve over $\mathrm{KU}((q))$, a lift of the classical elliptic curve of Tate over $\mathbf{Z}((q))$. Applications of both an algebro-geometric and a topological flavour follow. First, we construct a spectral algebro-geometric model for the compactification of the moduli stack of oriented elliptic curves, giving a canonical choice of holomorphic topological $q$-expansion map. Then we define globally equivariant forms of Tate $K$-theory $\mathbf{KO}((q))$ and $\mathbf{KU}((q))$, and equip them with globally equivariant meromorphic topological $q$-expansion maps from global topological modular forms. Finally, we explore $C_2$-equivariant versions of global Tate $K$-theory and connect them with $C_2$-equivariant global topological modular forms with level structures.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "On depth-zero integral models of local Shimura varieties", "author": "Yuta Takaya", "published": "Thu, 02 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2505.10000", "summary": "arXiv:2505.10000v3 Announce Type: replace-cross \nAbstract: We specify explicit affinoids in depth-zero local Shimura varieties whose reductions are parabolic Deligne-Lusztig varieties, and construct explicit Jacquet-Langlands pairs of regular depth-zero supercuspidal representations in the cohomology of local Shimura varieties. Along the way, we develop the theory of integral moduli spaces of depth-zero level structures on local shtukas, especially at non-parahoric levels. As a consequence, we provide a direct construction of Yoshida's generalized semistable models of depth-zero Lubin-Tate spaces that were originally constructed as successive blowups.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2505.10000" target="_blank">On depth-zero integral models of local Shimura varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yuta Takaya</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 02 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2505.10000" target="_blank">https://arxiv.org/abs/2505.10000</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We specify explicit affinoids in depth-zero local Shimura varieties whose reductions are parabolic Deligne-Lusztig varieties, and construct explicit Jacquet-Langlands pairs of regular depth-zero supercuspidal representations in the cohomology of local Shimura varieties. Along the way, we develop the theory of integral moduli spaces of depth-zero level structures on local shtukas, especially at non-parahoric levels. As a consequence, we provide a direct construction of Yoshida's generalized semistable models of depth-zero Lubin-Tate spaces that were originally constructed as successive blowups.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-07-02 11:37:14
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>
