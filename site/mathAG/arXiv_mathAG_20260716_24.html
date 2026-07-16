@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Thu, 16 Jul 2026 04:00:09 +0000<br>
+        <strong>論文数:</strong> 24件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Composition of Sarkisov links between del Pezzo surfaces</a>
+            <span class="title-label-badge" style="background-color: #9b59b6;">del Pezzo</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Euclidean Distance Degrees in Macaulay2</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">On the $K$-theoretic logarithmic double ramification class</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">A complete curve of genus 105 in the moduli space of curves of genus 3</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">Non-cancellative varieties, maximal tori, and the Makar-Limanov invariant</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">On Milnor and Tjurina numbers of Pairs of Holomorphic Functions Germs</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">On the Feyzbakhsh-Thomas programme for Fano $3$-folds</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Open surfaces with a triangle at infinity</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">Smashing, Balmer, Zariski spectra: an ideal approach</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">Nonlinear Hodge correspondence for morphisms</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">Matroid correspondence</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">What are symmetric monoidal categories?</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">A note on the automorphism group of Kodaira surfaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Geometry of regular semisimple Lusztig varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Lines on K3-sextics with simple singularities</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">Notes on rational chain connectedness</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">On the Chow ring of very general abelian varieties and a question of Pirola</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">Motivic correlators, cluster varieties and Zagier's conjecture on zeta(F,4)</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Three perspectives on categorical symmetric Howe duality</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">On categorical local langlands program for $GL_n$</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-21" onchange="updateSelectedCount()">
+            <span class="title-number">21.</span>
+            <a href="#paper-21">Arithmetic Sparsity and Obstructions in Weighted Projective Spaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-22" onchange="updateSelectedCount()">
+            <span class="title-number">22.</span>
+            <a href="#paper-22">Reduced Gromov-Witten invariants without ghost bubble censorship</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-23" onchange="updateSelectedCount()">
+            <span class="title-number">23.</span>
+            <a href="#paper-23">Inversion of the Multiplicative Matrix Compound Operator</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-24" onchange="updateSelectedCount()">
+            <span class="title-number">24.</span>
+            <a href="#paper-24">Smooth solutions to systems of linear inequalities on $\mathbb{R}$</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Composition of Sarkisov links between del Pezzo surfaces", "author": "Anastasia V. Vikulova", "published": "Thu, 16 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.13270", "summary": "arXiv:2607.13270v1 Announce Type: new \nAbstract: We prove that for any two birationally equivalent del Pezzo surfaces of Picard rank one over a perfect field there is a birational map between them such that it is decomposed in a composition of at most two Sarkisov links.", "number": 1, "labels": [{"name": "del Pezzo", "color": "#9b59b6"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2607.13270" target="_blank">Composition of Sarkisov links between del Pezzo surfaces</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #9b59b6;">del Pezzo</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Anastasia V. Vikulova</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.13270" target="_blank">https://arxiv.org/abs/2607.13270</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove that for any two birationally equivalent del Pezzo surfaces of Picard rank one over a perfect field there is a birational map between them such that it is decomposed in a composition of at most two Sarkisov links.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Euclidean Distance Degrees in Macaulay2", "author": "William Huang, Jose Israel Rodriguez", "published": "Thu, 16 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.13277", "summary": "arXiv:2607.13277v1 Announce Type: new \nAbstract: We introduce EuclideanDistanceDegree, a Macaulay2 package that implements symbolic and numerical methods for computing Euclidean Distance (ED) degrees. The package includes symbolic methods based on minors and conormal varieties as well as numerical methods for unit and generic ED degrees using tools from numerical algebraic geometry. We illustrate the package functionality with a range of examples in the paper and in the accompanying GitHub repository.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2607.13277" target="_blank">Euclidean Distance Degrees in Macaulay2</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> William Huang, Jose Israel Rodriguez</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.13277" target="_blank">https://arxiv.org/abs/2607.13277</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We introduce EuclideanDistanceDegree, a Macaulay2 package that implements symbolic and numerical methods for computing Euclidean Distance (ED) degrees. The package includes symbolic methods based on minors and conormal varieties as well as numerical methods for unit and generic ED degrees using tools from numerical algebraic geometry. We illustrate the package functionality with a range of examples in the paper and in the accompanying GitHub repository.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "On the $K$-theoretic logarithmic double ramification class", "author": "Kamyar Amini, You-Cheng Chou, Leo Herr, David Holmes, Irit Huq-Kuruvilla, Yuan-Pin Lee", "published": "Thu, 16 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.13376", "summary": "arXiv:2607.13376v1 Announce Type: new \nAbstract: The logarithmic double ramification cycle is the virtual fundamental class of the locus where a line bundle on a family of curves is fiberwise trivial. We construct a K-theoretic logarithmic double ramification class and prove a product formula and a \\(\\mathrm{GL}_r(\\mathbb Z)\\)-invariance property. We also give an explicit formula for this class in terms of a Grothendieck polynomial via a novel $K$-theoretic Thom--Porteous formula for vector bundles on algebraic stacks.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2607.13376" target="_blank">On the $K$-theoretic logarithmic double ramification class</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Kamyar Amini, You-Cheng Chou, Leo Herr, David Holmes, Irit Huq-Kuruvilla, Yuan-Pin Lee</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.13376" target="_blank">https://arxiv.org/abs/2607.13376</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The logarithmic double ramification cycle is the virtual fundamental class of the locus where a line bundle on a family of curves is fiberwise trivial. We construct a K-theoretic logarithmic double ramification class and prove a product formula and a \(\mathrm{GL}_r(\mathbb Z)\)-invariance property. We also give an explicit formula for this class in terms of a Grothendieck polynomial via a novel $K$-theoretic Thom--Porteous formula for vector bundles on algebraic stacks.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "A complete curve of genus 105 in the moduli space of curves of genus 3", "author": "Christophe Ritzenthaler", "published": "Thu, 16 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.13486", "summary": "arXiv:2607.13486v1 Announce Type: new \nAbstract: We show the existence of a complete curve of genus 105 in the moduli space of smooth projective curves of genus 3 over the complex field.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2607.13486" target="_blank">A complete curve of genus 105 in the moduli space of curves of genus 3</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Christophe Ritzenthaler</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.13486" target="_blank">https://arxiv.org/abs/2607.13486</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We show the existence of a complete curve of genus 105 in the moduli space of smooth projective curves of genus 3 over the complex field.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "Non-cancellative varieties, maximal tori, and the Makar-Limanov invariant", "author": "Sergey Gaifullin, Mikhail Petrov", "published": "Thu, 16 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.13593", "summary": "arXiv:2607.13593v1 Announce Type: new \nAbstract: In this paper, we construct a wide class of new counterexamples to the generalized Zariski cancellation problem. The cylinders over these counterexamples have infinitely many non-conjugate maximal tori in their regular automorphism groups. We provide an example of a variety with maximal tori of different dimensions in its automorphism group. Additionally, we prove that a cylinder over a non-rigid trinomial variety without a line factor is generically flexible, and hence, has a trivial Makar-Limanov invariant.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2607.13593" target="_blank">Non-cancellative varieties, maximal tori, and the Makar-Limanov invariant</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sergey Gaifullin, Mikhail Petrov</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.13593" target="_blank">https://arxiv.org/abs/2607.13593</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we construct a wide class of new counterexamples to the generalized Zariski cancellation problem. The cylinders over these counterexamples have infinitely many non-conjugate maximal tori in their regular automorphism groups. We provide an example of a variety with maximal tori of different dimensions in its automorphism group. Additionally, we prove that a cylinder over a non-rigid trinomial variety without a line factor is generically flexible, and hence, has a trivial Makar-Limanov invariant.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "On Milnor and Tjurina numbers of Pairs of Holomorphic Functions Germs", "author": "Arturo Fern\\'andez-P\\'erez, Evelia R. Garc\\'ia Barroso, Nancy Saravia-Molina", "published": "Thu, 16 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.13717", "summary": "arXiv:2607.13717v1 Announce Type: new \nAbstract: Motivated by the bifurcation formula for the Milnor number of pairs of holomorphic function germs, we introduce, via foliation theory, the Tjurina number of such pairs. We prove that this is an analytic invariant, derive an explicit formula for it, and establish several of its properties, including a bifurcation formula. As an application, we characterize semitame meromorphic function germs in terms of this invariant. We also investigate several properties of the Milnor number of a pair of holomorphic function germs. In particular, we establish a version of Teissier's Lemma for pairs, derive an upper bound for the Milnor number of a pair, and apply these results to generic pencils of algebraic curves.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2607.13717" target="_blank">On Milnor and Tjurina numbers of Pairs of Holomorphic Functions Germs</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Arturo Fern\'andez-P\'erez, Evelia R. Garc\'ia Barroso, Nancy Saravia-Molina</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.13717" target="_blank">https://arxiv.org/abs/2607.13717</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Motivated by the bifurcation formula for the Milnor number of pairs of holomorphic function germs, we introduce, via foliation theory, the Tjurina number of such pairs. We prove that this is an analytic invariant, derive an explicit formula for it, and establish several of its properties, including a bifurcation formula. As an application, we characterize semitame meromorphic function germs in terms of this invariant. We also investigate several properties of the Milnor number of a pair of holomorphic function germs. In particular, we establish a version of Teissier's Lemma for pairs, derive an upper bound for the Milnor number of a pair, and apply these results to generic pencils of algebraic curves.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "On the Feyzbakhsh-Thomas programme for Fano $3$-folds", "author": "Ivan Karpov, Miguel Moreira", "published": "Thu, 16 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.13982", "summary": "arXiv:2607.13982v1 Announce Type: new \nAbstract: Let $X$ be a Fano $3$-fold with even canonical class which satisfies the generalized Bogomolov-Gieseker inequality, such as $\\mathbb P^3$. We express Donaldson-Thomas invariants counting Gieseker semistable sheaves of rank $r$, where $r &gt; 0$, on $X$ in terms of those counting sheaves of rank $0$ and pure dimension $2$. This implements an analogue of the programme initiated by S. Feyzbakhsh and R. Thomas in the case of Calabi-Yau varieties.\n  The methods include $K$-theoretic Donaldson-Thomas theory and, quite unexpectedly, the use of certain combinatorial properties of vertex algebras.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2607.13982" target="_blank">On the Feyzbakhsh-Thomas programme for Fano $3$-folds</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ivan Karpov, Miguel Moreira</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.13982" target="_blank">https://arxiv.org/abs/2607.13982</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $X$ be a Fano $3$-fold with even canonical class which satisfies the generalized Bogomolov-Gieseker inequality, such as $\mathbb P^3$. We express Donaldson-Thomas invariants counting Gieseker semistable sheaves of rank $r$, where $r &gt; 0$, on $X$ in terms of those counting sheaves of rank $0$ and pure dimension $2$. This implements an analogue of the programme initiated by S. Feyzbakhsh and R. Thomas in the case of Calabi-Yau varieties.
+  The methods include $K$-theoretic Donaldson-Thomas theory and, quite unexpectedly, the use of certain combinatorial properties of vertex algebras.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Open surfaces with a triangle at infinity", "author": "Dmitriy Chunaev, Alexander Perepechko, Daniil Shunin", "published": "Thu, 16 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.14055", "summary": "arXiv:2607.14055v1 Announce Type: new \nAbstract: A triangle surface is an open algebraic surface completed by a triangle of contractible $(-1)$-curves. We establish a combinatorial description of their completions. We also show that affine triangle surfaces are exactly cubic surfaces of Markov type. Explicit description of their automorphism groups is provided.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2607.14055" target="_blank">Open surfaces with a triangle at infinity</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Dmitriy Chunaev, Alexander Perepechko, Daniil Shunin</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.14055" target="_blank">https://arxiv.org/abs/2607.14055</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                A triangle surface is an open algebraic surface completed by a triangle of contractible $(-1)$-curves. We establish a combinatorial description of their completions. We also show that affine triangle surfaces are exactly cubic surfaces of Markov type. Explicit description of their automorphism groups is provided.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "Smashing, Balmer, Zariski spectra: an ideal approach", "author": "Jiacheng Liang, Changhan Zou", "published": "Thu, 16 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.13329", "summary": "arXiv:2607.13329v1 Announce Type: cross \nAbstract: We introduce the Zariski frame of any presentably symmetric monoidal $\\infty$-category. This allows us to unify several spectral theories arising in higher algebra. The Zariski frame is coherent whenever the category is compactly generated, and the associated spectral space recovers both the classical Zariski spectrum of a commutative ring and the Hochster dual of the Balmer spectrum of a commutative $2$-ring. Moreover, the smashing frame of any stable presentably symmetric monoidal $\\infty$-category can be identified with the Zariski frame of its category of dualizable modules. This construction is based on the principle that ideals in a symmetric monoidal $\\infty$-category should be understood as monomorphisms into the unit object. In suitable contexts, this notion recovers the kinds of ideals appearing in the preceding examples, including thick ideals and smashing ideals, and it also accommodates the smashing ideals of non-stable $\\infty$-categories. We also study the problem of forming quotients by ideals, which is subtle in the setting of higher algebra. To address this, we introduce two properties of pointed $\\infty$-categories, called $\\Sigma$-triviality and $\\Sigma$-exactness. These conditions ensure that quotienting by ideals behaves well. As an application, we construct quotients of $\\mathbb{E}_\\infty$-semirings.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2607.13329" target="_blank">Smashing, Balmer, Zariski spectra: an ideal approach</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jiacheng Liang, Changhan Zou</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.13329" target="_blank">https://arxiv.org/abs/2607.13329</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We introduce the Zariski frame of any presentably symmetric monoidal $\infty$-category. This allows us to unify several spectral theories arising in higher algebra. The Zariski frame is coherent whenever the category is compactly generated, and the associated spectral space recovers both the classical Zariski spectrum of a commutative ring and the Hochster dual of the Balmer spectrum of a commutative $2$-ring. Moreover, the smashing frame of any stable presentably symmetric monoidal $\infty$-category can be identified with the Zariski frame of its category of dualizable modules. This construction is based on the principle that ideals in a symmetric monoidal $\infty$-category should be understood as monomorphisms into the unit object. In suitable contexts, this notion recovers the kinds of ideals appearing in the preceding examples, including thick ideals and smashing ideals, and it also accommodates the smashing ideals of non-stable $\infty$-categories. We also study the problem of forming quotients by ideals, which is subtle in the setting of higher algebra. To address this, we introduce two properties of pointed $\infty$-categories, called $\Sigma$-triviality and $\Sigma$-exactness. These conditions ensure that quotienting by ideals behaves well. As an application, we construct quotients of $\mathbb{E}_\infty$-semirings.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "Nonlinear Hodge correspondence for morphisms", "author": "Nianzi Li, Mao Sheng", "published": "Thu, 16 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.13450", "summary": "arXiv:2607.13450v1 Announce Type: cross \nAbstract: We study Higgs sections, flat sections, and their higher-dimensional and functorial analogues in the setting of nonlinear harmonic bundles. For a harmonic vector bundle over a compact K\\\"ahler manifold, a global section is flat if and only if it is a Higgs section. We show that for general nonlinear harmonic bundles this equivalence requires the vanishing of a degree obstruction. We then extend the result to sub-fibrations and to morphisms by interpreting morphisms as graph sub-fibrations in a fiber product.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2607.13450" target="_blank">Nonlinear Hodge correspondence for morphisms</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Nianzi Li, Mao Sheng</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.13450" target="_blank">https://arxiv.org/abs/2607.13450</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study Higgs sections, flat sections, and their higher-dimensional and functorial analogues in the setting of nonlinear harmonic bundles. For a harmonic vector bundle over a compact K\"ahler manifold, a global section is flat if and only if it is a Higgs section. We show that for general nonlinear harmonic bundles this equivalence requires the vanishing of a degree obstruction. We then extend the result to sub-fibrations and to morphisms by interpreting morphisms as graph sub-fibrations in a fiber product.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "Matroid correspondence", "author": "Colin Crowley, Changxin Ding, Haoxi Hu, Arvind Kumar, Jonathan Monta\\~no, Thai Thanh Nguyen, Anna Shapiro, Noah Solomon, Botong Wang, Juliet Whidden", "published": "Thu, 16 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.13783", "summary": "arXiv:2607.13783v1 Announce Type: cross \nAbstract: Motivated by algebraic correspondences and linear operators associated with volume and Lorentzian polynomials, we introduce matroid correspondences and their polymatroid analogues. A matroid correspondence defines a functor between poset categories of matroids whose morphisms are matroid quotients, and various standard functors, including deletion, contraction, free extension, truncation, intersection, union, and pullback, arise in this way. We show that these correspondences preserve representability and algebraicity under natural hypotheses. In the polymatroid setting, we establish compatibility with multisymmetric lifts. Finally, we relate this construction to the supports of linear operators with Lorentzian symbols.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2607.13783" target="_blank">Matroid correspondence</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Colin Crowley, Changxin Ding, Haoxi Hu, Arvind Kumar, Jonathan Monta\~no, Thai Thanh Nguyen, Anna Shapiro, Noah Solomon, Botong Wang, Juliet Whidden</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.13783" target="_blank">https://arxiv.org/abs/2607.13783</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Motivated by algebraic correspondences and linear operators associated with volume and Lorentzian polynomials, we introduce matroid correspondences and their polymatroid analogues. A matroid correspondence defines a functor between poset categories of matroids whose morphisms are matroid quotients, and various standard functors, including deletion, contraction, free extension, truncation, intersection, union, and pullback, arise in this way. We show that these correspondences preserve representability and algebraicity under natural hypotheses. In the polymatroid setting, we establish compatibility with multisymmetric lifts. Finally, we relate this construction to the supports of linear operators with Lorentzian symbols.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "What are symmetric monoidal categories?", "author": "Jiasen Liu, J. P. May, Kyle I. Roke, Hongyi Zhang, Keming Zhou", "published": "Thu, 16 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.13912", "summary": "arXiv:2607.13912v1 Announce Type: cross \nAbstract: Symmetric monoidal categories have been understood since the 1960's and are central to many branches of mathematics. In particular, the construction of spectra from symmetric monoidal categories is at the heart of algebraic $K$-theory. This construction starts from either categories with an action by a suitable operad $\\sP$ or with suitable functors from the category $\\sF$ of finite sets to the category $\\mathbf{Cat}$ of categories. Infinite loop space theory, which codifies these constructions, led to the invention of $\\infty$-categories. So why the title? We shall prove that the $2$-category of symmetric monoidal categories is equivalent (in fact very nearly isomorphic) both to a $2$-category of $\\sP$-pseudoalgebras and to an isomorphic $2$-category of strictly special $\\sF$-pseudoalgebras. This equivalence underlies a streamlined equivariant and multiplicative enhancement of infinite loop space theory, but it should be of independent interest.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2607.13912" target="_blank">What are symmetric monoidal categories?</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jiasen Liu, J. P. May, Kyle I. Roke, Hongyi Zhang, Keming Zhou</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.13912" target="_blank">https://arxiv.org/abs/2607.13912</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Symmetric monoidal categories have been understood since the 1960's and are central to many branches of mathematics. In particular, the construction of spectra from symmetric monoidal categories is at the heart of algebraic $K$-theory. This construction starts from either categories with an action by a suitable operad $\sP$ or with suitable functors from the category $\sF$ of finite sets to the category $\mathbf{Cat}$ of categories. Infinite loop space theory, which codifies these constructions, led to the invention of $\infty$-categories. So why the title? We shall prove that the $2$-category of symmetric monoidal categories is equivalent (in fact very nearly isomorphic) both to a $2$-category of $\sP$-pseudoalgebras and to an isomorphic $2$-category of strictly special $\sF$-pseudoalgebras. This equivalence underlies a streamlined equivariant and multiplicative enhancement of infinite loop space theory, but it should be of independent interest.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "A note on the automorphism group of Kodaira surfaces", "author": "Andrea Cattaneo", "published": "Thu, 16 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2304.09429", "summary": "arXiv:2304.09429v4 Announce Type: replace \nAbstract: We give an explicit description of the automorphism groups of primary and secondary Kodaira surfaces. We first prove that every automorphism of a Kodaira surface lifts to an affine transformation of the universal cover $\\mathbb{C}^2$, and characterize precisely the affine transformations arising in this way for primary Kodaira surfaces. This allows us to compute explicitly the normalizer of the fundamental group and, consequently, to determine both the connected component of the identity and the group of connected components of the automorphism group. Passing to the canonical cover, we then obtain an analogous explicit description for secondary Kodaira surfaces, including a complete determination of the possible groups of connected components.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2304.09429" target="_blank">A note on the automorphism group of Kodaira surfaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Andrea Cattaneo</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2304.09429" target="_blank">https://arxiv.org/abs/2304.09429</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We give an explicit description of the automorphism groups of primary and secondary Kodaira surfaces. We first prove that every automorphism of a Kodaira surface lifts to an affine transformation of the universal cover $\mathbb{C}^2$, and characterize precisely the affine transformations arising in this way for primary Kodaira surfaces. This allows us to compute explicitly the normalizer of the fundamental group and, consequently, to determine both the connected component of the identity and the group of connected components of the automorphism group. Passing to the canonical cover, we then obtain an analogous explicit description for secondary Kodaira surfaces, including a complete determination of the possible groups of connected components.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Geometry of regular semisimple Lusztig varieties", "author": "Patrick Brosnan, Jaehyun Hong, Donggun Lee", "published": "Thu, 16 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2504.15868", "summary": "arXiv:2504.15868v3 Announce Type: replace \nAbstract: Lusztig varieties are subvarieties in flag manifolds $G/B$ associated to an element $w$ in the Weyl group $W$ and an element $x$ in $G$, introduced in Lusztig's papers on character sheaves. We study the geometry of these varieties when $x$ is regular semisimple.\n  In the first part, we establish that they are normal, Cohen-Macaulay, of pure expected dimension and have rational singularities. We then show that the cohomology of ample line bundles vanishes in positive degrees, in arbitrary characteristic. This extends to nef line bundles when the base field has characteristic zero or sufficiently large characteristic. Along the way, we prove that Lusztig varieties are Frobenius split in positive characteristic and that their open cells are affine. We also prove that the open cells in Deligne-Lusztig varieties are affine, settling a question that has been open since the foundational paper of Deligne and Lusztig.\n  In the second part, we explore their relationship with regular semisimple Hessenberg varieties. Both varieties admit Tymoczko's dot action of $W$ on their (intersection) cohomology. We associate to each element $w$ in $W$ a Hessenberg space using the tangent cone of the Schubert variety associated with $w$, and show that the cohomology of the associated regular semisimple Lusztig varieties and Hessenberg varieties is isomorphic as graded $W$-representations when they are smooth.\n  This relationship extends to the level of varieties: we construct a flat degeneration of regular semisimple Lusztig varieties to regular semisimple Hessenberg varieties. In particular, this proves a conjecture of Abreu and Nigro on the homeomorphism types of regular semisimple Lusztig varieties in type $A$, and generalizes it to arbitrary Lie types.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2504.15868" target="_blank">Geometry of regular semisimple Lusztig varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Patrick Brosnan, Jaehyun Hong, Donggun Lee</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2504.15868" target="_blank">https://arxiv.org/abs/2504.15868</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Lusztig varieties are subvarieties in flag manifolds $G/B$ associated to an element $w$ in the Weyl group $W$ and an element $x$ in $G$, introduced in Lusztig's papers on character sheaves. We study the geometry of these varieties when $x$ is regular semisimple.
+  In the first part, we establish that they are normal, Cohen-Macaulay, of pure expected dimension and have rational singularities. We then show that the cohomology of ample line bundles vanishes in positive degrees, in arbitrary characteristic. This extends to nef line bundles when the base field has characteristic zero or sufficiently large characteristic. Along the way, we prove that Lusztig varieties are Frobenius split in positive characteristic and that their open cells are affine. We also prove that the open cells in Deligne-Lusztig varieties are affine, settling a question that has been open since the foundational paper of Deligne and Lusztig.
+  In the second part, we explore their relationship with regular semisimple Hessenberg varieties. Both varieties admit Tymoczko's dot action of $W$ on their (intersection) cohomology. We associate to each element $w$ in $W$ a Hessenberg space using the tangent cone of the Schubert variety associated with $w$, and show that the cohomology of the associated regular semisimple Lusztig varieties and Hessenberg varieties is isomorphic as graded $W$-representations when they are smooth.
+  This relationship extends to the level of varieties: we construct a flat degeneration of regular semisimple Lusztig varieties to regular semisimple Hessenberg varieties. In particular, this proves a conjecture of Abreu and Nigro on the homeomorphism types of regular semisimple Lusztig varieties in type $A$, and generalizes it to arbitrary Lie types.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Lines on K3-sextics with simple singularities", "author": "Alex Degtyarev, S{\\l}awomir Rams", "published": "Thu, 16 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2512.08018", "summary": "arXiv:2512.08018v3 Announce Type: replace \nAbstract: We advance our understanding of the configurations of low degree smooth rational curves on (quasi-)polarized complex K3-surfaces. We apply our efficient approach to classify the configurations of at least 36 lines on K3-sextics with at worst A-D-E singularities. Besides, we characterize a certain class of infinite dihedral groups of birational automorphisms of K3-sextics, we show that no K3-sextic can contain a Kummer configuration of lines, and we give a complete account of the line configurations on closest analogue of Kummer K3-octics or quartics, viz. the so-called Humbert K3-sextics.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2512.08018" target="_blank">Lines on K3-sextics with simple singularities</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Alex Degtyarev, S{\l}awomir Rams</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.08018" target="_blank">https://arxiv.org/abs/2512.08018</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We advance our understanding of the configurations of low degree smooth rational curves on (quasi-)polarized complex K3-surfaces. We apply our efficient approach to classify the configurations of at least 36 lines on K3-sextics with at worst A-D-E singularities. Besides, we characterize a certain class of infinite dihedral groups of birational automorphisms of K3-sextics, we show that no K3-sextic can contain a Kummer configuration of lines, and we give a complete account of the line configurations on closest analogue of Kummer K3-octics or quartics, viz. the so-called Humbert K3-sextics.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "Notes on rational chain connectedness", "author": "Osamu Fujino", "published": "Thu, 16 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2602.19415", "summary": "arXiv:2602.19415v4 Announce Type: replace \nAbstract: We extend Hacon--M\\textsuperscript{c}Kernan's rational chain connectedness theorem to the complex analytic setting. As a consequence, we prove that the fibers of any resolution of singularities of complex analytic kawamata log terminal singularities are rationally chain connected. In contrast to the original approach, we avoid the use of extension theorems and instead rely on the minimal model program.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2602.19415" target="_blank">Notes on rational chain connectedness</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Osamu Fujino</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2602.19415" target="_blank">https://arxiv.org/abs/2602.19415</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We extend Hacon--M\textsuperscript{c}Kernan's rational chain connectedness theorem to the complex analytic setting. As a consequence, we prove that the fibers of any resolution of singularities of complex analytic kawamata log terminal singularities are rationally chain connected. In contrast to the original approach, we avoid the use of extension theorems and instead rely on the minimal model program.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "On the Chow ring of very general abelian varieties and a question of Pirola", "author": "Claire Voisin", "published": "Thu, 16 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.07053", "summary": "arXiv:2607.07053v2 Announce Type: replace \nAbstract: We prove that for a very general abelian variety of dimension $\\geq 4$, a divisor $D\\in {\\rm CH}^1(A)$ that satisfies $D^2=0$ in ${\\rm CH}^2(A)$ is of torsion. The same result is also established for a very general Jacobian in genus $4$. We use then the second statement in order to prove a conjecture of Pirola, which states that any rational section of the Kummer fibration $K=J/\\pm {\\rm Id}\\rightarrow \\mathcal{M}_4$, where $J\\rightarrow \\mathcal{M}_4 $ is the Jacobian fibration, must be a multiple of the Griffiths-Pirola section given by the difference of the two trigonal divisors.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2607.07053" target="_blank">On the Chow ring of very general abelian varieties and a question of Pirola</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Claire Voisin</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.07053" target="_blank">https://arxiv.org/abs/2607.07053</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove that for a very general abelian variety of dimension $\geq 4$, a divisor $D\in {\rm CH}^1(A)$ that satisfies $D^2=0$ in ${\rm CH}^2(A)$ is of torsion. The same result is also established for a very general Jacobian in genus $4$. We use then the second statement in order to prove a conjecture of Pirola, which states that any rational section of the Kummer fibration $K=J/\pm {\rm Id}\rightarrow \mathcal{M}_4$, where $J\rightarrow \mathcal{M}_4 $ is the Jacobian fibration, must be a multiple of the Griffiths-Pirola section given by the difference of the two trigonal divisors.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "Motivic correlators, cluster varieties and Zagier's conjecture on zeta(F,4)", "author": "Alexander B. Goncharov, Daniil Rudenko", "published": "Thu, 16 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/1803.08585", "summary": "arXiv:1803.08585v5 Announce Type: replace-cross \nAbstract: We prove Zagier's conjecture on the value at s=4 of the Dedekind zeta-function of a number field F. For any field F, we define a map from the appropriate pieces of algebraic K-theory of F to the cohomology of the weight 4 polylogarithmic motivic complex. When F is the function field of a complex variety, composing this map with the regulator map on the polylogarithmic complex to the Deligne cohomology, we get a rational multiple of Beilinson's regulator. This plus Borel's theorem implies Zagier's conjecture. Another application is a formula expressing the value at s=4 of the L-function of an elliptic curve E over Q via generalized Eisenstein-Kronecker series. We get a strong evidence for the part of Freeness Conjecture describing the weight four part of the motivic Lie coalgebra of F via higher Bloch groups. Our main tools are motivic correlators and a new link of cluster varieties to polylogarithms.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/1803.08585" target="_blank">Motivic correlators, cluster varieties and Zagier's conjecture on zeta(F,4)</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Alexander B. Goncharov, Daniil Rudenko</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/1803.08585" target="_blank">https://arxiv.org/abs/1803.08585</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove Zagier's conjecture on the value at s=4 of the Dedekind zeta-function of a number field F. For any field F, we define a map from the appropriate pieces of algebraic K-theory of F to the cohomology of the weight 4 polylogarithmic motivic complex. When F is the function field of a complex variety, composing this map with the regulator map on the polylogarithmic complex to the Deligne cohomology, we get a rational multiple of Beilinson's regulator. This plus Borel's theorem implies Zagier's conjecture. Another application is a formula expressing the value at s=4 of the L-function of an elliptic curve E over Q via generalized Eisenstein-Kronecker series. We get a strong evidence for the part of Freeness Conjecture describing the weight four part of the motivic Lie coalgebra of F via higher Bloch groups. Our main tools are motivic correlators and a new link of cluster varieties to polylogarithms.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Three perspectives on categorical symmetric Howe duality", "author": "Ben Webster", "published": "Thu, 16 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2001.07584", "summary": "arXiv:2001.07584v4 Announce Type: replace-cross \nAbstract: In this paper, we consider the categorical symmetric Howe duality introduced by Khovanov, Lauda, Sussan and Yonezawa. While originally defined from a purely diagrammatic perspective, this construction also has geometric and representation-theoretic interpretations, corresponding to certain perverse sheaves on spaces of quiver representations and the category of Gelfand-Tsetlin modules over $\\mathfrak{gl}_n$.\n  In particular, we show that the \"deformed Webster algebras\" discussed in work of Khovanov-Lauda-Sussan-Yonezawa manifest a Koszul duality between blocks of the category of Gelfand-Tsetlin modules over $\\mathfrak{gl}_n$, and the constructible sheaves on representations of a linear quiver invariant under a certain parabolic in the group that acts by changing bases. Furthermore, we show that this duality intertwines translation functors with a diagrammatic categorical action. Includes an appendix by the author and Jerry Guan.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2001.07584" target="_blank">Three perspectives on categorical symmetric Howe duality</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ben Webster</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2001.07584" target="_blank">https://arxiv.org/abs/2001.07584</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we consider the categorical symmetric Howe duality introduced by Khovanov, Lauda, Sussan and Yonezawa. While originally defined from a purely diagrammatic perspective, this construction also has geometric and representation-theoretic interpretations, corresponding to certain perverse sheaves on spaces of quiver representations and the category of Gelfand-Tsetlin modules over $\mathfrak{gl}_n$.
+  In particular, we show that the "deformed Webster algebras" discussed in work of Khovanov-Lauda-Sussan-Yonezawa manifest a Koszul duality between blocks of the category of Gelfand-Tsetlin modules over $\mathfrak{gl}_n$, and the constructible sheaves on representations of a linear quiver invariant under a certain parabolic in the group that acts by changing bases. Furthermore, we show that this duality intertwines translation functors with a diagrammatic categorical action. Includes an appendix by the author and Jerry Guan.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "On categorical local langlands program for $GL_n$", "author": "Kieu Hieu Nguyen", "published": "Thu, 16 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2309.16505", "summary": "arXiv:2309.16505v5 Announce Type: replace-cross \nAbstract: We study various moduli spaces of local Shtukas in the setting of Fargues' program for $GL_n$. In certain cases, this gives us an explicit description of the spectral action which was recently introduced by Fargues and Scholze. This description sheds light to the categorical local Langlands program for $GL_n$ and allows us to construct Hecke eigensheaves associated to certain $\\ell$-adic Weil representations of rank $n$ and to prove some parts of Fargues' conjecture. Moreover, by using this description, we can prove new cases of the Harris-Viehmann conjecture for non-basic Rapoport-Zink spaces and compute some parts of the cohomology of the Igusa varieties associated to $GL_n$.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2309.16505" target="_blank">On categorical local langlands program for $GL_n$</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Kieu Hieu Nguyen</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2309.16505" target="_blank">https://arxiv.org/abs/2309.16505</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study various moduli spaces of local Shtukas in the setting of Fargues' program for $GL_n$. In certain cases, this gives us an explicit description of the spectral action which was recently introduced by Fargues and Scholze. This description sheds light to the categorical local Langlands program for $GL_n$ and allows us to construct Hecke eigensheaves associated to certain $\ell$-adic Weil representations of rank $n$ and to prove some parts of Fargues' conjecture. Moreover, by using this description, we can prove new cases of the Harris-Viehmann conjecture for non-basic Rapoport-Zink spaces and compute some parts of the cohomology of the Igusa varieties associated to $GL_n$.
+            </div>
+        </div>
+        <div class="paper" id="paper-21">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-21" data-paper-data='{"title": "Arithmetic Sparsity and Obstructions in Weighted Projective Spaces", "author": "Tanush Shaska", "published": "Thu, 16 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2509.02319", "summary": "arXiv:2509.02319v3 Announce Type: replace-cross \nAbstract: We study rational and algebraic points of bounded height on weighted projective spaces. A weighted projective space $\\mathbb{P}^n_{\\mathbf{w}}$, with weights $\\mathbf{w} = (q_0, \\dots, q_n)$, carries two natural heights: the tautological height $\\widetilde{h}$, attached to the tautological bundle on the associated stack, and the weighted height $h = H(\\phi(\\,\\cdot\\,))^{1/q}$, the normalized pullback of the Weil height under the Veronese morphism $\\phi : \\mathbb{P}^n_{\\mathbf{w}} \\to \\mathbb{P}^n$, where $q = \\operatorname{lcm}(q_0, \\dots, q_n)$. For $\\widetilde{h}$ we prove a Schanuel-type theorem over any number field $k$ of degree $m$, with leading term $c_k(\\mathbf{w}) X^{mQ}$, where $Q = q_0 + \\cdots + q_n$.\n  Our main result concerns $h$ over $\\mathbb{Q}$, for arbitrary coprime weights. A point of $\\mathbb{P}^n(\\mathbb{Q})$ lifts along $\\phi$ only if its valuation vector at every prime lies in a set $M_{\\mathbf{w}}$ cut out by Kummer congruences. We prove that the points with all coordinates nonzero satisfy \\[Z^{\\circ}_{h}(\\mathbb{P}^n_{\\mathbf{w}}(\\mathbb{Q}), X) = X^{q\\,a(\\mathbf{w})} P_{\\mathbf{w}}(\\log X) + O(X^{q\\,a(\\mathbf{w}) - \\theta})\\]\n  for some $\\theta &gt; 0$, where $P_{\\mathbf{w}}$ has exact degree $\\beta(\\mathbf{w})$ and positive leading coefficient, and $a(\\mathbf{w})$ and $\\beta(\\mathbf{w})$ are the value and the dimension of the optimal face of a linear program over the minimal elements of $M_{\\mathbf{w}}$. The exponent need not equal the projective benchmark $q(n+1)$, and can exceed $Q$. Since the coordinate strata are again weighted projective spaces, the full count follows by stratification, and a proper stratum may dominate. We also count points of fixed degree when the exponents $q/q_i$ are pairwise coprime, and conjecture the asymptotic for $h$ over an arbitrary number field.", "number": 21, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#21</span>
+                <a href="https://arxiv.org/abs/2509.02319" target="_blank">Arithmetic Sparsity and Obstructions in Weighted Projective Spaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Tanush Shaska</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2509.02319" target="_blank">https://arxiv.org/abs/2509.02319</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study rational and algebraic points of bounded height on weighted projective spaces. A weighted projective space $\mathbb{P}^n_{\mathbf{w}}$, with weights $\mathbf{w} = (q_0, \dots, q_n)$, carries two natural heights: the tautological height $\widetilde{h}$, attached to the tautological bundle on the associated stack, and the weighted height $h = H(\phi(\,\cdot\,))^{1/q}$, the normalized pullback of the Weil height under the Veronese morphism $\phi : \mathbb{P}^n_{\mathbf{w}} \to \mathbb{P}^n$, where $q = \operatorname{lcm}(q_0, \dots, q_n)$. For $\widetilde{h}$ we prove a Schanuel-type theorem over any number field $k$ of degree $m$, with leading term $c_k(\mathbf{w}) X^{mQ}$, where $Q = q_0 + \cdots + q_n$.
+  Our main result concerns $h$ over $\mathbb{Q}$, for arbitrary coprime weights. A point of $\mathbb{P}^n(\mathbb{Q})$ lifts along $\phi$ only if its valuation vector at every prime lies in a set $M_{\mathbf{w}}$ cut out by Kummer congruences. We prove that the points with all coordinates nonzero satisfy \[Z^{\circ}_{h}(\mathbb{P}^n_{\mathbf{w}}(\mathbb{Q}), X) = X^{q\,a(\mathbf{w})} P_{\mathbf{w}}(\log X) + O(X^{q\,a(\mathbf{w}) - \theta})\]
+  for some $\theta &gt; 0$, where $P_{\mathbf{w}}$ has exact degree $\beta(\mathbf{w})$ and positive leading coefficient, and $a(\mathbf{w})$ and $\beta(\mathbf{w})$ are the value and the dimension of the optimal face of a linear program over the minimal elements of $M_{\mathbf{w}}$. The exponent need not equal the projective benchmark $q(n+1)$, and can exceed $Q$. Since the coordinate strata are again weighted projective spaces, the full count follows by stratification, and a proper stratum may dominate. We also count points of fixed degree when the exponents $q/q_i$ are pairwise coprime, and conjecture the asymptotic for $h$ over an arbitrary number field.
+            </div>
+        </div>
+        <div class="paper" id="paper-22">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-22" data-paper-data='{"title": "Reduced Gromov-Witten invariants without ghost bubble censorship", "author": "Guangbo Xu", "published": "Thu, 16 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.13209", "summary": "arXiv:2604.13209v2 Announce Type: replace-cross \nAbstract: We give a definition of all-genus reduced Gromov-Witten invariants of symplectic manifolds by using effectively supported multivalued perturbations on derived orbifold/Kuranishi charts, which bypasses the hard analytical result of sharp compactification/ghost bubble censorship of Zinger, Doan-Walpuski, and Ekholm-Shende.", "number": 22, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#22</span>
+                <a href="https://arxiv.org/abs/2604.13209" target="_blank">Reduced Gromov-Witten invariants without ghost bubble censorship</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Guangbo Xu</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.13209" target="_blank">https://arxiv.org/abs/2604.13209</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We give a definition of all-genus reduced Gromov-Witten invariants of symplectic manifolds by using effectively supported multivalued perturbations on derived orbifold/Kuranishi charts, which bypasses the hard analytical result of sharp compactification/ghost bubble censorship of Zinger, Doan-Walpuski, and Ekholm-Shende.
+            </div>
+        </div>
+        <div class="paper" id="paper-23">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-23" data-paper-data='{"title": "Inversion of the Multiplicative Matrix Compound Operator", "author": "Debojyoti Dey, Ron Ofir, Christian Grussler", "published": "Thu, 16 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.27682", "summary": "arXiv:2605.27682v3 Announce Type: replace-cross \nAbstract: We study the problem of determining a matrix whose $k$th multiplicative compound, with $k &gt; 1$, is a prescribed matrix $M$. The cardinality of the set of matrices whose $k$th multiplicative compound equals $M$ is characterized in terms of $\\rank(M)$. On the one hand, if $\\rank(M)\\le 1$, it is shown that there exist infinitely many such matrices for which a complete characterization is determined. On the other hand, if $\\rank(M)&gt;1$, then there exists a unique matrix -- up to an overall sign -- whose compound is $M$. An algorithm for finding a matrix whose compound equals $M$ is detailed, and its time complexity is analyzed.", "number": 23, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#23</span>
+                <a href="https://arxiv.org/abs/2605.27682" target="_blank">Inversion of the Multiplicative Matrix Compound Operator</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Debojyoti Dey, Ron Ofir, Christian Grussler</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.27682" target="_blank">https://arxiv.org/abs/2605.27682</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the problem of determining a matrix whose $k$th multiplicative compound, with $k &gt; 1$, is a prescribed matrix $M$. The cardinality of the set of matrices whose $k$th multiplicative compound equals $M$ is characterized in terms of $\rank(M)$. On the one hand, if $\rank(M)\le 1$, it is shown that there exist infinitely many such matrices for which a complete characterization is determined. On the other hand, if $\rank(M)&gt;1$, then there exists a unique matrix -- up to an overall sign -- whose compound is $M$. An algorithm for finding a matrix whose compound equals $M$ is detailed, and its time complexity is analyzed.
+            </div>
+        </div>
+        <div class="paper" id="paper-24">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-24" data-paper-data='{"title": "Smooth solutions to systems of linear inequalities on $\\mathbb{R}$", "author": "Fushuai Jiang, Garving K. Luli", "published": "Thu, 16 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2606.22805", "summary": "arXiv:2606.22805v3 Announce Type: replace-cross \nAbstract: We study the one-dimensional case of the problem of deciding when a system of linear inequalities \\[\n  \\sum_{j=1}^{M} A_{ij}(x)F_j(x) \\leq f_i(x),\n  \\qquad i=1,\\ldots,N, \\] with fixed semialgebraic coefficients $A_{ij}\\colon \\mathbb{R}\\to\\mathbb{R}$, admits a solution $F=(F_1,\\ldots,F_M)\\in C^m(\\mathbb{R},\\mathbb{R}^M)$. The analogous problem for systems of linear equations has a finite linear-differential criterion. For $x \\in \\mathbb{R}^{n \\geq 2}$, the corresponding finite linear-differential-inequality criterion is known to fail. The obstruction comes from the fact that there are infinitely many directions to approach a point, and the fact that an infinite intersection of polytopes need not remain a polytope. The purpose of this paper is to prove that this obstruction disappears in dimension one. More precisely, solvability is characterized by finitely many linear ordinary differential inequalities in the data $f=(f_1,\\ldots,f_N)$ with semialgebraic coefficients.", "number": 24, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#24</span>
+                <a href="https://arxiv.org/abs/2606.22805" target="_blank">Smooth solutions to systems of linear inequalities on $\mathbb{R}$</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Fushuai Jiang, Garving K. Luli</div>
+                <div class="paper-date"><strong>公開日:</strong> Thu, 16 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2606.22805" target="_blank">https://arxiv.org/abs/2606.22805</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the one-dimensional case of the problem of deciding when a system of linear inequalities \[
+  \sum_{j=1}^{M} A_{ij}(x)F_j(x) \leq f_i(x),
+  \qquad i=1,\ldots,N, \] with fixed semialgebraic coefficients $A_{ij}\colon \mathbb{R}\to\mathbb{R}$, admits a solution $F=(F_1,\ldots,F_M)\in C^m(\mathbb{R},\mathbb{R}^M)$. The analogous problem for systems of linear equations has a finite linear-differential criterion. For $x \in \mathbb{R}^{n \geq 2}$, the corresponding finite linear-differential-inequality criterion is known to fail. The obstruction comes from the fact that there are infinitely many directions to approach a point, and the fact that an infinite intersection of polytopes need not remain a polytope. The purpose of this paper is to prove that this obstruction disappears in dimension one. More precisely, solvability is characterized by finitely many linear ordinary differential inequalities in the data $f=(f_1,\ldots,f_N)$ with semialgebraic coefficients.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-07-16 11:03:02
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>
