@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Mon, 27 Jul 2026 04:00:24 +0000<br>
+        <strong>論文数:</strong> 20件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">A topological Chern character for matrix factorizations</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Rank-one convexity, polyconvexity, and extremality for three-dimensional elasticity tensors in various symmetry classes</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Critical loci of self-maps of projective space</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">Moduli of atoms of complex projective varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">Base-change of locally stable families in positive characteristic</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">Incidence equivalence, a survey</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Ulrich sheaves and determinantal representations for higher secant varieties of curves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Generalizations of the Scorza correspondence</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">A five-variable counterexample to the Hessian conjecture, and the low-dimensional status of the Jacobian and Hessian conjectures</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">An estimate of canonical dimension of groups based on Schubert calculus</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">Hilbert schemes for crepant partial resolutions</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">The tempered disk and the tempered cohomology</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">GIT stability and biquotients of $SU(3)$</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Remarks on diagonal dimension for algebraic stacks</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Divisorial Persistence and Asymptotic Homology of Analytic Pairs</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">The m=2 amplituhedron and the hypersimplex: signs, clusters, triangulations, Eulerian numbers</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">Towards $\mathbb{A}^1$-homotopy theory of rigid analytic spaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">Important Classes of Morphisms and the Relative Cotangent Sequence in Tangent Categories</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Permutation twisted cohomology, remixed</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">On gonality-tight graphs</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "A topological Chern character for matrix factorizations", "author": "Mark Shoemaker", "published": "Mon, 27 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.21788", "summary": "arXiv:2607.21788v1 Announce Type: new \nAbstract: For $Y$ a quasi-projective complex variety and $w \\colon Y \\to \\mathbb C$ a regular function, we construct a Chern character from the Grothendieck group of the category of matrix factorizations of $w$ to the critical cohomology of $w$, and show that it factors through a certain topological $K$-theory group. We prove a Grothendieck-Riemann-Roch theorem with respect to this Chern character, and verify several functorial properties.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2607.21788" target="_blank">A topological Chern character for matrix factorizations</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Mark Shoemaker</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 27 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.21788" target="_blank">https://arxiv.org/abs/2607.21788</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                For $Y$ a quasi-projective complex variety and $w \colon Y \to \mathbb C$ a regular function, we construct a Chern character from the Grothendieck group of the category of matrix factorizations of $w$ to the critical cohomology of $w$, and show that it factors through a certain topological $K$-theory group. We prove a Grothendieck-Riemann-Roch theorem with respect to this Chern character, and verify several functorial properties.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Rank-one convexity, polyconvexity, and extremality for three-dimensional elasticity tensors in various symmetry classes", "author": "Davit Harutyunyan, Gagik Amirkhanyan", "published": "Mon, 27 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.21828", "summary": "arXiv:2607.21828v1 Announce Type: new \nAbstract: It has been known that, for quadratic functions, quasiconvexity equals rank-one convexity but need not equal polyconvexity. While there is an explicit characterization of polyconvexity for quadratic energies, a similar characterization for quasiconvexity is not known in dimensions $n,N \\geq 3.$ This paper is concerned with the search of extremal quasiconvex quadratic forms regarded as a linear elastic energy in dimensions $N=n=3$ in various symmetry classes of the elasticity tensor. In particular, we prove that for tensors with orthotropic symmetry, quasiconvexity implies polyconvexity, and thus the orthotropic class contains no nontrivial extremals. We show that this equivalence fails first at trigonal symmetry, where among some statemets, we provide a one-parameter family of non-polyconvex trigonal extreme rays. We also provide some general criteria for proving rank-one convexity, polyconvexity, and extremality, improving a result in [\\ref{bib:Har.Hov.}].", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2607.21828" target="_blank">Rank-one convexity, polyconvexity, and extremality for three-dimensional elasticity tensors in various symmetry classes</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Davit Harutyunyan, Gagik Amirkhanyan</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 27 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.21828" target="_blank">https://arxiv.org/abs/2607.21828</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                It has been known that, for quadratic functions, quasiconvexity equals rank-one convexity but need not equal polyconvexity. While there is an explicit characterization of polyconvexity for quadratic energies, a similar characterization for quasiconvexity is not known in dimensions $n,N \geq 3.$ This paper is concerned with the search of extremal quasiconvex quadratic forms regarded as a linear elastic energy in dimensions $N=n=3$ in various symmetry classes of the elasticity tensor. In particular, we prove that for tensors with orthotropic symmetry, quasiconvexity implies polyconvexity, and thus the orthotropic class contains no nontrivial extremals. We show that this equivalence fails first at trigonal symmetry, where among some statemets, we provide a one-parameter family of non-polyconvex trigonal extreme rays. We also provide some general criteria for proving rank-one convexity, polyconvexity, and extremality, improving a result in [\ref{bib:Har.Hov.}].
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Critical loci of self-maps of projective space", "author": "Matt Olechnowicz, Max Weinreich", "published": "Mon, 27 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.21923", "summary": "arXiv:2607.21923v1 Announce Type: new \nAbstract: Let $K$ be an algebraically closed field and let $n, d \\geq 2$. We show that the critical scheme of a general endomorphism of $\\mathbb{P}^n_K$ of degree $d$ is an integral hypersurface. This extends a result of Ingram--Ramadas--Silverman to arbitrary characteristic. We use basic facts about polynomial rings to show that certain carefully chosen examples have absolutely irreducible Jacobian. To handle the wild case where the characteristic of $K$ divides $d$, we introduce a polynomial that imitates the homogeneous Jacobian determinant.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2607.21923" target="_blank">Critical loci of self-maps of projective space</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Matt Olechnowicz, Max Weinreich</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 27 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.21923" target="_blank">https://arxiv.org/abs/2607.21923</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $K$ be an algebraically closed field and let $n, d \geq 2$. We show that the critical scheme of a general endomorphism of $\mathbb{P}^n_K$ of degree $d$ is an integral hypersurface. This extends a result of Ingram--Ramadas--Silverman to arbitrary characteristic. We use basic facts about polynomial rings to show that certain carefully chosen examples have absolutely irreducible Jacobian. To handle the wild case where the characteristic of $K$ divides $d$, we introduce a polynomial that imitates the homogeneous Jacobian determinant.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "Moduli of atoms of complex projective varieties", "author": "Maxim Kontsevich, Szilard Szabo", "published": "Mon, 27 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.22074", "summary": "arXiv:2607.22074v1 Announce Type: new \nAbstract: The category of constituent pieces of Dubrovin connection of varieties is introduced and shown to be representable in affine space.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2607.22074" target="_blank">Moduli of atoms of complex projective varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Maxim Kontsevich, Szilard Szabo</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 27 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.22074" target="_blank">https://arxiv.org/abs/2607.22074</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The category of constituent pieces of Dubrovin connection of varieties is introduced and shown to be representable in affine space.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "Base-change of locally stable families in positive characteristic", "author": "Marta Benozzo, Quentin Posva", "published": "Mon, 27 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.22106", "summary": "arXiv:2607.22106v1 Announce Type: new \nAbstract: We investigate the permanence of local stability for one-parameter families $X\\to C$ under finite flat base-changes, when the base-field has positive characteristic $p&gt;0$. Building on previous work of Hu--Zong, we show that it suffices to consider base-changes by Frobenius morphisms. In that case, we show that the situation is governed by the discrepancies of the pairs $(X,X_c)$, together with some differential invariants of the vertical divisors whose multiplicity in their fiber is divisible by $p$. While the behaviour of these invariants remains in general mysterious, we establish upper bounds under some $F$-splitting assumptions.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2607.22106" target="_blank">Base-change of locally stable families in positive characteristic</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Marta Benozzo, Quentin Posva</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 27 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.22106" target="_blank">https://arxiv.org/abs/2607.22106</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We investigate the permanence of local stability for one-parameter families $X\to C$ under finite flat base-changes, when the base-field has positive characteristic $p&gt;0$. Building on previous work of Hu--Zong, we show that it suffices to consider base-changes by Frobenius morphisms. In that case, we show that the situation is governed by the discrepancies of the pairs $(X,X_c)$, together with some differential invariants of the vertical divisors whose multiplicity in their fiber is divisible by $p$. While the behaviour of these invariants remains in general mysterious, we establish upper bounds under some $F$-splitting assumptions.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "Incidence equivalence, a survey", "author": "Chris Peters", "published": "Mon, 27 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.22233", "summary": "arXiv:2607.22233v1 Announce Type: new \nAbstract: This is a survey of results on incidence equivalence, a notion introduced by P.Griffiths around 1970 when trying to extend the classical properties of the Abel-Jacobi map for curves. Using the intermediate jacobians and the associated Abel-Jacobi maps in higher dimension, a natural question came up: is the geometrically defined incidence equivalence relation the same as Abel-Jacobi equivalence, which is of transcendental nature? I give an overview of results related to this question and to several classical conjectures that are far from resolved, such as Grothendieck's generalized Hodge conjecture. The motivation for writing this survey came from a recently observed unexpected connection of Griffiths' question to the asymptotic behaviour of the archimedean height pairing in a geometric setting.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2607.22233" target="_blank">Incidence equivalence, a survey</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Chris Peters</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 27 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.22233" target="_blank">https://arxiv.org/abs/2607.22233</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This is a survey of results on incidence equivalence, a notion introduced by P.Griffiths around 1970 when trying to extend the classical properties of the Abel-Jacobi map for curves. Using the intermediate jacobians and the associated Abel-Jacobi maps in higher dimension, a natural question came up: is the geometrically defined incidence equivalence relation the same as Abel-Jacobi equivalence, which is of transcendental nature? I give an overview of results related to this question and to several classical conjectures that are far from resolved, such as Grothendieck's generalized Hodge conjecture. The motivation for writing this survey came from a recently observed unexpected connection of Griffiths' question to the asymptotic behaviour of the archimedean height pairing in a geometric setting.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Ulrich sheaves and determinantal representations for higher secant varieties of curves", "author": "Daniele Agostini, Mario Kummer, Jinhyung Park", "published": "Mon, 27 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.22247", "summary": "arXiv:2607.22247v1 Announce Type: new \nAbstract: We show that higher secant varieties of smooth projective curves have symmetric admissible determinantal representations with symmetric Ulrich sheaves of rank one if the embedding is sufficiently ample. For secant varieties of real curves, we give conditions for the representing matrices to be positive definite. This allows us, under mild (conjecturally vacuous) conditions, to represent the convex hull of the curve as a spectrahedron whenever it is a hyperbolicity cone. For secant varieties of rational normal curves, we derive very explicit representations in terms of Littlewood--Richardson coefficients. One key tool that we use are the higher Szeg\\H{o} kernels and the higher Scorza correspondences associated to a non-effective theta characteristic on the curve.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2607.22247" target="_blank">Ulrich sheaves and determinantal representations for higher secant varieties of curves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Daniele Agostini, Mario Kummer, Jinhyung Park</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 27 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.22247" target="_blank">https://arxiv.org/abs/2607.22247</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We show that higher secant varieties of smooth projective curves have symmetric admissible determinantal representations with symmetric Ulrich sheaves of rank one if the embedding is sufficiently ample. For secant varieties of real curves, we give conditions for the representing matrices to be positive definite. This allows us, under mild (conjecturally vacuous) conditions, to represent the convex hull of the curve as a spectrahedron whenever it is a hyperbolicity cone. For secant varieties of rational normal curves, we derive very explicit representations in terms of Littlewood--Richardson coefficients. One key tool that we use are the higher Szeg\H{o} kernels and the higher Scorza correspondences associated to a non-effective theta characteristic on the curve.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Generalizations of the Scorza correspondence", "author": "Maria Teresa Ruggiero", "published": "Mon, 27 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.22339", "summary": "arXiv:2607.22339v1 Announce Type: new \nAbstract: We study generalizations of the Scorza correspondence associated with a general $(C,\\eta)$ in the moduli space of even spin curves $S_g^+$. We first give a new proof of the smoothness of the classical Scorza curve, originally established by Farkas-Verra. We then introduce higher order analogues of the Scorza correspondence and investigate their geometry. In particular, we compute their classes in the N\\'eron-Severi group and study their singularities and genera. Finally, we consider a higher-dimensional version of the construction and focus on the threefold case, where we describe its class and prove a smoothness result outside a naturally defined degeneracy locus.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2607.22339" target="_blank">Generalizations of the Scorza correspondence</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Maria Teresa Ruggiero</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 27 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.22339" target="_blank">https://arxiv.org/abs/2607.22339</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study generalizations of the Scorza correspondence associated with a general $(C,\eta)$ in the moduli space of even spin curves $S_g^+$. We first give a new proof of the smoothness of the classical Scorza curve, originally established by Farkas-Verra. We then introduce higher order analogues of the Scorza correspondence and investigate their geometry. In particular, we compute their classes in the N\'eron-Severi group and study their singularities and genera. Finally, we consider a higher-dimensional version of the construction and focus on the threefold case, where we describe its class and prove a smoothness result outside a naturally defined degeneracy locus.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "A five-variable counterexample to the Hessian conjecture, and the low-dimensional status of the Jacobian and Hessian conjectures", "author": "Guowu Meng, Liang Yang", "published": "Mon, 27 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.22198", "summary": "arXiv:2607.22198v1 Announce Type: cross \nAbstract: We exhibit an explicit integer polynomial $\\Psi$ in five variables, of total degree $14$ and with constant Hessian determinant $\\det\\Hess\\Psi\\equiv128$, whose gradient is not injective. Consequently the formal Legendre transform of $\\Psi$ is not a polynomial, and the Hessian conjecture $\\HC_5$ is false. The counterexample is obtained from the six-variable doubling of Alp\\\"oge's 2026 Jacobian counterexample by a one-variable \\emph{Schur descent}---a partial Legendre transform in a single variable---and all of its defining identities have been checked in exact rational arithmetic. Combined with de~Bondt's theorem that $\\HC_n$ holds for $n\\le3$, with the elementary doubling and stabilization bridges relating the Jacobian conjectures $\\JC_n$ to the Hessian conjectures $\\HC_n$, and with Alp\\\"oge's refutation of $\\JC_3$, this decides the Hessian conjecture in every dimension except $n=4$: $\\HC_n$ is true for $n\\le3$, false for $n\\ge5$, and open only at $n=4$. Exactly two statements of the two families remain unsettled, $\\JC_2$ and $\\HC_4$, linked by $\\HC_4 \\Rightarrow \\JC_2$. Along the way we record, as a warm-up, an explicit six-variable counterexample to $\\HC_6$ with constant Hessian determinant $-4$ and gradient generically three-to-one over $\\C$. This paper extends and supersedes the first author's earlier educational note \\cite{MengRG2026}.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2607.22198" target="_blank">A five-variable counterexample to the Hessian conjecture, and the low-dimensional status of the Jacobian and Hessian conjectures</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Guowu Meng, Liang Yang</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 27 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.22198" target="_blank">https://arxiv.org/abs/2607.22198</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We exhibit an explicit integer polynomial $\Psi$ in five variables, of total degree $14$ and with constant Hessian determinant $\det\Hess\Psi\equiv128$, whose gradient is not injective. Consequently the formal Legendre transform of $\Psi$ is not a polynomial, and the Hessian conjecture $\HC_5$ is false. The counterexample is obtained from the six-variable doubling of Alp\"oge's 2026 Jacobian counterexample by a one-variable \emph{Schur descent}---a partial Legendre transform in a single variable---and all of its defining identities have been checked in exact rational arithmetic. Combined with de~Bondt's theorem that $\HC_n$ holds for $n\le3$, with the elementary doubling and stabilization bridges relating the Jacobian conjectures $\JC_n$ to the Hessian conjectures $\HC_n$, and with Alp\"oge's refutation of $\JC_3$, this decides the Hessian conjecture in every dimension except $n=4$: $\HC_n$ is true for $n\le3$, false for $n\ge5$, and open only at $n=4$. Exactly two statements of the two families remain unsettled, $\JC_2$ and $\HC_4$, linked by $\HC_4 \Rightarrow \JC_2$. Along the way we record, as a warm-up, an explicit six-variable counterexample to $\HC_6$ with constant Hessian determinant $-4$ and gradient generically three-to-one over $\C$. This paper extends and supersedes the first author's earlier educational note \cite{MengRG2026}.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "An estimate of canonical dimension of groups based on Schubert calculus", "author": "Rostislav Devyatov", "published": "Mon, 27 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2011.00950", "summary": "arXiv:2011.00950v4 Announce Type: replace \nAbstract: We sketch the proof of a connection between the canonical (0-)dimension of semisimple split simply connected groups and cohomology of their full flag varieties. Using this connection, we get a new estimate of the canonical (0-)dimension of simply connected split exceptional groups of type $E$ understood as a group.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2011.00950" target="_blank">An estimate of canonical dimension of groups based on Schubert calculus</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Rostislav Devyatov</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 27 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2011.00950" target="_blank">https://arxiv.org/abs/2011.00950</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We sketch the proof of a connection between the canonical (0-)dimension of semisimple split simply connected groups and cohomology of their full flag varieties. Using this connection, we get a new estimate of the canonical (0-)dimension of simply connected split exceptional groups of type $E$ understood as a group.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "Hilbert schemes for crepant partial resolutions", "author": "Alastair Craw, Ruth Wye", "published": "Mon, 27 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2409.07408", "summary": "arXiv:2409.07408v3 Announce Type: replace \nAbstract: For $n\\geq 1$, we construct the underlying reduced subscheme of the Hilbert scheme of $n$ points on any crepant partial resolution of a Kleinian singularity as a Nakajima quiver variety for an explicit GIT stability parameter. This generalises and unifies existing quiver variety constructions of the Hilbert scheme of points on the minimal resolution of a Kleinian singularity, and on the Kleinian singularity itself. As a corollary, we compute the nef and movable cones of the Hilbert scheme of $n$ points on any crepant partial resolution of a Kleinian singularity.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2409.07408" target="_blank">Hilbert schemes for crepant partial resolutions</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Alastair Craw, Ruth Wye</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 27 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2409.07408" target="_blank">https://arxiv.org/abs/2409.07408</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                For $n\geq 1$, we construct the underlying reduced subscheme of the Hilbert scheme of $n$ points on any crepant partial resolution of a Kleinian singularity as a Nakajima quiver variety for an explicit GIT stability parameter. This generalises and unifies existing quiver variety constructions of the Hilbert scheme of points on the minimal resolution of a Kleinian singularity, and on the Kleinian singularity itself. As a corollary, we compute the nef and movable cones of the Hilbert scheme of $n$ points on any crepant partial resolution of a Kleinian singularity.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "The tempered disk and the tempered cohomology", "author": "Federico Bambozzi, Bruno Chiarellotto, Pietro Vanni", "published": "Mon, 27 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2410.09473", "summary": "arXiv:2410.09473v3 Announce Type: replace \nAbstract: Let V be a complete discretely valued ring of mixed characteristic, with fraction field K and residue field k. Using the ind-Banach framework for derived analytic geometry, we view generic fibers of V-schemes as derived analytic spaces. This approach yields a refined notion of spectrum, richer than that of classical rigid geometry: for ex- ample we may have open subsets whose structure sheaf contains functions of logarithmic growth. In this setting, the transfer theorem for the log-growth of solutions of p-adic differ- ential equations becomes a natural continuity statement, analogous to the classical transfer theorem for radii of convergence on Berkovich spaces. Motivated by ideas of Scholze, we introduce tempered tubular neighborhoods of smooth k-schemes and define a new tempered de Rham cohomology via the derived de Rham complex of these tubes. Finally, we establish a comparison theorem showing that, for smooth proper k-schemes, tempered de Rham cohomology agrees with crystalline cohomology.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2410.09473" target="_blank">The tempered disk and the tempered cohomology</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Federico Bambozzi, Bruno Chiarellotto, Pietro Vanni</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 27 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2410.09473" target="_blank">https://arxiv.org/abs/2410.09473</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let V be a complete discretely valued ring of mixed characteristic, with fraction field K and residue field k. Using the ind-Banach framework for derived analytic geometry, we view generic fibers of V-schemes as derived analytic spaces. This approach yields a refined notion of spectrum, richer than that of classical rigid geometry: for ex- ample we may have open subsets whose structure sheaf contains functions of logarithmic growth. In this setting, the transfer theorem for the log-growth of solutions of p-adic differ- ential equations becomes a natural continuity statement, analogous to the classical transfer theorem for radii of convergence on Berkovich spaces. Motivated by ideas of Scholze, we introduce tempered tubular neighborhoods of smooth k-schemes and define a new tempered de Rham cohomology via the derived de Rham complex of these tubes. Finally, we establish a comparison theorem showing that, for smooth proper k-schemes, tempered de Rham cohomology agrees with crystalline cohomology.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "GIT stability and biquotients of $SU(3)$", "author": "Yoshinori Hashimoto, Hiroaki Ishida, Hisashi Kasuya", "published": "Mon, 27 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2509.20254", "summary": "arXiv:2509.20254v3 Announce Type: replace \nAbstract: We study double-sided actions of $(\\mathbb{C}^*)^2$ on $SL(3,\\mathbb{C})/U$ and the associated quotients, where $U$ is a maximal unipotent subgroup of $SL(3,\\mathbb{C})$. The main results of this paper are a sufficient condition for the double-sided quotient to agree with the quotient in terms of the geometric invariant theory (GIT), and an explicit necessary and sufficient condition for $SL(3,\\mathbb{C})/U$ to agree with the $\\chi$-stable locus in its affine closure. We apply this result to characterize certain complex structures on $SU(3)$ which are not left invariant by means of the GIT quotient.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2509.20254" target="_blank">GIT stability and biquotients of $SU(3)$</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yoshinori Hashimoto, Hiroaki Ishida, Hisashi Kasuya</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 27 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2509.20254" target="_blank">https://arxiv.org/abs/2509.20254</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study double-sided actions of $(\mathbb{C}^*)^2$ on $SL(3,\mathbb{C})/U$ and the associated quotients, where $U$ is a maximal unipotent subgroup of $SL(3,\mathbb{C})$. The main results of this paper are a sufficient condition for the double-sided quotient to agree with the quotient in terms of the geometric invariant theory (GIT), and an explicit necessary and sufficient condition for $SL(3,\mathbb{C})/U$ to agree with the $\chi$-stable locus in its affine closure. We apply this result to characterize certain complex structures on $SU(3)$ which are not left invariant by means of the GIT quotient.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Remarks on diagonal dimension for algebraic stacks", "author": "Pat Lank, Fei Peng", "published": "Mon, 27 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.13416", "summary": "arXiv:2605.13416v2 Announce Type: replace \nAbstract: This note is concerned with the Rouquier dimension of the bounded derived category of coherent complexes on a Noetherian algebraic stack. Specifically, we study the diagonal dimension of a morphism, which can be used to produce upper bounds on Rouquier dimension. First, we obtain an explicit upper bound for smooth morphisms with a regular target. Second, we identify classical generators of a fibre product, recovering a result of Elagin--Lunts--Schn\\\"{u}rer. Finally, we show that the diagonal dimension of a variety in arbitrary characteristic with mild singularities is at most twice its Krull dimension.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2605.13416" target="_blank">Remarks on diagonal dimension for algebraic stacks</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Pat Lank, Fei Peng</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 27 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.13416" target="_blank">https://arxiv.org/abs/2605.13416</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This note is concerned with the Rouquier dimension of the bounded derived category of coherent complexes on a Noetherian algebraic stack. Specifically, we study the diagonal dimension of a morphism, which can be used to produce upper bounds on Rouquier dimension. First, we obtain an explicit upper bound for smooth morphisms with a regular target. Second, we identify classical generators of a fibre product, recovering a result of Elagin--Lunts--Schn\"{u}rer. Finally, we show that the diagonal dimension of a variety in arbitrary characteristic with mild singularities is at most twice its Krull dimension.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Divisorial Persistence and Asymptotic Homology of Analytic Pairs", "author": "Nivaldo Grulha", "published": "Mon, 27 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.06717", "summary": "arXiv:2607.06717v3 Announce Type: replace \nAbstract: Numerical divisorial invariants -- the log canonical threshold, the real log canonical threshold (RLCT), and their associated spectra -- give remarkably effective measurements of the asymptotic geometry of an analytic pair $(X,\\mathcal I)$, arising from the sublevel sets of the intrinsic analytic energy $K_{\\mathcal I}=\\sum_j |f_j|^2$ on a log-resolution. Yet these invariants reduce a highly structured geometric object to a finite collection of numbers, and in doing so they leave invisible the topology governing how the exceptional divisors are glued together. We show that this missing information is recovered by a single persistent homological structure, \\emph{Divisorial Asymptotic Homology} (DAH), of which the RLCT and a finite homological spectrum $\\Gamma_{\\mathrm H}(X,\\mathcal I)$ are derived invariants: respectively the minimum and the jump locus of the associated persistence module $\\{AH_k^\\alpha(X,\\mathcal I)\\}_{\\alpha&gt;0}$. We prove that this persistence module is tame, changing only at the finitely many critical values of $\\Gamma_{\\mathrm H}(X,\\mathcal I)$, and establish functoriality, relative and Mayer--Vietoris sequences, and birational invariance for DAH. For normal analytic surface germs we prove a rigidity theorem identifying the critical DAH groups with the homology of critical weighted dual graphs. Examples show that $\\Gamma_{\\mathrm H}$ records which divisorial levels occur but forgets how the corresponding divisors are glued together, while DAH recovers exactly this gluing information, revealing persistent topological content invisible to purely numerical divisorial invariants.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2607.06717" target="_blank">Divisorial Persistence and Asymptotic Homology of Analytic Pairs</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Nivaldo Grulha</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 27 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.06717" target="_blank">https://arxiv.org/abs/2607.06717</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Numerical divisorial invariants -- the log canonical threshold, the real log canonical threshold (RLCT), and their associated spectra -- give remarkably effective measurements of the asymptotic geometry of an analytic pair $(X,\mathcal I)$, arising from the sublevel sets of the intrinsic analytic energy $K_{\mathcal I}=\sum_j |f_j|^2$ on a log-resolution. Yet these invariants reduce a highly structured geometric object to a finite collection of numbers, and in doing so they leave invisible the topology governing how the exceptional divisors are glued together. We show that this missing information is recovered by a single persistent homological structure, \emph{Divisorial Asymptotic Homology} (DAH), of which the RLCT and a finite homological spectrum $\Gamma_{\mathrm H}(X,\mathcal I)$ are derived invariants: respectively the minimum and the jump locus of the associated persistence module $\{AH_k^\alpha(X,\mathcal I)\}_{\alpha&gt;0}$. We prove that this persistence module is tame, changing only at the finitely many critical values of $\Gamma_{\mathrm H}(X,\mathcal I)$, and establish functoriality, relative and Mayer--Vietoris sequences, and birational invariance for DAH. For normal analytic surface germs we prove a rigidity theorem identifying the critical DAH groups with the homology of critical weighted dual graphs. Examples show that $\Gamma_{\mathrm H}$ records which divisorial levels occur but forgets how the corresponding divisors are glued together, while DAH recovers exactly this gluing information, revealing persistent topological content invisible to purely numerical divisorial invariants.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "The m=2 amplituhedron and the hypersimplex: signs, clusters, triangulations, Eulerian numbers", "author": "Matteo Parisi, Melissa Sherman-Bennett, Lauren Williams", "published": "Mon, 27 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2104.08254", "summary": "arXiv:2104.08254v5 Announce Type: replace-cross \nAbstract: The hypersimplex $\\Delta_{k+1,n}$ is the image of the positive Grassmannian $Gr^{\\geq 0}_{k+1,n}$ under the moment map. It is a polytope of dimension $n-1$ in $\\mathbb{R}^n$. Meanwhile, the amplituhedron ${A}_{n,k,2}(Z)$ is the projection of the positive Grassmannian $Gr^{\\geq 0}_{k,n}$ into $Gr_{k,k+2}$ under a map $\\tilde{Z}$ induced by a matrix $Z\\in \\text{Mat}_{n,k+2}^{&gt;0}$. Introduced in the context of scattering amplitudes, it is not a polytope, and has dimension $2k$. Nevertheless, there seem to be remarkable connections between these two objects via T-duality, as was first noted by Lukowski--Parisi--Williams (LPW). In this paper we use ideas from oriented matroid theory, total positivity, and the geometry of the hypersimplex and positroid polytopes to obtain a deeper understanding of the amplituhedron. We show that the inequalities cutting out positroid polytopes -- images of positroid cells of $Gr^{\\geq 0}_{k+1,n}$ under the moment map -- translate into sign conditions characterizing the T-dual Grasstopes -- images of positroid cells of $Gr^{\\geq 0}_{k,n}$ under $\\tilde{Z}$. Moreover, we subdivide the amplituhedron into chambers, just as the hypersimplex can be subdivided into simplices, with both chambers and simplices enumerated by the Eulerian numbers. We prove the main conjecture of (LPW): a collection of positroid polytopes is a triangulation of $\\Delta_{k+1, n}$ if and only if the collection of T-dual Grasstopes is a triangulation of ${A}_{n,k,2}(Z)$ for all $Z$. Moreover, we prove Arkani-Hamed--Thomas--Trnka's conjectural sign-flip characterization of ${A}_{n,k,2}(Z)$, and Lukowski--Parisi--Spradlin--Volovich's conjectures on $m=2$ cluster adjacency and on generalized triangles (images of $2k$-dimensional positroid cells which map injectively into ${A}_{n,k,2}(Z)$). Finally, we introduce new cluster structures in the amplituhedron.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2104.08254" target="_blank">The m=2 amplituhedron and the hypersimplex: signs, clusters, triangulations, Eulerian numbers</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Matteo Parisi, Melissa Sherman-Bennett, Lauren Williams</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 27 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2104.08254" target="_blank">https://arxiv.org/abs/2104.08254</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The hypersimplex $\Delta_{k+1,n}$ is the image of the positive Grassmannian $Gr^{\geq 0}_{k+1,n}$ under the moment map. It is a polytope of dimension $n-1$ in $\mathbb{R}^n$. Meanwhile, the amplituhedron ${A}_{n,k,2}(Z)$ is the projection of the positive Grassmannian $Gr^{\geq 0}_{k,n}$ into $Gr_{k,k+2}$ under a map $\tilde{Z}$ induced by a matrix $Z\in \text{Mat}_{n,k+2}^{&gt;0}$. Introduced in the context of scattering amplitudes, it is not a polytope, and has dimension $2k$. Nevertheless, there seem to be remarkable connections between these two objects via T-duality, as was first noted by Lukowski--Parisi--Williams (LPW). In this paper we use ideas from oriented matroid theory, total positivity, and the geometry of the hypersimplex and positroid polytopes to obtain a deeper understanding of the amplituhedron. We show that the inequalities cutting out positroid polytopes -- images of positroid cells of $Gr^{\geq 0}_{k+1,n}$ under the moment map -- translate into sign conditions characterizing the T-dual Grasstopes -- images of positroid cells of $Gr^{\geq 0}_{k,n}$ under $\tilde{Z}$. Moreover, we subdivide the amplituhedron into chambers, just as the hypersimplex can be subdivided into simplices, with both chambers and simplices enumerated by the Eulerian numbers. We prove the main conjecture of (LPW): a collection of positroid polytopes is a triangulation of $\Delta_{k+1, n}$ if and only if the collection of T-dual Grasstopes is a triangulation of ${A}_{n,k,2}(Z)$ for all $Z$. Moreover, we prove Arkani-Hamed--Thomas--Trnka's conjectural sign-flip characterization of ${A}_{n,k,2}(Z)$, and Lukowski--Parisi--Spradlin--Volovich's conjectures on $m=2$ cluster adjacency and on generalized triangles (images of $2k$-dimensional positroid cells which map injectively into ${A}_{n,k,2}(Z)$). Finally, we introduce new cluster structures in the amplituhedron.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "Towards $\\mathbb{A}^1$-homotopy theory of rigid analytic spaces", "author": "Christian Dahlhausen, Can Yaylali", "published": "Mon, 27 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2407.09606", "summary": "arXiv:2407.09606v3 Announce Type: replace-cross \nAbstract: To any rigid analytic space (in the sense of Fujiwara--Kato) we assign an $\\mathbb{A}^1$-invariant rigid analytic homotopy category with coefficients in any presentable category. We show some functorial properties of this assignment as a functor on the category of rigid analytic spaces. Moreover, we show that there exists a full six-functor formalism for the precomposition with the analytification functor by evoking Ayoub's thesis. As an application, we prove mod $p$ rigidity for rigid spaces over $\\mathbb{Q}_p$. Moreover, we prove the equivalence of $\\mathbb{A}^1$-invariant sheaves and $\\mathbb{B}^1$-invariant sheaves in the mod $\\ell$ case.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2407.09606" target="_blank">Towards $\mathbb{A}^1$-homotopy theory of rigid analytic spaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Christian Dahlhausen, Can Yaylali</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 27 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2407.09606" target="_blank">https://arxiv.org/abs/2407.09606</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                To any rigid analytic space (in the sense of Fujiwara--Kato) we assign an $\mathbb{A}^1$-invariant rigid analytic homotopy category with coefficients in any presentable category. We show some functorial properties of this assignment as a functor on the category of rigid analytic spaces. Moreover, we show that there exists a full six-functor formalism for the precomposition with the analytification functor by evoking Ayoub's thesis. As an application, we prove mod $p$ rigidity for rigid spaces over $\mathbb{Q}_p$. Moreover, we prove the equivalence of $\mathbb{A}^1$-invariant sheaves and $\mathbb{B}^1$-invariant sheaves in the mod $\ell$ case.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "Important Classes of Morphisms and the Relative Cotangent Sequence in Tangent Categories", "author": "Jean-Simon Pacaud Lemay, Geoff Vooys", "published": "Mon, 27 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2506.07874", "summary": "arXiv:2506.07874v3 Announce Type: replace-cross \nAbstract: In this paper we provide a deep and systematic study of what it means to be an immersion, a submersion, a local diffeomorphism, and unramified in a tangent category. We also give a systematic study of the ways in which these classes of morphisms interact, their properties, and give very explicit and concrete characterizations of how each class appears in algebraic geometry, differential geometry, algebra, and in Cartesian differential categories. Additionally, we discuss the notion of being carrable with respect to the tangent bundle projection, then use this to define the notion of horizontal descent in a tangent category, which we then use as a key tool to study the aforementioned classes of morphisms. In particular, we use this to define a de Rham relative cotangent complex in an arbitrary tangent category.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2506.07874" target="_blank">Important Classes of Morphisms and the Relative Cotangent Sequence in Tangent Categories</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jean-Simon Pacaud Lemay, Geoff Vooys</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 27 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2506.07874" target="_blank">https://arxiv.org/abs/2506.07874</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper we provide a deep and systematic study of what it means to be an immersion, a submersion, a local diffeomorphism, and unramified in a tangent category. We also give a systematic study of the ways in which these classes of morphisms interact, their properties, and give very explicit and concrete characterizations of how each class appears in algebraic geometry, differential geometry, algebra, and in Cartesian differential categories. Additionally, we discuss the notion of being carrable with respect to the tangent bundle projection, then use this to define the notion of horizontal descent in a tangent category, which we then use as a key tool to study the aforementioned classes of morphisms. In particular, we use this to define a de Rham relative cotangent complex in an arbitrary tangent category.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Permutation twisted cohomology, remixed", "author": "Sam K. Miller", "published": "Mon, 27 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2509.00954", "summary": "arXiv:2509.00954v4 Announce Type: replace-cross \nAbstract: For each endotrivial complex for a $p$-group arising from Bredon homology of a representation sphere, we construct $p$-local quasi-isomorphisms, called forerunners. These enable us to extend Balmer--Gallauer's results in arXiv:2307.04398 concerning the tensor-triangular geometry of permutation modules for elementary abelian $p$-groups to all $p$-groups. We construct an open cover of the Balmer spectrum under which all endotrivials are tt-line bundles, that is, every endotrivial is locally isomorphic to a shift of the tensor unit. We define a remixed permutation twisted cohomology ring for which the canonical comparison map from the Balmer spectrum to the homogeneous spectrum of the twisted cohomology ring is injective. If the twisted cohomology ring is Noetherian, the comparison map is an open immersion, and the open cover endows the Balmer spectrum with Dirac scheme structure. We prove Noetherianity holds for Dedekind groups and the dihedral group of order 8, and conjecture it holds for all $p$-groups.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2509.00954" target="_blank">Permutation twisted cohomology, remixed</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sam K. Miller</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 27 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2509.00954" target="_blank">https://arxiv.org/abs/2509.00954</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                For each endotrivial complex for a $p$-group arising from Bredon homology of a representation sphere, we construct $p$-local quasi-isomorphisms, called forerunners. These enable us to extend Balmer--Gallauer's results in arXiv:2307.04398 concerning the tensor-triangular geometry of permutation modules for elementary abelian $p$-groups to all $p$-groups. We construct an open cover of the Balmer spectrum under which all endotrivials are tt-line bundles, that is, every endotrivial is locally isomorphic to a shift of the tensor unit. We define a remixed permutation twisted cohomology ring for which the canonical comparison map from the Balmer spectrum to the homogeneous spectrum of the twisted cohomology ring is injective. If the twisted cohomology ring is Noetherian, the comparison map is an open immersion, and the open cover endows the Balmer spectrum with Dirac scheme structure. We prove Noetherianity holds for Dedekind groups and the dihedral group of order 8, and conjecture it holds for all $p$-groups.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "On gonality-tight graphs", "author": "\\v{S}imun Dropulji\\'c, Yoav Len", "published": "Mon, 27 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2511.19138", "summary": "arXiv:2511.19138v3 Announce Type: replace-cross \nAbstract: We address a question posed by Fessler--Jensen--Kelsey--Owen regarding graphs whose second gonality is greater than the first by exactly 1. We answer the question affirmatively under a stronger condition, thereby characterising the entire gonality sequence for a large family of graphs, that we refer to as quasi-banana graphs. We prove a structure theorem for those graphs, and show that they are all obtained via an inductive process by gluing together complete and banana graphs under certain rules.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2511.19138" target="_blank">On gonality-tight graphs</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> \v{S}imun Dropulji\'c, Yoav Len</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 27 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.19138" target="_blank">https://arxiv.org/abs/2511.19138</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We address a question posed by Fessler--Jensen--Kelsey--Owen regarding graphs whose second gonality is greater than the first by exactly 1. We answer the question affirmatively under a stronger condition, thereby characterising the entire gonality sequence for a large family of graphs, that we refer to as quasi-banana graphs. We prove a structure theorem for those graphs, and show that they are all obtained via an inductive process by gluing together complete and banana graphs under certain rules.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-07-27 12:27:44
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>
