@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Fri, 31 Jul 2026 04:00:12 +0000<br>
+        <strong>論文数:</strong> 23件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Sharp Bounds for Totally Invariant Cycles of Projective Varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Families of curves separating points</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Logarithmic Lefschetz fixed point formulae and resonant boundary indices</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">Log Canonical Models and Positive Geometries</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">Stability conditions and moduli spaces on projective families</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">Boundedness of polarized foliated surfaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Local cohomology modules with nonclosed support</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Transcendental Hilbert-Kunz Multiplicities</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">Chtoucas restreints pour les groupes r\'eductifs et param\'etrisation de Langlands locale</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">On surfaces of high degree with respect to the sectional genus</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">Motivic multiplicativity of complete intersections</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">Une conjecture $C_{\rm st}$ pour la cohomologie \`a support compact</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">Eigenforms and graphs of Hecke operators with wild ramification</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Graphs of Hecke operators in mixed ramification</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Uniformization as Tannakian Reconstruction</a>
+            <span class="title-label-badge" style="background-color: #ff69b4;">privacy</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">On Automorphism Groups of (1,2)-Surfaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">$p$-elementary non-cyclic subgroups of the Cremona group of the plane</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">Generic degrees of real polynomial Keller maps with non-dense image</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Biangular lines with angles arccos(1/5) and arccos(3/5)</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">Fourier transforms and a filtration on the Lagrangian cobordism group of tori</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-21" onchange="updateSelectedCount()">
+            <span class="title-number">21.</span>
+            <a href="#paper-21">Morita equivalences, moduli spaces and flag varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-22" onchange="updateSelectedCount()">
+            <span class="title-number">22.</span>
+            <a href="#paper-22">On the basic locus of GSpin Shimura varieties with vertex stabilizer level</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-23" onchange="updateSelectedCount()">
+            <span class="title-number">23.</span>
+            <a href="#paper-23">Potential semistability of Finite height Galois representations: Relative case</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Sharp Bounds for Totally Invariant Cycles of Projective Varieties", "author": "Wentao Chang, Yujie Luo", "published": "Fri, 31 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.27738", "summary": "arXiv:2607.27738v1 Announce Type: new \nAbstract: Let $X$ be a smooth projective variety, $f:X\\to X$ an int-amplified endomorphism, and $L$ any ample line bundle on $X$. We prove that, in every codimension, the total degree of prime cycles that become totally invariant under an iterate of $f$ satisfies an explicit Hilbert-function bound on their total $L$-degree. In particular, when $X=\\mathbf{P}^n$, the number of totally invariant prime $(n-r)$-cycle is bounded by $\\binom{n+1}{r}$, and this bound is optimal.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2607.27738" target="_blank">Sharp Bounds for Totally Invariant Cycles of Projective Varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Wentao Chang, Yujie Luo</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 31 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.27738" target="_blank">https://arxiv.org/abs/2607.27738</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $X$ be a smooth projective variety, $f:X\to X$ an int-amplified endomorphism, and $L$ any ample line bundle on $X$. We prove that, in every codimension, the total degree of prime cycles that become totally invariant under an iterate of $f$ satisfies an explicit Hilbert-function bound on their total $L$-degree. In particular, when $X=\mathbf{P}^n$, the number of totally invariant prime $(n-r)$-cycle is bounded by $\binom{n+1}{r}$, and this bound is optimal.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Families of curves separating points", "author": "Wojciech Porowski", "published": "Fri, 31 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.27746", "summary": "arXiv:2607.27746v1 Announce Type: new \nAbstract: We show that for a hyperbolic curve X over an algebraically closed field k of characteristic zero and a finite set S of k-rational points of X, after replacing X by a finite \\'etale cover, there exists a family of curves over X whose fibres over points in S have pairwise nonisogenous Jacobians. We also give an application of our results to a problem concerning Galois sections.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2607.27746" target="_blank">Families of curves separating points</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Wojciech Porowski</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 31 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.27746" target="_blank">https://arxiv.org/abs/2607.27746</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We show that for a hyperbolic curve X over an algebraically closed field k of characteristic zero and a finite set S of k-rational points of X, after replacing X by a finite \'etale cover, there exists a family of curves over X whose fibres over points in S have pairwise nonisogenous Jacobians. We also give an application of our results to a problem concerning Galois sections.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Logarithmic Lefschetz fixed point formulae and resonant boundary indices", "author": "Elaheh Shahsavaripour", "published": "Fri, 31 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.28288", "summary": "arXiv:2607.28288v1 Announce Type: new \nAbstract: We prove logarithmic Lefschetz fixed point formulae for strict self-maps of compact complex manifolds with simple normal crossings boundary and isolated fixed points. At boundary points, normal rescaling and relative duality give canonical specialisation coefficients for admissible fixed-point ideals. In the de Rham specialisation, non-resonant boundary terms vanish, whereas resonant terms record normal contact and tangential multiplicity.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2607.28288" target="_blank">Logarithmic Lefschetz fixed point formulae and resonant boundary indices</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Elaheh Shahsavaripour</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 31 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.28288" target="_blank">https://arxiv.org/abs/2607.28288</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove logarithmic Lefschetz fixed point formulae for strict self-maps of compact complex manifolds with simple normal crossings boundary and isolated fixed points. At boundary points, normal rescaling and relative duality give canonical specialisation coefficients for admissible fixed-point ideals. In the de Rham specialisation, non-resonant boundary terms vanish, whereas resonant terms record normal contact and tangential multiplicity.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "Log Canonical Models and Positive Geometries", "author": "Benjamin Hollering, Dmitrii Pavlov, Elizabeth Pratt", "published": "Fri, 31 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.28368", "summary": "arXiv:2607.28368v1 Announce Type: new \nAbstract: Constructing log canonical compactifications of open varieties is a central problem in birational geometry. Finding a natural coordinate system and obtaining the equations of these models is difficult in general. We show that for a large class of varieties explicit coordinates for the log canonical model are provided by canonical forms of positive geometries, and use this to compute the equations of these models. Our theory applies, for instance, to complements of hyperplane arrangements, cubic surfaces with lines removed, and the moduli space of marked cubic del Pezzo surfaces.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2607.28368" target="_blank">Log Canonical Models and Positive Geometries</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Benjamin Hollering, Dmitrii Pavlov, Elizabeth Pratt</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 31 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.28368" target="_blank">https://arxiv.org/abs/2607.28368</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Constructing log canonical compactifications of open varieties is a central problem in birational geometry. Finding a natural coordinate system and obtaining the equations of these models is difficult in general. We show that for a large class of varieties explicit coordinates for the log canonical model are provided by canonical forms of positive geometries, and use this to compute the equations of these models. Our theory applies, for instance, to complements of hyperplane arrangements, cubic surfaces with lines removed, and the moduli space of marked cubic del Pezzo surfaces.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "Stability conditions and moduli spaces on projective families", "author": "Chunyi Li, Zhiyu Liu, Ziqi Liu, Emanuele Macr\\`i, Alexander Perry, Paolo Stellari, Xiaolei Zhao", "published": "Fri, 31 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.28411", "summary": "arXiv:2607.28411v1 Announce Type: new \nAbstract: We extend the construction of stability conditions on projective schemes over a field to projective families over an arbitrary base, and prove that they admit proper relative moduli spaces of semistable objects. We also prove a number of complementary results: the existence of mass-Hom bounds for these stability conditions, as conjectured by Halpern-Leistner and Robotis; a comparison with tilt-stability on surfaces and threefolds; a construction of stability conditions on the supported derived category of total spaces of certain vector bundles, including all local Calabi--Yau varieties; and a simple new proof of Bondal and Orlov's reconstruction theorem.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2607.28411" target="_blank">Stability conditions and moduli spaces on projective families</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Chunyi Li, Zhiyu Liu, Ziqi Liu, Emanuele Macr\`i, Alexander Perry, Paolo Stellari, Xiaolei Zhao</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 31 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.28411" target="_blank">https://arxiv.org/abs/2607.28411</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We extend the construction of stability conditions on projective schemes over a field to projective families over an arbitrary base, and prove that they admit proper relative moduli spaces of semistable objects. We also prove a number of complementary results: the existence of mass-Hom bounds for these stability conditions, as conjectured by Halpern-Leistner and Robotis; a comparison with tilt-stability on surfaces and threefolds; a construction of stability conditions on the supported derived category of total spaces of certain vector bundles, including all local Calabi--Yau varieties; and a simple new proof of Bondal and Orlov's reconstruction theorem.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "Boundedness of polarized foliated surfaces", "author": "Yen-An Chen, Minzhe Zhu", "published": "Fri, 31 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.28586", "summary": "arXiv:2607.28586v1 Announce Type: new \nAbstract: We establish the minimal model program for klt adjoint foliated surfaces and use it to study the boundedness of polarized adjoint foliated surfaces. We prove that $\\epsilon$-lc adjoint foliated surfaces with nef adjoint canonical divisor and a nef and big integral polarization form a bounded family, provided that the volume of their sum is bounded from above. As applications, we establish boundedness and effective birationality for adjoint foliated surfaces of general type, as well as a uniform positive lower bound for their volumes. Finally, for $\\epsilon$-lc Calabi--Yau adjoint foliated surfaces, we prove that the volumes of the canonical divisors of rank one foliations on the underlying surfaces belong to a fixed discrete set.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2607.28586" target="_blank">Boundedness of polarized foliated surfaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yen-An Chen, Minzhe Zhu</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 31 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.28586" target="_blank">https://arxiv.org/abs/2607.28586</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We establish the minimal model program for klt adjoint foliated surfaces and use it to study the boundedness of polarized adjoint foliated surfaces. We prove that $\epsilon$-lc adjoint foliated surfaces with nef adjoint canonical divisor and a nef and big integral polarization form a bounded family, provided that the volume of their sum is bounded from above. As applications, we establish boundedness and effective birationality for adjoint foliated surfaces of general type, as well as a uniform positive lower bound for their volumes. Finally, for $\epsilon$-lc Calabi--Yau adjoint foliated surfaces, we prove that the volumes of the canonical divisors of rank one foliations on the underlying surfaces belong to a fixed discrete set.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Local cohomology modules with nonclosed support", "author": "Bhargav Bhatt, Linquan Ma", "published": "Fri, 31 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.28096", "summary": "arXiv:2607.28096v1 Announce Type: cross \nAbstract: We construct noetherian rings admitting local cohomology modules with nonclosed support, or equivalently with infinitely many minimal primes; this answers a question of Huneke--Lyubeznik.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2607.28096" target="_blank">Local cohomology modules with nonclosed support</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Bhargav Bhatt, Linquan Ma</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 31 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.28096" target="_blank">https://arxiv.org/abs/2607.28096</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We construct noetherian rings admitting local cohomology modules with nonclosed support, or equivalently with infinitely many minimal primes; this answers a question of Huneke--Lyubeznik.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Transcendental Hilbert-Kunz Multiplicities", "author": "Sudipta Das, Stephen Landsittel, Vinh Anh Pham", "published": "Fri, 31 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.28205", "summary": "arXiv:2607.28205v1 Announce Type: cross \nAbstract: We prove that ordinary Hilbert-Kunz multiplicity can be transcendental. More precisely, over every uncountable algebraically closed field of characteristic $p&gt;2$, there exists a normal standard graded domain $S$ and an $S_+$-primary homogeneous ideal $I\\subseteq S$ such that $e_{\\rm HK}(IS_{S_+})$ is transcendental.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2607.28205" target="_blank">Transcendental Hilbert-Kunz Multiplicities</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sudipta Das, Stephen Landsittel, Vinh Anh Pham</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 31 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.28205" target="_blank">https://arxiv.org/abs/2607.28205</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove that ordinary Hilbert-Kunz multiplicity can be transcendental. More precisely, over every uncountable algebraically closed field of characteristic $p&gt;2$, there exists a normal standard graded domain $S$ and an $S_+$-primary homogeneous ideal $I\subseteq S$ such that $e_{\rm HK}(IS_{S_+})$ is transcendental.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "Chtoucas restreints pour les groupes r\\'eductifs et param\\'etrisation de Langlands locale", "author": "Alain Genestier, Vincent Lafforgue", "published": "Fri, 31 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/1709.00978", "summary": "arXiv:1709.00978v3 Announce Type: replace \nAbstract: We associate to every irreducible representation of a reductive group over a local field of equal characteristics a local Langlands parameter up to semisimplification and prove the compatibility with the global parameterization constructed by the second author. Our method involves stacks of restricted shtukas (which are analogues of truncated Barsotti-Tate groups) and nearby cycles over arbitrary bases.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/1709.00978" target="_blank">Chtoucas restreints pour les groupes r\'eductifs et param\'etrisation de Langlands locale</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Alain Genestier, Vincent Lafforgue</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 31 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/1709.00978" target="_blank">https://arxiv.org/abs/1709.00978</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We associate to every irreducible representation of a reductive group over a local field of equal characteristics a local Langlands parameter up to semisimplification and prove the compatibility with the global parameterization constructed by the second author. Our method involves stacks of restricted shtukas (which are analogues of truncated Barsotti-Tate groups) and nearby cycles over arbitrary bases.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "On surfaces of high degree with respect to the sectional genus", "author": "Ciro Ciliberto, Thomas Dedieu, Margarida Mendes Lopes", "published": "Fri, 31 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2503.22299", "summary": "arXiv:2503.22299v2 Announce Type: replace \nAbstract: We study and classify linearly normal surfaces in $\\mathbf{P}^n$, of degree $d$ and sectional genus $g$, such that $d\\geq 2g-1$.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2503.22299" target="_blank">On surfaces of high degree with respect to the sectional genus</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ciro Ciliberto, Thomas Dedieu, Margarida Mendes Lopes</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 31 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2503.22299" target="_blank">https://arxiv.org/abs/2503.22299</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study and classify linearly normal surfaces in $\mathbf{P}^n$, of degree $d$ and sectional genus $g$, such that $d\geq 2g-1$.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "Motivic multiplicativity of complete intersections", "author": "Ze Xu", "published": "Fri, 31 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2511.01362", "summary": "arXiv:2511.01362v2 Announce Type: replace \nAbstract: For a smooth projective variety endowed with a Chow-K\\\"unneth (abbr. CK) decomposition, we introduce the notions of motivic multiple twist-multiplicativity and multiplicativity defect to measure the obstruction to the compatibility of multiple intersection products with the given CK decomposition. These notions extend the more restrictive notion of multiplicativity introduced by Shen-Vial. We establish their basic properties and derive natural upper bounds for the motivic multiplicativity defects of curves, surfaces, and ample subvarieties of varieties with trivial Chow groups. We then explicitly determine the motivic 2-fold multiplicativity defect of any smooth Fano or Calabi-Yau complete intersection in a smooth weighted projective space, thereby strengthening a result of Fu in the Calabi-Yau case. In particular, we prove that any smooth Fano or Calabi-Yau hypersurface admits motivic 0-multiplicativity. This generalizes the corresponding result for cubic hypersurfaces, proved independently by Diaz and Fu-Laterveer-Vial, and confirms a conjecture of Voisin in the Calabi-Yau case. As a consequence, certain relative powers of the associated universal families satisfy the Franchetta property. We also obtain several further applications.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2511.01362" target="_blank">Motivic multiplicativity of complete intersections</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ze Xu</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 31 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.01362" target="_blank">https://arxiv.org/abs/2511.01362</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                For a smooth projective variety endowed with a Chow-K\"unneth (abbr. CK) decomposition, we introduce the notions of motivic multiple twist-multiplicativity and multiplicativity defect to measure the obstruction to the compatibility of multiple intersection products with the given CK decomposition. These notions extend the more restrictive notion of multiplicativity introduced by Shen-Vial. We establish their basic properties and derive natural upper bounds for the motivic multiplicativity defects of curves, surfaces, and ample subvarieties of varieties with trivial Chow groups. We then explicitly determine the motivic 2-fold multiplicativity defect of any smooth Fano or Calabi-Yau complete intersection in a smooth weighted projective space, thereby strengthening a result of Fu in the Calabi-Yau case. In particular, we prove that any smooth Fano or Calabi-Yau hypersurface admits motivic 0-multiplicativity. This generalizes the corresponding result for cubic hypersurfaces, proved independently by Diaz and Fu-Laterveer-Vial, and confirms a conjecture of Voisin in the Calabi-Yau case. As a consequence, certain relative powers of the associated universal families satisfy the Franchetta property. We also obtain several further applications.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "Une conjecture $C_{\\rm st}$ pour la cohomologie \\`a support compact", "author": "Pierre Colmez, Sally Gilles, Wies{\\l}awa Nizio{\\l}", "published": "Fri, 31 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2511.14675", "summary": "arXiv:2511.14675v3 Announce Type: replace \nAbstract: Let $\\mathbf{B}$ be the ring of analytic functions on the Fargues-Fontaine curve $Y_{\\rm FF}$. We show that adding $p$-adic analogs of $\\log p$ and $\\log 2\\pi i$ kills its Galois cohomology in degrees~$\\geq 1$. The analogous result for $\\mathbf{B}^+_{\\rm dR}$ is folklore. This makes it possible to formulate $C_{\\rm dR}$ and $C_{\\rm st}$-type conjectures for compact support cohomology of $p$-adic analytic varieties.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2511.14675" target="_blank">Une conjecture $C_{\rm st}$ pour la cohomologie \`a support compact</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Pierre Colmez, Sally Gilles, Wies{\l}awa Nizio{\l}</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 31 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.14675" target="_blank">https://arxiv.org/abs/2511.14675</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $\mathbf{B}$ be the ring of analytic functions on the Fargues-Fontaine curve $Y_{\rm FF}$. We show that adding $p$-adic analogs of $\log p$ and $\log 2\pi i$ kills its Galois cohomology in degrees~$\geq 1$. The analogous result for $\mathbf{B}^+_{\rm dR}$ is folklore. This makes it possible to formulate $C_{\rm dR}$ and $C_{\rm st}$-type conjectures for compact support cohomology of $p$-adic analytic varieties.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "Eigenforms and graphs of Hecke operators with wild ramification", "author": "Rudrendra Kashyap, Vladyslav Zveryk", "published": "Fri, 31 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2603.15931", "summary": "arXiv:2603.15931v4 Announce Type: replace \nAbstract: Hecke operators on moduli of bundles over a global function field become substantially more complicated in the presence of ramification. We show that far enough in the Harder-Narasimhan cone of $\\mathrm{Bun}_G$, this extra complexity has a simple structure, which allows to reduce most of the study to the unramified case. Using the theory of graphs of Hecke operators, we transform this statement into a combinatorial condition. Utilizing the combinatorial language, we obtain tight bounds, and for generic eigenvalues exact formulas for the dimensions of Hecke eigenspaces with arbitrary ramification for $\\mathrm{Bun}_{\\mathrm{PGL}_2}$. We compare these formulas to the known results in the theory of Eisenstein series. Moreover, our methods allow to construct eigenforms explicitly.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2603.15931" target="_blank">Eigenforms and graphs of Hecke operators with wild ramification</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Rudrendra Kashyap, Vladyslav Zveryk</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 31 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.15931" target="_blank">https://arxiv.org/abs/2603.15931</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Hecke operators on moduli of bundles over a global function field become substantially more complicated in the presence of ramification. We show that far enough in the Harder-Narasimhan cone of $\mathrm{Bun}_G$, this extra complexity has a simple structure, which allows to reduce most of the study to the unramified case. Using the theory of graphs of Hecke operators, we transform this statement into a combinatorial condition. Utilizing the combinatorial language, we obtain tight bounds, and for generic eigenvalues exact formulas for the dimensions of Hecke eigenspaces with arbitrary ramification for $\mathrm{Bun}_{\mathrm{PGL}_2}$. We compare these formulas to the known results in the theory of Eisenstein series. Moreover, our methods allow to construct eigenforms explicitly.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Graphs of Hecke operators in mixed ramification", "author": "Rudrendra Kashyap, Vladyslav Zveryk", "published": "Fri, 31 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.13824", "summary": "arXiv:2605.13824v2 Announce Type: replace \nAbstract: We study Hecke operators on moduli spaces of ramified $G$-bundles using the combinatorial language of Hecke graphs. We introduce a general notion of $\\mathcal H$-ramification in the spirit of parahoric ramification, which depends on a choice of a divisor and subgroups of $G$ at every point of the divisor. Building on our previous work, we prove that, under mild regularity conditions, the action of a Hecke operator in the deep cusp of $\\mathrm{Bun}_G$ in a highly complex ramification mimics an action in a much simpler ramification. This reduces the study to a smaller number of cases which, in particular, involve divisors supported at no more than two points. We demonstrate our methods by computing various examples for $G=\\mathrm{PGL}_2$ and computing the dimensions of spaces of Hecke eigenforms for generic eigenvalues. We connect the obtained dimension formulas with the known results from the theory of Eisenstein series.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2605.13824" target="_blank">Graphs of Hecke operators in mixed ramification</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Rudrendra Kashyap, Vladyslav Zveryk</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 31 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.13824" target="_blank">https://arxiv.org/abs/2605.13824</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study Hecke operators on moduli spaces of ramified $G$-bundles using the combinatorial language of Hecke graphs. We introduce a general notion of $\mathcal H$-ramification in the spirit of parahoric ramification, which depends on a choice of a divisor and subgroups of $G$ at every point of the divisor. Building on our previous work, we prove that, under mild regularity conditions, the action of a Hecke operator in the deep cusp of $\mathrm{Bun}_G$ in a highly complex ramification mimics an action in a much simpler ramification. This reduces the study to a smaller number of cases which, in particular, involve divisors supported at no more than two points. We demonstrate our methods by computing various examples for $G=\mathrm{PGL}_2$ and computing the dimensions of spaces of Hecke eigenforms for generic eigenvalues. We connect the obtained dimension formulas with the known results from the theory of Eisenstein series.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Uniformization as Tannakian Reconstruction", "author": "Xiaojin Lin, Mao Sheng", "published": "Fri, 31 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.25468", "summary": "arXiv:2605.25468v2 Announce Type: replace \nAbstract: Classical hyperbolic uniformization identifies every hyperbolic log-orbi curve with a compactified quotient of the upper half-plane by a cofinite Fuchsian lattice. The lattice is unique up to conjugacy. We reconstruct it intrinsically. For each hyperbolic log-orbi curve C we construct a canonical maximal principal PSL2-Higgs object. Etale-locally it comes from the standard square-root SL2-model. The central mu2 ambiguity disappears after passage to PSL2. Using vector tame non-abelian Hodge theory and regular-singular Riemann--Hilbert as input we assemble the required principal realizations Tannakianly. Parahoric structures encode the orbifold and cusp data on the coarse curve. After choosing a base point and conjugating the Betti realization is represented by a discrete faithful finite-covolume representation whose image is the uniformizing lattice. Compatibility with finite etale pullback makes the lattice construction a quasi-inverse to the compactified quotient functor. Thus classical uniformization is recast as an intrinsic Tannakian reconstruction theorem. We also identify finite etale covers with finite continuous sets for the profinite completion of the reconstructed lattice. After fixing a separable closure and the resulting geometric generic point we recover the absolute Galois group of the function field of C as the inverse limit of the based etale fundamental groups of orbifold models over C.", "number": 15, "labels": [{"name": "privacy", "color": "#ff69b4"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2605.25468" target="_blank">Uniformization as Tannakian Reconstruction</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #ff69b4;">privacy</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Xiaojin Lin, Mao Sheng</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 31 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.25468" target="_blank">https://arxiv.org/abs/2605.25468</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Classical hyperbolic uniformization identifies every hyperbolic log-orbi curve with a compactified quotient of the upper half-plane by a cofinite Fuchsian lattice. The lattice is unique up to conjugacy. We reconstruct it intrinsically. For each hyperbolic log-orbi curve C we construct a canonical maximal principal PSL2-Higgs object. Etale-locally it comes from the standard square-root SL2-model. The central mu2 ambiguity disappears after passage to PSL2. Using vector tame non-abelian Hodge theory and regular-singular Riemann--Hilbert as input we assemble the required principal realizations Tannakianly. Parahoric structures encode the orbifold and cusp data on the coarse curve. After choosing a base point and conjugating the Betti realization is represented by a discrete faithful finite-covolume representation whose image is the uniformizing lattice. Compatibility with finite etale pullback makes the lattice construction a quasi-inverse to the compactified quotient functor. Thus classical uniformization is recast as an intrinsic Tannakian reconstruction theorem. We also identify finite etale covers with finite continuous sets for the profinite completion of the reconstructed lattice. After fixing a separable closure and the resulting geometric generic point we recover the absolute Galois group of the function field of C as the inverse limit of the based etale fundamental groups of orbifold models over C.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "On Automorphism Groups of (1,2)-Surfaces", "author": "Hang Zhao", "published": "Fri, 31 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2606.25554", "summary": "arXiv:2606.25554v3 Announce Type: replace \nAbstract: Let S be a minimal surface of general type with K_S^2 = 1 and p_g(S) = 2, commonly referred to as a (1,2)-surface. The automorphism groups of such surfaces have been classified by David Wen using algebraic methods via the canonical ring, establishing the bound |Aut(S)| &lt;= 200. In this paper, we provide a geometric recovery of this bound from the double cover of the Hirzebruch surface Sigma_2. We compute the automorphisms of Sigma_2 from its Cox ring and analyze the induced action on the base P^1 together with its vertical kernel. Applying this to automorphisms preserving the branch divisor R = Delta_0 + R_0, R_0 in |5 Delta_0 + 10 Gamma|, gives a geometric framework for the vertical and horizontal parts of the automorphism group and recovers Wen's bound |Aut(S)| &lt;= 200.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2606.25554" target="_blank">On Automorphism Groups of (1,2)-Surfaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Hang Zhao</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 31 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2606.25554" target="_blank">https://arxiv.org/abs/2606.25554</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let S be a minimal surface of general type with K_S^2 = 1 and p_g(S) = 2, commonly referred to as a (1,2)-surface. The automorphism groups of such surfaces have been classified by David Wen using algebraic methods via the canonical ring, establishing the bound |Aut(S)| &lt;= 200. In this paper, we provide a geometric recovery of this bound from the double cover of the Hirzebruch surface Sigma_2. We compute the automorphisms of Sigma_2 from its Cox ring and analyze the induced action on the base P^1 together with its vertical kernel. Applying this to automorphisms preserving the branch divisor R = Delta_0 + R_0, R_0 in |5 Delta_0 + 10 Gamma|, gives a geometric framework for the vertical and horizontal parts of the automorphism group and recovers Wen's bound |Aut(S)| &lt;= 200.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "$p$-elementary non-cyclic subgroups of the Cremona group of the plane", "author": "Mani Esna Ashari", "published": "Fri, 31 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.09941", "summary": "arXiv:2607.09941v2 Announce Type: replace \nAbstract: We classify, up to conjugacy, the subgroups of the Cremona group of the plane isomorphic to $(\\mathbb{Z}/p\\mathbb{Z})^r$, where $p$ is prime and $r \\geq 2$, over an algebraically closed field $\\mathbf{k}$ of characteristic not equal to $p$. In particular, we show that $r \\leq 2$ if $p \\geq 5$, $r \\leq 3$ if $p=3$, and $r \\leq 4$ if $p=2$. Furthermore, we give an explicit list of representatives via a set of 20 families consisting of subgroups of the de Jonqui\\`eres group and subgroups of automorphisms of del Pezzo surfaces, and we study the possible conjugacies by birational maps between these families. Finally, we give some results on subgroups of the Cremona group of the plane isomorphic to $(\\mathbb{Z}/p\\mathbb{Z})^r$, where $p$ is prime and $r$ is an integer, over an algebraically closed field $\\mathbf{k}$ of characteristic equal to $p$.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2607.09941" target="_blank">$p$-elementary non-cyclic subgroups of the Cremona group of the plane</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Mani Esna Ashari</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 31 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.09941" target="_blank">https://arxiv.org/abs/2607.09941</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We classify, up to conjugacy, the subgroups of the Cremona group of the plane isomorphic to $(\mathbb{Z}/p\mathbb{Z})^r$, where $p$ is prime and $r \geq 2$, over an algebraically closed field $\mathbf{k}$ of characteristic not equal to $p$. In particular, we show that $r \leq 2$ if $p \geq 5$, $r \leq 3$ if $p=3$, and $r \leq 4$ if $p=2$. Furthermore, we give an explicit list of representatives via a set of 20 families consisting of subgroups of the de Jonqui\`eres group and subgroups of automorphisms of del Pezzo surfaces, and we study the possible conjugacies by birational maps between these families. Finally, we give some results on subgroups of the Cremona group of the plane isomorphic to $(\mathbb{Z}/p\mathbb{Z})^r$, where $p$ is prime and $r$ is an integer, over an algebraically closed field $\mathbf{k}$ of characteristic equal to $p$.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "Generic degrees of real polynomial Keller maps with non-dense image", "author": "Piotr Migus", "published": "Fri, 31 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.21572", "summary": "arXiv:2607.21572v2 Announce Type: replace \nAbstract: We determine the possible generic degrees of real polynomial Keller maps with non-dense image, where density is understood in the Euclidean topology. For every dimension $n\\geq3$, these degrees are exactly the even integers $d\\geq4$. They are realized in dimension three by an explicit family $G_d\\colon\\mathbb{R}^{3}\\to\\mathbb{R}^{3}$, and hence in every higher dimension by stabilization. In dimension two, any such degree is an even integer at least six, and no such maps exist if the planar Jacobian conjecture holds; in dimension one, none exist. For the family $G_d$, we describe the image exactly and show that no $G_d$ omits a half-space. We also show that the maximal cardinality of a real fibre is not determined by the generic degree and is not uniformly bounded in this class. Finally, we prove that the non-properness set of any real polynomial local diffeomorphism with non-dense image has codimension one.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2607.21572" target="_blank">Generic degrees of real polynomial Keller maps with non-dense image</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Piotr Migus</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 31 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.21572" target="_blank">https://arxiv.org/abs/2607.21572</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We determine the possible generic degrees of real polynomial Keller maps with non-dense image, where density is understood in the Euclidean topology. For every dimension $n\geq3$, these degrees are exactly the even integers $d\geq4$. They are realized in dimension three by an explicit family $G_d\colon\mathbb{R}^{3}\to\mathbb{R}^{3}$, and hence in every higher dimension by stabilization. In dimension two, any such degree is an even integer at least six, and no such maps exist if the planar Jacobian conjecture holds; in dimension one, none exist. For the family $G_d$, we describe the image exactly and show that no $G_d$ omits a half-space. We also show that the maximal cardinality of a real fibre is not determined by the generic degree and is not uniformly bounded in this class. Finally, we prove that the non-properness set of any real polynomial local diffeomorphism with non-dense image has codimension one.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Biangular lines with angles arccos(1/5) and arccos(3/5)", "author": "Paul Tricot", "published": "Fri, 31 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.23897", "summary": "arXiv:2607.23897v2 Announce Type: replace \nAbstract: The largest known biangular lines systems in dimension 7 through 20 are due to Ganzhinov and Sz\\\"oll\\H{o}si, and the lines make angles $\\arccos(\\frac{1}{5})$ and $\\arccos(\\frac{3}{5})$. They are constructed by making use of the nice connection with integral lattices. We explore further the connection between biangular lines and integral lattices to classify the largest biangular line systems with these angles, in dimension 7 through 10. We also give a new biangular line system in dimension 15, that matches the size of the largest known in this dimension.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2607.23897" target="_blank">Biangular lines with angles arccos(1/5) and arccos(3/5)</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Paul Tricot</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 31 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.23897" target="_blank">https://arxiv.org/abs/2607.23897</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The largest known biangular lines systems in dimension 7 through 20 are due to Ganzhinov and Sz\"oll\H{o}si, and the lines make angles $\arccos(\frac{1}{5})$ and $\arccos(\frac{3}{5})$. They are constructed by making use of the nice connection with integral lattices. We explore further the connection between biangular lines and integral lattices to classify the largest biangular line systems with these angles, in dimension 7 through 10. We also give a new biangular line system in dimension 15, that matches the size of the largest known in this dimension.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "Fourier transforms and a filtration on the Lagrangian cobordism group of tori", "author": "\\'Alvaro Mu\\~niz-Brea", "published": "Fri, 31 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2411.16543", "summary": "arXiv:2411.16543v2 Announce Type: replace-cross \nAbstract: Given a polarized tropical affine torus, we show that the fibered Lagrangian cobordism group of the corresponding symplectic manifold admits a natural geometric filtration of finite length. This contrasts with results of Sheridan-Smith in dimension four and the present author in higher dimensions, who showed that such group is infinite-dimensional.\n  In the second half of this paper, we construct a Fourier transform between Fukaya categories of dual symplectic tori. We show that, under homological mirror symmetry, it corresponds to the Fourier transform between derived categories of coherent sheaves of dual abelian varieties due to Mukai. We use this to show how our filtration is mirror to the Bloch filtration on Chow groups of abelian varieties, but the results may be of broader interest.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2411.16543" target="_blank">Fourier transforms and a filtration on the Lagrangian cobordism group of tori</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> \'Alvaro Mu\~niz-Brea</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 31 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2411.16543" target="_blank">https://arxiv.org/abs/2411.16543</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Given a polarized tropical affine torus, we show that the fibered Lagrangian cobordism group of the corresponding symplectic manifold admits a natural geometric filtration of finite length. This contrasts with results of Sheridan-Smith in dimension four and the present author in higher dimensions, who showed that such group is infinite-dimensional.
+  In the second half of this paper, we construct a Fourier transform between Fukaya categories of dual symplectic tori. We show that, under homological mirror symmetry, it corresponds to the Fourier transform between derived categories of coherent sheaves of dual abelian varieties due to Mukai. We use this to show how our filtration is mirror to the Bloch filtration on Chow groups of abelian varieties, but the results may be of broader interest.
+            </div>
+        </div>
+        <div class="paper" id="paper-21">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-21" data-paper-data='{"title": "Morita equivalences, moduli spaces and flag varieties", "author": "Daniel \\'Alvarez", "published": "Fri, 31 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2504.09293", "summary": "arXiv:2504.09293v3 Announce Type: replace-cross \nAbstract: Double Bruhat cells in a connected complex semisimple Lie group $G$ emerged as a crucial concept in the work of S. Fomin and A. Zelevinsky on total positivity and cluster algebras. These cells are special instances of a broader class of cluster varieties known as generalized double Bruhat cells, which can be studied collectively as Poisson subvarieties of $\\widetilde{F}_{2n} = \\mathcal{B}^{2n-1} \\times G$, where $\\mathcal{B}$ is the flag variety of $G$. The spaces $\\widetilde{F}_{2n}$ are Poisson groupoids over $\\mathcal{B}^n$ and were introduced by J.-H. Lu, V. Mouquin, and S. Yu in the study of configuration Poisson groupoids of flags.\n  In this work, we describe the spaces $\\widetilde{F}_{2n}$ as decorated moduli spaces of flat $G$-bundles over a disc. This perspective yields the following results: (1) We explicitly integrate the Poisson groupoids $\\widetilde{F}_{2n}$ to symplectic double groupoids, which are complex algebraic varieties. Furthermore, we show that these integrations are symplectically Morita equivalent for all $n$. (2) Using this construction, we integrate the Poisson subgroupoids of $\\widetilde{F}_{2n}$ formed by unions of generalized double Bruhat cells to explicit symplectic double groupoids. As a corollary, we obtain integrations for the top-dimensional generalized double Bruhat cells contained therein. (3) Finally, we relate our integration to the work of P. Boalch on meromorphic connections. We lift the torus actions on $\\widetilde{F}_{2n}$ to the double groupoid level and show that they correspond to the quasi-Hamiltonian actions on the fission spaces of irregular singularities.", "number": 21, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#21</span>
+                <a href="https://arxiv.org/abs/2504.09293" target="_blank">Morita equivalences, moduli spaces and flag varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Daniel \'Alvarez</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 31 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2504.09293" target="_blank">https://arxiv.org/abs/2504.09293</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Double Bruhat cells in a connected complex semisimple Lie group $G$ emerged as a crucial concept in the work of S. Fomin and A. Zelevinsky on total positivity and cluster algebras. These cells are special instances of a broader class of cluster varieties known as generalized double Bruhat cells, which can be studied collectively as Poisson subvarieties of $\widetilde{F}_{2n} = \mathcal{B}^{2n-1} \times G$, where $\mathcal{B}$ is the flag variety of $G$. The spaces $\widetilde{F}_{2n}$ are Poisson groupoids over $\mathcal{B}^n$ and were introduced by J.-H. Lu, V. Mouquin, and S. Yu in the study of configuration Poisson groupoids of flags.
+  In this work, we describe the spaces $\widetilde{F}_{2n}$ as decorated moduli spaces of flat $G$-bundles over a disc. This perspective yields the following results: (1) We explicitly integrate the Poisson groupoids $\widetilde{F}_{2n}$ to symplectic double groupoids, which are complex algebraic varieties. Furthermore, we show that these integrations are symplectically Morita equivalent for all $n$. (2) Using this construction, we integrate the Poisson subgroupoids of $\widetilde{F}_{2n}$ formed by unions of generalized double Bruhat cells to explicit symplectic double groupoids. As a corollary, we obtain integrations for the top-dimensional generalized double Bruhat cells contained therein. (3) Finally, we relate our integration to the work of P. Boalch on meromorphic connections. We lift the torus actions on $\widetilde{F}_{2n}$ to the double groupoid level and show that they correspond to the quasi-Hamiltonian actions on the fission spaces of irregular singularities.
+            </div>
+        </div>
+        <div class="paper" id="paper-22">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-22" data-paper-data='{"title": "On the basic locus of GSpin Shimura varieties with vertex stabilizer level", "author": "Qiao He, Rong Zhou", "published": "Fri, 31 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2505.08911", "summary": "arXiv:2505.08911v2 Announce Type: replace-cross \nAbstract: We study the basic locus of Shimura varieties associated to the group of spinor similitudes of a quadratic space over $\\mathbb{Q}$ with level structure given by the stabilizer of a vertex lattice. We give a description of the underlying reduced scheme of the associated Rapoport--Zink space, generalizing results of Howard--Pappas [HP17] and Oki [Oki20b], in the case of self-dual, and almost self dual level structure.", "number": 22, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#22</span>
+                <a href="https://arxiv.org/abs/2505.08911" target="_blank">On the basic locus of GSpin Shimura varieties with vertex stabilizer level</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Qiao He, Rong Zhou</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 31 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2505.08911" target="_blank">https://arxiv.org/abs/2505.08911</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the basic locus of Shimura varieties associated to the group of spinor similitudes of a quadratic space over $\mathbb{Q}$ with level structure given by the stabilizer of a vertex lattice. We give a description of the underlying reduced scheme of the associated Rapoport--Zink space, generalizing results of Howard--Pappas [HP17] and Oki [Oki20b], in the case of self-dual, and almost self dual level structure.
+            </div>
+        </div>
+        <div class="paper" id="paper-23">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-23" data-paper-data='{"title": "Potential semistability of Finite height Galois representations: Relative case", "author": "Kaustabh Mondal", "published": "Fri, 31 Jul 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2606.26043", "summary": "arXiv:2606.26043v2 Announce Type: replace-cross \nAbstract: Let $K$ be a $p$-adic field. We define the notion of finite height for an \\'etale $\\mathbb{Z}_p$-local system on a smooth adic space $\\mathcal{X}$ over $K$ with semistable reduction. Using analytic prismatic $F$-crystals and purity results of Du-Liu-Moon-Shimizu (arXiv:2404.19603), we prove that if an \\'etale $\\mathbb{Z}_p$-local system over $\\mathcal{X}$ is of finite height then its pullback along a finite \\'etale cover of $\\mathcal{X}$ is semistable. This answers a question of Tong Liu in the relative setting.", "number": 23, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#23</span>
+                <a href="https://arxiv.org/abs/2606.26043" target="_blank">Potential semistability of Finite height Galois representations: Relative case</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Kaustabh Mondal</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 31 Jul 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2606.26043" target="_blank">https://arxiv.org/abs/2606.26043</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $K$ be a $p$-adic field. We define the notion of finite height for an \'etale $\mathbb{Z}_p$-local system on a smooth adic space $\mathcal{X}$ over $K$ with semistable reduction. Using analytic prismatic $F$-crystals and purity results of Du-Liu-Moon-Shimizu (arXiv:2404.19603), we prove that if an \'etale $\mathbb{Z}_p$-local system over $\mathcal{X}$ is of finite height then its pullback along a finite \'etale cover of $\mathcal{X}$ is semistable. This answers a question of Tong Liu in the relative setting.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-07-31 11:30:53
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>
