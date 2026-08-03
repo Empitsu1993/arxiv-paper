@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Mon, 03 Aug 2026 04:00:18 +0000<br>
+        <strong>論文数:</strong> 24件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Notes on the Kuznetsov component of cubic sevenfolds</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Cellular $\mathbb{A}^1$-homology of wonderful models of subspace arrangements</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">On isotrivial cone structures of highest weight type</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">A quadratically enriched count of lines on a smooth del Pezzo surface of degree 5</a>
+            <span class="title-label-badge" style="background-color: #9b59b6;">del Pezzo</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">Khovanskii's Bezout-type Theorem for Pfaffian Functions: A Self-Contained Proof, and Applications</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">The motivic Lie algebra embeds into the cohomology of the general linear group</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">Alternating Quinary Cores of Complete Atomic Ternary $\Gamma$-Semirings: Representation, Binary-Collapse Rigidity, and Witness Geometry</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">On totally symplectically aspherical manifolds</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">An extension theorem in terms of adjoint ideal sheaves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">Small Resultant Systems via Linear Combinations</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">Regular Borel subalgebras of the Lie Algebra of Aut($\mathbb{A}^2$)</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">A motivic Fundamental Lemma</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">Semi-continuity for conductor divisors of \'etale sheaves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Characteristic cycle and wild Lefschetz theorems</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Complete flags on flat vector bundles in positive characteristic</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">A lower bound on the analytic log-canonical threshold over local fields of positive characteristic</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">Derived category of coherent systems on curves and stability conditions</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">Unboundedness of zero-cycles on higher dimensional Fano manifolds</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Defect of projective hypersurfaces with isolated singularities</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">Integral Zariski decompositions on smooth projective surfaces II</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-21" onchange="updateSelectedCount()">
+            <span class="title-number">21.</span>
+            <a href="#paper-21">$p$-elementary non-cyclic subgroups of the Cremona group of the plane</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-22" onchange="updateSelectedCount()">
+            <span class="title-number">22.</span>
+            <a href="#paper-22">The Hessian of elliptic curves as a Latt\`es map</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-23" onchange="updateSelectedCount()">
+            <span class="title-number">23.</span>
+            <a href="#paper-23">2d Mirrors in nonabelian 3d Mirror Symmetry</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-24" onchange="updateSelectedCount()">
+            <span class="title-number">24.</span>
+            <a href="#paper-24">Injectivity theorems for higher direct images under proper K\"ahler morphisms on snc spaces</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Notes on the Kuznetsov component of cubic sevenfolds", "author": "Peize Liu", "published": "Mon, 03 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.28784", "summary": "arXiv:2607.28784v1 Announce Type: new \nAbstract: Let $Y$ be a cubic 7-fold. When $Y$ is smooth, its Kuznetsov component is a Calabi-Yau category of dimension 3, and we construct an embedding of the Kuznetsov component into the derived category of Clifford modules over $\\mathbb{P}^4$. When $Y$ is a general cubic 7-fold singular along a line, we construct an explicit weakly crepant categorical resolution of its Kuznetsov component by the derived category of a smooth Calabi-Yau 3-fold, recovering a result of Favero-Kelly. In this construction, we express the resolution functor explicitly as a composition of geometric functors and mutations, and identify its kernel with a category equivalent to a pull-back of the derived category of a stacky curve.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2607.28784" target="_blank">Notes on the Kuznetsov component of cubic sevenfolds</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Peize Liu</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 03 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.28784" target="_blank">https://arxiv.org/abs/2607.28784</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $Y$ be a cubic 7-fold. When $Y$ is smooth, its Kuznetsov component is a Calabi-Yau category of dimension 3, and we construct an embedding of the Kuznetsov component into the derived category of Clifford modules over $\mathbb{P}^4$. When $Y$ is a general cubic 7-fold singular along a line, we construct an explicit weakly crepant categorical resolution of its Kuznetsov component by the derived category of a smooth Calabi-Yau 3-fold, recovering a result of Favero-Kelly. In this construction, we express the resolution functor explicitly as a composition of geometric functors and mutations, and identify its kernel with a category equivalent to a pull-back of the derived category of a stacky curve.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Cellular $\\mathbb{A}^1$-homology of wonderful models of subspace arrangements", "author": "Haoyang Liu, Keyao Peng", "published": "Mon, 03 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.29097", "summary": "arXiv:2607.29097v1 Announce Type: new \nAbstract: We compute the cellular $\\mathbb{A}^1$-homology of De Concini--Procesi wonderful models of subspace arrangements. For a building set $\\mathcal{G}$ over a field $k$, we identify the cellular $\\mathbb{A}^1$-chain complex of $\\mathbb{P}(\\mathcal{G})$ with an $\\eta$-twisted nested-set complex carrying Milnor--Witt coefficients and derived orientation data. The key geometric input is a motivic blow-up calculation: for a blow-up along a smooth center of codimension $c$, the relevant connecting class is $(c-1)_\\epsilon\\eta$, hence it is zero for $c$ odd and $\\eta$ for $c$ even. This replaces the parity condition in the computation of Rains by a Milnor--Witt attaching class. As a consequence, the part of cellular $\\mathbb{A}^1$-homology surviving after multiplication by $\\eta$, and also the homology after inverting $\\eta$, are expressed by the interval cohomology of the $2$-divisible subposet of the lattice generated by $\\mathcal{G}$. For the braid arrangement, the condition becomes the odd-block condition on partitions, yielding explicit decompositions for the cellular $\\mathbb{A}^1$-homology of $\\overline{\\mathcal M}_{0,N}$ and examples in low rank.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2607.29097" target="_blank">Cellular $\mathbb{A}^1$-homology of wonderful models of subspace arrangements</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Haoyang Liu, Keyao Peng</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 03 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.29097" target="_blank">https://arxiv.org/abs/2607.29097</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We compute the cellular $\mathbb{A}^1$-homology of De Concini--Procesi wonderful models of subspace arrangements. For a building set $\mathcal{G}$ over a field $k$, we identify the cellular $\mathbb{A}^1$-chain complex of $\mathbb{P}(\mathcal{G})$ with an $\eta$-twisted nested-set complex carrying Milnor--Witt coefficients and derived orientation data. The key geometric input is a motivic blow-up calculation: for a blow-up along a smooth center of codimension $c$, the relevant connecting class is $(c-1)_\epsilon\eta$, hence it is zero for $c$ odd and $\eta$ for $c$ even. This replaces the parity condition in the computation of Rains by a Milnor--Witt attaching class. As a consequence, the part of cellular $\mathbb{A}^1$-homology surviving after multiplication by $\eta$, and also the homology after inverting $\eta$, are expressed by the interval cohomology of the $2$-divisible subposet of the lattice generated by $\mathcal{G}$. For the braid arrangement, the condition becomes the odd-block condition on partitions, yielding explicit decompositions for the cellular $\mathbb{A}^1$-homology of $\overline{\mathcal M}_{0,N}$ and examples in low rank.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "On isotrivial cone structures of highest weight type", "author": "Yingqi Liu", "published": "Mon, 03 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.29140", "summary": "arXiv:2607.29140v1 Announce Type: new \nAbstract: We study the projective-geometric criterion of Hwang-Li for isotrivial cone structures admitting characteristic conic connections. We give a complete classification of flag varieties satisfying this criterion, and in the process characterize flag varieties with an injective Gaussian map. As an application, we classify germs of minimal rational curves whose VMRT at a general point is isomorphic to that of a non-homogeneous smooth projective symmetric variety of Picard number one, apart from two exceptional cases.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2607.29140" target="_blank">On isotrivial cone structures of highest weight type</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yingqi Liu</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 03 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.29140" target="_blank">https://arxiv.org/abs/2607.29140</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the projective-geometric criterion of Hwang-Li for isotrivial cone structures admitting characteristic conic connections. We give a complete classification of flag varieties satisfying this criterion, and in the process characterize flag varieties with an injective Gaussian map. As an application, we classify germs of minimal rational curves whose VMRT at a general point is isomorphic to that of a non-homogeneous smooth projective symmetric variety of Picard number one, apart from two exceptional cases.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "A quadratically enriched count of lines on a smooth del Pezzo surface of degree 5", "author": "Chachay Victor (IMB)", "published": "Mon, 03 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.29194", "summary": "arXiv:2607.29194v1 Announce Type: new \nAbstract: In this paper, we give an enriched count for the 10 lines on a smooth del Pezzo surface S of degree 5 as the quadratic degree of the Euler class of a locally free sheaf. To do this, we see S as a section of the quintic del Pezzo threefold V 5 and the lines on S as a sub-scheme of the P 2 of lines on V 5 . We then use some oriented Schubert calculus and Bott residue formula with N SL 2 -action to compute the degree of the Euler class.", "number": 4, "labels": [{"name": "del Pezzo", "color": "#9b59b6"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2607.29194" target="_blank">A quadratically enriched count of lines on a smooth del Pezzo surface of degree 5</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #9b59b6;">del Pezzo</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Chachay Victor (IMB)</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 03 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.29194" target="_blank">https://arxiv.org/abs/2607.29194</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we give an enriched count for the 10 lines on a smooth del Pezzo surface S of degree 5 as the quadratic degree of the Euler class of a locally free sheaf. To do this, we see S as a section of the quintic del Pezzo threefold V 5 and the lines on S as a sub-scheme of the P 2 of lines on V 5 . We then use some oriented Schubert calculus and Bott residue formula with N SL 2 -action to compute the degree of the Euler class.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "Khovanskii's Bezout-type Theorem for Pfaffian Functions: A Self-Contained Proof, and Applications", "author": "Martin Lotz, Abhiram Natarajan", "published": "Mon, 03 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.29267", "summary": "arXiv:2607.29267v1 Announce Type: new \nAbstract: We present a direct and self-contained proof of Khovanskii's Bezout-type bound for the number of nondegenerate solutions of a system of Pfaffian equations. We isolate the ingredients of Khovanskii's original argument and assemble them into a proof that avoids the general theory of integral manifolds developed in his monograph. Our formulation mildly refines the classical statement: rather than depending on the ambient dimension, our bound depends on the maximum number of variables on which any function in the Pfaffian chain depends. As a consequence, we obtain a refined bound on the number of connected components of a Pfaffian set.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2607.29267" target="_blank">Khovanskii's Bezout-type Theorem for Pfaffian Functions: A Self-Contained Proof, and Applications</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Martin Lotz, Abhiram Natarajan</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 03 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.29267" target="_blank">https://arxiv.org/abs/2607.29267</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We present a direct and self-contained proof of Khovanskii's Bezout-type bound for the number of nondegenerate solutions of a system of Pfaffian equations. We isolate the ingredients of Khovanskii's original argument and assemble them into a proof that avoids the general theory of integral manifolds developed in his monograph. Our formulation mildly refines the classical statement: rather than depending on the ambient dimension, our bound depends on the maximum number of variables on which any function in the Pfaffian chain depends. As a consequence, we obtain a refined bound on the number of connected components of a Pfaffian set.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "The motivic Lie algebra embeds into the cohomology of the general linear group", "author": "Francis Brown, Erik Panzer, Jean-Luc Portner", "published": "Mon, 03 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.29671", "summary": "arXiv:2607.29671v1 Announce Type: new \nAbstract: We show that the motivic Lie algebra of mixed Tate motives over $\\mathbb{Z}$ embeds canonically into the unstable compactly-supported cohomology of locally symmetric spaces for $\\mathrm{GL}_g(\\mathbb{Z})$, and into the weight-zero compactly-supported cohomology of $\\mathcal{A}_g$, the moduli space of principally polarized abelian varieties. Our construction passes through tropical geometry and graph complexes: compactly-supported analogues of the Borel classes pull back via the tropical Torelli map to canonical graph cocycles. The latter were recently identified with cocycles studied previously by Rossi and Willwacher. We combine their results with the theory of single-valued periods to conclude that the cocycles map to generators of the motivic Lie algebra. We also compute the canonical graph cocycles for all graphs with $\\leq14$ edges.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2607.29671" target="_blank">The motivic Lie algebra embeds into the cohomology of the general linear group</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Francis Brown, Erik Panzer, Jean-Luc Portner</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 03 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.29671" target="_blank">https://arxiv.org/abs/2607.29671</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We show that the motivic Lie algebra of mixed Tate motives over $\mathbb{Z}$ embeds canonically into the unstable compactly-supported cohomology of locally symmetric spaces for $\mathrm{GL}_g(\mathbb{Z})$, and into the weight-zero compactly-supported cohomology of $\mathcal{A}_g$, the moduli space of principally polarized abelian varieties. Our construction passes through tropical geometry and graph complexes: compactly-supported analogues of the Borel classes pull back via the tropical Torelli map to canonical graph cocycles. The latter were recently identified with cocycles studied previously by Rossi and Willwacher. We combine their results with the theory of single-valued periods to conclude that the cocycles map to generators of the motivic Lie algebra. We also compute the canonical graph cocycles for all graphs with $\leq14$ edges.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "Alternating Quinary Cores of Complete Atomic Ternary $\\Gamma$-Semirings: Representation, Binary-Collapse Rigidity, and Witness Geometry", "author": "Madhusudhana Rao Dasari (Department of Mathematics, Government College for Women, Department of Mathematics, Acharya Nagarjuna University, Guntur, Andhra Pradesh, India), Chandrasekhar Gokavarapu (Department of Mathematics, Government College, Department of Mathematics, Acharya Nagarjuna University, Guntur, Andhra Pradesh, India)", "published": "Mon, 03 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.28656", "summary": "arXiv:2607.28656v1 Announce Type: cross \nAbstract: We identify the two-sorted atomic operation encoded by a ternary $\\Gamma$-product: an alternating quinary core. Its powerset complex is a completely additive ordered ternary $\\Gamma$-semiring. Conversely, every atom-total structure whose additive reducts are complete atomic Boolean algebras is canonically such a complex, yielding a categorical reconstruction. For diagonal cores, binary reducibility is equivalent to an atom-preserving union-distributive associative binary collapse. Finite cores admit an exact witness-antichain algebra and terminating procedures for polynomial equivalence and inequational validity. A four-point irreducible symmetric five-ary band gives a $16$-element index-sensitive example with no binary collapse, where one inequation recovers a nontrivial parity quotient on atoms.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2607.28656" target="_blank">Alternating Quinary Cores of Complete Atomic Ternary $\Gamma$-Semirings: Representation, Binary-Collapse Rigidity, and Witness Geometry</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Madhusudhana Rao Dasari (Department of Mathematics, Government College for Women, Department of Mathematics, Acharya Nagarjuna University, Guntur, Andhra Pradesh, India), Chandrasekhar Gokavarapu (Department of Mathematics, Government College, Department of Mathematics, Acharya Nagarjuna University, Guntur, Andhra Pradesh, India)</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 03 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.28656" target="_blank">https://arxiv.org/abs/2607.28656</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We identify the two-sorted atomic operation encoded by a ternary $\Gamma$-product: an alternating quinary core. Its powerset complex is a completely additive ordered ternary $\Gamma$-semiring. Conversely, every atom-total structure whose additive reducts are complete atomic Boolean algebras is canonically such a complex, yielding a categorical reconstruction. For diagonal cores, binary reducibility is equivalent to an atom-preserving union-distributive associative binary collapse. Finite cores admit an exact witness-antichain algebra and terminating procedures for polynomial equivalence and inequational validity. A four-point irreducible symmetric five-ary band gives a $16$-element index-sensitive example with no binary collapse, where one inequation recovers a nontrivial parity quotient on atoms.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "On totally symplectically aspherical manifolds", "author": "Luca F. Di Cerbo, Alexander Dranishnikov, Ekansh Jauhari", "published": "Mon, 03 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.28763", "summary": "arXiv:2607.28763v1 Announce Type: cross \nAbstract: We construct examples of totally symplectically aspherical Kaehler manifolds with non-trivial second homotopy group in every even dimension greater than or equal to six. In dimension four, we construct examples of totally c-symplectically aspherical near-symplectic manifolds with non-trivial second homotopy group.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2607.28763" target="_blank">On totally symplectically aspherical manifolds</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Luca F. Di Cerbo, Alexander Dranishnikov, Ekansh Jauhari</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 03 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.28763" target="_blank">https://arxiv.org/abs/2607.28763</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We construct examples of totally symplectically aspherical Kaehler manifolds with non-trivial second homotopy group in every even dimension greater than or equal to six. In dimension four, we construct examples of totally c-symplectically aspherical near-symplectic manifolds with non-trivial second homotopy group.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "An extension theorem in terms of adjoint ideal sheaves", "author": "Tsz On Mario Chan", "published": "Mon, 03 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.29153", "summary": "arXiv:2607.29153v1 Announce Type: cross \nAbstract: In the context of the study of the Ohsawa--Takegoshi $L^2$ extension theorem, a \"qualitative\" extension theorem in terms of adjoint ideal sheaves (i.e. extension result without $L^2$ estimates but with some form of local $L^2$ condition ensured) is proved on compact K\\\"ahler manifolds via harmonic theory and residue computations. The arguments are adapted from those in the study of the injectivity theorem by Chan--Choi--Matsumura. The result guarantees, in particular, the existence of extensions of line-bundle-valued holomorphic top forms over the union of any log-canonical centres of the same codimension to top forms over the ambient space under suitable positivity assumptions.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2607.29153" target="_blank">An extension theorem in terms of adjoint ideal sheaves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Tsz On Mario Chan</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 03 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.29153" target="_blank">https://arxiv.org/abs/2607.29153</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In the context of the study of the Ohsawa--Takegoshi $L^2$ extension theorem, a "qualitative" extension theorem in terms of adjoint ideal sheaves (i.e. extension result without $L^2$ estimates but with some form of local $L^2$ condition ensured) is proved on compact K\"ahler manifolds via harmonic theory and residue computations. The arguments are adapted from those in the study of the injectivity theorem by Chan--Choi--Matsumura. The result guarantees, in particular, the existence of extensions of line-bundle-valued holomorphic top forms over the union of any log-canonical centres of the same codimension to top forms over the ambient space under suitable positivity assumptions.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "Small Resultant Systems via Linear Combinations", "author": "M. Levent Do\\u{g}an, Elias Tsigaridas, Zafeirakis Zafeirakopoulos", "published": "Mon, 03 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.29308", "summary": "arXiv:2607.29308v1 Announce Type: cross \nAbstract: For a system of $s$ homogeneous polynomials of degree $d$ in $n$ variables, say ${\\bf{f}} = 0$, we consider the problem of constructing resultant systems. A resultant system is a finite set of polynomials in the coefficients of the input polynomials, the vanishing of which characterizes the systems $\\bf{f}$ with a common non-zero solution. The classical approaches for constructing resultant systems rely either on maximal minors of large coefficient matrices or on the coefficients of a resultant of generic linear combinations of the input polynomials. Typically, they produce resultant systems containing a very large number of polynomials.\n  We develop new constructions based on taking resultants of linear combinations of the input polynomials; this results in resultant systems of small cardinality. Our main results are:\n  1) We prove that a resultant system with ${d+n-1 \\choose n-1} s-n^2+1$ polynomials exists; each polynomial is the resultant of $n$ linear combinations of the input polynomials. This improves the previously known upper bounds, even for systems of bivariate homogeneous polynomials.\n  2) Under the assumption that the input polynomials are non-zero, we construct explicit resultant systems with cardinality $\\mathrm{poly}(s,d)$, when $n$ is fixed.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2607.29308" target="_blank">Small Resultant Systems via Linear Combinations</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> M. Levent Do\u{g}an, Elias Tsigaridas, Zafeirakis Zafeirakopoulos</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 03 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.29308" target="_blank">https://arxiv.org/abs/2607.29308</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                For a system of $s$ homogeneous polynomials of degree $d$ in $n$ variables, say ${\bf{f}} = 0$, we consider the problem of constructing resultant systems. A resultant system is a finite set of polynomials in the coefficients of the input polynomials, the vanishing of which characterizes the systems $\bf{f}$ with a common non-zero solution. The classical approaches for constructing resultant systems rely either on maximal minors of large coefficient matrices or on the coefficients of a resultant of generic linear combinations of the input polynomials. Typically, they produce resultant systems containing a very large number of polynomials.
+  We develop new constructions based on taking resultants of linear combinations of the input polynomials; this results in resultant systems of small cardinality. Our main results are:
+  1) We prove that a resultant system with ${d+n-1 \choose n-1} s-n^2+1$ polynomials exists; each polynomial is the resultant of $n$ linear combinations of the input polynomials. This improves the previously known upper bounds, even for systems of bivariate homogeneous polynomials.
+  2) Under the assumption that the input polynomials are non-zero, we construct explicit resultant systems with cardinality $\mathrm{poly}(s,d)$, when $n$ is fixed.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "Regular Borel subalgebras of the Lie Algebra of Aut($\\mathbb{A}^2$)", "author": "Ananya Pal", "published": "Mon, 03 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.29324", "summary": "arXiv:2607.29324v1 Announce Type: cross \nAbstract: In this paper, we find all regular Borel subalgebras of Lie(Aut($\\mathbb{A}^2$)), i.e., maximal solvable subalgebras generated by homogeneous derivations with respect to the standard $\\mathbb{Z}^2$-grading. It follows that a regular Borel subalgebra has derived length $2$ or $3$. We also describe isomorphism classes of such subalgebras.\n  On the way, we give a combinatorial description of the regular Abelian subalgebras and the regular solvable subalgebras of Lie(Aut($\\mathbb{A}^2$)).", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2607.29324" target="_blank">Regular Borel subalgebras of the Lie Algebra of Aut($\mathbb{A}^2$)</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ananya Pal</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 03 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.29324" target="_blank">https://arxiv.org/abs/2607.29324</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we find all regular Borel subalgebras of Lie(Aut($\mathbb{A}^2$)), i.e., maximal solvable subalgebras generated by homogeneous derivations with respect to the standard $\mathbb{Z}^2$-grading. It follows that a regular Borel subalgebra has derived length $2$ or $3$. We also describe isomorphism classes of such subalgebras.
+  On the way, we give a combinatorial description of the regular Abelian subalgebras and the regular solvable subalgebras of Lie(Aut($\mathbb{A}^2$)).
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "A motivic Fundamental Lemma", "author": "Arthur Forey, Fran\\c{c}ois Loeser, Dimitri Wyss", "published": "Mon, 03 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2308.12195", "summary": "arXiv:2308.12195v5 Announce Type: replace \nAbstract: In this paper we prove motivic versions of the Langlands-Shelstad Fundamental Lemma and Ng\\^o's Geometric Stabilization. To achieve this, we follow the strategy from the recent proof by Groechenig, Wyss and Ziegler which avoided the use of perverse sheaves using instead $p$-adic integration and Tate duality. We make a key use of a construction of Denef and Loeser which assigns a virtual motive to any definable set in the theory of pseudo-finite fields.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2308.12195" target="_blank">A motivic Fundamental Lemma</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Arthur Forey, Fran\c{c}ois Loeser, Dimitri Wyss</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 03 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2308.12195" target="_blank">https://arxiv.org/abs/2308.12195</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper we prove motivic versions of the Langlands-Shelstad Fundamental Lemma and Ng\^o's Geometric Stabilization. To achieve this, we follow the strategy from the recent proof by Groechenig, Wyss and Ziegler which avoided the use of perverse sheaves using instead $p$-adic integration and Tate duality. We make a key use of a construction of Denef and Loeser which assigns a virtual motive to any definable set in the theory of pseudo-finite fields.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "Semi-continuity for conductor divisors of \\'etale sheaves", "author": "Haoyu Hu, Jean-Baptiste Teyssier", "published": "Mon, 03 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2502.11063", "summary": "arXiv:2502.11063v2 Announce Type: replace \nAbstract: In this article, we prove a semi-continuity property for both conductor divisors and logarithmic conductor divisors for \\'etale sheaves on higher relative dimensions in a geometric situation. It generalizes a semi-continuity result for conductors of \\'etale sheaves on relative curves to higher relative dimensions, and it can be considered as a higher dimensional $\\ell$-adic analogy of Andr\\'e's result on the semi-continuity of Poincar\\'e-Katz ranks of meromorphic connections on smooth relative curves.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2502.11063" target="_blank">Semi-continuity for conductor divisors of \'etale sheaves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Haoyu Hu, Jean-Baptiste Teyssier</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 03 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2502.11063" target="_blank">https://arxiv.org/abs/2502.11063</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this article, we prove a semi-continuity property for both conductor divisors and logarithmic conductor divisors for \'etale sheaves on higher relative dimensions in a geometric situation. It generalizes a semi-continuity result for conductors of \'etale sheaves on relative curves to higher relative dimensions, and it can be considered as a higher dimensional $\ell$-adic analogy of Andr\'e's result on the semi-continuity of Poincar\'e-Katz ranks of meromorphic connections on smooth relative curves.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Characteristic cycle and wild Lefschetz theorems", "author": "Haoyu Hu, Jean-Baptiste Teyssier", "published": "Mon, 03 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2502.11064", "summary": "arXiv:2502.11064v3 Announce Type: replace \nAbstract: By relying on a new approach to Lefschetz type questions based on Beilinson's singular support and Saito's characteristic cycle, we prove an instance of the wild Lefschetz theorem envisioned by Deligne. Our main tool are new finiteness results for the characteristic cycles of perverse sheaves.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2502.11064" target="_blank">Characteristic cycle and wild Lefschetz theorems</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Haoyu Hu, Jean-Baptiste Teyssier</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 03 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2502.11064" target="_blank">https://arxiv.org/abs/2502.11064</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                By relying on a new approach to Lefschetz type questions based on Beilinson's singular support and Saito's characteristic cycle, we prove an instance of the wild Lefschetz theorem envisioned by Deligne. Our main tool are new finiteness results for the characteristic cycles of perverse sheaves.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Complete flags on flat vector bundles in positive characteristic", "author": "Youhei Morita, Yasuhiro Wakabayashi", "published": "Mon, 03 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2503.13750", "summary": "arXiv:2503.13750v2 Announce Type: replace \nAbstract: Let $X$ be a connected, smooth, and projective curve of genus $g$ over an algebraically closed field of characteristic $p &gt;0$. This paper investigates a characteristic-$p$ analogue of a well-known fact concerning flat vector bundles in characteristic $0$. That is to say, we prove that the inequality $g \\leq 1$ holds if and only if any flat vector bundle on $X$ admits a complete flag. We also explore a generalization of this result in a broader setting.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2503.13750" target="_blank">Complete flags on flat vector bundles in positive characteristic</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Youhei Morita, Yasuhiro Wakabayashi</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 03 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2503.13750" target="_blank">https://arxiv.org/abs/2503.13750</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $X$ be a connected, smooth, and projective curve of genus $g$ over an algebraically closed field of characteristic $p &gt;0$. This paper investigates a characteristic-$p$ analogue of a well-known fact concerning flat vector bundles in characteristic $0$. That is to say, we prove that the inequality $g \leq 1$ holds if and only if any flat vector bundle on $X$ admits a complete flag. We also explore a generalization of this result in a broader setting.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "A lower bound on the analytic log-canonical threshold over local fields of positive characteristic", "author": "Itay Glazer, Yotam I. Hendel", "published": "Mon, 03 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2511.01270", "summary": "arXiv:2511.01270v2 Announce Type: replace \nAbstract: Given a local field $F$ of positive characteristic, an $F$-analytic manifold $X$ and an analytic function $f:X\\rightarrow F$, the $F$-analytic log-canonical threshold $\\mathrm{lct}_{F}(f;x_{0})$ is the supremum over the values $s\\geq0$ such that $\\left|f\\right|_{F}^{-s}$ is integrable near $x_{0}\\in X$. We show that $\\mathrm{lct}_{F}(f;x_{0})&gt;0$. Moreover, if $f$ is a regular function on a smooth algebraic $F$-variety, we obtain an effective lower bound $\\mathrm{lct}_{F}(f;x_{0})&gt;C$, where $C&gt;0$ is explicit and depends only on the complexity class of $X$ and $f$.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2511.01270" target="_blank">A lower bound on the analytic log-canonical threshold over local fields of positive characteristic</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Itay Glazer, Yotam I. Hendel</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 03 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.01270" target="_blank">https://arxiv.org/abs/2511.01270</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Given a local field $F$ of positive characteristic, an $F$-analytic manifold $X$ and an analytic function $f:X\rightarrow F$, the $F$-analytic log-canonical threshold $\mathrm{lct}_{F}(f;x_{0})$ is the supremum over the values $s\geq0$ such that $\left|f\right|_{F}^{-s}$ is integrable near $x_{0}\in X$. We show that $\mathrm{lct}_{F}(f;x_{0})&gt;0$. Moreover, if $f$ is a regular function on a smooth algebraic $F$-variety, we obtain an effective lower bound $\mathrm{lct}_{F}(f;x_{0})&gt;C$, where $C&gt;0$ is explicit and depends only on the complexity class of $X$ and $f$.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "Derived category of coherent systems on curves and stability conditions", "author": "Soheyla Feyzbakhsh, Aliaksandra Novik", "published": "Mon, 03 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2511.01601", "summary": "arXiv:2511.01601v2 Announce Type: replace \nAbstract: Let $C$ be a smooth projective curve of genus $g&gt;0$. We describe an open locus of Bridgeland stability conditions on the bounded derived category of coherent systems on $C$, and show that stability manifold detects the Brill--Noether theory of the curve.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2511.01601" target="_blank">Derived category of coherent systems on curves and stability conditions</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Soheyla Feyzbakhsh, Aliaksandra Novik</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 03 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.01601" target="_blank">https://arxiv.org/abs/2511.01601</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $C$ be a smooth projective curve of genus $g&gt;0$. We describe an open locus of Bridgeland stability conditions on the bounded derived category of coherent systems on $C$, and show that stability manifold detects the Brill--Noether theory of the curve.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "Unboundedness of zero-cycles on higher dimensional Fano manifolds", "author": "Claire Voisin", "published": "Mon, 03 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2511.23080", "summary": "arXiv:2511.23080v2 Announce Type: replace \nAbstract: We show that, unlike del Pezzo surfaces, higher dimensional Fano manifolds do not satisfy in general boundedness properties for their ${\\rm CH}_0$ group of $0$-cycles. For example, for quartic threefolds having a point of odd degree, there is no ``Coray type\" uperbound on the minimal odd degrees of points. Also, the ${\\rm CH}_0$-group of Fano hypersurfaces can be ``unbounded'' (a notion which is related to infinite dimensionality in the sense of Mumford), meaning that there is no integer $N$ such that $0$-cycles of degree at least $N$ are effective.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2511.23080" target="_blank">Unboundedness of zero-cycles on higher dimensional Fano manifolds</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Claire Voisin</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 03 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.23080" target="_blank">https://arxiv.org/abs/2511.23080</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We show that, unlike del Pezzo surfaces, higher dimensional Fano manifolds do not satisfy in general boundedness properties for their ${\rm CH}_0$ group of $0$-cycles. For example, for quartic threefolds having a point of odd degree, there is no ``Coray type" uperbound on the minimal odd degrees of points. Also, the ${\rm CH}_0$-group of Fano hypersurfaces can be ``unbounded'' (a notion which is related to infinite dimensionality in the sense of Mumford), meaning that there is no integer $N$ such that $0$-cycles of degree at least $N$ are effective.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Defect of projective hypersurfaces with isolated singularities", "author": "Seung-Jo Jung, Morihiko Saito", "published": "Mon, 03 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2512.23522", "summary": "arXiv:2512.23522v4 Announce Type: replace \nAbstract: Let $X$ be a hypersurface with isolated singularities defined by $f$ in ${\\bf P^{n+1}}$ with $n&gt;1$. The difference ${\\rm def}(X):=h^{n+1}(X)-h^{n-1}(X)$ is called the defect of $X$ (for self-duality of the cohomology of $X$). It is known that its vanishing is closely related to ${\\bf Q}$-factoriality of $X$ without assuming rational singularities when $n=3$. This number coincides with the dimension of the cokernel of the inclusion $H^{n-1}(X)\\to{\\rm IH}^{n-1}(X)$, the rank of the morphism from the vanishing cohomologies of $X$ to $H^{n+1}(X)$ for a one-parameter smoothing of $X$ with total space smooth, and also with the dimension of the unipotent monodromy part of the Milnor fiber cohomology of $f$ with degree $n$. In the case $X$ has only weighted homogeneous isolated singularities, the defect ${\\rm def}(X)$ is then given by the $E_2$-term of the spectral sequence of the double complex with differentials ${\\rm d}f\\wedge$ and $\\rm d$ by the $E_2$-degeneration of the pole order spectral sequence. It can be calculated explicitly using a computer even for analogues of the Hirzebruch quintic threefold with more than one hundred ordinary double points found by B.\\ van Geemen and J.\\ Werner in a compatible way with their computation. We give also an example with ${\\rm def}(X)&gt;0$ and $|{\\rm Sing}\\,X|=1$ in the non-projective cone case where $n=3$.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2512.23522" target="_blank">Defect of projective hypersurfaces with isolated singularities</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Seung-Jo Jung, Morihiko Saito</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 03 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2512.23522" target="_blank">https://arxiv.org/abs/2512.23522</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $X$ be a hypersurface with isolated singularities defined by $f$ in ${\bf P^{n+1}}$ with $n&gt;1$. The difference ${\rm def}(X):=h^{n+1}(X)-h^{n-1}(X)$ is called the defect of $X$ (for self-duality of the cohomology of $X$). It is known that its vanishing is closely related to ${\bf Q}$-factoriality of $X$ without assuming rational singularities when $n=3$. This number coincides with the dimension of the cokernel of the inclusion $H^{n-1}(X)\to{\rm IH}^{n-1}(X)$, the rank of the morphism from the vanishing cohomologies of $X$ to $H^{n+1}(X)$ for a one-parameter smoothing of $X$ with total space smooth, and also with the dimension of the unipotent monodromy part of the Milnor fiber cohomology of $f$ with degree $n$. In the case $X$ has only weighted homogeneous isolated singularities, the defect ${\rm def}(X)$ is then given by the $E_2$-term of the spectral sequence of the double complex with differentials ${\rm d}f\wedge$ and $\rm d$ by the $E_2$-degeneration of the pole order spectral sequence. It can be calculated explicitly using a computer even for analogues of the Hirzebruch quintic threefold with more than one hundred ordinary double points found by B.\ van Geemen and J.\ Werner in a compatible way with their computation. We give also an example with ${\rm def}(X)&gt;0$ and $|{\rm Sing}\,X|=1$ in the non-projective cone case where $n=3$.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "Integral Zariski decompositions on smooth projective surfaces II", "author": "Sichen Li", "published": "Mon, 03 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.28019", "summary": "arXiv:2605.28019v2 Announce Type: replace \nAbstract: In this paper, we characterize three classes of smooth projective surfaces: relatively minimal elliptic surfaces with $\\chi\\ge 1$, rational surfaces $X$ satisfying that $-K_X$ iis nef and $\\kappa(-K_X)\\ge 1$,, and projective K3 surfaces on which every integral pseudoeffective divisor admits an integral Zariski decomposition.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2605.28019" target="_blank">Integral Zariski decompositions on smooth projective surfaces II</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sichen Li</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 03 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.28019" target="_blank">https://arxiv.org/abs/2605.28019</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we characterize three classes of smooth projective surfaces: relatively minimal elliptic surfaces with $\chi\ge 1$, rational surfaces $X$ satisfying that $-K_X$ iis nef and $\kappa(-K_X)\ge 1$,, and projective K3 surfaces on which every integral pseudoeffective divisor admits an integral Zariski decomposition.
+            </div>
+        </div>
+        <div class="paper" id="paper-21">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-21" data-paper-data='{"title": "$p$-elementary non-cyclic subgroups of the Cremona group of the plane", "author": "Mani Esna Ashari", "published": "Mon, 03 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.09941", "summary": "arXiv:2607.09941v3 Announce Type: replace \nAbstract: We classify, up to conjugacy, the subgroups of the Cremona group of the plane isomorphic to $(\\mathbb{Z}/p\\mathbb{Z})^r$, where $p$ is prime and $r \\geq 2$, over an algebraically closed field $\\mathbf{k}$ of characteristic not equal to $p$. In particular, we show that $r \\leq 2$ if $p \\geq 5$, $r \\leq 3$ if $p=3$, and $r \\leq 4$ if $p=2$. And hence reprove a well-known statement contained in the article of Arnaud Beauville \"$p$-elementary subgroups of the Cremona group\", 2007. The main contribution of this article is a concrete description of these groups. In fact, we give an explicit list of representatives via a set of 20 families consisting of subgroups of the de Jonqui\\`eres group and subgroups of automorphisms of del Pezzo surfaces, and we study the possible conjugacies by birational maps between these families. Finally, we give some results on subgroups of the Cremona group of the plane isomorphic to $(\\mathbb{Z}/p\\mathbb{Z})^r$, where $p$ is prime and $r$ is an integer, over an algebraically closed field $\\mathbf{k}$ of characteristic equal to $p$.", "number": 21, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#21</span>
+                <a href="https://arxiv.org/abs/2607.09941" target="_blank">$p$-elementary non-cyclic subgroups of the Cremona group of the plane</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Mani Esna Ashari</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 03 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.09941" target="_blank">https://arxiv.org/abs/2607.09941</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We classify, up to conjugacy, the subgroups of the Cremona group of the plane isomorphic to $(\mathbb{Z}/p\mathbb{Z})^r$, where $p$ is prime and $r \geq 2$, over an algebraically closed field $\mathbf{k}$ of characteristic not equal to $p$. In particular, we show that $r \leq 2$ if $p \geq 5$, $r \leq 3$ if $p=3$, and $r \leq 4$ if $p=2$. And hence reprove a well-known statement contained in the article of Arnaud Beauville "$p$-elementary subgroups of the Cremona group", 2007. The main contribution of this article is a concrete description of these groups. In fact, we give an explicit list of representatives via a set of 20 families consisting of subgroups of the de Jonqui\`eres group and subgroups of automorphisms of del Pezzo surfaces, and we study the possible conjugacies by birational maps between these families. Finally, we give some results on subgroups of the Cremona group of the plane isomorphic to $(\mathbb{Z}/p\mathbb{Z})^r$, where $p$ is prime and $r$ is an integer, over an algebraically closed field $\mathbf{k}$ of characteristic equal to $p$.
+            </div>
+        </div>
+        <div class="paper" id="paper-22">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-22" data-paper-data='{"title": "The Hessian of elliptic curves as a Latt\\`es map", "author": "Marzio Mula, Federico Pintore, Daniele Taufer", "published": "Mon, 03 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2407.17042", "summary": "arXiv:2407.17042v3 Announce Type: replace-cross \nAbstract: We prove that the Hessian transformation of elliptic curves, both as an action on $j$-invariants and on the Hesse pencil, is a rigid Latt\\`es map fitting into a reduced diagram, hence it lifts to a degree-$3$ endomorphism $\\psi$ of a prescribed elliptic curve $E$. This result provides an effective tool to investigate the dynamics of the Hessian transformation, whose symmetries are inherited from those of $\\psi$, which we characterize. In particular, over arbitrary fields of characteristic different from $2$ and $3$, the functional graphs of the Hessian and, more generally, of Latt\\`es maps fitting into analogous reduced diagrams, are completely determined by the action of $\\psi$ on the twists of $E$. When the underlying field is finite, we specialize these results to obtain a complete classification of Hessian functional graphs and derive an efficient method for computing iterated Hessians.", "number": 22, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#22</span>
+                <a href="https://arxiv.org/abs/2407.17042" target="_blank">The Hessian of elliptic curves as a Latt\`es map</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Marzio Mula, Federico Pintore, Daniele Taufer</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 03 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2407.17042" target="_blank">https://arxiv.org/abs/2407.17042</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove that the Hessian transformation of elliptic curves, both as an action on $j$-invariants and on the Hesse pencil, is a rigid Latt\`es map fitting into a reduced diagram, hence it lifts to a degree-$3$ endomorphism $\psi$ of a prescribed elliptic curve $E$. This result provides an effective tool to investigate the dynamics of the Hessian transformation, whose symmetries are inherited from those of $\psi$, which we characterize. In particular, over arbitrary fields of characteristic different from $2$ and $3$, the functional graphs of the Hessian and, more generally, of Latt\`es maps fitting into analogous reduced diagrams, are completely determined by the action of $\psi$ on the twists of $E$. When the underlying field is finite, we specialize these results to obtain a complete classification of Hessian functional graphs and derive an efficient method for computing iterated Hessians.
+            </div>
+        </div>
+        <div class="paper" id="paper-23">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-23" data-paper-data='{"title": "2d Mirrors in nonabelian 3d Mirror Symmetry", "author": "Ki Fung Chan, Naichung Conan Leung", "published": "Mon, 03 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2408.09479", "summary": "arXiv:2408.09479v3 Announce Type: replace-cross \nAbstract: We establish a connection between (nonabelian) equivariant 2d mirror symmetry and the geometry of Coulomb branches. In the context of 3d mirror symmetry, a Hamiltonian $G$-manifold $Y$ is expected to determine a complex Lagrangian subvariety $\\mathbb{L}^G_Y$ of the Coulomb branch. Using transverse Hilbert schemes and nil-Hecke algebras, we develop an algebro-geometric framework for studying Coulomb branches and their Lagrangian subvarieties and formulate criteria for the existence of $\\mathbb{L}^G_Y$ in terms of equivariant 2d mirror symmetry. We then reinterpret these criteria in terms of Lagrangian displaceability and prove the resulting statements using Lagrangian Floer theory.", "number": 23, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#23</span>
+                <a href="https://arxiv.org/abs/2408.09479" target="_blank">2d Mirrors in nonabelian 3d Mirror Symmetry</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ki Fung Chan, Naichung Conan Leung</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 03 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2408.09479" target="_blank">https://arxiv.org/abs/2408.09479</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We establish a connection between (nonabelian) equivariant 2d mirror symmetry and the geometry of Coulomb branches. In the context of 3d mirror symmetry, a Hamiltonian $G$-manifold $Y$ is expected to determine a complex Lagrangian subvariety $\mathbb{L}^G_Y$ of the Coulomb branch. Using transverse Hilbert schemes and nil-Hecke algebras, we develop an algebro-geometric framework for studying Coulomb branches and their Lagrangian subvarieties and formulate criteria for the existence of $\mathbb{L}^G_Y$ in terms of equivariant 2d mirror symmetry. We then reinterpret these criteria in terms of Lagrangian displaceability and prove the resulting statements using Lagrangian Floer theory.
+            </div>
+        </div>
+        <div class="paper" id="paper-24">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-24" data-paper-data='{"title": "Injectivity theorems for higher direct images under proper K\\\"ahler morphisms on snc spaces", "author": "Tsz On Mario Chan, Young-Jun Choi, Shin-ichi Matsumura", "published": "Mon, 03 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2409.14100", "summary": "arXiv:2409.14100v2 Announce Type: replace-cross \nAbstract: Let $X$ be a complex manifold, and let $Y$ and $D$ be two reduced simple-normal-crossing (snc) divisors on $X$ with no common irreducible components. Given a proper locally K\\\"ahler morphism $\\pi \\colon X \\to \\Delta$ from $X$ to a complex analytic space $\\Delta$, we prove Fujino's conjecture on the injectivity theorem in the relative setting in a generalized form. Specifically, we establish an injectivity result for the higher direct images under $\\pi$ for the lc pairs $(X, D)$ as well as $(Y, D_Y)$, where $D_Y := D \\cap Y$. As an application, this result immediately implies the injectivity theorem on holomorphically convex K\\\"ahler manifolds with reduced snc divisors. The main technique in the proof consists of the theory of harmonic integrals together with residue formulae associated with adjoint ideal sheaves, which are developed from our previous work for the absolute case (where $\\Delta$ is a point and $X$ is compact). Additionally, we make use of the Takegoshi harmonic forms to deal with the non-compactness of $X$.", "number": 24, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#24</span>
+                <a href="https://arxiv.org/abs/2409.14100" target="_blank">Injectivity theorems for higher direct images under proper K\"ahler morphisms on snc spaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Tsz On Mario Chan, Young-Jun Choi, Shin-ichi Matsumura</div>
+                <div class="paper-date"><strong>公開日:</strong> Mon, 03 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2409.14100" target="_blank">https://arxiv.org/abs/2409.14100</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $X$ be a complex manifold, and let $Y$ and $D$ be two reduced simple-normal-crossing (snc) divisors on $X$ with no common irreducible components. Given a proper locally K\"ahler morphism $\pi \colon X \to \Delta$ from $X$ to a complex analytic space $\Delta$, we prove Fujino's conjecture on the injectivity theorem in the relative setting in a generalized form. Specifically, we establish an injectivity result for the higher direct images under $\pi$ for the lc pairs $(X, D)$ as well as $(Y, D_Y)$, where $D_Y := D \cap Y$. As an application, this result immediately implies the injectivity theorem on holomorphically convex K\"ahler manifolds with reduced snc divisors. The main technique in the proof consists of the theory of harmonic integrals together with residue formulae associated with adjoint ideal sheaves, which are developed from our previous work for the absolute case (where $\Delta$ is a point and $X$ is compact). Additionally, we make use of the Takegoshi harmonic forms to deal with the non-compactness of $X$.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-08-03 12:28:07
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>
