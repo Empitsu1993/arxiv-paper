@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Fri, 21 Aug 2026 04:00:10 +0000<br>
+        <strong>論文数:</strong> 22件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">A minimality criterion for surfaces of general type with applications to product-quotient surfaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Geometrically multiplicative non-archimedean norms</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Quadratic generation of ideals defining nonsigular toric 3-folds</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">Explicit birational models of marked elliptic surfaces of relative degree two</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">Universal torsors over quartic del Pezzo surfaces and stable rationality</a>
+            <span class="title-label-badge" style="background-color: #9b59b6;">del Pezzo</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">Resolution of Singularities in Positive Characteristic: Frobenius-Hasse Towers and Exceptional-History Descent</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">The arithmetic de Rham stack</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Disproof of the Yau--Tian--Donaldson conjecture</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">Ribet Points, geometric divisibility sequence and order of reductions on semiabelian varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">Supergroup Gauged Linear Sigma Models and their Physical Mathematics</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">Eigensolvers for polynomial roots and tensor decomposition</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">Positive scalar curvature K\"ahler metrics and shifted $K$-stability</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">Exact Algebraic Computation of Learning Coefficients for Two-Dimensional Singular Models</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Nonabelian Kodaira-Spencer maps</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">Neutral representations in dimension $\leq 3$ and fields of moduli</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">On the cohomological classification of vector bundles on smooth real affine surfaces and threefolds</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">A nine-line counterexample to a conjecture on the minimal degree of Jacobian relations</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">Finite monodromy groups in degenerating families and the stability degree of curves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Deletion-contraction properties of graphically stable spaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">Distinct differences of singular moduli</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-21" onchange="updateSelectedCount()">
+            <span class="title-number">21.</span>
+            <a href="#paper-21">Exact counts of elliptic curves of bounded height over $\mathbb F_q(t)$ in characteristics $2$ and $3$</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-22" onchange="updateSelectedCount()">
+            <span class="title-number">22.</span>
+            <a href="#paper-22">$F$-intersection flatness of dagger and Berkovich Tate algebras</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "A minimality criterion for surfaces of general type with applications to product-quotient surfaces", "author": "Federico Fallucca", "published": "Fri, 21 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2608.19461", "summary": "arXiv:2608.19461v1 Announce Type: new \nAbstract: We present a numerical criterion to establish the minimality of surfaces of general type. This approach is then adapted to the case of product-quotient surfaces, where the criterion determines whether the (-1)-curves are constrained to lie inside a fibre of one of the two natural fibrations.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2608.19461" target="_blank">A minimality criterion for surfaces of general type with applications to product-quotient surfaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Federico Fallucca</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 21 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2608.19461" target="_blank">https://arxiv.org/abs/2608.19461</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We present a numerical criterion to establish the minimality of surfaces of general type. This approach is then adapted to the case of product-quotient surfaces, where the criterion determines whether the (-1)-curves are constrained to lie inside a fibre of one of the two natural fibrations.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Geometrically multiplicative non-archimedean norms", "author": "Michael Temkin, Grigory Zutler", "published": "Fri, 21 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2608.19481", "summary": "arXiv:2608.19481v1 Announce Type: new \nAbstract: Universally (or geometrically) multiplicative norms on Banach algebras over complete non-archimedean fields were used by Berkovich in his works on non-archimedean geometry, and later they were studied in some detail by Poineau. In this paper, we perform a more thorough study of the question when multiplicativity, spectrality and spectral multiplicativity of norms on algebras over real valued fields are preserved by ground field extensions. We obtain precise criteria quite analogous to the classical theory of geometric irreducibility and reducedness. In particular, we generalize the results of Poineau in a few aspects.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2608.19481" target="_blank">Geometrically multiplicative non-archimedean norms</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Michael Temkin, Grigory Zutler</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 21 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2608.19481" target="_blank">https://arxiv.org/abs/2608.19481</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Universally (or geometrically) multiplicative norms on Banach algebras over complete non-archimedean fields were used by Berkovich in his works on non-archimedean geometry, and later they were studied in some detail by Poineau. In this paper, we perform a more thorough study of the question when multiplicativity, spectrality and spectral multiplicativity of norms on algebras over real valued fields are preserved by ground field extensions. We obtain precise criteria quite analogous to the classical theory of geometric irreducibility and reducedness. In particular, we generalize the results of Poineau in a few aspects.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Quadratic generation of ideals defining nonsigular toric 3-folds", "author": "Shoetsu Ogata", "published": "Fri, 21 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2608.19577", "summary": "arXiv:2608.19577v1 Announce Type: new \nAbstract: Let $X$ be a projective line bundle over a nonsingular toric surface which is a blowup the projective plane along at most 4 invariant points, or a blowup the product of the projective lines along at most 4 invariant points. Let $L$ be an ample line bundle on $X$. Then $L$ defines a projectively normal embedding to big projective space. We show the ideal of this embedded $X$ is generated by elements of degree two.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2608.19577" target="_blank">Quadratic generation of ideals defining nonsigular toric 3-folds</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Shoetsu Ogata</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 21 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2608.19577" target="_blank">https://arxiv.org/abs/2608.19577</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $X$ be a projective line bundle over a nonsingular toric surface which is a blowup the projective plane along at most 4 invariant points, or a blowup the product of the projective lines along at most 4 invariant points. Let $L$ be an ample line bundle on $X$. Then $L$ defines a projectively normal embedding to big projective space. We show the ideal of this embedded $X$ is generated by elements of degree two.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "Explicit birational models of marked elliptic surfaces of relative degree two", "author": "S\\\"onke Rollenske, Anna Ulivi, Aline Zanardini", "published": "Fri, 21 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2608.19970", "summary": "arXiv:2608.19970v1 Announce Type: new \nAbstract: We introduce explicit construction methods for two distinct birational models of elliptic surfaces equipped with a bisection --- or, more generally, a relative polarisation of degree two --- and double fibres. For Halphen surfaces of index two and Enriques surfaces, we illustrate how these give simple descriptions inside a toric variety.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2608.19970" target="_blank">Explicit birational models of marked elliptic surfaces of relative degree two</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> S\"onke Rollenske, Anna Ulivi, Aline Zanardini</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 21 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2608.19970" target="_blank">https://arxiv.org/abs/2608.19970</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We introduce explicit construction methods for two distinct birational models of elliptic surfaces equipped with a bisection --- or, more generally, a relative polarisation of degree two --- and double fibres. For Halphen surfaces of index two and Enriques surfaces, we illustrate how these give simple descriptions inside a toric variety.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "Universal torsors over quartic del Pezzo surfaces and stable rationality", "author": "Yuri Tschinkel, Zhijia Zhang", "published": "Fri, 21 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2608.20029", "summary": "arXiv:2608.20029v1 Announce Type: new \nAbstract: Let $S$ be a smooth quartic del Pezzo surface over a field $k$, of characteristic zero. We prove that a universal torsor $\\mathcal T$ over $S$ is $k$-rational, provided $\\mathcal T$ has $k$-points. As an application, we obtain examples of stably rational smooth cubic hypersurfaces over $\\mathbb Q$ in every dimension greater than 2.", "number": 5, "labels": [{"name": "del Pezzo", "color": "#9b59b6"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2608.20029" target="_blank">Universal torsors over quartic del Pezzo surfaces and stable rationality</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #9b59b6;">del Pezzo</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yuri Tschinkel, Zhijia Zhang</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 21 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2608.20029" target="_blank">https://arxiv.org/abs/2608.20029</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $S$ be a smooth quartic del Pezzo surface over a field $k$, of characteristic zero. We prove that a universal torsor $\mathcal T$ over $S$ is $k$-rational, provided $\mathcal T$ has $k$-points. As an application, we obtain examples of stably rational smooth cubic hypersurfaces over $\mathbb Q$ in every dimension greater than 2.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "Resolution of Singularities in Positive Characteristic: Frobenius-Hasse Towers and Exceptional-History Descent", "author": "Chenxiao Tian", "published": "Fri, 21 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2608.20066", "summary": "arXiv:2608.20066v1 Announce Type: new \nAbstract: Let k be a perfect field of characteristic p&gt;0. We introduce an object-level construction for canonical strong embedded resolution and principalization over k. The construction program replaces monotonicity of pointwise numerical invariants by a well-founded history of addressed comparison factors. Starting from the differential-integral saturation of a marked Rees algebra, we construct total-Hasse activity packets, filtered coefficient cubes, semilinear Frobenius-Hasse sources, and literal transform data for ordinary permissible blowups. A six-row defect calculus routes local problems to certified surface, toroidal-monomial, binomial, and additive-type procedures, after which clean centre portfolios are serialized and descended on a global nerve.\n  The central structure is a global replacement certificate transporting successor addresses, paid quotients, typed traces, displayed parents, reopening data, and terminal truth across macroblocks. We prove that a complete state equipped with this certificate admits a strict multiset replacement in a single dependent well-founded order; hence the iteration terminates and the exhausted state reconstructs a regular strict transform having normal crossings with the ordered boundary. We further formulate an object-level realization of the certificate through rigid generation, cross-generation no-reset, complete wild-capacity control, a centre-or-typed-exit alternative, structured cofibres, displayed-parent allocation, and literal terminal truth. The program page is also available at website https://sites.google.com/view/positive-char-resolution", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2608.20066" target="_blank">Resolution of Singularities in Positive Characteristic: Frobenius-Hasse Towers and Exceptional-History Descent</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Chenxiao Tian</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 21 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2608.20066" target="_blank">https://arxiv.org/abs/2608.20066</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let k be a perfect field of characteristic p&gt;0. We introduce an object-level construction for canonical strong embedded resolution and principalization over k. The construction program replaces monotonicity of pointwise numerical invariants by a well-founded history of addressed comparison factors. Starting from the differential-integral saturation of a marked Rees algebra, we construct total-Hasse activity packets, filtered coefficient cubes, semilinear Frobenius-Hasse sources, and literal transform data for ordinary permissible blowups. A six-row defect calculus routes local problems to certified surface, toroidal-monomial, binomial, and additive-type procedures, after which clean centre portfolios are serialized and descended on a global nerve.
+  The central structure is a global replacement certificate transporting successor addresses, paid quotients, typed traces, displayed parents, reopening data, and terminal truth across macroblocks. We prove that a complete state equipped with this certificate admits a strict multiset replacement in a single dependent well-founded order; hence the iteration terminates and the exhausted state reconstructs a regular strict transform having normal crossings with the ordered boundary. We further formulate an object-level realization of the certificate through rigid generation, cross-generation no-reset, complete wild-capacity control, a centre-or-typed-exit alternative, structured cofibres, displayed-parent allocation, and literal terminal truth. The program page is also available at website https://sites.google.com/view/positive-char-resolution
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "The arithmetic de Rham stack", "author": "Junhui Qin", "published": "Fri, 21 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2608.20203", "summary": "arXiv:2608.20203v1 Announce Type: new \nAbstract: We define and study the arithmetic de Rham stack $X^{\\operatorname{arith}}$ of a scheme $X$ over a field of characteristic $p$, and analyze its relation with related stacks such as the Hyodo--Kato stack. We show that $X^{\\operatorname{arith}}$ gives a stack-theoretic approach to rigid cohomology and its coefficients, known as overconvergent isocrystals and arithmetic $D$-modules, which avoids the long-standing problem of frame-choosing in earlier approaches. We finally give some arithmetic applications of our formalism, such as a proof of Berthelot's conjecture on the preservation of overconvergent isocrystals by smooth proper pushforward.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2608.20203" target="_blank">The arithmetic de Rham stack</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Junhui Qin</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 21 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2608.20203" target="_blank">https://arxiv.org/abs/2608.20203</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We define and study the arithmetic de Rham stack $X^{\operatorname{arith}}$ of a scheme $X$ over a field of characteristic $p$, and analyze its relation with related stacks such as the Hyodo--Kato stack. We show that $X^{\operatorname{arith}}$ gives a stack-theoretic approach to rigid cohomology and its coefficients, known as overconvergent isocrystals and arithmetic $D$-modules, which avoids the long-standing problem of frame-choosing in earlier approaches. We finally give some arithmetic applications of our formalism, such as a proof of Berthelot's conjecture on the preservation of overconvergent isocrystals by smooth proper pushforward.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Disproof of the Yau--Tian--Donaldson conjecture", "author": "Jihao Liu", "published": "Fri, 21 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2608.19301", "summary": "arXiv:2608.19301v1 Announce Type: cross \nAbstract: We construct a polarized smooth projective fivefold and prove that it is K-polystable but does not admit a constant scalar curvature K\\\"ahler metric. This disproves the Yau--Tian--Donaldson conjecture for constant scalar curvature metrics.\n  The main result of this paper was obtained using generative AI, particularly GPT-5.6-sol, Fable 5, and the Danus system. A detailed report on the use of generative AI in this paper is enclosed in the appendix, joint with Bin Dong and Guoxiong Gao.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2608.19301" target="_blank">Disproof of the Yau--Tian--Donaldson conjecture</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jihao Liu</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 21 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2608.19301" target="_blank">https://arxiv.org/abs/2608.19301</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We construct a polarized smooth projective fivefold and prove that it is K-polystable but does not admit a constant scalar curvature K\"ahler metric. This disproves the Yau--Tian--Donaldson conjecture for constant scalar curvature metrics.
+  The main result of this paper was obtained using generative AI, particularly GPT-5.6-sol, Fable 5, and the Danus system. A detailed report on the use of generative AI in this paper is enclosed in the appendix, joint with Bin Dong and Guoxiong Gao.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "Ribet Points, geometric divisibility sequence and order of reductions on semiabelian varieties", "author": "Khai-Hoan Nguyen-Dang", "published": "Fri, 21 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2608.19742", "summary": "arXiv:2608.19742v1 Announce Type: cross \nAbstract: Silverman conjectured that the geometric divisibility sequence attached to a Zariski-dense point on an irreducible commutative algebraic group of dimension at least two, with no unipotent part, returns to its initial value infinitely often. We construct, for the firsst time, unconditional examples of this phenomenon on geometrically nonsplit semiabelian varieties over number fields. More precisely, let $A/K$ be a positive-dimensional abelian variety over number field $K$, let $$ 1\\longrightarrow\\mathbf G_m\\xrightarrow{\\iota}G_q\\xrightarrow{\\pi}A\n  \\longrightarrow0 $$ be the extension represented by $q\\in A^\\vee(K)$, and let $R_\\beta(q)\\in G_q(K)$ be the normalized Ribet point associated with a homomorphism $\\beta:A^\\vee\\to A$. Assume that $\\delta$ is an isogeny and that the cyclic subgroup generated by $\\delta q$ is Zariski dense in $A$. Let $t\\in\\mathbf G_m(K)$ be a torsion point. Then $G_q$ is geometrically nonsplit and $P=R_\\beta(q)+\\iota(t)$ has Zariski-dense cyclic orbit. Put $\\delta=\\beta-\\widehat{\\beta}$. If $e_\\delta$ denotes the exponent of $\\ker\\delta$ and $h=\\operatorname{ord}(t)$, define $$ N_{\\delta,t} := \\prod_{\\ell} \\ell^{ \\max\\left\\{ 0, \\left\\lceil \\frac{v_\\ell(h)-2v_\\ell(e_\\delta)}{2} \\right\\rceil \\right\\}}. $$ If $N_{\\delta,t}&gt;1$, then $N_{\\delta,t}\\mid d_v(P)$ for all but finitely many finite places $v$, where $d_v(P)$ denotes the order of the reduction of $P$. Consequently, there exists a squarefree integer $Q&gt;1$ such that $$ (n,Q)=1 \\quad\\Longrightarrow\\quad \\mathfrak d_{\\mathcal N}(nP) =\n\\mathfrak d_{\\mathcal N}(P), $$ where $\\mathfrak d_{\\mathcal N}$ denotes the full denominator ideal on the N\\'eron lft-model $\\mathcal N$.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2608.19742" target="_blank">Ribet Points, geometric divisibility sequence and order of reductions on semiabelian varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Khai-Hoan Nguyen-Dang</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 21 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2608.19742" target="_blank">https://arxiv.org/abs/2608.19742</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Silverman conjectured that the geometric divisibility sequence attached to a Zariski-dense point on an irreducible commutative algebraic group of dimension at least two, with no unipotent part, returns to its initial value infinitely often. We construct, for the firsst time, unconditional examples of this phenomenon on geometrically nonsplit semiabelian varieties over number fields. More precisely, let $A/K$ be a positive-dimensional abelian variety over number field $K$, let $$ 1\longrightarrow\mathbf G_m\xrightarrow{\iota}G_q\xrightarrow{\pi}A
+  \longrightarrow0 $$ be the extension represented by $q\in A^\vee(K)$, and let $R_\beta(q)\in G_q(K)$ be the normalized Ribet point associated with a homomorphism $\beta:A^\vee\to A$. Assume that $\delta$ is an isogeny and that the cyclic subgroup generated by $\delta q$ is Zariski dense in $A$. Let $t\in\mathbf G_m(K)$ be a torsion point. Then $G_q$ is geometrically nonsplit and $P=R_\beta(q)+\iota(t)$ has Zariski-dense cyclic orbit. Put $\delta=\beta-\widehat{\beta}$. If $e_\delta$ denotes the exponent of $\ker\delta$ and $h=\operatorname{ord}(t)$, define $$ N_{\delta,t} := \prod_{\ell} \ell^{ \max\left\{ 0, \left\lceil \frac{v_\ell(h)-2v_\ell(e_\delta)}{2} \right\rceil \right\}}. $$ If $N_{\delta,t}&gt;1$, then $N_{\delta,t}\mid d_v(P)$ for all but finitely many finite places $v$, where $d_v(P)$ denotes the order of the reduction of $P$. Consequently, there exists a squarefree integer $Q&gt;1$ such that $$ (n,Q)=1 \quad\Longrightarrow\quad \mathfrak d_{\mathcal N}(nP) =
+\mathfrak d_{\mathcal N}(P), $$ where $\mathfrak d_{\mathcal N}$ denotes the full denominator ideal on the N\'eron lft-model $\mathcal N$.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "Supergroup Gauged Linear Sigma Models and their Physical Mathematics", "author": "Arif Er, Zhangcheng Liu, Meng-Chwan Tan", "published": "Fri, 21 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2608.19775", "summary": "arXiv:2608.19775v1 Announce Type: cross \nAbstract: We construct 2d $\\mathcal{N}=(2,2)$ gauged linear sigma models with $\\mathrm{U}(1|1)^N$ supergauge group possibly with superpotential. Despite being nonunitary, one can still study their space of supersymmetric states and explore their applications to mathematics. In particular, we find a relation between a nonlinear sigma model on a Calabi-Yau complete intersection of hypersurfaces in a super-Grassmannian and a supergauged Landau-Ginzburg orbifold, which can reduce to a regular Calabi-Yau/Landau-Ginzburg correspondence for complete intersections. This defines a super-Grassmannian/supergroup generalization of the correspondence proved by Clader [1] and Zhao [2]. Similarly, we find a relation between a nonlinear sigma model on a Calabi-Yau hypersurface in a product of super-Grassmannians and a hybrid NLSM/supergauged Landau-Ginzburg orbifold, which can reduce to a regular hybrid Calabi-Yau/Landau-Ginzburg correspondence for hypersurfaces in product space. This defines a super-Grassmannian/supergroup generalization of the correspondence proved by Fan-Jarvis-Ruan [3]. We also find that Calabi-Yau supervector bundles over a super-Grassmannian can undergo a physically related mild topology change which is reducible to a regular Atiyah-type flop transition. This defines a super-Grassmannian generalization of a birational equivalence of Calabi-Yau vector bundles in mathematics. Similarly, we find that a Calabi-Yau complete intersection of quadrics in a super-Grassmannian can also undergo a physically related topology change which is reducible to a regular conifold transition. This defines a super-Grassmannian generalization of a homological projective duality for Calabi-Yau quadrics by Kuznetsov-Perry [4] in mathematics.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2608.19775" target="_blank">Supergroup Gauged Linear Sigma Models and their Physical Mathematics</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Arif Er, Zhangcheng Liu, Meng-Chwan Tan</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 21 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2608.19775" target="_blank">https://arxiv.org/abs/2608.19775</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We construct 2d $\mathcal{N}=(2,2)$ gauged linear sigma models with $\mathrm{U}(1|1)^N$ supergauge group possibly with superpotential. Despite being nonunitary, one can still study their space of supersymmetric states and explore their applications to mathematics. In particular, we find a relation between a nonlinear sigma model on a Calabi-Yau complete intersection of hypersurfaces in a super-Grassmannian and a supergauged Landau-Ginzburg orbifold, which can reduce to a regular Calabi-Yau/Landau-Ginzburg correspondence for complete intersections. This defines a super-Grassmannian/supergroup generalization of the correspondence proved by Clader [1] and Zhao [2]. Similarly, we find a relation between a nonlinear sigma model on a Calabi-Yau hypersurface in a product of super-Grassmannians and a hybrid NLSM/supergauged Landau-Ginzburg orbifold, which can reduce to a regular hybrid Calabi-Yau/Landau-Ginzburg correspondence for hypersurfaces in product space. This defines a super-Grassmannian/supergroup generalization of the correspondence proved by Fan-Jarvis-Ruan [3]. We also find that Calabi-Yau supervector bundles over a super-Grassmannian can undergo a physically related mild topology change which is reducible to a regular Atiyah-type flop transition. This defines a super-Grassmannian generalization of a birational equivalence of Calabi-Yau vector bundles in mathematics. Similarly, we find that a Calabi-Yau complete intersection of quadrics in a super-Grassmannian can also undergo a physically related topology change which is reducible to a regular conifold transition. This defines a super-Grassmannian generalization of a homological projective duality for Calabi-Yau quadrics by Kuznetsov-Perry [4] in mathematics.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "Eigensolvers for polynomial roots and tensor decomposition", "author": "Enrica Barrilli (AROMATH), Bernard Mourrain (AROMATH)", "published": "Fri, 21 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2608.19818", "summary": "arXiv:2608.19818v1 Announce Type: cross \nAbstract: Computing eigenvalues and eigenvectors is at the heart of the solution of many non-linear problems. For instance, finding the roots of polynomial systems reduces to computing joint eigenvectors of operators of multiplication. Similarly, tensor decomposition can be performed via the joint diagonalization of submatrices of the Catalecticant of the tensor. We describe and illustrate symbolic-numeric methods for computing the solutions of these algebraic problems from the computation of joint eigenvectors of commuting operators, and for analysing their multiplicity structure, as well as their implementation in the package AlgebraicSolvers.jl.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2608.19818" target="_blank">Eigensolvers for polynomial roots and tensor decomposition</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Enrica Barrilli (AROMATH), Bernard Mourrain (AROMATH)</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 21 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2608.19818" target="_blank">https://arxiv.org/abs/2608.19818</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Computing eigenvalues and eigenvectors is at the heart of the solution of many non-linear problems. For instance, finding the roots of polynomial systems reduces to computing joint eigenvectors of operators of multiplication. Similarly, tensor decomposition can be performed via the joint diagonalization of submatrices of the Catalecticant of the tensor. We describe and illustrate symbolic-numeric methods for computing the solutions of these algebraic problems from the computation of joint eigenvectors of commuting operators, and for analysing their multiplicity structure, as well as their implementation in the package AlgebraicSolvers.jl.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "Positive scalar curvature K\\\"ahler metrics and shifted $K$-stability", "author": "Zehao Sha", "published": "Fri, 21 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2608.20030", "summary": "arXiv:2608.20030v1 Announce Type: cross \nAbstract: In this paper, we show that the quantitative data underlying $K$-stability, originally developed in the study of canonical metrics, also detect the existence of positive scalar curvature K\\\"ahler metrics in a fixed class.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2608.20030" target="_blank">Positive scalar curvature K\"ahler metrics and shifted $K$-stability</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Zehao Sha</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 21 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2608.20030" target="_blank">https://arxiv.org/abs/2608.20030</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                In this paper, we show that the quantitative data underlying $K$-stability, originally developed in the study of canonical metrics, also detect the existence of positive scalar curvature K\"ahler metrics in a fixed class.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "Exact Algebraic Computation of Learning Coefficients for Two-Dimensional Singular Models", "author": "Gr\\'egoire Sergeant-Perthuis (CQSB, Sorbonne Universit\\'e), Elias Tsigaridas (Ouragan Team, INRIA), Jules Tsukahara (Ouragan Team, INRIA)", "published": "Fri, 21 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2608.20183", "summary": "arXiv:2608.20183v1 Announce Type: cross \nAbstract: Classical information criteria such as the Bayesian Information Criterion (BIC) rely on regularity assumptions that break down for singular models, leading to incorrect model selection in settings such as deep learning. The Widely Applicable Bayesian Information Criterion (WBIC) relies on local learning coefficients $\\lambda$, which in the analytic case coincides with local Real Log Canonical Thresholds (RLCT) of the Kullback-Leibler divergence of the model, to capture correct marginal likelihood asymptotics. Exact computation of the learning coefficients has been limited to special cases, and only sampling-based estimation methods are generally applicable. We present the first deterministic algorithm that computes local RLCTs exactly for any two-dimensional model whose Kullback-Leibler distance is contact equivalent to a polynomial, derive a bound on its complexity, and demonstrate its effectiveness for a broad class of models, with applications including polynomial neural networks. Beyond providing ground truth to calibrate sampling-based estimators, exact computation reveals algebraic structure in learning coefficients that sampling cannot and out-speeds it in the shallow regime.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2608.20183" target="_blank">Exact Algebraic Computation of Learning Coefficients for Two-Dimensional Singular Models</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Gr\'egoire Sergeant-Perthuis (CQSB, Sorbonne Universit\'e), Elias Tsigaridas (Ouragan Team, INRIA), Jules Tsukahara (Ouragan Team, INRIA)</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 21 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2608.20183" target="_blank">https://arxiv.org/abs/2608.20183</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Classical information criteria such as the Bayesian Information Criterion (BIC) rely on regularity assumptions that break down for singular models, leading to incorrect model selection in settings such as deep learning. The Widely Applicable Bayesian Information Criterion (WBIC) relies on local learning coefficients $\lambda$, which in the analytic case coincides with local Real Log Canonical Thresholds (RLCT) of the Kullback-Leibler divergence of the model, to capture correct marginal likelihood asymptotics. Exact computation of the learning coefficients has been limited to special cases, and only sampling-based estimation methods are generally applicable. We present the first deterministic algorithm that computes local RLCTs exactly for any two-dimensional model whose Kullback-Leibler distance is contact equivalent to a polynomial, derive a bound on its complexity, and demonstrate its effectiveness for a broad class of models, with applications including polynomial neural networks. Beyond providing ground truth to calibrate sampling-based estimators, exact computation reveals algebraic structure in learning coefficients that sampling cannot and out-speeds it in the shallow regime.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Nonabelian Kodaira-Spencer maps", "author": "Yixuan Fu, Mao Sheng", "published": "Fri, 21 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2509.06050", "summary": "arXiv:2509.06050v2 Announce Type: replace \nAbstract: We give an explicit formula of the associated graded map to the nonabelian Gauss-Manin connection with respect to the nonabelian Hodge filtration.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2509.06050" target="_blank">Nonabelian Kodaira-Spencer maps</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Yixuan Fu, Mao Sheng</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 21 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2509.06050" target="_blank">https://arxiv.org/abs/2509.06050</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We give an explicit formula of the associated graded map to the nonabelian Gauss-Manin connection with respect to the nonabelian Hodge filtration.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "Neutral representations in dimension $\\leq 3$ and fields of moduli", "author": "Giulio Bresciani, Tianzhi Yang", "published": "Fri, 21 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2604.08773", "summary": "arXiv:2604.08773v2 Announce Type: replace \nAbstract: A representation $V$ of an algebraic group $G$ induces a vector bundle $[V/G] \\to BG$. The representation $V$ of $G$ is neutral if, for every twisted form $\\mathcal{V} \\to \\mathcal{G}$ of $[V/G] \\to BG$ over a field $k$, we have $\\mathcal{G}(k) \\neq \\emptyset$.\n  Twisted forms of representations arise in many ways, for instance as cohomology of families of varieties on residual gerbes of moduli spaces, and from quotient singularities. Moreover, every Tannakian category is the category of vector bundles on some gerbe. Because of this, studying neutral representations yields numerous applications, especially to problems about fields of moduli.\n  The present article has three main results. First, we completely classify neutral, faithful representations of finite groups in dimension $\\leq 3$. Second, we give a very general, computation-friendly result for proving that representations of finite abelian groups are neutral, in arbitrary dimensions. Third, we develop the abstract concept of the normalizer $\\mathcal{G} \\to \\mathcal{N} \\to \\mathcal{H}$ of a morphism of gerbes $\\mathcal{G} \\to \\mathcal{H}$ on an arbitrary site (twisted representations correspond to morphisms of gerbes $\\mathcal{G} \\to B\\mathrm{GL}_{n}$), and show that the normalizer $\\mathcal{N}$ only depends on the geometric type of $\\mathcal{G} \\to \\mathcal{H}$.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2604.08773" target="_blank">Neutral representations in dimension $\leq 3$ and fields of moduli</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Giulio Bresciani, Tianzhi Yang</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 21 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2604.08773" target="_blank">https://arxiv.org/abs/2604.08773</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                A representation $V$ of an algebraic group $G$ induces a vector bundle $[V/G] \to BG$. The representation $V$ of $G$ is neutral if, for every twisted form $\mathcal{V} \to \mathcal{G}$ of $[V/G] \to BG$ over a field $k$, we have $\mathcal{G}(k) \neq \emptyset$.
+  Twisted forms of representations arise in many ways, for instance as cohomology of families of varieties on residual gerbes of moduli spaces, and from quotient singularities. Moreover, every Tannakian category is the category of vector bundles on some gerbe. Because of this, studying neutral representations yields numerous applications, especially to problems about fields of moduli.
+  The present article has three main results. First, we completely classify neutral, faithful representations of finite groups in dimension $\leq 3$. Second, we give a very general, computation-friendly result for proving that representations of finite abelian groups are neutral, in arbitrary dimensions. Third, we develop the abstract concept of the normalizer $\mathcal{G} \to \mathcal{N} \to \mathcal{H}$ of a morphism of gerbes $\mathcal{G} \to \mathcal{H}$ on an arbitrary site (twisted representations correspond to morphisms of gerbes $\mathcal{G} \to B\mathrm{GL}_{n}$), and show that the normalizer $\mathcal{N}$ only depends on the geometric type of $\mathcal{G} \to \mathcal{H}$.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "On the cohomological classification of vector bundles on smooth real affine surfaces and threefolds", "author": "Samuel Lerbet", "published": "Fri, 21 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2605.22706", "summary": "arXiv:2605.22706v2 Announce Type: replace \nAbstract: We study the cohomological classification of vector bundles on smooth real affine surfaces and threefolds. We show that, as was observed in joint work in A. Asok and J. Fasel and with S. Banerjee and J. Fasel, under suitable cohomological assumptions on the real locus of such varieties, this classification mirrors the one obtained on algebraically closed base fields by Mohan Kumar and Murthy and by Asok and Fasel. Using an argument due to Fasel, we also give an efficient proof of a theorem of Kucharz characterising the triples of algebraic cycles that can be realised as the Chern classes of a rank $3$ bundle on a smooth real affine threefold. We further answer the questions left open by Kucharz; to our knowledge, we give the first instance of a projective module over a smooth affine $\\mathbb{R}$-algebra of dimension $3$ with trivial Chern classes which is not stably free.", "number": 16, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2605.22706" target="_blank">On the cohomological classification of vector bundles on smooth real affine surfaces and threefolds</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Samuel Lerbet</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 21 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2605.22706" target="_blank">https://arxiv.org/abs/2605.22706</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the cohomological classification of vector bundles on smooth real affine surfaces and threefolds. We show that, as was observed in joint work in A. Asok and J. Fasel and with S. Banerjee and J. Fasel, under suitable cohomological assumptions on the real locus of such varieties, this classification mirrors the one obtained on algebraically closed base fields by Mohan Kumar and Murthy and by Asok and Fasel. Using an argument due to Fasel, we also give an efficient proof of a theorem of Kucharz characterising the triples of algebraic cycles that can be realised as the Chern classes of a rank $3$ bundle on a smooth real affine threefold. We further answer the questions left open by Kucharz; to our knowledge, we give the first instance of a projective module over a smooth affine $\mathbb{R}$-algebra of dimension $3$ with trivial Chern classes which is not stably free.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "A nine-line counterexample to a conjecture on the minimal degree of Jacobian relations", "author": "Alexandru Dimca, Piotr Pokora", "published": "Fri, 21 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2607.01985", "summary": "arXiv:2607.01985v2 Announce Type: replace \nAbstract: We construct two arrangements of nine lines in the complex projective plane with isomorphic intersection lattices but with different minimal degrees of Jacobian relations. The common weak combinatorics is \\[ (n_2,n_3,n_4)=(9,7,1), \\] so the example is not the classical Ziegler-Yuzvinsky pair, whose weak combinatorics is $(n_{2},n_{3}) = (18,6)$. For the two defining equations $f$ and $g$ we prove \\[ {\\rm mdr}(f)=4,\\qquad {\\rm mdr}(g)=5. \\] Since the degree is $d=9$, the first equality gives ${\\rm mdr}(f)&lt;d/2$. Hence the pair gives a counterexample to the Generalized Terao Conjecture.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/2607.01985" target="_blank">A nine-line counterexample to a conjecture on the minimal degree of Jacobian relations</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Alexandru Dimca, Piotr Pokora</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 21 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2607.01985" target="_blank">https://arxiv.org/abs/2607.01985</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We construct two arrangements of nine lines in the complex projective plane with isomorphic intersection lattices but with different minimal degrees of Jacobian relations. The common weak combinatorics is \[ (n_2,n_3,n_4)=(9,7,1), \] so the example is not the classical Ziegler-Yuzvinsky pair, whose weak combinatorics is $(n_{2},n_{3}) = (18,6)$. For the two defining equations $f$ and $g$ we prove \[ {\rm mdr}(f)=4,\qquad {\rm mdr}(g)=5. \] Since the degree is $d=9$, the first equality gives ${\rm mdr}(f)&lt;d/2$. Hence the pair gives a counterexample to the Generalized Terao Conjecture.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "Finite monodromy groups in degenerating families and the stability degree of curves", "author": "S\\'everin Philip", "published": "Fri, 21 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2608.10742", "summary": "arXiv:2608.10742v2 Announce Type: replace \nAbstract: We compute the stability degree of curves of genus g and show that it is equal to the classical Minkowsky bound. We also compute the stability degree of semi-abelian varieties with prescribed toric and abelian ranks. The proof uses a specialization result for finite monodromy groups in degenerating families, obtained from a variant of Krasner's lemma, together with an explicit construction at the prime 2.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2608.10742" target="_blank">Finite monodromy groups in degenerating families and the stability degree of curves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> S\'everin Philip</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 21 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2608.10742" target="_blank">https://arxiv.org/abs/2608.10742</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We compute the stability degree of curves of genus g and show that it is equal to the classical Minkowsky bound. We also compute the stability degree of semi-abelian varieties with prescribed toric and abelian ranks. The proof uses a specialization result for finite monodromy groups in degenerating families, obtained from a variant of Krasner's lemma, together with an explicit construction at the prime 2.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Deletion-contraction properties of graphically stable spaces", "author": "Andy Xiaoan Yang", "published": "Fri, 21 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2608.11487", "summary": "arXiv:2608.11487v2 Announce Type: replace \nAbstract: Graphically stable spaces $\\overline{\\mathcal{M}}_{g,G}$ parametrize marked nodal curves whose permitted collisions of markings are determined by a graph. We study intersection numbers of $\\psi$-classes on $\\overline{\\mathcal{M}}_{g,G}$, as well as the classes $[M_{g,G}]$ in the Grothendieck ring of varieties. In both settings, we show that the geometry is governed by an underlying graphical structure, expressed through deletion-contraction relations. As consequences, we derive string and dilaton equations and express several families of $\\psi$-class integrals in terms of the chromatic polynomial. We also express the Grothendieck class of $M_{0,G}$ over an arbitrary field in terms of the chromatic polynomial and identify various Euler characteristics with combinatorial quantities. Along the way, we obtain a new formula for Crapo's $\\beta$-invariant of graphs. Finally, we extend these relations to genus one and, under a chromatic condition, to higher genus.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2608.11487" target="_blank">Deletion-contraction properties of graphically stable spaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Andy Xiaoan Yang</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 21 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2608.11487" target="_blank">https://arxiv.org/abs/2608.11487</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Graphically stable spaces $\overline{\mathcal{M}}_{g,G}$ parametrize marked nodal curves whose permitted collisions of markings are determined by a graph. We study intersection numbers of $\psi$-classes on $\overline{\mathcal{M}}_{g,G}$, as well as the classes $[M_{g,G}]$ in the Grothendieck ring of varieties. In both settings, we show that the geometry is governed by an underlying graphical structure, expressed through deletion-contraction relations. As consequences, we derive string and dilaton equations and express several families of $\psi$-class integrals in terms of the chromatic polynomial. We also express the Grothendieck class of $M_{0,G}$ over an arbitrary field in terms of the chromatic polynomial and identify various Euler characteristics with combinatorial quantities. Along the way, we obtain a new formula for Crapo's $\beta$-invariant of graphs. Finally, we extend these relations to genus one and, under a chromatic condition, to higher genus.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "Distinct differences of singular moduli", "author": "Guy Fowler, Emanuele Tron", "published": "Fri, 21 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2503.19686", "summary": "arXiv:2503.19686v2 Announce Type: replace-cross \nAbstract: Let $E_1, E_2 / \\mathbb{C}$ be non-isomorphic elliptic curves with complex multiplication. We prove that the pair $(E_1, E_2)$ is characterised, up to isomorphism, by the difference $j(E_1) - j(E_2)$ of the respective $j$-invariants. In other words, we show that if $x_1, x_2, x_3, x_4$ are singular moduli such that $x_1 - x_2 = x_3 - x_4$, then either $(x_1, x_2) = (x_3, x_4)$ or $(x_1, x_3) = (x_2, x_4)$.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2503.19686" target="_blank">Distinct differences of singular moduli</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Guy Fowler, Emanuele Tron</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 21 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2503.19686" target="_blank">https://arxiv.org/abs/2503.19686</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $E_1, E_2 / \mathbb{C}$ be non-isomorphic elliptic curves with complex multiplication. We prove that the pair $(E_1, E_2)$ is characterised, up to isomorphism, by the difference $j(E_1) - j(E_2)$ of the respective $j$-invariants. In other words, we show that if $x_1, x_2, x_3, x_4$ are singular moduli such that $x_1 - x_2 = x_3 - x_4$, then either $(x_1, x_2) = (x_3, x_4)$ or $(x_1, x_3) = (x_2, x_4)$.
+            </div>
+        </div>
+        <div class="paper" id="paper-21">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-21" data-paper-data='{"title": "Exact counts of elliptic curves of bounded height over $\\mathbb F_q(t)$ in characteristics $2$ and $3$", "author": "Jun-Yong Park", "published": "Fri, 21 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2507.06754", "summary": "arXiv:2507.06754v3 Announce Type: replace-cross \nAbstract: Let $p\\in\\{2,3\\}$, let $q=p^r$ with $r\\geq1$, and put $K=\\mathbb F_q(t)$. We determine the exact weighted and unweighted counts of $K$-isomorphism classes of elliptic curves of bounded Faltings height, equivalently of bounded minimal-discriminant degree. Writing $B$ for the discriminant height bound, the leading term in each count is of order $B^{5/6}$ and has the same coefficient in every characteristic, whereas the lower-order terms depend substantially on $p$ and on the arithmetic of the constant field. In the unweighted count, characteristic two produces a term of order $B^{5/12}$ and, when $r$ is even, a term of order $B^{1/4}$, neither of which occurs for $p&gt;3$. Some characteristic-specific lower-order coefficients are negative.\n  These terms reflect two small-characteristic phenomena. First, the nonsmooth locus of generalized Weierstrass equations contains quasi-elliptic-type strata that are not detected by the rational-singular-section argument in de Jong's count: the unique geometric singular point of the generic fiber may be defined only after a nontrivial purely inseparable extension of $K$. Second, on the $j=0$ locus, the geometric origin-preserving automorphism groups are nonabelian and contain wild elements, while twisting affects which automorphisms descend to $K$. Consequently, the passage from weighted to unweighted counts requires a marked-inertia calculation involving conjugacy classes and centralizer weights.\n  Our formulas show that nonsmooth-locus corrections, extra-automorphism loci, and the removal of minimality defects collectively account for all lower-order terms. Together with the characteristic-greater-than-three formulas of Bejleri-Park-Satriano, this completes the exact weighted and unweighted bounded-height enumerations over $\\mathbb F_q(t)$ in every characteristic.", "number": 21, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#21</span>
+                <a href="https://arxiv.org/abs/2507.06754" target="_blank">Exact counts of elliptic curves of bounded height over $\mathbb F_q(t)$ in characteristics $2$ and $3$</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Jun-Yong Park</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 21 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2507.06754" target="_blank">https://arxiv.org/abs/2507.06754</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $p\in\{2,3\}$, let $q=p^r$ with $r\geq1$, and put $K=\mathbb F_q(t)$. We determine the exact weighted and unweighted counts of $K$-isomorphism classes of elliptic curves of bounded Faltings height, equivalently of bounded minimal-discriminant degree. Writing $B$ for the discriminant height bound, the leading term in each count is of order $B^{5/6}$ and has the same coefficient in every characteristic, whereas the lower-order terms depend substantially on $p$ and on the arithmetic of the constant field. In the unweighted count, characteristic two produces a term of order $B^{5/12}$ and, when $r$ is even, a term of order $B^{1/4}$, neither of which occurs for $p&gt;3$. Some characteristic-specific lower-order coefficients are negative.
+  These terms reflect two small-characteristic phenomena. First, the nonsmooth locus of generalized Weierstrass equations contains quasi-elliptic-type strata that are not detected by the rational-singular-section argument in de Jong's count: the unique geometric singular point of the generic fiber may be defined only after a nontrivial purely inseparable extension of $K$. Second, on the $j=0$ locus, the geometric origin-preserving automorphism groups are nonabelian and contain wild elements, while twisting affects which automorphisms descend to $K$. Consequently, the passage from weighted to unweighted counts requires a marked-inertia calculation involving conjugacy classes and centralizer weights.
+  Our formulas show that nonsmooth-locus corrections, extra-automorphism loci, and the removal of minimality defects collectively account for all lower-order terms. Together with the characteristic-greater-than-three formulas of Bejleri-Park-Satriano, this completes the exact weighted and unweighted bounded-height enumerations over $\mathbb F_q(t)$ in every characteristic.
+            </div>
+        </div>
+        <div class="paper" id="paper-22">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-22" data-paper-data='{"title": "$F$-intersection flatness of dagger and Berkovich Tate algebras", "author": "Rankeya Datta, Jack J Garzella, Kevin Tucker", "published": "Fri, 21 Aug 2026 00:00:00 -0400", "link": "https://arxiv.org/abs/2511.00753", "summary": "arXiv:2511.00753v3 Announce Type: replace-cross \nAbstract: We show, using the techniques developed in arXiv:2504.06444 and arXiv:2305.11139, that dagger algebras and Tate algebras in the sense of Berkovich in prime characteristic $p &gt; 0$ have intersection flat Frobenius. Equivalently, if $S$ is such a ring, then $S^{1/p}$ is a flat and Mittag-Leffler $S$-module. As a consequence, we deduce that any ideal-adic completion of a reduced ring that is essentially of finite type over a dagger algebra or a Berkovich Tate algebra in prime characteristic has big test elements from tight closure theory.", "number": 22, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#22</span>
+                <a href="https://arxiv.org/abs/2511.00753" target="_blank">$F$-intersection flatness of dagger and Berkovich Tate algebras</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Rankeya Datta, Jack J Garzella, Kevin Tucker</div>
+                <div class="paper-date"><strong>公開日:</strong> Fri, 21 Aug 2026 00:00:00 -0400</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2511.00753" target="_blank">https://arxiv.org/abs/2511.00753</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We show, using the techniques developed in arXiv:2504.06444 and arXiv:2305.11139, that dagger algebras and Tate algebras in the sense of Berkovich in prime characteristic $p &gt; 0$ have intersection flat Frobenius. Equivalently, if $S$ is such a ring, then $S^{1/p}$ is a flat and Mittag-Leffler $S$-module. As a consequence, we deduce that any ideal-adic completion of a reduced ring that is essentially of finite type over a dagger algebra or a Berkovich Tate algebra in prime characteristic has big test elements from tight closure theory.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-08-21 09:40:04
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>
