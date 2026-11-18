@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arXiv論文一覧 - math.AG updates on arXiv.org</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .paper {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .paper:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .paper-title a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .paper-title a:hover {
+            text-decoration: underline;
+        }
+        .paper-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .paper-author {
+            margin-bottom: 5px;
+        }
+        .paper-date {
+            margin-bottom: 5px;
+        }
+        .paper-link {
+            margin-top: 5px;
+        }
+        .paper-link a {
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .paper-link a:hover {
+            text-decoration: underline;
+        }
+        .paper-summary {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            color: #555;
+            line-height: 1.8;
+        }
+        .count {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        .title-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .title-list h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .title-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .title-item:last-child {
+            border-bottom: none;
+        }
+        .title-item a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .title-item a:hover {
+            text-decoration: underline;
+            color: #3498db;
+        }
+        .title-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .section-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 30px 0 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .paper {
+            scroll-margin-top: 20px;
+        }
+        .paper.hidden {
+            display: none;
+        }
+        .paper-checkbox {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            z-index: 100;
+        }
+        .action-buttons button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .action-buttons button:hover {
+            background-color: #2980b9;
+        }
+        .action-buttons button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .selected-count {
+            display: inline-block;
+            margin-left: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .paper-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .label-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .title-label-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>math.AG updates on arXiv.org</h1>
+    
+    <div class="info">
+        <strong>更新日時:</strong> Wed, 18 Nov 2026 05:00:03 +0000<br>
+        <strong>論文数:</strong> 22件
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="selectAll()">全て選択</button>
+        <button onclick="deselectAll()">全て解除</button>
+        <button onclick="showAll()" id="showAllButton">全て表示</button>
+        <button onclick="showSelectedOnly()" id="showSelectedButton">選択したもののみ表示</button>
+        <span class="selected-count" id="selectedCount">0件選択中</span>
+    </div>
+    
+    <div class="title-list">
+        <h2>📋 論文タイトル一覧</h2>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-1" onchange="updateSelectedCount()">
+            <span class="title-number">1.</span>
+            <a href="#paper-1">Quantum $K$-theoretic Whitney relation for Lagrangian Grassmannian</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-2" onchange="updateSelectedCount()">
+            <span class="title-number">2.</span>
+            <a href="#paper-2">Remarks on Fourier--Mukai invariances</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-3" onchange="updateSelectedCount()">
+            <span class="title-number">3.</span>
+            <a href="#paper-3">Topology of some smooth real Fano threefolds arising from blow-ups along rational curves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-4" onchange="updateSelectedCount()">
+            <span class="title-number">4.</span>
+            <a href="#paper-4">The Nygaard graded piece, the Frobenius--Witt cotangent complex and regularity criteria</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-5" onchange="updateSelectedCount()">
+            <span class="title-number">5.</span>
+            <a href="#paper-5">The injectivity of the Kudla--Millson lift on unitary Shimura varieties</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-6" onchange="updateSelectedCount()">
+            <span class="title-number">6.</span>
+            <a href="#paper-6">Bounded functions on the character variety for quadratic extensions of $\mathbb{Q}_p$</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-7" onchange="updateSelectedCount()">
+            <span class="title-number">7.</span>
+            <a href="#paper-7">A local-local principle for quadratic forms over semiglobal fields</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-8" onchange="updateSelectedCount()">
+            <span class="title-number">8.</span>
+            <a href="#paper-8">Hyperk\"ahler Periods in Families of Parabolic Higgs Bundle Moduli Spaces</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-9" onchange="updateSelectedCount()">
+            <span class="title-number">9.</span>
+            <a href="#paper-9">Picard Groups of Spectral Varieties and Moduli of Higgs Sheaves</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-10" onchange="updateSelectedCount()">
+            <span class="title-number">10.</span>
+            <a href="#paper-10">Secant sheaves on abelian n-folds with real multiplication and Weil classes on abelian 2n-folds with complex multiplication</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-11" onchange="updateSelectedCount()">
+            <span class="title-number">11.</span>
+            <a href="#paper-11">On the decomposition of the diagonal for n-fold hypersurfaces via cubic n-1-folds</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-12" onchange="updateSelectedCount()">
+            <span class="title-number">12.</span>
+            <a href="#paper-12">Motivic local density of isolated surface singularities</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-13" onchange="updateSelectedCount()">
+            <span class="title-number">13.</span>
+            <a href="#paper-13">A conjecture on the action of Hecke operators</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-14" onchange="updateSelectedCount()">
+            <span class="title-number">14.</span>
+            <a href="#paper-14">Tropical Matsusaka and Matsusaka--Ran Criteria</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-15" onchange="updateSelectedCount()">
+            <span class="title-number">15.</span>
+            <a href="#paper-15">The Constant in Thomae-Type Formulas for Eight Points on the Complex Projective Line</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-16" onchange="updateSelectedCount()">
+            <span class="title-number">16.</span>
+            <a href="#paper-16">The Legendre potential and the gradient case of the differential Galois criterion for the Jacobian Conjecture</a>
+            <span class="title-label-badge" style="background-color: #ff69b4;">privacy</span>
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-17" onchange="updateSelectedCount()">
+            <span class="title-number">17.</span>
+            <a href="#paper-17">An application of "Selmer group Chabauty" to arithmetic dynamics</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-18" onchange="updateSelectedCount()">
+            <span class="title-number">18.</span>
+            <a href="#paper-18">Greatest Common Divisors and an Unlikely Intersection Type Conjecture</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-19" onchange="updateSelectedCount()">
+            <span class="title-number">19.</span>
+            <a href="#paper-19">Cohomological VC-density: Bounds and Applications</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-20" onchange="updateSelectedCount()">
+            <span class="title-number">20.</span>
+            <a href="#paper-20">Non-commutative crepant resolutions of toric singularities with divisor class group of rank one</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-21" onchange="updateSelectedCount()">
+            <span class="title-number">21.</span>
+            <a href="#paper-21">Jordan types for pairs of commuting nilpotent matrices: A survey</a>
+            
+        </div>
+        <div class="title-item">
+            <input type="checkbox" class="title-checkbox" data-paper-id="paper-22" onchange="updateSelectedCount()">
+            <span class="title-number">22.</span>
+            <a href="#paper-22">Macdonald intersections and the $N!/k$ conjecture</a>
+            
+        </div>
+    </div>
+    
+    <div class="section-header">📄 論文詳細</div>
+    
+    <div class="papers">
+        <div class="paper" id="paper-1">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-1" data-paper-data='{"title": "Quantum $K$-theoretic Whitney relation for Lagrangian Grassmannian", "author": "Takafumi Kouno", "published": "Wed, 18 Nov 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2611.21654", "summary": "arXiv:2611.21654v1 Announce Type: new \nAbstract: We give a quantum $K$-theoretic analogue of the Whitney relation for the torus-equivariant $K$-ring of the Lagrangian Grassmannian. As a consequence, we give a presentation of the torus-equivariant quantum $K$-ring of the Lagrangian Grassmannian. The strategy for obtaining such relations is to use the quantum $K$-theoretic Whitney relation for the full-flag manifold in type $C$ established by the author and Kato's pushforward map from the quantum $K$-ring of the full-flag manifold to that of the partial flag manifold. Then the Nakayama-type argument established by Gu et al., together with the classical Whitney presentation for the torus-equivariant $K$-ring of the Lagrangian Grassmannian, gives a proof of such a presentation.", "number": 1, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#1</span>
+                <a href="https://arxiv.org/abs/2611.21654" target="_blank">Quantum $K$-theoretic Whitney relation for Lagrangian Grassmannian</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Takafumi Kouno</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Nov 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2611.21654" target="_blank">https://arxiv.org/abs/2611.21654</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We give a quantum $K$-theoretic analogue of the Whitney relation for the torus-equivariant $K$-ring of the Lagrangian Grassmannian. As a consequence, we give a presentation of the torus-equivariant quantum $K$-ring of the Lagrangian Grassmannian. The strategy for obtaining such relations is to use the quantum $K$-theoretic Whitney relation for the full-flag manifold in type $C$ established by the author and Kato's pushforward map from the quantum $K$-ring of the full-flag manifold to that of the partial flag manifold. Then the Nakayama-type argument established by Gu et al., together with the classical Whitney presentation for the torus-equivariant $K$-ring of the Lagrangian Grassmannian, gives a proof of such a presentation.
+            </div>
+        </div>
+        <div class="paper" id="paper-2">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-2" data-paper-data='{"title": "Remarks on Fourier--Mukai invariances", "author": "El\\'{i}as Guisado Villalgordo, Pat Lank", "published": "Wed, 18 Nov 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2611.21703", "summary": "arXiv:2611.21703v1 Announce Type: new \nAbstract: This note proves that smoothness and Gorensteinness are Fourier--Mukai invariants for proper flat families of Noetherian algebraic spaces. Moreover, a kernel realizing such a partnership is perfect if, and only if, the families are smooth.", "number": 2, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#2</span>
+                <a href="https://arxiv.org/abs/2611.21703" target="_blank">Remarks on Fourier--Mukai invariances</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> El\'{i}as Guisado Villalgordo, Pat Lank</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Nov 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2611.21703" target="_blank">https://arxiv.org/abs/2611.21703</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                This note proves that smoothness and Gorensteinness are Fourier--Mukai invariants for proper flat families of Noetherian algebraic spaces. Moreover, a kernel realizing such a partnership is perfect if, and only if, the families are smooth.
+            </div>
+        </div>
+        <div class="paper" id="paper-3">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-3" data-paper-data='{"title": "Topology of some smooth real Fano threefolds arising from blow-ups along rational curves", "author": "Guillaume Kineider", "published": "Wed, 18 Nov 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2611.21866", "summary": "arXiv:2611.21866v1 Announce Type: new \nAbstract: We describe the topological blow-up of a fibre of a Seifert fibration. We then apply this result to determine the diffeomorphism types of the real loci of smooth real Fano threefolds obtained by blowing up either $\\mathbb{P}^3_{\\mathbb{R}}$ or a smooth real quadric threefold along a smooth real rational curve. As an application, we also determine the topology of the real loci of the two real forms of the quintic del Pezzo threefold $V_5$, completing the topological classification of smooth real rational del Pezzo threefolds.", "number": 3, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#3</span>
+                <a href="https://arxiv.org/abs/2611.21866" target="_blank">Topology of some smooth real Fano threefolds arising from blow-ups along rational curves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Guillaume Kineider</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Nov 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2611.21866" target="_blank">https://arxiv.org/abs/2611.21866</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We describe the topological blow-up of a fibre of a Seifert fibration. We then apply this result to determine the diffeomorphism types of the real loci of smooth real Fano threefolds obtained by blowing up either $\mathbb{P}^3_{\mathbb{R}}$ or a smooth real quadric threefold along a smooth real rational curve. As an application, we also determine the topology of the real loci of the two real forms of the quintic del Pezzo threefold $V_5$, completing the topological classification of smooth real rational del Pezzo threefolds.
+            </div>
+        </div>
+        <div class="paper" id="paper-4">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-4" data-paper-data='{"title": "The Nygaard graded piece, the Frobenius--Witt cotangent complex and regularity criteria", "author": "Ryo Ishizuka, Kanau Shimada", "published": "Wed, 18 Nov 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2611.22214", "summary": "arXiv:2611.22214v1 Announce Type: new \nAbstract: For a $p$-torsionfree $p$-quasisyntomic ring, we construct a fiber sequence relating the $p$-th Nygaard graded piece of absolute prismatic cohomology to the Frobenius--Witt cotangent complex. The latter is an arithmetic analogue of the cotangent complex in which the differential of $p$ need not vanish. We also clarify the relationship between the regularity criterion proved by Mao using the Frobenius--Witt cotangent complex and the regularity criterion established by Bhatt and Mathew using the Nygaard graded piece. This relationship was anticipated by Bhatt and Mathew.", "number": 4, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#4</span>
+                <a href="https://arxiv.org/abs/2611.22214" target="_blank">The Nygaard graded piece, the Frobenius--Witt cotangent complex and regularity criteria</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ryo Ishizuka, Kanau Shimada</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Nov 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2611.22214" target="_blank">https://arxiv.org/abs/2611.22214</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                For a $p$-torsionfree $p$-quasisyntomic ring, we construct a fiber sequence relating the $p$-th Nygaard graded piece of absolute prismatic cohomology to the Frobenius--Witt cotangent complex. The latter is an arithmetic analogue of the cotangent complex in which the differential of $p$ need not vanish. We also clarify the relationship between the regularity criterion proved by Mao using the Frobenius--Witt cotangent complex and the regularity criterion established by Bhatt and Mathew using the Nygaard graded piece. This relationship was anticipated by Bhatt and Mathew.
+            </div>
+        </div>
+        <div class="paper" id="paper-5">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-5" data-paper-data='{"title": "The injectivity of the Kudla--Millson lift on unitary Shimura varieties", "author": "Hanyu Yao", "published": "Wed, 18 Nov 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2611.21692", "summary": "arXiv:2611.21692v1 Announce Type: cross \nAbstract: We prove the injectivity of the Kudla--Millson lift on unitary Shimura varieties over imaginary quadratic fields under some lattice hypotheses. We express integrals of the lift over special cycles as special values of Dirichlet series and deduce injectivity by separating the Fourier coefficients of the cusp forms. We also establish a converse theorem for Borcherds products on $\\mathrm{U}(n,1)$.", "number": 5, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#5</span>
+                <a href="https://arxiv.org/abs/2611.21692" target="_blank">The injectivity of the Kudla--Millson lift on unitary Shimura varieties</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Hanyu Yao</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Nov 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2611.21692" target="_blank">https://arxiv.org/abs/2611.21692</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove the injectivity of the Kudla--Millson lift on unitary Shimura varieties over imaginary quadratic fields under some lattice hypotheses. We express integrals of the lift over special cycles as special values of Dirichlet series and deduce injectivity by separating the Fourier coefficients of the cusp forms. We also establish a converse theorem for Borcherds products on $\mathrm{U}(n,1)$.
+            </div>
+        </div>
+        <div class="paper" id="paper-6">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-6" data-paper-data='{"title": "Bounded functions on the character variety for quadratic extensions of $\\mathbb{Q}_p$", "author": "Laurent Berger, Johannes Sprang, Rustam Steingart", "published": "Wed, 18 Nov 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2611.21796", "summary": "arXiv:2611.21796v1 Announce Type: cross \nAbstract: For any finite extension $L$ of $\\mathbb{Q}_p$, Schneider--Teitelbaum defined and studied the character variety in $p$-adic Fourier theory. It is a rigid analytic curve over $L$ that parameterizes the set of locally $L$-analytic characters of $o_L$. It is conjectured that all bounded functions on the character variety of Schneider--Teitelbaum come from $p$-adic measures. We prove this conjecture for all quadratic extensions $L/\\mathbb{Q}_p$.", "number": 6, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#6</span>
+                <a href="https://arxiv.org/abs/2611.21796" target="_blank">Bounded functions on the character variety for quadratic extensions of $\mathbb{Q}_p$</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Laurent Berger, Johannes Sprang, Rustam Steingart</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Nov 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2611.21796" target="_blank">https://arxiv.org/abs/2611.21796</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                For any finite extension $L$ of $\mathbb{Q}_p$, Schneider--Teitelbaum defined and studied the character variety in $p$-adic Fourier theory. It is a rigid analytic curve over $L$ that parameterizes the set of locally $L$-analytic characters of $o_L$. It is conjectured that all bounded functions on the character variety of Schneider--Teitelbaum come from $p$-adic measures. We prove this conjecture for all quadratic extensions $L/\mathbb{Q}_p$.
+            </div>
+        </div>
+        <div class="paper" id="paper-7">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-7" data-paper-data='{"title": "A local-local principle for quadratic forms over semiglobal fields", "author": "Karim Johannes Becher, David Grimm, Parul Gupta", "published": "Wed, 18 Nov 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2611.21870", "summary": "arXiv:2611.21870v1 Announce Type: cross \nAbstract: Given a quadratic form over a semiglobal field, the set of discrete valuations on the field for which the form is anisotropic over the completion is either empty, or it contains a valuation extending that of the base field with a transcendental residue field extension. In dimension at least $3$, this gives a refinement of the local-global principle for isotropy. In dimension $2$, the result yields a description of the set of elements that are locally squares everywhere.", "number": 7, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#7</span>
+                <a href="https://arxiv.org/abs/2611.21870" target="_blank">A local-local principle for quadratic forms over semiglobal fields</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Karim Johannes Becher, David Grimm, Parul Gupta</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Nov 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2611.21870" target="_blank">https://arxiv.org/abs/2611.21870</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Given a quadratic form over a semiglobal field, the set of discrete valuations on the field for which the form is anisotropic over the completion is either empty, or it contains a valuation extending that of the base field with a transcendental residue field extension. In dimension at least $3$, this gives a refinement of the local-global principle for isotropy. In dimension $2$, the result yields a description of the set of elements that are locally squares everywhere.
+            </div>
+        </div>
+        <div class="paper" id="paper-8">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-8" data-paper-data='{"title": "Hyperk\\\"ahler Periods in Families of Parabolic Higgs Bundle Moduli Spaces", "author": "Panagiotis Dimakis, Laura Fredrickson, Arya Yae", "published": "Wed, 18 Nov 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2611.21990", "summary": "arXiv:2611.21990v1 Announce Type: cross \nAbstract: We consider the period map on families of parabolic Higgs bundle moduli spaces with varying parabolic weights $\\alpha$ and Higgs field eigenvalues $\\sigma$. We assemble the moduli spaces into a smooth family $\\pi:\\mathscr M\\to\\Lambda$ where $\\Lambda$ encodes $(\\alpha,\\sigma)$, and define parallel transport for homology along paths in an open dense subset $\\Lambda_0\\subset\\Lambda$. By generalizing a classical theorem of Duistermaat and Heckman, we prove that the period map is affine linear in $(\\alpha,\\sigma)$, with slope governed by the curvature class of a principal torus bundle over $\\mathscr M$. For the four-dimensional moduli spaces of types $E_6,E_7,E_8$, we compute these classes to get explicit formulas for the period maps.", "number": 8, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#8</span>
+                <a href="https://arxiv.org/abs/2611.21990" target="_blank">Hyperk\"ahler Periods in Families of Parabolic Higgs Bundle Moduli Spaces</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Panagiotis Dimakis, Laura Fredrickson, Arya Yae</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Nov 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2611.21990" target="_blank">https://arxiv.org/abs/2611.21990</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We consider the period map on families of parabolic Higgs bundle moduli spaces with varying parabolic weights $\alpha$ and Higgs field eigenvalues $\sigma$. We assemble the moduli spaces into a smooth family $\pi:\mathscr M\to\Lambda$ where $\Lambda$ encodes $(\alpha,\sigma)$, and define parallel transport for homology along paths in an open dense subset $\Lambda_0\subset\Lambda$. By generalizing a classical theorem of Duistermaat and Heckman, we prove that the period map is affine linear in $(\alpha,\sigma)$, with slope governed by the curvature class of a principal torus bundle over $\mathscr M$. For the four-dimensional moduli spaces of types $E_6,E_7,E_8$, we compute these classes to get explicit formulas for the period maps.
+            </div>
+        </div>
+        <div class="paper" id="paper-9">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-9" data-paper-data='{"title": "Picard Groups of Spectral Varieties and Moduli of Higgs Sheaves", "author": "Xiaoyu Su, Bin Wang", "published": "Wed, 18 Nov 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2409.10296", "summary": "arXiv:2409.10296v2 Announce Type: replace \nAbstract: We study moduli spaces of Higgs sheaves valued in line bundles and the associated Hitchin maps on surfaces. We first work out Picard groups of generic (very general) spectral varieties which holds for dimension of at least 2, i.e., a Noether--Lefschetz type theorem for spectral varieties. We then apply these Picard-group calculations to obtain a necessary and sufficient condition for the non-emptiness of generic Hitchin fibers in the range where the spectral Noether--Lefschetz theorem applies. Then we move on to detect the geometry of the moduli spaces of Higgs sheaves as the second Chern class varies.", "number": 9, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#9</span>
+                <a href="https://arxiv.org/abs/2409.10296" target="_blank">Picard Groups of Spectral Varieties and Moduli of Higgs Sheaves</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Xiaoyu Su, Bin Wang</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Nov 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2409.10296" target="_blank">https://arxiv.org/abs/2409.10296</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study moduli spaces of Higgs sheaves valued in line bundles and the associated Hitchin maps on surfaces. We first work out Picard groups of generic (very general) spectral varieties which holds for dimension of at least 2, i.e., a Noether--Lefschetz type theorem for spectral varieties. We then apply these Picard-group calculations to obtain a necessary and sufficient condition for the non-emptiness of generic Hitchin fibers in the range where the spectral Noether--Lefschetz theorem applies. Then we move on to detect the geometry of the moduli spaces of Higgs sheaves as the second Chern class varies.
+            </div>
+        </div>
+        <div class="paper" id="paper-10">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-10" data-paper-data='{"title": "Secant sheaves on abelian n-folds with real multiplication and Weil classes on abelian 2n-folds with complex multiplication", "author": "Eyal Markman", "published": "Wed, 18 Nov 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2509.23079", "summary": "arXiv:2509.23079v2 Announce Type: replace \nAbstract: Let K be a CM-field, i.e., a totally complex quadratic extension of a totally real field F. Let X be a g-dimensional abelian variety admitting an algebra embedding of F into the rational endomorphisms End_Q(X) of X. Let A be the product of X and Pic^0(X). We construct an embedding e of K into End_Q(A) associated to a choice of an F-bilinear polarization h on X and a purely imaginary element q in K. We get the [K:Q]-dimensional subspace HW(A,e) of Hodge Weil classes in the d-th cohomology of A, where d:=4g/[K:Q].\n  Let V be the first cohomology of A. The even cohomology S^+ of X is the half-spin representation of the group Spin(V) and so the projectivization P(S^+) contains the even spinorial variety. The latter is a component of the Grassmannian of maximal isotropic subspaces of V. We associate to (h,q) a rational 2^[F:Q]-dimensional subspace B of S^+ such that P(B) is secant to the spinorial variety. Associated to two coherent sheaves G and G' on X with Chern characters in B we obtain the object E in D^b(A) by applying Orlov's equivalence between D^b(XxX) and D^b(A) to the outer tensor product of G and G'. The flat deformations of a normalized Chern class k(E) of E remain of Hodge type under every deformation of (A,e) as an abelian variety (A',e') of Weil type.\n  We provide a criterion for the tensor product of ch(G) and ch(G') to belong to the open subset in the tensor square of B for which the algebraicity of the flat deformation of k(E) implies the algebraicity of all classes in HW(A',e'). The algebraicity would thus follow if E is semiregular in the appropriate sense. Examples of such secant sheaves G and G' are provided for X the Jacobian with real multiplication by a real quadratic number field F of a genus 4 curve. The search for semiregular such E is left for future work.", "number": 10, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#10</span>
+                <a href="https://arxiv.org/abs/2509.23079" target="_blank">Secant sheaves on abelian n-folds with real multiplication and Weil classes on abelian 2n-folds with complex multiplication</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Eyal Markman</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Nov 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2509.23079" target="_blank">https://arxiv.org/abs/2509.23079</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let K be a CM-field, i.e., a totally complex quadratic extension of a totally real field F. Let X be a g-dimensional abelian variety admitting an algebra embedding of F into the rational endomorphisms End_Q(X) of X. Let A be the product of X and Pic^0(X). We construct an embedding e of K into End_Q(A) associated to a choice of an F-bilinear polarization h on X and a purely imaginary element q in K. We get the [K:Q]-dimensional subspace HW(A,e) of Hodge Weil classes in the d-th cohomology of A, where d:=4g/[K:Q].
+  Let V be the first cohomology of A. The even cohomology S^+ of X is the half-spin representation of the group Spin(V) and so the projectivization P(S^+) contains the even spinorial variety. The latter is a component of the Grassmannian of maximal isotropic subspaces of V. We associate to (h,q) a rational 2^[F:Q]-dimensional subspace B of S^+ such that P(B) is secant to the spinorial variety. Associated to two coherent sheaves G and G' on X with Chern characters in B we obtain the object E in D^b(A) by applying Orlov's equivalence between D^b(XxX) and D^b(A) to the outer tensor product of G and G'. The flat deformations of a normalized Chern class k(E) of E remain of Hodge type under every deformation of (A,e) as an abelian variety (A',e') of Weil type.
+  We provide a criterion for the tensor product of ch(G) and ch(G') to belong to the open subset in the tensor square of B for which the algebraicity of the flat deformation of k(E) implies the algebraicity of all classes in HW(A',e'). The algebraicity would thus follow if E is semiregular in the appropriate sense. Examples of such secant sheaves G and G' are provided for X the Jacobian with real multiplication by a real quadratic number field F of a genus 4 curve. The search for semiregular such E is left for future work.
+            </div>
+        </div>
+        <div class="paper" id="paper-11">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-11" data-paper-data='{"title": "On the decomposition of the diagonal for n-fold hypersurfaces via cubic n-1-folds", "author": "Elia Fiammengo, Morten L\\\"uders", "published": "Wed, 18 Nov 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2510.07111", "summary": "arXiv:2510.07111v3 Announce Type: replace \nAbstract: We study the question of the existence of a decomposition of the diagonal for very general degree $d\\geq 4$ and $(2,d\\geq 3)$-complete intersection $n$-folds. Using cycle-theoretic techniques of Lange, Pavic and Schreieder we reduce the question to the existence of such a decomposition for $n-1$-dimensional cubic hypersurfaces. This extends results of Nicaise and Ottem from stable rationality to the existence of a decomposition of the diagonal. A key ingredient is the essential dimension of cubic hypersurfaces due to Voisin. As an application, we use a recent result of Engel, de Gaay Fortman and Schreieder on the decomposition of the diagonal for cubic threefolds to give a new proof of the retract irrationality of a very general complex quartic $4$-fold, originally due to Totaro, and of a very general complex $(2,3)$-complete intersection $4$-fold, originally due to Skauli. As another application we show that a very general quintic fourfold containing a three-dimensional linear subspace with multiplicity $2$, which is unirational due to results of Massarenti, does not admit a decomposition of the diagonal and is therefore not retract rational.", "number": 11, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#11</span>
+                <a href="https://arxiv.org/abs/2510.07111" target="_blank">On the decomposition of the diagonal for n-fold hypersurfaces via cubic n-1-folds</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Elia Fiammengo, Morten L\"uders</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Nov 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.07111" target="_blank">https://arxiv.org/abs/2510.07111</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We study the question of the existence of a decomposition of the diagonal for very general degree $d\geq 4$ and $(2,d\geq 3)$-complete intersection $n$-folds. Using cycle-theoretic techniques of Lange, Pavic and Schreieder we reduce the question to the existence of such a decomposition for $n-1$-dimensional cubic hypersurfaces. This extends results of Nicaise and Ottem from stable rationality to the existence of a decomposition of the diagonal. A key ingredient is the essential dimension of cubic hypersurfaces due to Voisin. As an application, we use a recent result of Engel, de Gaay Fortman and Schreieder on the decomposition of the diagonal for cubic threefolds to give a new proof of the retract irrationality of a very general complex quartic $4$-fold, originally due to Totaro, and of a very general complex $(2,3)$-complete intersection $4$-fold, originally due to Skauli. As another application we show that a very general quintic fourfold containing a three-dimensional linear subspace with multiplicity $2$, which is unirational due to results of Massarenti, does not admit a decomposition of the diagonal and is therefore not retract rational.
+            </div>
+        </div>
+        <div class="paper" id="paper-12">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-12" data-paper-data='{"title": "Motivic local density of isolated surface singularities", "author": "Sidonie Ratajczak", "published": "Wed, 18 Nov 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2603.26391", "summary": "arXiv:2603.26391v3 Announce Type: replace \nAbstract: The goal of this paper is to compute the motivic local density of an isolated algebraic surface singularity, in order to explain its link with algebraic multiplicity. In this context, we can use an additional data: the inner rate related to the bilipschitz geometry of the singularity, as studied by A. Belotto da Silva, L. Fantini and A. Pichon.", "number": 12, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#12</span>
+                <a href="https://arxiv.org/abs/2603.26391" target="_blank">Motivic local density of isolated surface singularities</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Sidonie Ratajczak</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Nov 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2603.26391" target="_blank">https://arxiv.org/abs/2603.26391</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The goal of this paper is to compute the motivic local density of an isolated algebraic surface singularity, in order to explain its link with algebraic multiplicity. In this context, we can use an additional data: the inner rate related to the bilipschitz geometry of the singularity, as studied by A. Belotto da Silva, L. Fantini and A. Pichon.
+            </div>
+        </div>
+        <div class="paper" id="paper-13">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-13" data-paper-data='{"title": "A conjecture on the action of Hecke operators", "author": "David Kazhdan", "published": "Wed, 18 Nov 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2606.23240", "summary": "arXiv:2606.23240v3 Announce Type: replace \nAbstract: Let $F$ be a non-Archimedean local field of characteristic different from $2$ and $E/F$ be a quadratic \\'etale algebra.\n  For a central division $F$-algebras $L$ of a fixed degree $n$ we identify the double quotients of the homogeneous spaces $L_E^\\times/L^\\times$ with a topological space $\\Xi _E$ which does not depend on a choice of $L$ , define a convolution products $\\ast _L$ on the space ${\\mathcal M} _E$ compactly supported measures on $\\Xi _E$ and conjecture that the product $\\ast _L$ on $\\Xi _E$ does not depend on a choice of $L$.", "number": 13, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#13</span>
+                <a href="https://arxiv.org/abs/2606.23240" target="_blank">A conjecture on the action of Hecke operators</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> David Kazhdan</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Nov 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2606.23240" target="_blank">https://arxiv.org/abs/2606.23240</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $F$ be a non-Archimedean local field of characteristic different from $2$ and $E/F$ be a quadratic \'etale algebra.
+  For a central division $F$-algebras $L$ of a fixed degree $n$ we identify the double quotients of the homogeneous spaces $L_E^\times/L^\times$ with a topological space $\Xi _E$ which does not depend on a choice of $L$ , define a convolution products $\ast _L$ on the space ${\mathcal M} _E$ compactly supported measures on $\Xi _E$ and conjecture that the product $\ast _L$ on $\Xi _E$ does not depend on a choice of $L$.
+            </div>
+        </div>
+        <div class="paper" id="paper-14">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-14" data-paper-data='{"title": "Tropical Matsusaka and Matsusaka--Ran Criteria", "author": "Zhijie Ji", "published": "Wed, 18 Nov 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2608.30148", "summary": "arXiv:2608.30148v2 Announce Type: replace \nAbstract: The tropical Schottky problem asks which principally polarized tropical abelian varieties are isomorphic to tropical Jacobian varieties equipped with their canonical principal polarizations. We prove the tropical Matsusaka criterion and the tropical Matsusaka--Ran criterion, which are the main results of this paper, and show that their hypotheses are equivalent. Together with the tropical Poincar\\'e formula proved by Gross--Shokrieh, these results give a geometric solution to the tropical Schottky problem. In particular, we give an affirmative answer to a question posed by Brannetti--Melo--Viviani.\n  Several tools are developed for the proofs of the two criteria. In particular, we establish Hodge-type inequalities for ample tropical Cartier divisors on tropical abelian varieties and prove a splitting criterion for principally polarized tropical abelian varieties.", "number": 14, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#14</span>
+                <a href="https://arxiv.org/abs/2608.30148" target="_blank">Tropical Matsusaka and Matsusaka--Ran Criteria</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Zhijie Ji</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Nov 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2608.30148" target="_blank">https://arxiv.org/abs/2608.30148</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The tropical Schottky problem asks which principally polarized tropical abelian varieties are isomorphic to tropical Jacobian varieties equipped with their canonical principal polarizations. We prove the tropical Matsusaka criterion and the tropical Matsusaka--Ran criterion, which are the main results of this paper, and show that their hypotheses are equivalent. Together with the tropical Poincar\'e formula proved by Gross--Shokrieh, these results give a geometric solution to the tropical Schottky problem. In particular, we give an affirmative answer to a question posed by Brannetti--Melo--Viviani.
+  Several tools are developed for the proofs of the two criteria. In particular, we establish Hodge-type inequalities for ample tropical Cartier divisors on tropical abelian varieties and prove a splitting criterion for principally polarized tropical abelian varieties.
+            </div>
+        </div>
+        <div class="paper" id="paper-15">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-15" data-paper-data='{"title": "The Constant in Thomae-Type Formulas for Eight Points on the Complex Projective Line", "author": "Ryunosuke Nakano", "published": "Wed, 18 Nov 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2609.06439", "summary": "arXiv:2609.06439v2 Announce Type: replace \nAbstract: We consider the family of cyclic fourfold covers $C(x)$ of the complex projective line branched at eight points $x=(x_1,\\ldots,x_8)$. It is known that the period map identifies the configuration space $X(2,8)$ of the branch points with a Zariski open subset of a quotient of the five-dimensional complex ball, and that the inverse of the period map is expressed projectively by $105$ automorphic forms $f_J$, which are proportional to the signed branch-point polynomials $\\hat x_J$ with a common scalar factor. We normalize an element $\\omega$ of the one-dimensional eigenspace of the deck transformation group acting on the holomorphic differentials on $C(x)$. For the period $\\eta$ of $\\omega$, we determine the common scalar factor: it is the product of a constant expressed in terms of the gamma function and the square of a quadratic form in $\\eta$.", "number": 15, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#15</span>
+                <a href="https://arxiv.org/abs/2609.06439" target="_blank">The Constant in Thomae-Type Formulas for Eight Points on the Complex Projective Line</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ryunosuke Nakano</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Nov 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2609.06439" target="_blank">https://arxiv.org/abs/2609.06439</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We consider the family of cyclic fourfold covers $C(x)$ of the complex projective line branched at eight points $x=(x_1,\ldots,x_8)$. It is known that the period map identifies the configuration space $X(2,8)$ of the branch points with a Zariski open subset of a quotient of the five-dimensional complex ball, and that the inverse of the period map is expressed projectively by $105$ automorphic forms $f_J$, which are proportional to the signed branch-point polynomials $\hat x_J$ with a common scalar factor. We normalize an element $\omega$ of the one-dimensional eigenspace of the deck transformation group acting on the holomorphic differentials on $C(x)$. For the period $\eta$ of $\omega$, we determine the common scalar factor: it is the product of a constant expressed in terms of the gamma function and the square of a quadratic form in $\eta$.
+            </div>
+        </div>
+        <div class="paper" id="paper-16">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-16" data-paper-data='{"title": "The Legendre potential and the gradient case of the differential Galois criterion for the Jacobian Conjecture", "author": "El\\.zbieta Adamus, Zbigniew Hajto", "published": "Wed, 18 Nov 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2610.36736", "summary": "arXiv:2610.36736v2 Announce Type: replace \nAbstract: Let $h\\in\\C[X_1,\\dots,X_n]$ have constant nonzero Hessian determinant, let $h^{*}$ be its formal Legendre transform and $g=\\vv{X,\\grad h}-h$. The Nambu derivations of $\\grad h$ satisfy $\\delta_i(g)=X_i$ and $\\delta^\\alpha(g)=(\\partial^\\alpha h^{*})\\circ\\grad h$. Consequently, in the gradient case the differential Galois criterion of \\cite{ACH19}, consisting of $n$ membership conditions, reduces to a single membership condition. Equivalently, $\\grad h$ is a polynomial automorphism if and only if $g\\in\\C[\\partial_1h,\\dots,\\partial_nh]$. Moreover, $\\grad h$ is a polynomial automorphism if and only if $\\delta^\\alpha(g)=0$ for $|\\alpha|=(\\deg h-1)^{n-1}+2$, and then the coefficients $\\delta^\\alpha(g)(x_0)/\\alpha!$ of $h^{*}$ at $\\grad h(x_0)$ determine the inverse. If the Hessian determinant of $h$ is merely a nonzero polynomial, then $g$ is still a primitive element of $\\C(X)$ over $\\C(\\partial_1h,\\dots,\\partial_nh)$. For the Nambu-tower criterion, doubling a Keller map yields no independent conditions. After an affine change of coordinates putting $\\grad h$ in the normal form $X+H$, the formal Legendre transform is the sum of the formal Pascal difference series of $g$, and the termination of this series implies polynomial invertibility. In at most three variables the normal form of every gradient Keller map has strongly nilpotent Jacobian part and is therefore Pascal finite, by a theorem of de Bondt, and an explicit gradient automorphism in four variables has a normal form which is not Pascal finite. The five-variable counterexample of Meng and Yang shows that the properties used here do not imply the Hessian conjecture. The results do not settle the open cases $\\JC_2$ and $\\HC_4$.", "number": 16, "labels": [{"name": "privacy", "color": "#ff69b4"}]}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#16</span>
+                <a href="https://arxiv.org/abs/2610.36736" target="_blank">The Legendre potential and the gradient case of the differential Galois criterion for the Jacobian Conjecture</a>
+            </div>
+            <div class="paper-labels"><span class="label-badge" style="background-color: #ff69b4;">privacy</span></div>
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> El\.zbieta Adamus, Zbigniew Hajto</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Nov 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2610.36736" target="_blank">https://arxiv.org/abs/2610.36736</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                Let $h\in\C[X_1,\dots,X_n]$ have constant nonzero Hessian determinant, let $h^{*}$ be its formal Legendre transform and $g=\vv{X,\grad h}-h$. The Nambu derivations of $\grad h$ satisfy $\delta_i(g)=X_i$ and $\delta^\alpha(g)=(\partial^\alpha h^{*})\circ\grad h$. Consequently, in the gradient case the differential Galois criterion of \cite{ACH19}, consisting of $n$ membership conditions, reduces to a single membership condition. Equivalently, $\grad h$ is a polynomial automorphism if and only if $g\in\C[\partial_1h,\dots,\partial_nh]$. Moreover, $\grad h$ is a polynomial automorphism if and only if $\delta^\alpha(g)=0$ for $|\alpha|=(\deg h-1)^{n-1}+2$, and then the coefficients $\delta^\alpha(g)(x_0)/\alpha!$ of $h^{*}$ at $\grad h(x_0)$ determine the inverse. If the Hessian determinant of $h$ is merely a nonzero polynomial, then $g$ is still a primitive element of $\C(X)$ over $\C(\partial_1h,\dots,\partial_nh)$. For the Nambu-tower criterion, doubling a Keller map yields no independent conditions. After an affine change of coordinates putting $\grad h$ in the normal form $X+H$, the formal Legendre transform is the sum of the formal Pascal difference series of $g$, and the termination of this series implies polynomial invertibility. In at most three variables the normal form of every gradient Keller map has strongly nilpotent Jacobian part and is therefore Pascal finite, by a theorem of de Bondt, and an explicit gradient automorphism in four variables has a normal form which is not Pascal finite. The five-variable counterexample of Meng and Yang shows that the properties used here do not imply the Hessian conjecture. The results do not settle the open cases $\JC_2$ and $\HC_4$.
+            </div>
+        </div>
+        <div class="paper" id="paper-17">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-17" data-paper-data='{"title": "An application of \"Selmer group Chabauty\" to arithmetic dynamics", "author": "Michael Stoll", "published": "Wed, 18 Nov 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/1912.05893", "summary": "arXiv:1912.05893v3 Announce Type: replace-cross \nAbstract: We describe how one can use the \"Selmer group Chabauty\" method developed by the author to show that certain hyperelliptic curves of the form $$ C \\colon y^2 = x^{2g+1} + h(x)^2 \\,, $$ with $h \\in \\mathbb{Z}[x]$ such that $\\operatorname{deg} h \\le g$ and $h(0)$ is odd, have only the \"obvious\" rational points $\\infty$ (the unique point at infinity on the smooth projective model of the curve) and $(0, \\pm h(0))$.\n  Let $c \\in \\mathbb{Q}$ and write $f_c(x) = x^2 + c$. We denote the iterates of $f_c$ by $f_c^{\\circ n}$; i.e., we set $f_c^{\\circ 0}(x) = x$ and $f_c^{\\circ(n+1)}(x) = f_c(f_c^{\\circ n}(x))$. As an application of the method, we prove that if $f_c^{\\circ 2}$ is irreducible, then $f_c^{\\circ 6}$ is also irreducible. Assuming the Generalized Riemann Hypothesis (GRH), it also follows that $f_c^{\\circ 10}$ is irreducible.", "number": 17, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#17</span>
+                <a href="https://arxiv.org/abs/1912.05893" target="_blank">An application of "Selmer group Chabauty" to arithmetic dynamics</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Michael Stoll</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Nov 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/1912.05893" target="_blank">https://arxiv.org/abs/1912.05893</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We describe how one can use the "Selmer group Chabauty" method developed by the author to show that certain hyperelliptic curves of the form $$ C \colon y^2 = x^{2g+1} + h(x)^2 \,, $$ with $h \in \mathbb{Z}[x]$ such that $\operatorname{deg} h \le g$ and $h(0)$ is odd, have only the "obvious" rational points $\infty$ (the unique point at infinity on the smooth projective model of the curve) and $(0, \pm h(0))$.
+  Let $c \in \mathbb{Q}$ and write $f_c(x) = x^2 + c$. We denote the iterates of $f_c$ by $f_c^{\circ n}$; i.e., we set $f_c^{\circ 0}(x) = x$ and $f_c^{\circ(n+1)}(x) = f_c(f_c^{\circ n}(x))$. As an application of the method, we prove that if $f_c^{\circ 2}$ is irreducible, then $f_c^{\circ 6}$ is also irreducible. Assuming the Generalized Riemann Hypothesis (GRH), it also follows that $f_c^{\circ 10}$ is irreducible.
+            </div>
+        </div>
+        <div class="paper" id="paper-18">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-18" data-paper-data='{"title": "Greatest Common Divisors and an Unlikely Intersection Type Conjecture", "author": "Keping Huang, Aaron Levin", "published": "Wed, 18 Nov 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2207.14432", "summary": "arXiv:2207.14432v2 Announce Type: replace-cross \nAbstract: We prove inequalities involving greatest common divisors of functions at integral points with respect to numerically parallel divisors, generalizing a result of Wang and Yasufuku (after work of Bugeaud-Corvaja-Zannier, Corvaja-Zannier, and the second author). In addition to proving results in a broader context than previously considered, we also study the exceptional set in this setting, for both the counting function and the proximity function. Based on our study of exceptional sets, we propose new conjectures connected to the topic of unlikely intersections. We prove special cases of the conjectures on abelian varieties and the algebraic torus, including a completely explicit result in the former case, and provide a link between the conjectures and exceptional sets for inequalities involving greatest common divisors.", "number": 18, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#18</span>
+                <a href="https://arxiv.org/abs/2207.14432" target="_blank">Greatest Common Divisors and an Unlikely Intersection Type Conjecture</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Keping Huang, Aaron Levin</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Nov 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2207.14432" target="_blank">https://arxiv.org/abs/2207.14432</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove inequalities involving greatest common divisors of functions at integral points with respect to numerically parallel divisors, generalizing a result of Wang and Yasufuku (after work of Bugeaud-Corvaja-Zannier, Corvaja-Zannier, and the second author). In addition to proving results in a broader context than previously considered, we also study the exceptional set in this setting, for both the counting function and the proximity function. Based on our study of exceptional sets, we propose new conjectures connected to the topic of unlikely intersections. We prove special cases of the conjectures on abelian varieties and the algebraic torus, including a completely explicit result in the former case, and provide a link between the conjectures and exceptional sets for inequalities involving greatest common divisors.
+            </div>
+        </div>
+        <div class="paper" id="paper-19">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-19" data-paper-data='{"title": "Cohomological VC-density: Bounds and Applications", "author": "Saugata Basu, Deepam Patel", "published": "Wed, 18 Nov 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2411.09670", "summary": "arXiv:2411.09670v3 Announce Type: replace-cross \nAbstract: The concept of Vapnik-Chervonenkis (VC) density is pivotal across various mathematical fields, including discrete geometry, probability theory and model theory. In this paper, we introduce a topological generalization of VC-density. Let $Y$ be a topological space and $\\mathcal{X}$ a family of closed subspaces of $Y$. For each $p \\geq 0$, we define a number, $\\mathrm{vcd}^{p}_{\\mathcal{X}}$, which we refer to as the degree $p$ VC-density of the family $\\mathcal{X}$. The classical notion of VC-density within this topological framework can be recovered by setting $p=0$.\n  Our definition of degree $p$ VC-density extends to higher orders as well. For $p \\geq 0$, $q \\geq 1$, we define the degree $p$, order $q$ VC density $\\mathrm{vcd}^{p,q}_{\\mathcal{X}}$ of $\\mathcal{X}$, which recovers Shelah's notion of higher order VC-density for $q$-dependent families when $p=0$. Our definition introduces a completely new notion when $p &gt; 0$.\n  We examine the properties of $\\mathrm{vcd}_{\\mathcal{X}}^p$ (as well as $\\mathrm{vcd}^{p,q}_{\\mathcal{X}}$) when the families $\\mathcal{X}$ are definable in structures with some underlying topology (for instance, the Euclidean topology for o-minimal structures over $\\mathbb{R}$, the analytic topology over $\\mathbb{C}$, or the \\'{e}tale site for schemes over arbitrary algebraically closed fields). Our main result establishes that in any model of these theories\n  \\[ \\mathrm{vcd}_{\\mathcal{X}}^p \\leq (p+1) \\dim X, \\] and more generally for any $q \\geq 1$ \\[ \\mathrm{vcd}^{p,q}_{\\mathcal{X}} \\leq (p+q) \\dim X. \\] We give examples to show that our bounds are optimal. We also present combinatorial applications of our higher-degree VC-density bounds, deriving higher degree topological analogs of well-known results such as the existence of $\\varepsilon$-nets and the fractional Helly theorem.", "number": 19, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#19</span>
+                <a href="https://arxiv.org/abs/2411.09670" target="_blank">Cohomological VC-density: Bounds and Applications</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Saugata Basu, Deepam Patel</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Nov 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2411.09670" target="_blank">https://arxiv.org/abs/2411.09670</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The concept of Vapnik-Chervonenkis (VC) density is pivotal across various mathematical fields, including discrete geometry, probability theory and model theory. In this paper, we introduce a topological generalization of VC-density. Let $Y$ be a topological space and $\mathcal{X}$ a family of closed subspaces of $Y$. For each $p \geq 0$, we define a number, $\mathrm{vcd}^{p}_{\mathcal{X}}$, which we refer to as the degree $p$ VC-density of the family $\mathcal{X}$. The classical notion of VC-density within this topological framework can be recovered by setting $p=0$.
+  Our definition of degree $p$ VC-density extends to higher orders as well. For $p \geq 0$, $q \geq 1$, we define the degree $p$, order $q$ VC density $\mathrm{vcd}^{p,q}_{\mathcal{X}}$ of $\mathcal{X}$, which recovers Shelah's notion of higher order VC-density for $q$-dependent families when $p=0$. Our definition introduces a completely new notion when $p &gt; 0$.
+  We examine the properties of $\mathrm{vcd}_{\mathcal{X}}^p$ (as well as $\mathrm{vcd}^{p,q}_{\mathcal{X}}$) when the families $\mathcal{X}$ are definable in structures with some underlying topology (for instance, the Euclidean topology for o-minimal structures over $\mathbb{R}$, the analytic topology over $\mathbb{C}$, or the \'{e}tale site for schemes over arbitrary algebraically closed fields). Our main result establishes that in any model of these theories
+  \[ \mathrm{vcd}_{\mathcal{X}}^p \leq (p+1) \dim X, \] and more generally for any $q \geq 1$ \[ \mathrm{vcd}^{p,q}_{\mathcal{X}} \leq (p+q) \dim X. \] We give examples to show that our bounds are optimal. We also present combinatorial applications of our higher-degree VC-density bounds, deriving higher degree topological analogs of well-known results such as the existence of $\varepsilon$-nets and the fractional Helly theorem.
+            </div>
+        </div>
+        <div class="paper" id="paper-20">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-20" data-paper-data='{"title": "Non-commutative crepant resolutions of toric singularities with divisor class group of rank one", "author": "Ryu Tomonaga", "published": "Wed, 18 Nov 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2510.26252", "summary": "arXiv:2510.26252v4 Announce Type: replace-cross \nAbstract: We classify the basic reflexive modules giving toric non-commutative crepant resolutions (NCCRs) of Gorenstein toric singularities whose divisor class group has rank one. Their isomorphism classes are parametrized by nonempty proper upper sets in a partially ordered quotient of the class group. Each upper set determines a finite subset called its window, which specifies the divisorial summands. The number of summands in each such module equals the normalized volume of the associated lattice polytope, as conjectured by Van den Bergh. If two upper sets differ by one element, their modules are related by a finite sequence of Iyama--Wemyss mutations. Such sequences connect any two of the classified modules, so all toric NCCRs of a fixed singularity are derived equivalent.\n  We construct higher-dimensional analogues of dimer dual quivers when the associated $d$-dimensional lattice polytope is non-pyramidal. The same window determines a cut of a periodic quiver on the $d$-torus. The cut gives an explicit presentation of the endomorphism algebra by a quiver with relations. For $d=2$, the resulting quiver is dual to a dimer model, a bipartite tiling of the two-torus.", "number": 20, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#20</span>
+                <a href="https://arxiv.org/abs/2510.26252" target="_blank">Non-commutative crepant resolutions of toric singularities with divisor class group of rank one</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Ryu Tomonaga</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Nov 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2510.26252" target="_blank">https://arxiv.org/abs/2510.26252</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We classify the basic reflexive modules giving toric non-commutative crepant resolutions (NCCRs) of Gorenstein toric singularities whose divisor class group has rank one. Their isomorphism classes are parametrized by nonempty proper upper sets in a partially ordered quotient of the class group. Each upper set determines a finite subset called its window, which specifies the divisorial summands. The number of summands in each such module equals the normalized volume of the associated lattice polytope, as conjectured by Van den Bergh. If two upper sets differ by one element, their modules are related by a finite sequence of Iyama--Wemyss mutations. Such sequences connect any two of the classified modules, so all toric NCCRs of a fixed singularity are derived equivalent.
+  We construct higher-dimensional analogues of dimer dual quivers when the associated $d$-dimensional lattice polytope is non-pyramidal. The same window determines a cut of a periodic quiver on the $d$-torus. The cut gives an explicit presentation of the endomorphism algebra by a quiver with relations. For $d=2$, the resulting quiver is dual to a dimer model, a bipartite tiling of the two-torus.
+            </div>
+        </div>
+        <div class="paper" id="paper-21">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-21" data-paper-data='{"title": "Jordan types for pairs of commuting nilpotent matrices: A survey", "author": "Toma\\v{z} Ko\\v{s}ir", "published": "Wed, 18 Nov 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2606.02026", "summary": "arXiv:2606.02026v2 Announce Type: replace-cross \nAbstract: The aim of the paper is to survey results on Jordan types for pairs of nilpotent commuting matrices. We also review recent proof of the Box Conjecture on Jordan types that have equal dense orbit in the nilpotent commutator.", "number": 21, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#21</span>
+                <a href="https://arxiv.org/abs/2606.02026" target="_blank">Jordan types for pairs of commuting nilpotent matrices: A survey</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Toma\v{z} Ko\v{s}ir</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Nov 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2606.02026" target="_blank">https://arxiv.org/abs/2606.02026</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                The aim of the paper is to survey results on Jordan types for pairs of nilpotent commuting matrices. We also review recent proof of the Box Conjecture on Jordan types that have equal dense orbit in the nilpotent commutator.
+            </div>
+        </div>
+        <div class="paper" id="paper-22">
+            <input type="checkbox" class="paper-checkbox" data-paper-id="paper-22" data-paper-data='{"title": "Macdonald intersections and the $N!/k$ conjecture", "author": "Peter L. Guo, Mingyang Kang, Changjian Su, Rui Xiong", "published": "Wed, 18 Nov 2026 00:00:00 -0500", "link": "https://arxiv.org/abs/2611.09638", "summary": "arXiv:2611.09638v2 Announce Type: replace-cross \nAbstract: We prove the Frobenius characteristic formula for the intersection of Garsia--Haiman modules predicted in the Science Fiction of Bergeron and Garsia. As a consequence, we resolve the $N!/k$ conjecture. The proof uses the geometry of the Hilbert scheme of points in the plane developed by Haiman.", "number": 22, "labels": []}' onchange="updateSelectedCount(); syncTitleCheckbox(this)" style="display: none;">
+            <div class="paper-title">
+                <span style="color: #7f8c8d; font-size: 0.9em; margin-right: 10px;">#22</span>
+                <a href="https://arxiv.org/abs/2611.09638" target="_blank">Macdonald intersections and the $N!/k$ conjecture</a>
+            </div>
+            
+            <div class="paper-meta">
+                <div class="paper-author"><strong>著者:</strong> Peter L. Guo, Mingyang Kang, Changjian Su, Rui Xiong</div>
+                <div class="paper-date"><strong>公開日:</strong> Wed, 18 Nov 2026 00:00:00 -0500</div>
+                <div class="paper-link"><strong>リンク:</strong> <a href="https://arxiv.org/abs/2611.09638" target="_blank">https://arxiv.org/abs/2611.09638</a></div>
+            </div>
+            <div class="paper-summary">
+                <strong>要約:</strong><br>
+                We prove the Frobenius characteristic formula for the intersection of Garsia--Haiman modules predicted in the Science Fiction of Bergeron and Garsia. As a consequence, we resolve the $N!/k$ conjecture. The proof uses the geometry of the Hilbert scheme of points in the plane developed by Haiman.
+            </div>
+        </div>
+    </div>
+    
+    <div class="count">
+        生成日時: 2026-11-18 17:53:00
+    </div>
+    
+    <script>
+        // タイトル一覧のチェックボックスと詳細のチェックボックスを同期
+        function syncTitleCheckbox(checkbox) {
+            const paperId = checkbox.getAttribute('data-paper-id');
+            const titleCheckbox = document.querySelector(`.title-checkbox[data-paper-id="${paperId}"]`);
+            if (titleCheckbox) {
+                titleCheckbox.checked = checkbox.checked;
+            }
+        }
+        
+        // タイトル一覧のチェックボックスをクリックしたときの処理
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleCheckboxes = document.querySelectorAll('.title-checkbox');
+            titleCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const paperId = this.getAttribute('data-paper-id');
+                    const paperCheckbox = document.querySelector(`.paper-checkbox[data-paper-id="${paperId}"]`);
+                    if (paperCheckbox) {
+                        paperCheckbox.checked = this.checked;
+                        updateSelectedCount();
+                        // 選択のみ表示モードの場合、表示を更新
+                        if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                            showSelectedOnly();
+                        }
+                    }
+                });
+            });
+            
+            // 初期状態では全て表示
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+        });
+        
+        // 選択された論文数を更新
+        function updateSelectedCount() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const count = checkedBoxes.length;
+            document.getElementById('selectedCount').textContent = count + '件選択中';
+        }
+        
+        // 全て選択
+        function selectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = true);
+            updateSelectedCount();
+        }
+        
+        // 全て解除
+        function deselectAll() {
+            document.querySelectorAll('.paper-checkbox, .title-checkbox').forEach(cb => cb.checked = false);
+            updateSelectedCount();
+        }
+        
+        // 全て表示
+        function showAll() {
+            document.querySelectorAll('.paper').forEach(paper => {
+                paper.classList.remove('hidden');
+            });
+            document.getElementById('showAllButton').style.backgroundColor = '#2980b9';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#3498db';
+        }
+        
+        // 選択したもののみ表示
+        function showSelectedOnly() {
+            const checkedBoxes = document.querySelectorAll('.paper-checkbox:checked');
+            const checkedIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-paper-id'));
+            
+            if (checkedIds.length === 0) {
+                alert('選択した論文がありません');
+                return;
+            }
+            
+            document.querySelectorAll('.paper').forEach(paper => {
+                const paperId = paper.getAttribute('id');
+                if (checkedIds.includes(paperId)) {
+                    paper.classList.remove('hidden');
+                } else {
+                    paper.classList.add('hidden');
+                }
+            });
+            
+            document.getElementById('showAllButton').style.backgroundColor = '#3498db';
+            document.getElementById('showSelectedButton').style.backgroundColor = '#2980b9';
+        }
+        
+        // チェックボックス変更時に表示を更新
+        document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                updateSelectedCount();
+                // 選択のみ表示モードの場合、表示を更新
+                if (document.getElementById('showSelectedButton').style.backgroundColor === 'rgb(41, 128, 185)') {
+                    showSelectedOnly();
+                }
+            });
+        });
+        
+        // 初期化
+        updateSelectedCount();
+    </script>
+</body>
+</html>
